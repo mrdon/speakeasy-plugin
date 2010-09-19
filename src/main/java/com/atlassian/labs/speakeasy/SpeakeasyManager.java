@@ -1,0 +1,214 @@
+package com.atlassian.labs.speakeasy;
+
+import com.atlassian.plugin.ModuleDescriptor;
+import com.atlassian.plugin.Plugin;
+import com.atlassian.plugin.PluginAccessor;
+import com.atlassian.plugin.event.PluginEventListener;
+import com.atlassian.plugin.event.PluginEventManager;
+import com.atlassian.plugin.event.events.PluginDisabledEvent;
+import com.atlassian.plugin.event.events.PluginEnabledEvent;
+import com.atlassian.plugin.osgi.factory.OsgiPlugin;
+import com.atlassian.sal.api.pluginsettings.PluginSettings;
+import com.atlassian.sal.api.pluginsettings.PluginSettingsFactory;
+import org.osgi.framework.Bundle;
+import org.osgi.framework.BundleContext;
+import org.osgi.framework.ServiceReference;
+import org.osgi.framework.ServiceRegistration;
+import org.springframework.beans.factory.DisposableBean;
+import org.springframework.osgi.context.BundleContextAware;
+
+import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
+
+/**
+ *
+ */
+public class SpeakeasyManager implements BundleContextAware, DisposableBean
+{
+    private final PluginAccessor pluginAccessor;
+    private volatile BundleContext bundleContext;
+    private final PluginSettings pluginSettings;
+
+    private final Map<String, ServiceRegistration> serviceRegistrations;
+    private final PluginEventManager pluginEventManager;
+
+    public SpeakeasyManager(PluginAccessor pluginAccessor, PluginSettingsFactory pluginSettingsFactory, PluginEventManager pluginEventManager)
+    {
+        this.pluginAccessor = pluginAccessor;
+        this.pluginSettings = pluginSettingsFactory.createGlobalSettings();
+        this.serviceRegistrations = new ConcurrentHashMap<String, ServiceRegistration>();
+        this.pluginEventManager = pluginEventManager;
+        pluginEventManager.register(this);
+    }
+
+    @PluginEventListener
+    public void onPluginEnabled(PluginEnabledEvent event)
+    {
+        String key = createAccessKey(event.getPlugin().getKey());
+        List<String> accessList = getAccessList(key);
+        for (ModuleDescriptor descriptor : event.getPlugin().getModuleDescriptors())
+        {
+            if (descriptor instanceof DescriptorGenerator)
+            {
+                for (String user : accessList)
+                {
+                    addUserModuleDescriptor(descriptor.getPluginKey(), descriptor.getKey(), user);
+                }
+            }
+        }
+    }
+
+    @PluginEventListener
+    public void onPluginDisabled(PluginDisabledEvent event)
+    {
+        String key = createAccessKey(event.getPlugin().getKey());
+        List<String> accessList = getAccessList(key);
+        for (ModuleDescriptor descriptor : event.getPlugin().getModuleDescriptors())
+        {
+            if (descriptor instanceof DescriptorGenerator)
+            {
+                for (String user : accessList)
+                {
+                    removeUserModuleDescriptor(descriptor.getPluginKey(), descriptor.getKey(), user);
+                }
+            }
+        }
+    }
+
+    public Map<Plugin, List<String>> getUserAccessList()
+    {
+        Map<Plugin, List<String>> result = new LinkedHashMap<Plugin, List<String>>();
+        for (Plugin plugin : pluginAccessor.getPlugins())
+        {
+            String key = createAccessKey(plugin.getKey());
+            List<String> accessList = getAccessList(key);
+            for (ModuleDescriptor moduleDescriptor : plugin.getModuleDescriptors())
+            {
+                if (moduleDescriptor instanceof DescriptorGenerator)
+                {
+                    result.put(plugin, accessList);
+                    break;
+                }
+            }
+        }
+        return result;
+    }
+
+    public void allowUserAccess(String pluginKey, String user)
+    {
+        String key = createAccessKey(pluginKey);
+        List<String> accessList = getAccessList(key);
+        if (!accessList.contains(user))
+        {
+            accessList.add(user);
+            pluginSettings.put(key, accessList);
+            for (ModuleDescriptor moduleDescriptor : pluginAccessor.getPlugin(pluginKey).getModuleDescriptors())
+            {
+                if (moduleDescriptor instanceof DescriptorGenerator)
+                {
+                    addUserModuleDescriptor(pluginKey, moduleDescriptor.getKey(), user);
+                }
+            }
+        }
+
+    }
+
+    private List<String> getAccessList(String key)
+    {
+        List<String> accessList = (List<String>) pluginSettings.get(key);
+        if (accessList == null)
+        {
+            accessList = new ArrayList<String>();
+        }
+        return accessList;
+    }
+
+    public void disallowUserAccess(String pluginKey, String user)
+    {
+        String key = createAccessKey(pluginKey);
+        List<String> accessList = getAccessList(key);
+        if (accessList.contains(user))
+        {
+            accessList.remove(user);
+            pluginSettings.put(key, accessList);
+
+            for (ModuleDescriptor moduleDescriptor : pluginAccessor.getPlugin(pluginKey).getModuleDescriptors())
+            {
+                if (moduleDescriptor instanceof DescriptorGenerator)
+                {
+                    removeUserModuleDescriptor(pluginKey, moduleDescriptor.getKey(), user);
+                }
+            }
+        }
+    }
+
+
+    private String createAccessKey(String pluginKey)
+    {
+        return "speakeasy-" + pluginKey;
+    }
+
+    private void addUserModuleDescriptor(String pluginKey, String moduleKey, String user)
+    {
+        Plugin plugin = pluginAccessor.getPlugin(pluginKey);
+        ModuleDescriptor descriptor = plugin.getModuleDescriptor(moduleKey);
+        if (descriptor instanceof DescriptorGenerator)
+        {
+            ModuleDescriptor addedDescriptor = ((DescriptorGenerator)descriptor).getDescriptorToExposeForUser(user);
+            for (Bundle bundle : bundleContext.getBundles())
+            {
+                String maybePluginKey = (String) bundle.getHeaders().get(OsgiPlugin.ATLASSIAN_PLUGIN_KEY);
+                if (plugin.getKey().equals(maybePluginKey) && !serviceRegistrations.containsKey(getServiceRegKey(descriptor, user)))
+                {
+                    Hashtable props = new Hashtable();
+                    props.put("moduleKey", moduleKey);
+                    serviceRegistrations.put(getServiceRegKey(descriptor, user), bundle.getBundleContext().registerService(ModuleDescriptor.class.getName(), addedDescriptor, props));
+                    break;
+                }
+            }
+        }
+    }
+
+    private String getServiceRegKey(ModuleDescriptor descriptor, String user)
+    {
+        return descriptor.getCompleteKey() + "-" + user;
+    }
+
+    private void removeUserModuleDescriptor(String pluginKey, String moduleKey, String user)
+    {
+        Plugin plugin = pluginAccessor.getPlugin(pluginKey);
+        ModuleDescriptor descriptor = plugin.getModuleDescriptor(moduleKey);
+        if (descriptor instanceof DescriptorGenerator)
+        {
+            for (Bundle bundle : bundleContext.getBundles())
+            {
+                String maybePluginKey = (String) bundle.getHeaders().get(OsgiPlugin.ATLASSIAN_PLUGIN_KEY);
+                if (plugin.getKey().equals(maybePluginKey))
+                {
+                    for (ServiceReference ref : bundle.getRegisteredServices())
+                    {
+                        if (moduleKey.equals(ref.getProperty("moduleKey")))
+                        {
+                            ServiceRegistration rego = serviceRegistrations.remove(getServiceRegKey(descriptor, user));
+                            if (rego != null)
+                            {
+                                rego.unregister();
+                            }
+                        }
+                    }
+                    break;
+                }
+            }
+        }
+    }
+
+    public void setBundleContext(BundleContext bundleContext)
+    {
+        this.bundleContext = bundleContext;
+    }
+
+    public void destroy() throws Exception
+    {
+        pluginEventManager.unregister(this);
+    }
+}

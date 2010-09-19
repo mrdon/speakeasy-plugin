@@ -1,0 +1,26 @@
+<atlassian-plugin key="${project.groupId}.${project.artifactId}" name="${project.name}" plugins-version="2">
+    <plugin-info>
+        <description>${project.description}</description>
+        <version>${project.version}</version>
+        <vendor name="${project.organization.name}" url="${project.organization.url}" />
+    </plugin-info>
+
+    <servlet name="speakeasy-plugin" class="com.atlassian.labs.speakeasy.SpeakeasyManagementServlet" key="test">
+        <url-pattern>/test</url-pattern>
+    </servlet>
+
+    <web-resource-transformer key="userTransformer" class="com.atlassian.labs.speakeasy.UserScopedTransformer" />
+    
+    <component key="speakeasyManager" class="com.atlassian.labs.speakeasy.SpeakeasyManager" />
+    
+    <component-import key="userManager" interface="com.atlassian.sal.api.user.UserManager" />
+    <component-import key="pluginSettings" interface="com.atlassian.sal.api.pluginsettings.PluginSettingsFactory" />
+    <component-import key="templateRenderer" interface="com.atlassian.templaterenderer.TemplateRenderer" />
+
+    <module-type key="scoped-web-resource" class="com.atlassian.labs.speakeasy.SpeakeasyWebResourceModuleDescriptor" />
+
+    <scoped-web-resource key="testScoping">
+        <resource type="download" name="test.js" location="test.js" />
+        <context>atl.admin</context>
+    </scoped-web-resource>
+</atlassian-plugin>

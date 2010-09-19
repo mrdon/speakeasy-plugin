@@ -1,0 +1,28 @@
+<html>
+<head>
+    <meta name="decorator" content="atl.admin"/>
+    <title>Scoped Plugins</title>
+</head>
+<body>
+<h1>Scoped Plugins</h1>
+<div>
+    $msg
+</div>
+
+
+#foreach ($pluginEntry in $accessList.entrySet())
+<h3>$pluginEntry.key.name</h3>
+<ul>
+    #foreach ($name in $pluginEntry.value)
+        <li><a href="?action=remove&amp;user=$name&amp;plugin=$pluginEntry.key.key">[x]</a> $name</li>
+    #end
+</ul>
+<form action="">
+    <input type="hidden" name="plugin" value="$pluginEntry.key.key" />
+    <input type="hidden" name="action" value="add" />
+    Add user: <input type="text" name="user" />
+    <input type="submit" value="Add"/>
+</form>
+#end
+</body>
+</html>
