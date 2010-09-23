@@ -1,0 +1,10 @@
+<atlassian-plugin key="plugin-tests" plugins-version="2">
+    <plugin-info>
+        <version>1</version>
+    </plugin-info>
+
+    <scoped-web-resource key="testScoping">
+        <resource type="download" name="test.js" location="test.js" />
+        <context>atl.admin</context>
+    </scoped-web-resource>
+</atlassian-plugin>

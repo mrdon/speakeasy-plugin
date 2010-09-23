@@ -7,6 +7,7 @@ import com.atlassian.plugin.event.PluginEventListener;
 import com.atlassian.plugin.event.PluginEventManager;
 import com.atlassian.plugin.event.events.PluginDisabledEvent;
 import com.atlassian.plugin.event.events.PluginEnabledEvent;
+import com.atlassian.plugin.event.events.PluginModuleAvailableEvent;
 import com.atlassian.plugin.osgi.factory.OsgiPlugin;
 import com.atlassian.sal.api.pluginsettings.PluginSettings;
 import com.atlassian.sal.api.pluginsettings.PluginSettingsFactory;
@@ -41,38 +42,29 @@ public class SpeakeasyManager implements BundleContextAware, DisposableBean
         pluginEventManager.register(this);
     }
 
-    @PluginEventListener
-    public void onPluginEnabled(PluginEnabledEvent event)
+    private void registerDescriptor(List<String> accessList, ModuleDescriptor descriptor)
     {
-        String key = createAccessKey(event.getPlugin().getKey());
-        List<String> accessList = getAccessList(key);
-        for (ModuleDescriptor descriptor : event.getPlugin().getModuleDescriptors())
+        if (descriptor instanceof DescriptorGenerator)
         {
-            if (descriptor instanceof DescriptorGenerator)
+            for (String user : accessList)
             {
-                for (String user : accessList)
-                {
-                    addUserModuleDescriptor(descriptor.getPluginKey(), descriptor.getKey(), user);
-                }
+                addUserModuleDescriptor(descriptor.getPluginKey(), descriptor.getKey(), user);
             }
         }
     }
 
     @PluginEventListener
+    public void onPluginModuleAvailable(PluginModuleAvailableEvent event)
+    {
+        String key = createAccessKey(event.getModule().getPluginKey());
+        List<String> accessList = getAccessList(key);
+        registerDescriptor(accessList, event.getModule());
+    }
+
+    @PluginEventListener
     public void onPluginDisabled(PluginDisabledEvent event)
     {
-        String key = createAccessKey(event.getPlugin().getKey());
-        List<String> accessList = getAccessList(key);
-        for (ModuleDescriptor descriptor : event.getPlugin().getModuleDescriptors())
-        {
-            if (descriptor instanceof DescriptorGenerator)
-            {
-                for (String user : accessList)
-                {
-                    removeUserModuleDescriptor(descriptor.getPluginKey(), descriptor.getKey(), user);
-                }
-            }
-        }
+        unregisterDescriptorsForPlugin(event.getPlugin());
     }
 
     public Map<Plugin, List<String>> getUserAccessList()
@@ -134,9 +126,9 @@ public class SpeakeasyManager implements BundleContextAware, DisposableBean
 
             for (ModuleDescriptor moduleDescriptor : pluginAccessor.getPlugin(pluginKey).getModuleDescriptors())
             {
-                if (moduleDescriptor instanceof DescriptorGenerator)
+                if (serviceRegistrations.containsKey(moduleDescriptor.getCompleteKey()))
                 {
-                    removeUserModuleDescriptor(pluginKey, moduleDescriptor.getKey(), user);
+                    removeUserModuleDescriptor(moduleDescriptor);
                 }
             }
         }
@@ -158,47 +150,22 @@ public class SpeakeasyManager implements BundleContextAware, DisposableBean
             for (Bundle bundle : bundleContext.getBundles())
             {
                 String maybePluginKey = (String) bundle.getHeaders().get(OsgiPlugin.ATLASSIAN_PLUGIN_KEY);
-                if (plugin.getKey().equals(maybePluginKey) && !serviceRegistrations.containsKey(getServiceRegKey(descriptor, user)))
+                if (plugin.getKey().equals(maybePluginKey) && !serviceRegistrations.containsKey(addedDescriptor.getCompleteKey()))
                 {
                     Hashtable props = new Hashtable();
                     props.put("moduleKey", moduleKey);
-                    serviceRegistrations.put(getServiceRegKey(descriptor, user), bundle.getBundleContext().registerService(ModuleDescriptor.class.getName(), addedDescriptor, props));
+                    serviceRegistrations.put(addedDescriptor.getCompleteKey(), bundle.getBundleContext().registerService(ModuleDescriptor.class.getName(), addedDescriptor, props));
                     break;
                 }
             }
         }
     }
 
-    private String getServiceRegKey(ModuleDescriptor descriptor, String user)
+    private void removeUserModuleDescriptor(ModuleDescriptor dynamicDescriptor)
     {
-        return descriptor.getCompleteKey() + "-" + user;
-    }
-
-    private void removeUserModuleDescriptor(String pluginKey, String moduleKey, String user)
-    {
-        Plugin plugin = pluginAccessor.getPlugin(pluginKey);
-        ModuleDescriptor descriptor = plugin.getModuleDescriptor(moduleKey);
-        if (descriptor instanceof DescriptorGenerator)
+        if (serviceRegistrations.containsKey(dynamicDescriptor.getCompleteKey()))
         {
-            for (Bundle bundle : bundleContext.getBundles())
-            {
-                String maybePluginKey = (String) bundle.getHeaders().get(OsgiPlugin.ATLASSIAN_PLUGIN_KEY);
-                if (plugin.getKey().equals(maybePluginKey))
-                {
-                    for (ServiceReference ref : bundle.getRegisteredServices())
-                    {
-                        if (moduleKey.equals(ref.getProperty("moduleKey")))
-                        {
-                            ServiceRegistration rego = serviceRegistrations.remove(getServiceRegKey(descriptor, user));
-                            if (rego != null)
-                            {
-                                rego.unregister();
-                            }
-                        }
-                    }
-                    break;
-                }
-            }
+            serviceRegistrations.remove(dynamicDescriptor.getCompleteKey()).unregister();
         }
     }
 
@@ -210,5 +177,35 @@ public class SpeakeasyManager implements BundleContextAware, DisposableBean
     public void destroy() throws Exception
     {
         pluginEventManager.unregister(this);
+        for (Plugin plugin : pluginAccessor.getEnabledPlugins())
+        {
+            unregisterDescriptorsForPlugin(plugin);
+        }
+    }
+
+    private void unregisterDescriptorsForPlugin(Plugin plugin)
+    {
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        
+        for (ModuleDescriptor descriptor : plugin.getModuleDescriptors())
+        {
+            if (serviceRegistrations.containsKey(descriptor.getCompleteKey()))
+            {
+                removeUserModuleDescriptor(descriptor);
+            }
+        }
     }
 }
