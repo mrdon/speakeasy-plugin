@@ -97,7 +97,10 @@
                 <configuration>
                     <productVersion>${refapp.version}</productVersion>
                     <instructions>
-                        <Import-Package>com.atlassian.confluence.plugin.descriptor.web.model;resolution:=optional,*;resolution:=optional</Import-Package>
+                        <Import-Package>
+                            com.atlassian.confluence.plugin.descriptor.web.descriptors;resolution:=optional,
+                            com.atlassian.confluence.plugin.webresource;resolution:=optional,
+                            *;resolution:=optional</Import-Package>
                     </instructions>
                 </configuration>
             </plugin>

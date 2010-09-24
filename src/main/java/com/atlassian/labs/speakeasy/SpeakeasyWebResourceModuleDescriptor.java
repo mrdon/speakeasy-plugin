@@ -3,6 +3,8 @@ package com.atlassian.labs.speakeasy;
 import com.atlassian.plugin.Plugin;
 import com.atlassian.plugin.PluginParseException;
 import com.atlassian.plugin.descriptors.AbstractModuleDescriptor;
+import com.atlassian.plugin.web.descriptors.DefaultWebItemModuleDescriptor;
+import com.atlassian.plugin.web.descriptors.WebItemModuleDescriptor;
 import com.atlassian.plugin.webresource.WebResourceModuleDescriptor;
 import org.dom4j.DocumentFactory;
 import org.dom4j.Element;
@@ -29,7 +31,19 @@ public class SpeakeasyWebResourceModuleDescriptor extends AbstractModuleDescript
 
     public WebResourceModuleDescriptor getDescriptorToExposeForUser(String user)
     {
-        WebResourceModuleDescriptor descriptor = new WebResourceModuleDescriptor();
+        WebResourceModuleDescriptor descriptor;
+        try
+        {
+            Class cls = getClass().getClassLoader().loadClass("com.atlassian.confluence.plugin.webresource.ConfluenceWebResourceModuleDescriptor");
+            descriptor = (WebResourceModuleDescriptor) cls.getConstructor().newInstance();
+        }
+        catch (Exception e)
+        {
+            // not confluence so ignore
+
+            descriptor = new WebResourceModuleDescriptor();
+        }
+
         Element userElement = (Element) originalElement.clone();
         userElement.addAttribute("key", userElement.attributeValue("key") + "-for-user-" + user);
         Element transElement = userElement.addElement("transformation");

@@ -5,6 +5,7 @@ import com.atlassian.labs.speakeasy.UserScopedCondition;
 import com.atlassian.plugin.Plugin;
 import com.atlassian.plugin.PluginParseException;
 import com.atlassian.plugin.descriptors.AbstractModuleDescriptor;
+import com.atlassian.plugin.impl.AbstractDelegatingPlugin;
 import com.atlassian.plugin.web.WebInterfaceManager;
 import com.atlassian.plugin.web.descriptors.DefaultWebItemModuleDescriptor;
 import com.atlassian.plugin.web.descriptors.WebItemModuleDescriptor;
@@ -42,22 +43,19 @@ public class SpeakeasyWebItemModuleDescriptor extends AbstractModuleDescriptor<V
 
     public WebItemModuleDescriptor getDescriptorToExposeForUser(String user)
     {
-        WebItemModuleDescriptor descriptor = new DefaultWebItemModuleDescriptor(new SpeakeasyWebInterfaceManager(webInterfaceManager, userManager))
+        WebItemModuleDescriptor descriptor;
+        try
         {
-            public WebLabel getLabel()
-            {
-                try
-                {
-                    Class cls = getClass().getClassLoader().loadClass("com.atlassian.confluence.plugin.descriptor.web.model.ConfluenceWebLabel");
-                    return (WebLabel) cls.getConstructor(WebLabel.class).newInstance(getWebLabel());
-                }
-                catch (Exception e)
-                {
-                    // not confluence so ignore
-                }
-                return getWebLabel();
-            }
-        };
+            Class cls = getClass().getClassLoader().loadClass("com.atlassian.confluence.plugin.descriptor.web.descriptors.ConfluenceWebItemModuleDescriptor");
+            descriptor = (WebItemModuleDescriptor) cls.getConstructor().newInstance();
+        }
+        catch (Exception e)
+        {
+            // not confluence so ignore
+
+            descriptor = new DefaultWebItemModuleDescriptor(webInterfaceManager);
+        }
+
         Element userElement = (Element) originalElement.clone();
         userElement.addAttribute("key", userElement.attributeValue("key") + "-for-user-" + user);
 
@@ -67,7 +65,21 @@ public class SpeakeasyWebItemModuleDescriptor extends AbstractModuleDescriptor<V
         paramElement.addAttribute("name", "user");
         paramElement.setText(user);
 
-        descriptor.init(getPlugin(), userElement);
+        descriptor.init(new AbstractDelegatingPlugin(getPlugin())
+        {
+            @Override
+            public <T> Class<T> loadClass(String clazz, Class<?> callingClass) throws ClassNotFoundException
+            {
+                try
+                {
+                    return super.loadClass(clazz, callingClass);
+                }
+                catch (ClassNotFoundException ex)
+                {
+                    return (Class<T>) getClass().getClassLoader().loadClass(clazz);
+                }
+            }
+        }, userElement);
         return descriptor;
     }
 }

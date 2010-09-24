@@ -3,12 +3,18 @@ package com.atlassian.labs.speakeasy;
 import com.atlassian.plugin.ModuleDescriptor;
 import com.atlassian.plugin.Plugin;
 import com.atlassian.plugin.PluginAccessor;
+import com.atlassian.plugin.descriptors.UnrecognisedModuleDescriptor;
 import com.atlassian.plugin.event.PluginEventListener;
 import com.atlassian.plugin.event.PluginEventManager;
 import com.atlassian.plugin.event.events.PluginDisabledEvent;
 import com.atlassian.plugin.event.events.PluginEnabledEvent;
 import com.atlassian.plugin.event.events.PluginModuleAvailableEvent;
+import com.atlassian.plugin.event.events.PluginModuleEnabledEvent;
+import com.atlassian.plugin.hostcontainer.HostContainer;
+import com.atlassian.plugin.osgi.external.ListableModuleDescriptorFactory;
+import com.atlassian.plugin.osgi.external.SingleModuleDescriptorFactory;
 import com.atlassian.plugin.osgi.factory.OsgiPlugin;
+import com.atlassian.plugin.webresource.transformer.WebResourceTransformerModuleDescriptor;
 import com.atlassian.sal.api.pluginsettings.PluginSettings;
 import com.atlassian.sal.api.pluginsettings.PluginSettingsFactory;
 import org.osgi.framework.Bundle;
@@ -27,15 +33,18 @@ import java.util.concurrent.ConcurrentHashMap;
 public class SpeakeasyManager implements BundleContextAware, DisposableBean
 {
     private final PluginAccessor pluginAccessor;
+    private final HostContainer hostContainer;
     private volatile BundleContext bundleContext;
     private final PluginSettings pluginSettings;
 
     private final Map<String, ServiceRegistration> serviceRegistrations;
     private final PluginEventManager pluginEventManager;
+    private ServiceRegistration userTransformerService;
 
-    public SpeakeasyManager(PluginAccessor pluginAccessor, PluginSettingsFactory pluginSettingsFactory, PluginEventManager pluginEventManager)
+    public SpeakeasyManager(PluginAccessor pluginAccessor, PluginSettingsFactory pluginSettingsFactory, PluginEventManager pluginEventManager, HostContainer hostContainer)
     {
         this.pluginAccessor = pluginAccessor;
+        this.hostContainer = hostContainer;
         this.pluginSettings = pluginSettingsFactory.createGlobalSettings();
         this.serviceRegistrations = new ConcurrentHashMap<String, ServiceRegistration>();
         this.pluginEventManager = pluginEventManager;
@@ -54,7 +63,7 @@ public class SpeakeasyManager implements BundleContextAware, DisposableBean
     }
 
     @PluginEventListener
-    public void onPluginModuleAvailable(PluginModuleAvailableEvent event)
+    public void onPluginModuleEnabled(PluginModuleEnabledEvent event)
     {
         String key = createAccessKey(event.getModule().getPluginKey());
         List<String> accessList = getAccessList(key);
@@ -172,6 +181,12 @@ public class SpeakeasyManager implements BundleContextAware, DisposableBean
     public void setBundleContext(BundleContext bundleContext)
     {
         this.bundleContext = bundleContext;
+        String pluginKey = (String) bundleContext.getBundle().getHeaders().get(OsgiPlugin.ATLASSIAN_PLUGIN_KEY);
+        Plugin self = pluginAccessor.getPlugin(pluginKey);
+        if (self.getModuleDescriptor("userTransformer") instanceof UnrecognisedModuleDescriptor)
+        {
+            userTransformerService = bundleContext.registerService(ListableModuleDescriptorFactory.class.getName(), new SingleModuleDescriptorFactory(hostContainer, "web-resource-transformer", WebResourceTransformerModuleDescriptor.class), null);
+        }
     }
 
     public void destroy() throws Exception
@@ -181,30 +196,19 @@ public class SpeakeasyManager implements BundleContextAware, DisposableBean
         {
             unregisterDescriptorsForPlugin(plugin);
         }
+        if (userTransformerService != null)
+        {
+            userTransformerService.unregister();
+        }
     }
 
     private void unregisterDescriptorsForPlugin(Plugin plugin)
     {
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-        
-        for (ModuleDescriptor descriptor : plugin.getModuleDescriptors())
+        for (String descriptorCompleteKey : new HashSet<String>(serviceRegistrations.keySet()))
         {
-            if (serviceRegistrations.containsKey(descriptor.getCompleteKey()))
+            if (descriptorCompleteKey.startsWith(plugin.getKey()))
             {
-                removeUserModuleDescriptor(descriptor);
+                serviceRegistrations.remove(descriptorCompleteKey);
             }
         }
     }

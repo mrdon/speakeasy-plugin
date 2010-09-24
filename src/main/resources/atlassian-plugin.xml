@@ -12,6 +12,7 @@
     <web-resource-transformer key="userTransformer" class="com.atlassian.labs.speakeasy.UserScopedTransformer" />
     
     <component key="speakeasyManager" class="com.atlassian.labs.speakeasy.SpeakeasyManager" />
+    <component key="classPrefixModuleFactory" class="com.atlassian.plugin.module.ClassPrefixModuleFactory" />
     
     <component-import key="userManager" interface="com.atlassian.sal.api.user.UserManager" />
     <component-import key="pluginSettings" interface="com.atlassian.sal.api.pluginsettings.PluginSettingsFactory" />
