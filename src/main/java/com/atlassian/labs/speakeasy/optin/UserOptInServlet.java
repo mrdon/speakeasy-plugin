@@ -33,30 +33,46 @@ public class UserOptInServlet extends HttpServlet
     {
         webResourceManager.requireResource("com.atlassian.auiplugin:ajs");
         String user = userManager.getRemoteUsername(req);
-        if (!userManager.isAdmin(user))
+        if (user == null)
         {
-            res.sendError(403, "Unauthorized - must be admin");
+            res.sendError(403, "Unauthorized - must be a valid user");
+            return;
         }
         String msg = "";
-        String plugin = req.getParameter("plugin");
         String action = req.getParameter("action");
         if ("add".equals(action))
         {
-            speakeasyManager.allowUserAccess(plugin, user);
-            msg = "User " + user + " added to plugin " + plugin + " access list";
+            msg = enablePluginAccess(req, user);
         }
         else if ("remove".equals(action))
         {
-            speakeasyManager.disallowUserAccess(plugin, user);
-            msg = "User " + user + " removed from plugin " + plugin + " access list";
+            msg = disablePluginAccess(req, user);
         }
 
-        render("templates/user-optin.vm", ImmutableMap.<String,Object>builder().
-                put("accessList", speakeasyManager.getUserAccessList()).
-                put("user", user).
-                put("msg", msg).
-                build(),
-                res);
+//        render("templates/user-optin.vm", ImmutableMap.<String,Object>builder().
+//                put("accessList", speakeasyManager.getUserAccessList()).
+//                put("user", user).
+//                put("msg", msg).
+//                build(),
+//                res);
+    }
+
+    private String disablePluginAccess(HttpServletRequest req, String user)
+    {
+        String plugin = req.getParameter("plugin");
+        String msg;
+        speakeasyManager.disallowUserAccess(plugin, user);
+        msg = "User " + user + " removed from plugin " + plugin + " access list";
+        return msg;
+    }
+
+    private String enablePluginAccess(HttpServletRequest req, String user)
+    {
+        String plugin = req.getParameter("plugin");
+        String msg;
+        speakeasyManager.allowUserAccess(plugin, user);
+        msg = "User " + user + " added to plugin " + plugin + " access list";
+        return msg;
     }
 
     protected void render(final String template, final Map<String, Object> renderContext,

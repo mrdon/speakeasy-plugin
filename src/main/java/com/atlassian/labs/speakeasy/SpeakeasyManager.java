@@ -1,5 +1,7 @@
 package com.atlassian.labs.speakeasy;
 
+import com.atlassian.labs.speakeasy.model.RemotePlugin;
+import com.atlassian.labs.speakeasy.model.UserPlugins;
 import com.atlassian.plugin.ModuleDescriptor;
 import com.atlassian.plugin.Plugin;
 import com.atlassian.plugin.PluginAccessor;
@@ -76,23 +78,27 @@ public class SpeakeasyManager implements BundleContextAware, DisposableBean
         unregisterDescriptorsForPlugin(event.getPlugin());
     }
 
-    public Map<Plugin, List<String>> getUserAccessList()
+    public UserPlugins getUserAccessList(String userName)
     {
-        Map<Plugin, List<String>> result = new LinkedHashMap<Plugin, List<String>>();
+        List<RemotePlugin> plugins = new ArrayList<RemotePlugin>();
         for (Plugin plugin : pluginAccessor.getPlugins())
         {
             String key = createAccessKey(plugin.getKey());
+            RemotePlugin remotePlugin = new RemotePlugin(plugin);
             List<String> accessList = getAccessList(key);
             for (ModuleDescriptor moduleDescriptor : plugin.getModuleDescriptors())
             {
                 if (moduleDescriptor instanceof DescriptorGenerator)
                 {
-                    result.put(plugin, accessList);
+                    remotePlugin.setEnabled(accessList.contains(userName));
+                    plugins.add(remotePlugin);
                     break;
                 }
             }
+            
+
         }
-        return result;
+        return new UserPlugins(plugins);
     }
 
     public void allowUserAccess(String pluginKey, String user)

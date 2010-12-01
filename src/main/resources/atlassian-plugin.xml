@@ -10,13 +10,19 @@
     </servlet>
 
     <web-resource-transformer key="userTransformer" class="com.atlassian.labs.speakeasy.UserScopedTransformer" />
+
+    <rest key="rest" path="/speakeasy" version="1" />
     
     <component key="speakeasyManager" class="com.atlassian.labs.speakeasy.SpeakeasyManager" />
+    <component key="pluginManager" class="com.atlassian.labs.speakeasy.install.PluginManager" />
     <component key="classPrefixModuleFactory" class="com.atlassian.plugin.module.ClassPrefixModuleFactory" />
     
     <component-import key="userManager" interface="com.atlassian.sal.api.user.UserManager" />
     <component-import key="pluginSettings" interface="com.atlassian.sal.api.pluginsettings.PluginSettingsFactory" />
     <component-import key="templateRenderer" interface="com.atlassian.templaterenderer.TemplateRenderer" />
+
+    <component-import key="pluginController" interface="com.atlassian.plugin.PluginController" />
+    <component-import key="pluginAccessor" interface="com.atlassian.plugin.PluginAccessor" />
 
     <module-type key="scoped-web-resource" class="com.atlassian.labs.speakeasy.SpeakeasyWebResourceModuleDescriptor" />
 

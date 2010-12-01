@@ -27,7 +27,7 @@ public class SpeakeasyManagementServlet extends HttpServlet
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse res) throws ServletException, IOException
     {
-        if (!userManager.isAdmin(userManager.getRemoteUsername(req)))
+        /*if (!userManager.isAdmin(userManager.getRemoteUsername(req)))
         {
             res.sendError(403, "Unauthorized - must be admin");
         }
@@ -51,6 +51,7 @@ public class SpeakeasyManagementServlet extends HttpServlet
                 put("msg", msg).
                 build(),
                 res);
+                */
     }
 
     protected void render(final String template, final Map<String, Object> renderContext,
