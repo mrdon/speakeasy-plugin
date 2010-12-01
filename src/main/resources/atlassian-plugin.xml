@@ -5,8 +5,8 @@
         <vendor name="${project.organization.name}" url="${project.organization.url}" />
     </plugin-info>
 
-    <servlet name="speakeasy-plugin" class="com.atlassian.labs.speakeasy.SpeakeasyManagementServlet" key="test">
-        <url-pattern>/speakeasy</url-pattern>
+    <servlet key="optin-userprofile" name="speakeasy-plugin" class="com.atlassian.labs.speakeasy.optin.UserOptInServlet">
+        <url-pattern>/speakeasy/user</url-pattern>
     </servlet>
 
     <web-resource-transformer key="userTransformer" class="com.atlassian.labs.speakeasy.UserScopedTransformer" />
@@ -21,7 +21,15 @@
     <module-type key="scoped-web-resource" class="com.atlassian.labs.speakeasy.SpeakeasyWebResourceModuleDescriptor" />
 
     <module-type key="scoped-web-item" class="com.atlassian.labs.speakeasy.webfragment.SpeakeasyWebItemModuleDescriptor" />
-    
+
+    <!-- user profile links -->
+
+    <web-item key="refimpl-speakeasy-user-menu" name="Speakeasy Plugins" section="system.admin/general"  weight="1" application="refapp">
+        <label>Speakeasy Plugins</label>
+        <link linkId="speakeasy-admin-link">/plugins/servlet/speakeasy/user</link>
+    </web-item>
+
+    <!-- admin links -->
     <web-item key="refimpl-speakeasy-admin-menu" name="Plugin Access" section="system.admin/general"  weight="1" application="refapp">
         <label>Plugin Access</label>
         <link linkId="speakeasy-admin-link">/plugins/servlet/speakeasy</link>

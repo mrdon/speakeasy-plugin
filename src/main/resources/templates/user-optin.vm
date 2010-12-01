@@ -1,0 +1,43 @@
+<html>
+<head>
+    <meta name="decorator" content="atl.userprofile"/>
+    <meta name="tab" content=""/>
+    <title>Speakeasy Plugins</title>
+</head>
+<body>
+<h1>Speakeasy Plugins</h1>
+<div>
+    $msg
+</div>
+
+
+<table class="aui">
+<thead>
+    <tr>
+        <th id="pluginName">Name</th>
+        <th id="pluginDescription">Description</th>
+        <th id="pluginAuthor">Author</th>
+        <th id="pluginVersion">Version</th>
+        <th id="action">Action</th>
+    </tr>
+</thead>
+<tbody>
+    #foreach ($pluginEntry in $accessList.entrySet())
+    <tr>
+        <td headers="pluginName">#if ($pluginEntry.key.name) $pluginEntry.key.name #else $pluginEntry.key.key #end</td>
+        <td headers="pluginDescription">$!pluginEntry.key.pluginInformation.description</td>
+        <td headers="pluginAuthor">$!pluginEntry.key.pluginInformation.vendorName</td>
+        <td headers="pluginVersion">$!pluginEntry.key.pluginInformation.version</td>
+        <td headers="action">
+            #if ($pluginEntry.value.contains($user))
+                <a href="?action=remove&amp;plugin=$pluginEntry.key.key">Disable</a>
+            #else
+                <a href="?action=add&amp;plugin=$pluginEntry.key.key">Enable</a>
+            #end
+        </td>
+    </tr>
+    #end
+</tbody>
+</table>
+</body>
+</html>
