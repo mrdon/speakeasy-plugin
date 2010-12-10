@@ -3,6 +3,7 @@ package com.atlassian.labs.speakeasy.model;
 import com.atlassian.plugin.Plugin;
 
 import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
 /**
@@ -31,8 +32,11 @@ public class RemotePlugin
         key = plugin.getKey();
         name = plugin.getName() != null ? plugin.getName() : plugin.getKey();
         author = plugin.getPluginInformation().getVendorName();
+        description = plugin.getPluginInformation().getDescription();
         version = plugin.getPluginInformation().getVersion();
     }
+
+    @XmlElement
     public String getKey()
     {
         return key;
@@ -43,6 +47,7 @@ public class RemotePlugin
         this.key = key;
     }
 
+    @XmlElement
     public String getVersion()
     {
         return version;
@@ -53,6 +58,7 @@ public class RemotePlugin
         this.version = version;
     }
 
+    @XmlElement
     public String getName()
     {
         return name;
@@ -63,6 +69,7 @@ public class RemotePlugin
         this.name = name;
     }
 
+    @XmlElement
     public String getAuthor()
     {
         return author;
@@ -73,6 +80,7 @@ public class RemotePlugin
         this.author = author;
     }
 
+    @XmlElement
     public String getDescription()
     {
         return description;
@@ -83,6 +91,7 @@ public class RemotePlugin
         this.description = description;
     }
 
+    @XmlElement
     public boolean isEnabled()
     {
         return enabled;

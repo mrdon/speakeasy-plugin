@@ -26,8 +26,12 @@ import org.osgi.framework.ServiceRegistration;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.osgi.context.BundleContextAware;
 
+import java.io.File;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.regex.Pattern;
+
+import static java.util.Arrays.asList;
 
 /**
  *
@@ -218,4 +222,5 @@ public class SpeakeasyManager implements BundleContextAware, DisposableBean
             }
         }
     }
+
 }

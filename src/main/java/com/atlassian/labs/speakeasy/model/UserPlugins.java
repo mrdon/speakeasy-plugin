@@ -21,6 +21,7 @@ public class UserPlugins
         this.plugins = plugins;
     }
 
+    @XmlElement
     public List<RemotePlugin> getPlugins()
     {
         return plugins;

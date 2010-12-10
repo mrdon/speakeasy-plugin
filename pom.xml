@@ -37,6 +37,12 @@
             <scope>test</scope>
         </dependency>
         <dependency>
+            <groupId>commons-fileupload</groupId>
+            <artifactId>commons-fileupload</artifactId>
+            <version>1.2.1</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
             <groupId>javax.servlet</groupId>
             <artifactId>servlet-api</artifactId>
             <version>2.4</version>
@@ -45,6 +51,12 @@
         <dependency>
             <groupId>com.atlassian.plugins.rest</groupId>
             <artifactId>atlassian-rest-common</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.atlassian.velocity.htmlsafe</groupId>
+            <artifactId>velocity-htmlsafe</artifactId>
+            <version>1.0.2</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
@@ -95,14 +107,14 @@
             <artifactId>sal-api</artifactId>
             <scope>provided</scope>
         </dependency>
-  </dependencies>
+    </dependencies>
 
     <build>
         <plugins>
             <plugin>
                 <groupId>com.atlassian.maven.plugins</groupId>
                 <artifactId>maven-refapp-plugin</artifactId>
-                <version>3.3-SNAPSHOT</version>
+                <version>3.3-m5</version>
                 <extensions>true</extensions>
                 <configuration>
                     <productVersion>${platform.version}</productVersion>
@@ -110,7 +122,8 @@
                         <Import-Package>
                             com.atlassian.confluence.plugin.descriptor.web.descriptors;resolution:=optional,
                             com.atlassian.confluence.plugin.webresource;resolution:=optional,
-                            *;resolution:=optional</Import-Package>
+                            *;resolution:=optional
+                        </Import-Package>
                     </instructions>
                 </configuration>
             </plugin>
@@ -123,9 +136,9 @@
             </plugin>
         </plugins>
     </build>
-    
+
     <properties>
-        <platform.version>2.9.0-SNAPSHOT</platform.version>
+        <platform.version>2.9.0-alpha3</platform.version>
     </properties>
 
 </project>

@@ -1,12 +1,22 @@
 package com.atlassian.labs.speakeasy.install;
 
-import com.atlassian.plugin.DefaultPluginArtifactFactory;
-import com.atlassian.plugin.Plugin;
-import com.atlassian.plugin.PluginAccessor;
-import com.atlassian.plugin.PluginController;
+import com.atlassian.plugin.*;
+import org.apache.commons.io.IOUtils;
+import org.dom4j.*;
+import org.dom4j.io.SAXReader;
 
 import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.Collection;
+import java.util.Enumeration;
+import java.util.List;
 import java.util.Set;
+import java.util.regex.Pattern;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipFile;
+
+import static java.util.Arrays.asList;
 
 /**
  *
@@ -17,6 +27,23 @@ public class PluginManager
     private final PluginAccessor pluginAccessor;
     private final DefaultPluginArtifactFactory pluginArtifactFactory;
 
+    private static final Iterable<Pattern> pluginContentsWhitelist = asList(
+            Pattern.compile(".*\\.js"),
+            Pattern.compile(".*\\.gif"),
+            Pattern.compile(".*\\.png"),
+            Pattern.compile(".*/$"),
+            Pattern.compile("META-INF/MANIFEST.MF"),
+            Pattern.compile(".*/pom.xml"),
+            Pattern.compile(".*/pom.properties"),
+            Pattern.compile("META-INF/MANIFEST.MF"),
+            Pattern.compile("atlassian-plugin.xml"));
+
+    private static final Collection<String> pluginModulesWhitelist = asList(
+            "plugin-info",
+            "scoped-web-resource",
+            "scoped-web-item",
+            "scoped-web-section");
+
     public PluginManager(PluginController pluginController, PluginAccessor pluginAccessor)
     {
         this.pluginController = pluginController;
@@ -24,22 +51,125 @@ public class PluginManager
         pluginArtifactFactory = new DefaultPluginArtifactFactory();
     }
 
-    public Plugin install(File plugin)
+    public Plugin install(String user, File plugin) throws PluginOperationFailedException
     {
-        Set<String> pluginKeys = pluginController.installPlugins(pluginArtifactFactory.create(plugin.toURI()));
-        if (pluginKeys.size() == 1)
+        if (!canUserInstallPlugins(user)) {
+            throw new PluginOperationFailedException("User '" + user + "' doesn't have access to install plugins");
+        }
+
+        if (plugin.getName().endsWith(".jar"))
         {
-            return pluginAccessor.getPlugin(pluginKeys.iterator().next());
+            PluginArtifact pluginArtifact = pluginArtifactFactory.create(plugin.toURI());
+            verifyContents(pluginArtifact);
+            verifyModules(pluginArtifact);
+            Set<String> pluginKeys = pluginController.installPlugins(pluginArtifact);
+            if (pluginKeys.size() == 1)
+            {
+                return pluginAccessor.getPlugin(pluginKeys.iterator().next());
+            }
+            else
+            {
+                throw new PluginOperationFailedException("Plugin didn't install correctly");
+            }
         }
         else
         {
-            throw new IllegalArgumentException("RemotePlugin wasn't installed correctly");
+            throw new PluginOperationFailedException("The plugin must be a valid zip file");
         }
     }
 
-    public void uninstall(String pluginKey)
+    private void verifyModules(PluginArtifact plugin) throws PluginOperationFailedException
     {
+        InputStream in = null;
+        try
+        {
+            in = plugin.getResourceAsStream("atlassian-plugin.xml");
+            Document doc = new SAXReader().read(in);
+            for (Element module : ((List<Element>)doc.getRootElement().elements()))
+            {
+                boolean allowed = false;
+                if (pluginModulesWhitelist.contains(module.getName()))
+                {
+                    allowed = true;
+                    break;
+                }
+                if (!allowed)
+                {
+                    throw new PluginOperationFailedException("Invalid plugin module: " + module.getName());
+                }
+            }
+        }
+        catch (final DocumentException e)
+            {
+                throw new PluginOperationFailedException("Cannot parse XML plugin descriptor", e);
+            }
+        finally
+        {
+            IOUtils.closeQuietly(in);
+        }
+    }
+
+    private void verifyContents(PluginArtifact plugin) throws PluginOperationFailedException
+    {
+        ZipFile zip = null;
+        try
+        {
+            zip = new ZipFile(plugin.toFile());
+            for (Enumeration<? extends ZipEntry> e = zip.entries(); e.hasMoreElements();)
+            {
+                ZipEntry entry = e.nextElement();
+                boolean allowed = false;
+                for (Pattern whitelist : pluginContentsWhitelist)
+                {
+                    if (whitelist.matcher(entry.getName()).matches())
+                    {
+                        allowed = true;
+                        break;
+                    }
+                }
+                if (!allowed)
+                {
+                    throw new PluginOperationFailedException("Invalid plugin entry: " + entry.getName());
+                }
+            }
+        }
+        catch (IOException e)
+        {
+            throw new PluginOperationFailedException("Unable to open plugin zip", e);
+        }
+        finally
+        {
+            if (zip != null)
+            {
+                try
+                {
+                    zip.close();
+                }
+                catch (IOException e)
+                {
+                    // ignore
+                }
+            }
+        }
+
+    }
+
+    public void uninstall(String user, String pluginKey) throws PluginOperationFailedException
+    {
+        if (!canUserInstallPlugins(user)) {
+            throw new PluginOperationFailedException("User '" + user + "' doesn't have access to uninstall the '" + pluginKey + "' plugin");
+        }
         Plugin plugin = pluginAccessor.getPlugin(pluginKey);
-        pluginController.uninstall(plugin);
+
+        if (user.equals(plugin.getPluginInformation().getVendorName())) {
+            pluginController.uninstall(plugin);
+        } else {
+            throw new PluginOperationFailedException("User '" + user + "' is not the author of plugin '" + pluginKey + "' and cannot uninstall it");
+        }
+    }
+
+    public boolean canUserInstallPlugins(String user)
+    {
+        return true;
     }
 }

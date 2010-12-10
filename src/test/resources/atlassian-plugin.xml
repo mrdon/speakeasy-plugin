@@ -2,7 +2,7 @@
     <plugin-info>
         <version>1</version>
         <description>Alerts 'loaded' on admin pages</description>
-        <vendor name="Don Brown"/>
+        <vendor name="admin"/>
     </plugin-info>
 
     <scoped-web-resource key="testScoping">

@@ -9,14 +9,24 @@
         <url-pattern>/speakeasy/user</url-pattern>
     </servlet>
 
+    <web-resource key="optin-js">
+        <resource type="download" name="optin.js" location="js/optin.js" />
+        <resource type="download" name="ajaxupload.js" location="js/external/ajaxupload.js" />
+        <resource type="download" name="wait.gif" location="wait.gif" />
+    </web-resource>
+
     <web-resource-transformer key="userTransformer" class="com.atlassian.labs.speakeasy.UserScopedTransformer" />
 
-    <rest key="rest" path="/speakeasy" version="1" />
+    <rest key="rest" path="/speakeasy" version="1">
+        <dispatcher>REQUEST</dispatcher>
+        <dispatcher>INCLUDE</dispatcher>
+    </rest>
     
     <component key="speakeasyManager" class="com.atlassian.labs.speakeasy.SpeakeasyManager" />
     <component key="pluginManager" class="com.atlassian.labs.speakeasy.install.PluginManager" />
     <component key="classPrefixModuleFactory" class="com.atlassian.plugin.module.ClassPrefixModuleFactory" />
-    
+
+    <component-import key="jsonMarshaller" interface="com.atlassian.plugins.rest.common.json.JaxbJsonMarshaller" />
     <component-import key="userManager" interface="com.atlassian.sal.api.user.UserManager" />
     <component-import key="pluginSettings" interface="com.atlassian.sal.api.pluginsettings.PluginSettingsFactory" />
     <component-import key="templateRenderer" interface="com.atlassian.templaterenderer.TemplateRenderer" />

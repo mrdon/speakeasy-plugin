@@ -3,15 +3,44 @@
     <meta name="decorator" content="atl.userprofile"/>
     <meta name="tab" content=""/>
     <title>Speakeasy Plugins</title>
+    <script type="text/javascript">
+        var staticResourcesPrefix = "$staticResourcesPrefix";
+        var contextPath = "$contextPath";
+        var plugins = $plugins.json;
+        var currentUser = "$user";
+    </script>
+    <script type="text/x-template" title="uninstall">
+        <a class="pk_uninstall" href="$contextPath/rest/speakeasy/1/plugins/{key}">
+            Uninstall
+        </a>
+    </script>
+
+    <script type="text/x-template" title="row">
+        <tr data-pluginKey="{key}">
+            <td headers="pluginName">{name}</td>
+            <td headers="pluginDescription">{description}</td>
+            <td headers="pluginAuthor">{author}</td>
+            <td headers="pluginVersion">{version}</td>
+            <td headers="action">
+                <a class="pk_enable_toggle" href="$contextPath/rest/speakeasy/1/user/{key}">
+                    {enableText}
+                </a>
+                {uninstall}
+            </td>
+        </tr>
+    </script>
 </head>
 <body>
 <h1>Speakeasy Plugins</h1>
-<div>
-    $msg
-</div>
+
+<div id="aui-message-bar"> </div>
+
+#if ($installAllowed)
+<button id="plugin_upload_button">Upload a plugin</button>
+#end
 
 <table class="aui">
-<thead>
+<thead id="pluginsTable">
     <tr>
         <th id="pluginName">Name</th>
         <th id="pluginDescription">Description</th>
@@ -21,21 +50,7 @@
     </tr>
 </thead>
 <tbody>
-    #foreach ($pluginEntry in $accessList.entrySet())
-    <tr>
-        <td headers="pluginName">#if ($pluginEntry.key.name) $pluginEntry.key.name #else $pluginEntry.key.key #end</td>
-        <td headers="pluginDescription">$!pluginEntry.key.pluginInformation.description</td>
-        <td headers="pluginAuthor">$!pluginEntry.key.pluginInformation.vendorName</td>
-        <td headers="pluginVersion">$!pluginEntry.key.pluginInformation.version</td>
-        <td headers="action">
-            #if ($pluginEntry.value.contains($user))
-                <a href="?action=remove&amp;plugin=$pluginEntry.key.key">Disable</a>
-            #else
-                <a href="?action=add&amp;plugin=$pluginEntry.key.key">Enable</a>
-            #end
-        </td>
-    </tr>
-    #end
+
 </tbody>
 </table>
 </body>
