@@ -10,6 +10,7 @@ import com.atlassian.sal.api.user.UserManager;
 import com.atlassian.templaterenderer.TemplateRenderer;
 import com.atlassian.templaterenderer.annotations.HtmlSafe;
 import com.google.common.collect.ImmutableMap;
+import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.codehaus.jackson.annotate.JsonGetter;
 
 import javax.servlet.ServletException;
@@ -49,6 +50,10 @@ public class UserOptInServlet extends HttpServlet
         {
             res.sendError(403, "Unauthorized - must be a valid user");
             return;
+        }
+        if (ServletFileUpload.isMultipartContent(req))
+        {
+
         }
 
         final UserPlugins plugins = speakeasyManager.getUserAccessList(user);

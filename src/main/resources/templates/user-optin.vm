@@ -36,11 +36,13 @@
 <div id="aui-message-bar"> </div>
 
 #if ($installAllowed)
-<button id="plugin_upload_button">Upload a plugin</button>
+    <form id="uploadForm" action="$contextPath/rest/speakeasy/1/plugins" enctype="multipart/form-data" method="post">
+        <input id="pluginFile" type="file" name="pluginFile" size="40">
+    </form>
 #end
 
-<table class="aui">
-<thead id="pluginsTable">
+<table class="aui" id="pluginsTable">
+<thead>
     <tr>
         <th id="pluginName">Name</th>
         <th id="pluginDescription">Description</th>
@@ -49,7 +51,7 @@
         <th id="action">Action</th>
     </tr>
 </thead>
-<tbody>
+<tbody id="pluginsTableBody">
 
 </tbody>
 </table>

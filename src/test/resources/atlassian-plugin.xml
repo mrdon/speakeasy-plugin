@@ -1,12 +1,12 @@
 <atlassian-plugin key="plugin-tests" plugins-version="2">
     <plugin-info>
         <version>1</version>
-        <description>Alerts 'loaded' on admin pages</description>
+        <description>Alerts 'loaded' on non-admin pages</description>
         <vendor name="admin"/>
     </plugin-info>
 
     <scoped-web-resource key="testScoping">
         <resource type="download" name="test.js" location="test.js" />
-        <context>atl.admin</context>
+        <context>atl.general</context>
     </scoped-web-resource>
 </atlassian-plugin>

@@ -11,7 +11,7 @@
 
     <web-resource key="optin-js">
         <resource type="download" name="optin.js" location="js/optin.js" />
-        <resource type="download" name="ajaxupload.js" location="js/external/ajaxupload.js" />
+        <resource type="download" name="jquery.form.js" location="js/external/jquery.form.js" />
         <resource type="download" name="wait.gif" location="wait.gif" />
     </web-resource>
 

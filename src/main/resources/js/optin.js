@@ -31,7 +31,7 @@
 
     jQuery(document).ready(function() {
 
-        var pluginsTable = jQuery("#pluginsTable");
+        var pluginsTable = jQuery("#pluginsTableBody");
 
         function addRow(plugin)
         {
@@ -79,43 +79,41 @@
             addRow(this);
         });
 
-        new AjaxUpload('plugin_upload_button', {
-          // Location of the server-side upload script
-          action: contextPath + '/rest/speakeasy/1/plugins',
-          name: 'pluginFile',
-          // Submit file after selection
-          autoSubmit: true,
-          // The type of data that you're expecting back from the server.
-          // HTML (text) and XML are detected automatically.
-          // Useful when you are using JSON data as a response, set to "json" in that case.
-          // Also set server response type to text/html, otherwise it will not work in IE6
-          responseType: "json",
-          // Fired before the file is uploaded
-          // You can return false to cancel upload
-          // @param file basename of uploaded file
-          // @param extension of that file
-          onSubmit: function(file, extension) {
-              if (extension != 'jar') {
-                  AJS.messages.error({body: "The extension '" + extension + "' is not allowed"});
-                  return false;
-              }
-          },
-          // Fired when file upload is completed
-          // WARNING! DO NOT USE "FALSE" STRING AS A RESPONSE!
-          // @param file basename of uploaded file
-          // @param response server response
-          onComplete: function(file, response) {
-              for (var x in response) {
-                  console.log(x + " : " + response[x]);
-              }
-              if (response.error) {
-                  AJS.messages.error({title: "error:" + response.error + "key:" + response.key + ":", body: response.error});
-              } else {
-                  addRow(response);
-                  AJS.messages.success({body: "The plugin '" + response.key + "' was uploaded successfully"});
-              }
-          }
+        var pluginFile = jQuery('#pluginFile');
+        var uploadForm = jQuery('#uploadForm');
+
+        var changeForm = function() {
+            uploadForm.ajaxSubmit({
+                dataType: null, //"json",
+                iframe: "true",
+                beforeSubmit: function() {
+                   console.log('beforeSubmit');
+                   var extension = pluginFile.val().substring(pluginFile.val().lastIndexOf('.'));
+                   if (extension != '.jar') {
+                      AJS.messages.error({body: "The extension '" + extension + "' is not allowed"});
+                      return false;
+                   }
+                },
+                success: function(response, status, xhr, $form) {
+                    console.log('success');
+                    for (var x in response) {
+                      console.log(x + " : " + response[x]);
+                    }
+                    if (response.error) {
+                        AJS.messages.error({title: "error:" + response.error + "key:" + response.key + ":", body: response.error});
+                    } else {
+                        addRow(response);
+                        AJS.messages.success({body: "The plugin '" + response.key + "' was uploaded successfully"});
+                    }
+                }
+            });
+        };
+
+        uploadForm.change(function() {
+            setTimeout(changeForm, 1);
         });
+
+        uploadForm.resetForm();
 
     });
 
