@@ -16,6 +16,7 @@ import com.atlassian.plugin.hostcontainer.HostContainer;
 import com.atlassian.plugin.osgi.external.ListableModuleDescriptorFactory;
 import com.atlassian.plugin.osgi.external.SingleModuleDescriptorFactory;
 import com.atlassian.plugin.osgi.factory.OsgiPlugin;
+import com.atlassian.plugin.util.WaitUntil;
 import com.atlassian.plugin.webresource.transformer.WebResourceTransformerModuleDescriptor;
 import com.atlassian.sal.api.pluginsettings.PluginSettings;
 import com.atlassian.sal.api.pluginsettings.PluginSettingsFactory;
@@ -109,6 +110,7 @@ public class SpeakeasyManager implements BundleContextAware, DisposableBean
     {
         String key = createAccessKey(pluginKey);
         List<String> accessList = getAccessList(key);
+        final List<ModuleDescriptor> addedDescriptors = new ArrayList<ModuleDescriptor>();
         if (!accessList.contains(user))
         {
             accessList.add(user);
@@ -117,11 +119,31 @@ public class SpeakeasyManager implements BundleContextAware, DisposableBean
             {
                 if (moduleDescriptor instanceof DescriptorGenerator)
                 {
-                    addUserModuleDescriptor(pluginKey, moduleDescriptor.getKey(), user);
+                    addedDescriptors.add(addUserModuleDescriptor(pluginKey, moduleDescriptor.getKey(), user));
                 }
             }
         }
 
+        WaitUntil.invoke(new WaitUntil.WaitCondition()
+        {
+            public boolean isFinished()
+            {
+                for (ModuleDescriptor descriptor : addedDescriptors)
+                {
+                    ModuleDescriptor<?> module = pluginAccessor.getEnabledPluginModule(descriptor.getCompleteKey());
+                    if (module == null)
+                    {
+                        return false;
+                    }
+                }
+                return true;
+            }
+
+            public String getWaitMessage()
+            {
+                return "Waiting until the enabled plugins are available";
+            }
+        });
     }
 
     private List<String> getAccessList(String key)
@@ -138,6 +160,7 @@ public class SpeakeasyManager implements BundleContextAware, DisposableBean
     {
         String key = createAccessKey(pluginKey);
         List<String> accessList = getAccessList(key);
+        final List<ModuleDescriptor> removedDescriptors = new ArrayList<ModuleDescriptor>();
         if (accessList.contains(user))
         {
             accessList.remove(user);
@@ -147,10 +170,31 @@ public class SpeakeasyManager implements BundleContextAware, DisposableBean
             {
                 if (serviceRegistrations.containsKey(moduleDescriptor.getCompleteKey()))
                 {
-                    removeUserModuleDescriptor(moduleDescriptor);
+                    removedDescriptors.add(removeUserModuleDescriptor(moduleDescriptor));
                 }
             }
         }
+
+        WaitUntil.invoke(new WaitUntil.WaitCondition()
+        {
+            public boolean isFinished()
+            {
+                for (ModuleDescriptor descriptor : removedDescriptors)
+                {
+                    ModuleDescriptor<?> module = pluginAccessor.getEnabledPluginModule(descriptor.getCompleteKey());
+                    if (module != null)
+                    {
+                        return false;
+                    }
+                }
+                return true;
+            }
+
+            public String getWaitMessage()
+            {
+                return "Waiting until the enabled plugins are available";
+            }
+        });
     }
 
 
@@ -159,13 +203,14 @@ public class SpeakeasyManager implements BundleContextAware, DisposableBean
         return "speakeasy-" + pluginKey;
     }
 
-    private void addUserModuleDescriptor(String pluginKey, String moduleKey, String user)
+    private ModuleDescriptor addUserModuleDescriptor(String pluginKey, String moduleKey, String user)
     {
+        ModuleDescriptor addedDescriptor = null;
         Plugin plugin = pluginAccessor.getPlugin(pluginKey);
         ModuleDescriptor descriptor = plugin.getModuleDescriptor(moduleKey);
         if (descriptor instanceof DescriptorGenerator)
         {
-            ModuleDescriptor addedDescriptor = ((DescriptorGenerator)descriptor).getDescriptorToExposeForUser(user);
+            addedDescriptor = ((DescriptorGenerator)descriptor).getDescriptorToExposeForUser(user);
             for (Bundle bundle : bundleContext.getBundles())
             {
                 String maybePluginKey = (String) bundle.getHeaders().get(OsgiPlugin.ATLASSIAN_PLUGIN_KEY);
@@ -178,14 +223,16 @@ public class SpeakeasyManager implements BundleContextAware, DisposableBean
                 }
             }
         }
+        return addedDescriptor;
     }
 
-    private void removeUserModuleDescriptor(ModuleDescriptor dynamicDescriptor)
+    private ModuleDescriptor removeUserModuleDescriptor(ModuleDescriptor dynamicDescriptor)
     {
         if (serviceRegistrations.containsKey(dynamicDescriptor.getCompleteKey()))
         {
             serviceRegistrations.remove(dynamicDescriptor.getCompleteKey()).unregister();
         }
+        return dynamicDescriptor;
     }
 
     public void setBundleContext(BundleContext bundleContext)

@@ -6,6 +6,7 @@ import com.atlassian.webdriver.AtlassianWebDriver;
 import com.atlassian.webdriver.utils.Check;
 import com.google.common.base.Function;
 import org.openqa.selenium.By;
+import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.RenderedWebElement;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
@@ -29,6 +30,9 @@ public class SpeakeasyUserPage implements Page
 
     @FindBy(name = "pluginFile")
     private WebElement pluginFileUpload;
+
+    @FindBy(id = "aui-message-bar")
+    private WebElement messageBar;
 
     @WaitUntil
     public void waitForTableLoad()
@@ -60,11 +64,13 @@ public class SpeakeasyUserPage implements Page
     public void enablePlugin(String pluginKey)
     {
         clickToggleIf(pluginKey, "Enable");
+        waitForMessages();
     }
 
     public void disablePlugin(String pluginKey)
     {
         clickToggleIf(pluginKey, "Disable");
+        waitForMessages();
     }
 
     private void clickToggleIf(String pluginKey, String toggleText)
@@ -74,18 +80,75 @@ public class SpeakeasyUserPage implements Page
         {
             toggle.click();
         }
+        else
+        {
+            throw new IllegalStateException("Cannot toggle");
+        }
     }
 
     private WebElement getPluginRow(String key)
     {
-        return pluginsTableBody.findElement(By.tagName("tr"));
+        for (WebElement row : pluginsTableBody.findElements(By.tagName("tr")))
+        {
+            if (key.equals(row.getAttribute("data-pluginkey")))
+            {
+                return row;
+            }
+        }
+        return null;
     }
 
-    public void uploadPlugin(File jar)
+    public SpeakeasyUserPage uploadPlugin(File jar)
     {
         driver.waitUntilElementIsLocated(By.tagName("input"));
         WebElement input = driver.findElement(By.tagName("input"));
         input.sendKeys(jar.getAbsolutePath());
+        waitForMessages();
+        return this;
+    }
 
+    private void waitForMessages()
+    {
+        driver.waitUntilElementIsVisibleAt(By.className("aui-message"), messageBar);
+    }
+
+    public List<String> getSuccessMessages()
+    {
+        List<String> messages = new ArrayList<String>();
+        for (WebElement msg : messageBar.findElements(By.className("aui-message")))
+        {
+            if (msg.getAttribute("class").contains("success"))
+            {
+                messages.add(msg.getText().trim());
+            }
+        }
+        return messages;
+    }
+
+    public SpeakeasyUserPage uninstallPlugin(String pluginKey)
+    {
+        WebElement uninstallLink = getUninstallLink(pluginKey);
+        uninstallLink.click();
+        waitForMessages();
+        return this;
+    }
+
+    private WebElement getUninstallLink(String pluginKey)
+    {
+        WebElement pluginRow = getPluginRow(pluginKey);
+        return pluginRow.findElement(By.className("pk_uninstall"));
+    }
+
+    public boolean canUninstall(String pluginKey)
+    {
+        try
+        {
+            getUninstallLink(pluginKey);
+            return true;
+        }
+        catch (NoSuchElementException ex)
+        {
+            return false;
+        }
     }
 }

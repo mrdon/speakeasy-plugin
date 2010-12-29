@@ -1,6 +1,7 @@
 package com.atlassian.labs.speakeasy.install;
 
 import com.atlassian.plugin.*;
+import com.atlassian.plugin.util.WaitUntil;
 import org.apache.commons.io.IOUtils;
 import org.dom4j.*;
 import org.dom4j.io.SAXReader;
@@ -28,6 +29,7 @@ public class PluginManager
     private final DefaultPluginArtifactFactory pluginArtifactFactory;
 
     private static final Iterable<Pattern> pluginContentsWhitelist = asList(
+            Pattern.compile("it/.*\\.class"),
             Pattern.compile(".*\\.js"),
             Pattern.compile(".*\\.gif"),
             Pattern.compile(".*\\.png"),
@@ -51,21 +53,42 @@ public class PluginManager
         pluginArtifactFactory = new DefaultPluginArtifactFactory();
     }
 
-    public Plugin install(String user, File plugin) throws PluginOperationFailedException
+    public Plugin install(String user, File pluginFile) throws PluginOperationFailedException
     {
         if (!canUserInstallPlugins(user)) {
             throw new PluginOperationFailedException("User '" + user + "' doesn't have access to install plugins");
         }
 
-        if (plugin.getName().endsWith(".jar"))
+        if (pluginFile.getName().endsWith(".jar"))
         {
-            PluginArtifact pluginArtifact = pluginArtifactFactory.create(plugin.toURI());
+            PluginArtifact pluginArtifact = pluginArtifactFactory.create(pluginFile.toURI());
             verifyContents(pluginArtifact);
             verifyModules(pluginArtifact);
             Set<String> pluginKeys = pluginController.installPlugins(pluginArtifact);
             if (pluginKeys.size() == 1)
             {
-                return pluginAccessor.getPlugin(pluginKeys.iterator().next());
+                final Plugin plugin = pluginAccessor.getPlugin(pluginKeys.iterator().next());
+                WaitUntil.invoke(new WaitUntil.WaitCondition()
+                {
+
+                    public boolean isFinished()
+                    {
+                        for (ModuleDescriptor desc : plugin.getModuleDescriptors())
+                        {
+                            if (!pluginAccessor.isPluginModuleEnabled(desc.getCompleteKey()))
+                            {
+                                return false;
+                            }
+                        }
+                        return true;
+                    }
+
+                    public String getWaitMessage()
+                    {
+                        return "Waiting for all module descriptors to be resolved and enabled";
+                    }
+                });
+                return plugin;
             }
             else
             {
@@ -87,13 +110,7 @@ public class PluginManager
             Document doc = new SAXReader().read(in);
             for (Element module : ((List<Element>)doc.getRootElement().elements()))
             {
-                boolean allowed = false;
-                if (pluginModulesWhitelist.contains(module.getName()))
-                {
-                    allowed = true;
-                    break;
-                }
-                if (!allowed)
+                if (!pluginModulesWhitelist.contains(module.getName()))
                 {
                     throw new PluginOperationFailedException("Invalid plugin module: " + module.getName());
                 }

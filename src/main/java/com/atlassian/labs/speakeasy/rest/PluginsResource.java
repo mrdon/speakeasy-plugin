@@ -55,8 +55,6 @@ public class PluginsResource
 
     @POST
     @Path("")
-    // this is an annoying workaround due to the iframe approach in the file upload not dealing with json data right
-    // in firefox
     @Produces("text/html")
     public Response uploadPlugin(@Context HttpServletRequest request)
     {
@@ -122,7 +120,7 @@ public class PluginsResource
         }
         catch (PluginOperationFailedException e)
         {
-            return Response.ok().entity("{\"error\":'" + e.getMessage() + "\"}").build();
+            return Response.ok().entity("{\"error\":\"" + e.getMessage() + "\"}").build();
         }
     }
 

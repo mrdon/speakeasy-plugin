@@ -130,6 +130,7 @@
                 <extensions>true</extensions>
                 <configuration>
                     <productVersion>${platform.version}</productVersion>
+                    <functionalTestPattern>it/**/Test*.java</functionalTestPattern>
                     <instructions>
                         <Import-Package>
                             com.atlassian.confluence.plugin.descriptor.web.descriptors;resolution:=optional,

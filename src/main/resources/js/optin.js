@@ -8,8 +8,10 @@
                   success: function(data) {
                       if (method == 'PUT') {
                         link.html("Disable");
+                        AJS.messages.success({body: "The plugin was enabled successfully"});
                       } else {
                         link.html("Enable");
+                        AJS.messages.success({body: "The plugin was disabled successfully"});
                       }
                   }
                 });
@@ -95,15 +97,13 @@
                    }
                 },
                 success: function(response, status, xhr, $form) {
+                    var data = jQuery.parseJSON(response.substring(response.indexOf('{'), response.lastIndexOf("}") + 1));
                     console.log('success');
-                    for (var x in response) {
-                      console.log(x + " : " + response[x]);
-                    }
-                    if (response.error) {
-                        AJS.messages.error({title: "error:" + response.error + "key:" + response.key + ":", body: response.error});
+                    if (data.error) {
+                        AJS.messages.error({title: "Error installing plugin '" + data.key + "'", body: data.error});
                     } else {
-                        addRow(response);
-                        AJS.messages.success({body: "The plugin '" + response.key + "' was uploaded successfully"});
+                        addRow(data);
+                        AJS.messages.success({body: "The plugin '" + data.key + "' was uploaded successfully"});
                     }
                 }
             });

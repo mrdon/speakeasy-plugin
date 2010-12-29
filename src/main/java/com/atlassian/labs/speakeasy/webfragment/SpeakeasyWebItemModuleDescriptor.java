@@ -12,6 +12,7 @@ import com.atlassian.plugin.web.descriptors.WebItemModuleDescriptor;
 import com.atlassian.plugin.web.model.WebLabel;
 import com.atlassian.sal.api.user.UserManager;
 import org.dom4j.Element;
+import org.osgi.framework.BundleContext;
 
 /**
  *
@@ -19,12 +20,13 @@ import org.dom4j.Element;
 public class SpeakeasyWebItemModuleDescriptor extends AbstractModuleDescriptor<Void> implements DescriptorGenerator<WebItemModuleDescriptor>
 {
     private Element originalElement;
-    private final WebInterfaceManager webInterfaceManager;
+    private final BundleContext bundleContext;
     private final UserManager userManager;
+    private WebInterfaceManager webInterfaceManager;
 
-    public SpeakeasyWebItemModuleDescriptor(WebInterfaceManager webInterfaceManager, UserManager userManager)
+    public SpeakeasyWebItemModuleDescriptor(BundleContext bundleContext, UserManager userManager)
     {
-        this.webInterfaceManager = webInterfaceManager;
+        this.bundleContext = bundleContext;
         this.userManager = userManager;
     }
 
@@ -33,6 +35,7 @@ public class SpeakeasyWebItemModuleDescriptor extends AbstractModuleDescriptor<V
     {
         super.init(plugin, element);
         this.originalElement = element;
+        this.webInterfaceManager = (WebInterfaceManager) bundleContext.getService(bundleContext.getServiceReference(WebInterfaceManager.class.getName()));
     }
 
     @Override

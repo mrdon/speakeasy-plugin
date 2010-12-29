@@ -38,8 +38,8 @@ public class TestUserProfile
     {
         List<String> pluginKeys = product.getPageBinder().navigateToAndBind(SpeakeasyUserPage.class)
                 .getPluginKeys();
-        assertEquals(1, pluginKeys.size());
-        assertEquals("plugin-tests", pluginKeys.get(0));
+        assertTrue(pluginKeys.size() > 0);
+        assertTrue(pluginKeys.contains("plugin-tests"));
     }
 
     @Test
@@ -68,13 +68,75 @@ public class TestUserProfile
                             "    <plugin-info>",
                             "        <version>1</version>",
                             "    </plugin-info>",
-                            "    <web-item key='item' section='foo' />",
+                            "    <scoped-web-item key='item' section='foo' />",
                             "</atlassian-plugin>")
                     .build();
 
+        SpeakeasyUserPage page = product.getPageBinder()
+                .navigateToAndBind(SpeakeasyUserPage.class)
+                .uploadPlugin(jar);
+
+        List<String> messages = page.getSuccessMessages();
+        assertEquals(1, messages.size());
+        assertTrue(messages.get(0).contains("'test'"));
+        assertTrue(page.getPluginKeys().contains("test"));
+
+        // verify on reload
+        page = product.getPageBinder().navigateToAndBind(SpeakeasyUserPage.class);
+        assertTrue(page.getPluginKeys().contains("test"));
+    }
+
+    @Test
+    public void testUninstallPlugin() throws IOException
+    {
+        File jar = new PluginJarBuilder()
+                    .addFormattedResource("atlassian-plugin.xml",
+                            "<atlassian-plugin key='test' pluginsVersion='2'>",
+                            "    <plugin-info>",
+                            "        <version>1</version>",
+                            "        <vendor name='admin' />",
+                            "    </plugin-info>",
+                            "    <scoped-web-item key='item' section='foo' />",
+                            "</atlassian-plugin>")
+                    .build();
+
+        product.getPageBinder()
+                .navigateToAndBind(SpeakeasyUserPage.class)
+                .uploadPlugin(jar);
+
         SpeakeasyUserPage page = product.getPageBinder().navigateToAndBind(SpeakeasyUserPage.class);
-        page.uploadPlugin(jar);
+        assertTrue(page.getPluginKeys().contains("test"));
+        page.uninstallPlugin("test");
+        List<String> messages = page.getSuccessMessages();
+        assertEquals(1, messages.size());
+        assertTrue(messages.get(0).contains("uninstalled"));
+        assertFalse(page.getPluginKeys().contains("test"));
 
+        // verify on reload
+        page = product.getPageBinder().navigateToAndBind(SpeakeasyUserPage.class);
+        assertFalse(page.getPluginKeys().contains("test"));
+    }
 
+    @Test
+    public void testNoUninstallIfNotAuthor() throws IOException
+    {
+        File jar = new PluginJarBuilder()
+                    .addFormattedResource("atlassian-plugin.xml",
+                            "<atlassian-plugin key='test' pluginsVersion='2'>",
+                            "    <plugin-info>",
+                            "        <version>1</version>",
+                            "        <vendor name='someguy' />",
+                            "    </plugin-info>",
+                            "    <scoped-web-item key='item' section='foo' />",
+                            "</atlassian-plugin>")
+                    .build();
+
+        product.getPageBinder()
+                .navigateToAndBind(SpeakeasyUserPage.class)
+                .uploadPlugin(jar);
+
+        SpeakeasyUserPage page = product.getPageBinder().navigateToAndBind(SpeakeasyUserPage.class);
+        assertTrue(page.getPluginKeys().contains("test"));
+        assertFalse(page.canUninstall("test"));
     }
 }
