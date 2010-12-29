@@ -110,7 +110,19 @@
         <dependency>
             <groupId>com.atlassian.selenium</groupId>
             <artifactId>atlassian-webdriver-refapp</artifactId>
-            <version>2.0-SNAPSHOT</version> 
+            <version>2.0-SNAPSHOT</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.atlassian.selenium</groupId>
+            <artifactId>atlassian-webdriver-confluence</artifactId>
+            <version>2.0-SNAPSHOT</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.atlassian.selenium</groupId>
+            <artifactId>atlassian-webdriver-jira</artifactId>
+            <version>2.0-SNAPSHOT</version>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -126,10 +138,10 @@
             <plugin>
                 <groupId>com.atlassian.maven.plugins</groupId>
                 <artifactId>maven-refapp-plugin</artifactId>
-                <version>3.3-m5</version>
+                <version>3.3-SNAPSHOT</version>
                 <extensions>true</extensions>
                 <configuration>
-                    <productVersion>${platform.version}</productVersion>
+
                     <functionalTestPattern>it/**/Test*.java</functionalTestPattern>
                     <instructions>
                         <Import-Package>
@@ -138,6 +150,33 @@
                             *;resolution:=optional
                         </Import-Package>
                     </instructions>
+                    <products>
+                        <product>
+                            <id>refapp</id>
+                            <version>${platform.version}</version>
+                            <dataVersion>4.1.1</dataVersion>\<systemPropertyVariables>
+                                <atlassian.dev.mode>true</atlassian.dev.mode>
+                                <testedProductClass>com.atlassian.webdriver.refapp.RefappTestedProduct</testedProductClass>
+                            </systemPropertyVariables>
+                        </product>
+                        <product>
+                            <id>confluence</id>
+                            <version>3.4</version>
+                            <dataVersion>3.0</dataVersion>
+                            <systemPropertyVariables>
+                                <atlassian.dev.mode>true</atlassian.dev.mode>
+                                <testedProductClass>com.atlassian.webdriver.confluence.ConfluenceTestedProduct</testedProductClass>
+                            </systemPropertyVariables>
+                        </product>
+                        <product>
+                            <id>jira</id>
+                            <version>4.2.1</version>
+                            <dataVersion>4.1.1</dataVersion>\<systemPropertyVariables>
+                                <atlassian.dev.mode>true</atlassian.dev.mode>
+                                <testedProductClass>com.atlassian.webdriver.jira.JiraTestedProduct</testedProductClass>
+                            </systemPropertyVariables>
+                        </product>
+                    </products>
                 </configuration>
             </plugin>
             <plugin>
@@ -151,7 +190,7 @@
     </build>
 
     <properties>
-        <platform.version>2.9.0-alpha3</platform.version>
+        <platform.version>2.8.8</platform.version>
     </properties>
 
 </project>

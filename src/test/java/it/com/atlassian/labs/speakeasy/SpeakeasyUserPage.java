@@ -100,9 +100,7 @@ public class SpeakeasyUserPage implements Page
 
     public SpeakeasyUserPage uploadPlugin(File jar)
     {
-        driver.waitUntilElementIsLocated(By.tagName("input"));
-        WebElement input = driver.findElement(By.tagName("input"));
-        input.sendKeys(jar.getAbsolutePath());
+        pluginFileUpload.sendKeys(jar.getAbsolutePath());
         waitForMessages();
         return this;
     }

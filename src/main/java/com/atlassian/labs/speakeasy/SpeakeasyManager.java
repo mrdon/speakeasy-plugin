@@ -37,25 +37,27 @@ import static java.util.Arrays.asList;
 /**
  *
  */
-public class SpeakeasyManager implements BundleContextAware, DisposableBean
+public class SpeakeasyManager implements DisposableBean
 {
     private final PluginAccessor pluginAccessor;
     private final HostContainer hostContainer;
-    private volatile BundleContext bundleContext;
+    private final BundleContext bundleContext;
     private final PluginSettings pluginSettings;
 
     private final Map<String, ServiceRegistration> serviceRegistrations;
     private final PluginEventManager pluginEventManager;
     private ServiceRegistration userTransformerService;
 
-    public SpeakeasyManager(PluginAccessor pluginAccessor, PluginSettingsFactory pluginSettingsFactory, PluginEventManager pluginEventManager, HostContainer hostContainer)
+    public SpeakeasyManager(BundleContext bundleContext, PluginAccessor pluginAccessor, PluginSettingsFactory pluginSettingsFactory, PluginEventManager pluginEventManager, HostContainer hostContainer)
     {
+        this.bundleContext = bundleContext;
         this.pluginAccessor = pluginAccessor;
         this.hostContainer = hostContainer;
         this.pluginSettings = pluginSettingsFactory.createGlobalSettings();
         this.serviceRegistrations = new ConcurrentHashMap<String, ServiceRegistration>();
         this.pluginEventManager = pluginEventManager;
         pluginEventManager.register(this);
+        loadUserTransformerServiceIfNeeded();
     }
 
     private void registerDescriptor(List<String> accessList, ModuleDescriptor descriptor)
@@ -235,9 +237,12 @@ public class SpeakeasyManager implements BundleContextAware, DisposableBean
         return dynamicDescriptor;
     }
 
-    public void setBundleContext(BundleContext bundleContext)
+    /**
+     * Works around apps that don't properly register the web resource transformer module type.  Can be removed if all
+     * products are on platform 2.8
+     */
+    private void loadUserTransformerServiceIfNeeded()
     {
-        this.bundleContext = bundleContext;
         String pluginKey = (String) bundleContext.getBundle().getHeaders().get(OsgiPlugin.ATLASSIAN_PLUGIN_KEY);
         Plugin self = pluginAccessor.getPlugin(pluginKey);
         if (self.getModuleDescriptor("userTransformer") instanceof UnrecognisedModuleDescriptor)

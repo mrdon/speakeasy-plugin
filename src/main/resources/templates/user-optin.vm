@@ -3,10 +3,12 @@
     <meta name="decorator" content="atl.userprofile"/>
     <meta name="tab" content=""/>
     <title>Speakeasy Plugins</title>
-    <script type="text/javascript">
+</head>
+<body>
+<script type="text/javascript">
         var staticResourcesPrefix = "$staticResourcesPrefix";
         var contextPath = "$contextPath";
-        var plugins = $plugins.json;
+        var plugins = $plugins.renderJson;
         var currentUser = "$user";
     </script>
     <script type="text/x-template" title="uninstall">
@@ -29,8 +31,6 @@
             </td>
         </tr>
     </script>
-</head>
-<body>
 <h1>Speakeasy Plugins</h1>
 
 <div id="aui-message-bar"> </div>

@@ -88,7 +88,7 @@ public class UserOptInServlet extends HttpServlet
 
         @HtmlSafe
         @com.atlassian.velocity.htmlsafe.HtmlSafe
-        public String getJson()
+        public String getRenderJson()
         {
             return json;
         }

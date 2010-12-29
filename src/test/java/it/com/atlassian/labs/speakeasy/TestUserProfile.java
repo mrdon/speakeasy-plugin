@@ -1,10 +1,11 @@
 package it.com.atlassian.labs.speakeasy;
 
+import com.atlassian.pageobjects.page.Header;
+import com.atlassian.pageobjects.page.HomePage;
+import com.atlassian.pageobjects.product.TestedProduct;
 import com.atlassian.pageobjects.product.TestedProductFactory;
 import com.atlassian.plugin.test.PluginJarBuilder;
 import com.atlassian.webdriver.refapp.RefappTestedProduct;
-import com.atlassian.webdriver.refapp.page.RefappHomePage;
-import com.atlassian.webdriver.refapp.page.RefappLoginPage;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -22,15 +23,20 @@ import static org.junit.Assert.assertTrue;
  */
 public class TestUserProfile
 {
-    private RefappTestedProduct product = TestedProductFactory.create(RefappTestedProduct.class);
+    private TestedProduct product;
+
+    public TestUserProfile() throws ClassNotFoundException
+    {
+        product = TestedProductFactory.create(
+                (Class<TestedProduct>)getClass().getClassLoader().loadClass(System.getProperty("testedProductClass", RefappTestedProduct.class.getName())));
+    }
 
     @Before
     public void login()
     {
-        RefappLoginPage loginPage = product.gotoLoginPage();
-        if (!loginPage.isLoggedIn())
+        if (!product.gotoHomePage().getHeader().isLoggedIn())
         {
-            loginPage.loginAsSysAdmin(RefappHomePage.class);
+            product.gotoLoginPage().loginAsSysAdmin(HomePage.class);
         }
     }
     @Test
