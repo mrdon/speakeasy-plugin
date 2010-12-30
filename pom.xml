@@ -40,7 +40,6 @@
             <groupId>commons-fileupload</groupId>
             <artifactId>commons-fileupload</artifactId>
             <version>1.2.1</version>
-            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>javax.servlet</groupId>
@@ -154,29 +153,46 @@
                         <product>
                             <id>refapp</id>
                             <version>${platform.version}</version>
-                            <dataVersion>4.1.1</dataVersion>\<systemPropertyVariables>
-                                <atlassian.dev.mode>true</atlassian.dev.mode>
-                                <testedProductClass>com.atlassian.webdriver.refapp.RefappTestedProduct</testedProductClass>
-                            </systemPropertyVariables>
+                            <dataVersion>4.1.1</dataVersion>\
                         </product>
                         <product>
                             <id>confluence</id>
                             <version>3.4</version>
                             <dataVersion>3.0</dataVersion>
-                            <systemPropertyVariables>
-                                <atlassian.dev.mode>true</atlassian.dev.mode>
-                                <testedProductClass>com.atlassian.webdriver.confluence.ConfluenceTestedProduct</testedProductClass>
-                            </systemPropertyVariables>
                         </product>
                         <product>
                             <id>jira</id>
                             <version>4.2.1-b588</version>
-                            <dataVersion>4.1.1</dataVersion>\<systemPropertyVariables>
-                                <atlassian.dev.mode>true</atlassian.dev.mode>
-                                <testedProductClass>com.atlassian.webdriver.jira.JiraTestedProduct</testedProductClass>
-                            </systemPropertyVariables>
+                            <dataVersion>4.1.1</dataVersion>\
                         </product>
                     </products>
+                    <testGroups>
+                        <testGroup>
+                            <id>jira</id>
+                            <productIds>
+                                <productId>jira</productId>
+                            </productIds>
+                            <systemProperties>
+                                <testedProductClass>com.atlassian.webdriver.jira.JiraTestedProduct</testedProductClass>
+                            </systemProperties>
+                        </testGroup>
+                        <testGroup>
+                            <id>refapp</id>
+                            <productIds>
+                                <productId>refapp</productId>
+                            </productIds>
+                        </testGroup>
+                        <testGroup>
+                            <id>confluence</id>
+                            <productIds>
+                                <productId>confluence</productId>
+                            </productIds>
+                            <systemProperties>
+                                <testedProductClass>com.atlassian.webdriver.confluence.ConfluenceTestedProduct
+                                </testedProductClass>
+                            </systemProperties>
+                        </testGroup>
+                    </testGroups>
                 </configuration>
             </plugin>
             <plugin>
