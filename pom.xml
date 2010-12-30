@@ -170,7 +170,7 @@
                         </product>
                         <product>
                             <id>jira</id>
-                            <version>4.2.1</version>
+                            <version>4.2.1-b588</version>
                             <dataVersion>4.1.1</dataVersion>\<systemPropertyVariables>
                                 <atlassian.dev.mode>true</atlassian.dev.mode>
                                 <testedProductClass>com.atlassian.webdriver.jira.JiraTestedProduct</testedProductClass>

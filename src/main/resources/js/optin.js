@@ -23,7 +23,7 @@
                   url: link.attr('href'),
                   type: 'DELETE',
                   success: function(data) {
-                      link.parents("tr").each(function() {
+                      link.closest("tr").each(function() {
                           jQuery(this).detach();
                           AJS.messages.success({body: "The plugin was uninstalled successfully"});
                       })
@@ -105,6 +105,7 @@
                         addRow(data);
                         AJS.messages.success({body: "The plugin '" + data.key + "' was uploaded successfully"});
                     }
+                    pluginFile.val("");
                 }
             });
         };

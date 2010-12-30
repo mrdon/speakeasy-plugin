@@ -1,13 +1,11 @@
 package it.com.atlassian.labs.speakeasy;
 
+import com.atlassian.pageobjects.Page;
 import com.atlassian.pageobjects.binder.WaitUntil;
-import com.atlassian.pageobjects.page.Page;
 import com.atlassian.webdriver.AtlassianWebDriver;
-import com.atlassian.webdriver.utils.Check;
 import com.google.common.base.Function;
 import org.openqa.selenium.By;
 import org.openqa.selenium.NoSuchElementException;
-import org.openqa.selenium.RenderedWebElement;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 
