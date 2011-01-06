@@ -10,14 +10,15 @@ import org.apache.commons.lang.StringUtils;
 import org.dom4j.Element;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import sun.tools.jar.Manifest;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 /**
  *
@@ -33,20 +34,25 @@ public class UserScopedTransformer implements WebResourceTransformer
 
     public DownloadableResource transform(Element element, ResourceLocation resourceLocation, String s, DownloadableResource downloadableResource)
     {
-        String allowedUser = element.attributeValue("user");
-        return new UserFilteredDownloadableResource(allowedUser, downloadableResource, salUserManager);
+        Set<String> users = new HashSet<String>();
+        Element usersElement = element.element("users");
+        for (Element user : new ArrayList<Element>(usersElement.elements()))
+        {
+            users.add(user.getText());
+        }
+        return new UserFilteredDownloadableResource(users, downloadableResource, salUserManager);
     }
 
     private static class UserFilteredDownloadableResource extends AbstractTransformedDownloadableResource
     {
-        private final String allowedUser;
+        private final Set<String> allowedUsers;
         private final UserManager salUserManager;
         private static final Logger log = LoggerFactory.getLogger(UserFilteredDownloadableResource.class);
 
-        public UserFilteredDownloadableResource(String allowedUser, DownloadableResource originalResource, UserManager salUserManager)
+        public UserFilteredDownloadableResource(Set<String> allowedUsers, DownloadableResource originalResource, UserManager salUserManager)
         {
             super(originalResource);
-            this.allowedUser = allowedUser;
+            this.allowedUsers = allowedUsers;
             this.salUserManager = salUserManager;
         }
 
@@ -87,7 +93,7 @@ public class UserScopedTransformer implements WebResourceTransformer
                     }
                 }
             }
-            if (allowedUser.equals(username))
+            if (allowedUsers.contains(username))
             {
                 streamResource(out);
             }

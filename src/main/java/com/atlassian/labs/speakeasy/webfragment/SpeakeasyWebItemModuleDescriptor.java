@@ -11,8 +11,11 @@ import com.atlassian.plugin.web.descriptors.DefaultWebItemModuleDescriptor;
 import com.atlassian.plugin.web.descriptors.WebItemModuleDescriptor;
 import com.atlassian.plugin.web.model.WebLabel;
 import com.atlassian.sal.api.user.UserManager;
+import org.apache.commons.lang.StringUtils;
 import org.dom4j.Element;
 import org.osgi.framework.BundleContext;
+
+import java.util.List;
 
 /**
  *
@@ -21,13 +24,11 @@ public class SpeakeasyWebItemModuleDescriptor extends AbstractModuleDescriptor<V
 {
     private Element originalElement;
     private final BundleContext bundleContext;
-    private final UserManager userManager;
     private WebInterfaceManager webInterfaceManager;
 
-    public SpeakeasyWebItemModuleDescriptor(BundleContext bundleContext, UserManager userManager)
+    public SpeakeasyWebItemModuleDescriptor(BundleContext bundleContext)
     {
         this.bundleContext = bundleContext;
-        this.userManager = userManager;
     }
 
     @Override
@@ -44,7 +45,7 @@ public class SpeakeasyWebItemModuleDescriptor extends AbstractModuleDescriptor<V
         return null;
     }
 
-    public WebItemModuleDescriptor getDescriptorToExposeForUser(String user)
+    public WebItemModuleDescriptor getDescriptorToExposeForUsers(List<String> users, int state)
     {
         WebItemModuleDescriptor descriptor;
         try
@@ -60,13 +61,13 @@ public class SpeakeasyWebItemModuleDescriptor extends AbstractModuleDescriptor<V
         }
 
         Element userElement = (Element) originalElement.clone();
-        userElement.addAttribute("key", userElement.attributeValue("key") + "-for-user-" + user);
+        userElement.addAttribute("key", userElement.attributeValue("key") + "-" + state);
 
         Element condElement = userElement.addElement("condition");
         condElement.addAttribute("class", UserScopedCondition.class.getName());
         Element paramElement = condElement.addElement("param");
-        paramElement.addAttribute("name", "user");
-        paramElement.setText(user);
+        paramElement.addAttribute("name", "users");
+        paramElement.setText(users != null ? StringUtils.join(users, "|") : "");
 
         descriptor.init(new AbstractDelegatingPlugin(getPlugin())
         {

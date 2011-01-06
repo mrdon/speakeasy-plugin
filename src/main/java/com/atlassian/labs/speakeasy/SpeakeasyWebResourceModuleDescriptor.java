@@ -9,6 +9,8 @@ import com.atlassian.plugin.webresource.WebResourceModuleDescriptor;
 import org.dom4j.DocumentFactory;
 import org.dom4j.Element;
 
+import java.util.List;
+
 /**
  *
  */
@@ -29,7 +31,7 @@ public class SpeakeasyWebResourceModuleDescriptor extends AbstractModuleDescript
         return null;
     }
 
-    public WebResourceModuleDescriptor getDescriptorToExposeForUser(String user)
+    public WebResourceModuleDescriptor getDescriptorToExposeForUsers(List<String> users, int state)
     {
         WebResourceModuleDescriptor descriptor;
         try
@@ -45,12 +47,19 @@ public class SpeakeasyWebResourceModuleDescriptor extends AbstractModuleDescript
         }
 
         Element userElement = (Element) originalElement.clone();
-        userElement.addAttribute("key", userElement.attributeValue("key") + "-for-user-" + user);
+        userElement.addAttribute("key", userElement.attributeValue("key") + "-" + state);
         Element transElement = userElement.addElement("transformation");
         transElement.addAttribute("extension", "js");
         Element userTranElement = transElement.addElement("transformer");
         userTranElement.addAttribute("key", "userTransformer");
-        userTranElement.addAttribute("user", user);
+
+        Element usersElement = userTranElement.addElement("users");
+        for (String user : users)
+        {
+            Element e = usersElement.addElement("user");
+            e.setText(user);
+        }
+
         descriptor.init(getPlugin(), userElement);
         return descriptor;
     }
