@@ -1,5 +1,6 @@
 package it.com.atlassian.labs.speakeasy;
 
+import com.atlassian.labs.speakeasy.data.SpeakeasyData;
 import com.atlassian.pageobjects.TestedProduct;
 import com.atlassian.pageobjects.TestedProductFactory;
 import com.atlassian.pageobjects.page.HomePage;
@@ -7,15 +8,14 @@ import com.atlassian.pageobjects.page.LoginPage;
 import com.atlassian.plugin.test.PluginJarBuilder;
 import com.atlassian.webdriver.refapp.RefappTestedProduct;
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 public class TestUserProfile
 {
@@ -62,9 +62,10 @@ public class TestUserProfile
     {
         File jar = new PluginJarBuilder()
                 .addFormattedResource("atlassian-plugin.xml",
-                        "<atlassian-plugin key='test' pluginsVersion='2'>",
+                        "<atlassian-plugin key='test' pluginsVersion='2' name='Test'>",
                         "    <plugin-info>",
                         "        <version>1</version>",
+                        "        <description>Desc</description>",
                         "    </plugin-info>",
                         "    <scoped-web-item key='item' section='foo' />",
                         "</atlassian-plugin>")
@@ -78,9 +79,23 @@ public class TestUserProfile
         assertTrue(messages.get(0).contains("'test'"));
         assertTrue(page.getPluginKeys().contains("test"));
 
+        SpeakeasyUserPage.PluginRow row = page.getPlugins().get("test");
+        assertNotNull(row);
+        assertEquals("test", row.getKey());
+        assertEquals("Test", row.getName());
+        assertEquals("Desc", row.getDescription());
+        assertEquals("admin", row.getAuthor());
+
         // verify on reload
         page = product.visit(SpeakeasyUserPage.class);
         assertTrue(page.getPluginKeys().contains("test"));
+
+        row = page.getPlugins().get("test");
+        assertNotNull(row);
+        assertEquals("test", row.getKey());
+        assertEquals("Test", row.getName());
+        assertEquals("Desc", row.getDescription());
+        assertEquals("admin", row.getAuthor());
     }
 
     @Test
@@ -91,7 +106,6 @@ public class TestUserProfile
                         "<atlassian-plugin key='test' pluginsVersion='2'>",
                         "    <plugin-info>",
                         "        <version>1</version>",
-                        "        <vendor name='admin' />",
                         "    </plugin-info>",
                         "    <scoped-web-item key='item' section='foo' />",
                         "</atlassian-plugin>")
@@ -114,6 +128,7 @@ public class TestUserProfile
     }
 
     @Test
+    @Ignore("Ignored until can think of a way to login as different user")
     public void testNoUninstallIfNotAuthor() throws IOException
     {
         File jar = new PluginJarBuilder()
@@ -121,7 +136,6 @@ public class TestUserProfile
                         "<atlassian-plugin key='test' pluginsVersion='2'>",
                         "    <plugin-info>",
                         "        <version>1</version>",
-                        "        <vendor name='someguy' />",
                         "    </plugin-info>",
                         "    <scoped-web-item key='item' section='foo' />",
                         "</atlassian-plugin>")

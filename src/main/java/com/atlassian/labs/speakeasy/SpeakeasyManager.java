@@ -1,5 +1,6 @@
 package com.atlassian.labs.speakeasy;
 
+import com.atlassian.labs.speakeasy.data.SpeakeasyData;
 import com.atlassian.labs.speakeasy.model.RemotePlugin;
 import com.atlassian.labs.speakeasy.model.UserPlugins;
 import com.atlassian.plugin.ModuleDescriptor;
@@ -38,18 +39,18 @@ public class SpeakeasyManager implements DisposableBean
     private final PluginAccessor pluginAccessor;
     private final HostContainer hostContainer;
     private final BundleContext bundleContext;
-    private final PluginSettings pluginSettings;
+    private final SpeakeasyData data;
 
     private final Map<String, ServiceRegistration> serviceRegistrations;
     private final PluginEventManager pluginEventManager;
     private ServiceRegistration userTransformerService;
 
-    public SpeakeasyManager(BundleContext bundleContext, PluginAccessor pluginAccessor, PluginSettingsFactory pluginSettingsFactory, PluginEventManager pluginEventManager, HostContainer hostContainer)
+    public SpeakeasyManager(BundleContext bundleContext, PluginAccessor pluginAccessor, PluginEventManager pluginEventManager, HostContainer hostContainer, SpeakeasyData data)
     {
         this.bundleContext = bundleContext;
         this.pluginAccessor = pluginAccessor;
         this.hostContainer = hostContainer;
-        this.pluginSettings = pluginSettingsFactory.createGlobalSettings();
+        this.data = data;
         this.serviceRegistrations = new ConcurrentHashMap<String, ServiceRegistration>();
         this.pluginEventManager = pluginEventManager;
         pluginEventManager.register(this);
@@ -60,8 +61,7 @@ public class SpeakeasyManager implements DisposableBean
     public void onPluginEnabled(PluginEnabledEvent event)
     {
         String pluginKey = event.getPlugin().getKey();
-        String key = createAccessKey(pluginKey);
-        List<String> accessList = getAccessList(key);
+        List<String> accessList = data.getUsersList(pluginKey);
         updateModuleDescriptorsForPlugin(pluginKey, accessList);
     }
 
@@ -76,76 +76,40 @@ public class SpeakeasyManager implements DisposableBean
         List<RemotePlugin> plugins = new ArrayList<RemotePlugin>();
         for (Plugin plugin : pluginAccessor.getPlugins())
         {
-            String key = createAccessKey(plugin.getKey());
-            RemotePlugin remotePlugin = new RemotePlugin(plugin);
-            List<String> accessList = getAccessList(key);
             for (ModuleDescriptor moduleDescriptor : plugin.getModuleDescriptors())
             {
                 if (moduleDescriptor instanceof DescriptorGenerator)
                 {
+                    RemotePlugin remotePlugin = new RemotePlugin(plugin);
+                    remotePlugin.setAuthor(data.getPluginAuthor(plugin.getKey()));
+                    List<String> accessList = data.getUsersList(plugin.getKey());
                     remotePlugin.setEnabled(accessList.contains(userName));
                     plugins.add(remotePlugin);
                     break;
                 }
             }
-
-
         }
         return new UserPlugins(plugins);
     }
 
-    private int getPluginStateIdentifier(String pluginKey)
-    {
-        String key = createAccessKey(pluginKey) + ".state";
-        String stateValue = (String) pluginSettings.get(key);
-        if (stateValue != null)
-        {
-            return Integer.parseInt(stateValue);
-        }
-        else
-        {
-            return 0;
-        }
-    }
-
     public void allowUserAccess(String pluginKey, String user)
     {
-        String key = createAccessKey(pluginKey);
-        List<String> accessList = getAccessList(key);
+        List<String> accessList = data.getUsersList(pluginKey);
         if (!accessList.contains(user))
         {
             accessList.add(user);
-            pluginSettings.put(key, accessList);
-            updatePluginStateIdentifier(pluginKey);
+            data.saveUsersList(pluginKey, accessList);
             updateModuleDescriptorsForPlugin(pluginKey, accessList);
         }
     }
 
-    private void updatePluginStateIdentifier(String pluginKey)
-    {
-        String key = createAccessKey(pluginKey) + ".state";
-        pluginSettings.put(key, String.valueOf(getPluginStateIdentifier(pluginKey) + 1));
-    }
-
-    private List<String> getAccessList(String key)
-    {
-        List<String> accessList = (List<String>) pluginSettings.get(key);
-        if (accessList == null)
-        {
-            accessList = new ArrayList<String>();
-        }
-        return accessList;
-    }
-
     public void disallowUserAccess(String pluginKey, String user)
     {
-        String key = createAccessKey(pluginKey);
-        List<String> accessList = getAccessList(key);
+        List<String> accessList = data.getUsersList(pluginKey);
         if (accessList.contains(user))
         {
             accessList.remove(user);
-            pluginSettings.put(key, accessList);
-            updatePluginStateIdentifier(pluginKey);
+            data.saveUsersList(pluginKey, accessList);
 
             updateModuleDescriptorsForPlugin(pluginKey, accessList);
         }
@@ -176,11 +140,6 @@ public class SpeakeasyManager implements DisposableBean
     }
 
 
-    private String createAccessKey(String pluginKey)
-    {
-        return "speakeasy-" + pluginKey;
-    }
-
     private void updateModuleDescriptorsForPlugin(String pluginKey, List<String> users)
     {
         List<DescriptorGenerator> generators = findGeneratorsInPlugin(pluginKey);
@@ -191,7 +150,7 @@ public class SpeakeasyManager implements DisposableBean
             waitUntilModulesAreDisabled(unregisteredDescriptors);
 
             // generate and register new services
-            Integer pluginStateIdentifier = getPluginStateIdentifier(pluginKey);
+            Integer pluginStateIdentifier = data.getPluginStateIdentifier(pluginKey);
             Bundle targetBundle = findBundleForPlugin(pluginKey);
             List<ModuleDescriptor> generatedDescriptors = new ArrayList<ModuleDescriptor>();
             for (DescriptorGenerator generator : generators)

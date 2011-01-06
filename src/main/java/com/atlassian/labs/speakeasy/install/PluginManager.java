@@ -1,5 +1,7 @@
 package com.atlassian.labs.speakeasy.install;
 
+import com.atlassian.labs.speakeasy.data.SpeakeasyData;
+import com.atlassian.labs.speakeasy.model.RemotePlugin;
 import com.atlassian.plugin.*;
 import com.atlassian.plugin.util.WaitUntil;
 import org.apache.commons.io.IOUtils;
@@ -26,6 +28,7 @@ public class PluginManager
 {
     private final PluginController pluginController;
     private final PluginAccessor pluginAccessor;
+    private final SpeakeasyData data;
     private final DefaultPluginArtifactFactory pluginArtifactFactory;
 
     private static final Iterable<Pattern> pluginContentsWhitelist = asList(
@@ -46,14 +49,15 @@ public class PluginManager
             "scoped-web-item",
             "scoped-web-section");
 
-    public PluginManager(PluginController pluginController, PluginAccessor pluginAccessor)
+    public PluginManager(PluginController pluginController, PluginAccessor pluginAccessor, SpeakeasyData data)
     {
         this.pluginController = pluginController;
         this.pluginAccessor = pluginAccessor;
+        this.data = data;
         pluginArtifactFactory = new DefaultPluginArtifactFactory();
     }
 
-    public Plugin install(String user, File pluginFile) throws PluginOperationFailedException
+    public RemotePlugin install(String user, File pluginFile) throws PluginOperationFailedException
     {
         if (!canUserInstallPlugins(user)) {
             throw new PluginOperationFailedException("User '" + user + "' doesn't have access to install plugins");
@@ -67,7 +71,8 @@ public class PluginManager
             Set<String> pluginKeys = pluginController.installPlugins(pluginArtifact);
             if (pluginKeys.size() == 1)
             {
-                final Plugin plugin = pluginAccessor.getPlugin(pluginKeys.iterator().next());
+                final String installedKey = pluginKeys.iterator().next();
+                final Plugin plugin = pluginAccessor.getPlugin(installedKey);
                 WaitUntil.invoke(new WaitUntil.WaitCondition()
                 {
 
@@ -88,7 +93,10 @@ public class PluginManager
                         return "Waiting for all module descriptors to be resolved and enabled";
                     }
                 });
-                return plugin;
+                data.setPluginAuthor(installedKey, user);
+                RemotePlugin remotePlugin = new RemotePlugin(plugin);
+                remotePlugin.setAuthor(user);
+                return remotePlugin;
             }
             else
             {
@@ -178,7 +186,7 @@ public class PluginManager
         }
         Plugin plugin = pluginAccessor.getPlugin(pluginKey);
 
-        if (user.equals(plugin.getPluginInformation().getVendorName())) {
+        if (user.equals(data.getPluginAuthor(pluginKey))) {
             pluginController.uninstall(plugin);
         } else {
             throw new PluginOperationFailedException("User '" + user + "' is not the author of plugin '" + pluginKey + "' and cannot uninstall it");

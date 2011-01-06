@@ -31,7 +31,6 @@ public class RemotePlugin
     {
         key = plugin.getKey();
         name = plugin.getName() != null ? plugin.getName() : plugin.getKey();
-        author = plugin.getPluginInformation().getVendorName();
         description = plugin.getPluginInformation().getDescription();
         version = plugin.getPluginInformation().getVersion();
     }

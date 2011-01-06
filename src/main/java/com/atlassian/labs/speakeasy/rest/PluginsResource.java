@@ -108,10 +108,7 @@ public class PluginsResource
             {
                 throw new RuntimeException("Couldn't find the plugin in the request");
             }
-            Plugin plugin = null;
-
-            plugin = pluginManager.install(user, pluginFile);
-            final RemotePlugin remotePlugin = new RemotePlugin(plugin);
+            final RemotePlugin remotePlugin = pluginManager.install(user, pluginFile);
             return Response.ok().entity(jaxbJsonMarshaller.marshal(remotePlugin)).build();
         }
         catch (RuntimeException e)

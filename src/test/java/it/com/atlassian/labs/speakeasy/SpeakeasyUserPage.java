@@ -11,8 +11,7 @@ import org.openqa.selenium.support.FindBy;
 
 import javax.inject.Inject;
 import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 /**
  *
@@ -52,6 +51,23 @@ public class SpeakeasyUserPage implements Page
             pluginKeys.add(e.getAttribute("data-pluginkey"));
         }
         return pluginKeys;
+    }
+
+    public Map<String, PluginRow> getPlugins()
+    {
+        Map<String,PluginRow> plugins = new LinkedHashMap<String,PluginRow>();
+        for (WebElement e : pluginsTableBody.findElements(By.tagName("tr")))
+        {
+            PluginRow row = new PluginRow();
+            final String key = e.getAttribute("data-pluginkey");
+            row.setKey(key);
+            row.setName(e.findElement(By.xpath("td[@headers='pluginName']")).getText());
+            row.setDescription(e.findElement(By.xpath("td[@headers='pluginDescription']")).getText());
+            row.setAuthor(e.findElement(By.xpath("td[@headers='pluginAuthor']")).getText());
+            row.setVersion(e.findElement(By.xpath("td[@headers='pluginVersion']")).getText());
+            plugins.put(key,row);
+        }
+        return plugins;
     }
 
     public String getUrl()
@@ -145,6 +161,65 @@ public class SpeakeasyUserPage implements Page
         catch (NoSuchElementException ex)
         {
             return false;
+        }
+    }
+
+    public static class PluginRow
+    {
+        private String key;
+        private String name;
+        private String author;
+        private String description;
+        private String version;
+
+        public String getKey()
+        {
+            return key;
+        }
+
+        public void setKey(String key)
+        {
+            this.key = key;
+        }
+
+        public String getName()
+        {
+            return name;
+        }
+
+        public void setName(String name)
+        {
+            this.name = name;
+        }
+
+        public String getAuthor()
+        {
+            return author;
+        }
+
+        public void setAuthor(String author)
+        {
+            this.author = author;
+        }
+
+        public String getDescription()
+        {
+            return description;
+        }
+
+        public void setDescription(String description)
+        {
+            this.description = description;
+        }
+
+        public String getVersion()
+        {
+            return version;
+        }
+
+        public void setVersion(String version)
+        {
+            this.version = version;
         }
     }
 }

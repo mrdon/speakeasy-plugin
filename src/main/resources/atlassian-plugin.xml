@@ -25,6 +25,7 @@
     <component key="speakeasyManager" class="com.atlassian.labs.speakeasy.SpeakeasyManager" />
     <component key="pluginManager" class="com.atlassian.labs.speakeasy.install.PluginManager" />
     <component key="classPrefixModuleFactory" class="com.atlassian.plugin.module.ClassPrefixModuleFactory" />
+    <component key="speakeasyData" class="com.atlassian.labs.speakeasy.data.SpeakeasyData" />
 
     <component-import key="jsonMarshaller" interface="com.atlassian.plugins.rest.common.json.JaxbJsonMarshaller" />
     <component-import key="userManager" interface="com.atlassian.sal.api.user.UserManager" />
