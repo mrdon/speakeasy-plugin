@@ -31,6 +31,12 @@
     </dependencyManagement>
     <dependencies>
         <dependency>
+            <groupId>com.atlassian.jira</groupId>
+            <artifactId>atlassian-jira</artifactId>
+            <version>${jira.version}</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
             <version>4.6</version>
@@ -162,7 +168,7 @@
                         </product>
                         <product>
                             <id>jira</id>
-                            <version>4.2.1-b588</version>
+                            <version>${jira.version}</version>
                             <dataVersion>4.1.1</dataVersion>
                         </product>
                     </products>
@@ -207,6 +213,7 @@
 
     <properties>
         <platform.version>2.8.8</platform.version>
+        <jira.version>4.2.1-b588</jira.version>
     </properties>
 
 </project>
