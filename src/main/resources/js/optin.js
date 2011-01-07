@@ -49,6 +49,7 @@
             } else {
                 data.uninstall = "";
             }
+            data.user = currentUser;
 
             jQuery(pluginsTable.children()).each(function() {
                 if (jQuery(this).attr("data-pluginKey") == plugin.key){

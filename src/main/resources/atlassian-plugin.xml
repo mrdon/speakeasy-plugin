@@ -26,6 +26,7 @@
     <component key="pluginManager" class="com.atlassian.labs.speakeasy.install.PluginManager" />
     <component key="classPrefixModuleFactory" class="com.atlassian.plugin.module.ClassPrefixModuleFactory" />
     <component key="speakeasyData" class="com.atlassian.labs.speakeasy.data.SpeakeasyData" />
+    <component key="pomProperties" class="com.atlassian.labs.speakeasy.util.PomProperties" />
 
     <component-import key="jsonMarshaller" interface="com.atlassian.plugins.rest.common.json.JaxbJsonMarshaller" />
     <component-import key="userManager" interface="com.atlassian.sal.api.user.UserManager" />
@@ -38,6 +39,12 @@
     <module-type key="scoped-web-resource" class="com.atlassian.labs.speakeasy.SpeakeasyWebResourceModuleDescriptor" />
 
     <module-type key="scoped-web-item" class="com.atlassian.labs.speakeasy.webfragment.SpeakeasyWebItemModuleDescriptor" />
+
+    <!-- product accessors -->
+
+    <component key="productAccessor" class="com.atlassian.labs.speakeasy.product.ConfluenceProductAccessor" application="com.atlassian.confluence" />
+    <component key="productAccessor" class="com.atlassian.labs.speakeasy.product.JiraProductAccessor" application="jira" />
+    <component key="productAccessor" class="com.atlassian.labs.speakeasy.product.RefappProductAccessor" application="refapp" />
 
     <!-- user profile links -->
 

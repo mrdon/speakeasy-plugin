@@ -28,6 +28,9 @@
                     {enableText}
                 </a>
                 {uninstall}
+                <a class="pk_fork" href="$contextPath/rest/speakeasy/1/plugins/fork/{key}-{user}.zip">
+                    Fork
+                </a>
             </td>
         </tr>
     </script>

@@ -153,17 +153,16 @@
                         <product>
                             <id>refapp</id>
                             <version>${platform.version}</version>
-                            <dataVersion>4.1.1</dataVersion>
                         </product>
                         <product>
                             <id>confluence</id>
-                            <version>3.4</version>
-                            <dataVersion>3.0</dataVersion>
+                            <version>${confluence.version}</version>
+                            <dataVersion>${confluence.data.version}</dataVersion>
                         </product>
                         <product>
                             <id>jira</id>
-                            <version>4.2.1-b588</version>
-                            <dataVersion>4.1.1</dataVersion>
+                            <version>${jira.version}</version>
+                            <dataVersion>${jira.data.version}</dataVersion>
                         </product>
                     </products>
                     <testGroups>
@@ -207,6 +206,11 @@
 
     <properties>
         <platform.version>2.8.8</platform.version>
+        <refapp.version>2.8.8</refapp.version>
+        <confluence.version>3.4</confluence.version>
+        <confluence.data.version>3.0</confluence.data.version>
+        <jira.version>4.2.1-b588</jira.version>
+        <jira.data.version>4.1.1</jira.data.version>
     </properties>
 
 </project>

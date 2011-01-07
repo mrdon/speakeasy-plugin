@@ -1,9 +1,19 @@
 package it.com.atlassian.labs.speakeasy;
 
 import com.atlassian.pageobjects.Page;
+import com.atlassian.pageobjects.ProductInstance;
 import com.atlassian.pageobjects.binder.WaitUntil;
 import com.atlassian.webdriver.AtlassianWebDriver;
 import com.google.common.base.Function;
+import org.apache.commons.io.IOUtils;
+import org.apache.http.HttpResponse;
+import org.apache.http.auth.AuthScope;
+import org.apache.http.auth.UsernamePasswordCredentials;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.protocol.BasicHttpContext;
+import org.apache.http.protocol.HttpContext;
 import org.openqa.selenium.By;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebElement;
@@ -11,6 +21,8 @@ import org.openqa.selenium.support.FindBy;
 
 import javax.inject.Inject;
 import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.*;
 
 /**
@@ -21,6 +33,8 @@ public class SpeakeasyUserPage implements Page
     @Inject
     private AtlassianWebDriver driver;
 
+    @Inject
+    ProductInstance productInstance;
 
     @FindBy(id = "pluginsTableBody")
     private WebElement pluginsTableBody;
@@ -136,6 +150,24 @@ public class SpeakeasyUserPage implements Page
         }
         return messages;
     }
+
+    public File forkPlugin(String pluginKey) throws IOException
+    {
+        WebElement pluginRow = getPluginRow(pluginKey);
+        WebElement downloadAction =  pluginRow.findElement(By.className("pk_fork"));
+        String href = downloadAction.getAttribute("href");
+
+        DefaultHttpClient httpclient = new DefaultHttpClient();
+        httpclient.getCredentialsProvider().setCredentials(AuthScope.ANY, new UsernamePasswordCredentials("admin", "admin"));
+        HttpGet get = new HttpGet("http://localhost:" + productInstance.getHttpPort() + href + "?os_username=admin&os_password=admin");
+        HttpResponse res = httpclient.execute(get);
+        File tmpFile = File.createTempFile("speakeasy-fork-", ".zip");
+        FileOutputStream fout = new FileOutputStream(tmpFile);
+        res.getEntity().writeTo(fout);
+        fout.close();
+        return tmpFile;
+    }
+
 
     public SpeakeasyUserPage uninstallPlugin(String pluginKey)
     {

@@ -52,6 +52,21 @@ public class PluginsResource
         }
     }
 
+    @GET
+    @Path("fork/{pluginKey}-{user}.zip")
+    @Produces("application/octet-stream")
+    public Response get(@PathParam("pluginKey") String pluginKey)
+    {
+        File file = pluginManager.getPluginFileAsProject(pluginKey);
+        if (file != null)
+        {
+            return Response.ok().entity(file).build();
+        }
+        else
+        {
+            return Response.status(404).entity("Invalid plugin key - " + pluginKey).build();
+        }
+    }
 
     @POST
     @Path("")
