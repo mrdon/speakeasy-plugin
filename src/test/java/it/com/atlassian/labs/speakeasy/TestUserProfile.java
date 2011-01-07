@@ -7,6 +7,7 @@ import com.atlassian.pageobjects.page.LoginPage;
 import com.atlassian.plugin.test.PluginJarBuilder;
 import com.atlassian.plugin.util.zip.FileUnzipper;
 import com.atlassian.plugin.util.zip.Unzipper;
+import com.atlassian.webdriver.jira.JiraTestedProduct;
 import com.atlassian.webdriver.refapp.RefappTestedProduct;
 import com.google.common.collect.Sets;
 import org.apache.commons.io.FileUtils;
@@ -39,6 +40,10 @@ public class TestUserProfile
         if (!product.visit(HomePage.class).getHeader().isLoggedIn())
         {
             product.visit(LoginPage.class).loginAsSysAdmin(HomePage.class);
+        }
+        if (product instanceof JiraTestedProduct)
+        {
+            product.getPageBinder().override(SpeakeasyUserPage.class, JiraSpeakeasyUserPage.class);
         }
     }
 

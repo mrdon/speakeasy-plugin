@@ -1,10 +1,14 @@
+#if ($useUserProfileDecorator)
 <html>
 <head>
-    <meta name="decorator" content="atl.userprofile"/>
+
+        <meta name="decorator" content="atl.userprofile"/>
     <meta name="tab" content=""/>
     <title>Speakeasy Plugins</title>
 </head>
 <body>
+#end
+<div>
 <script type="text/javascript">
         var staticResourcesPrefix = "$staticResourcesPrefix";
         var contextPath = "$contextPath";
@@ -34,8 +38,6 @@
             </td>
         </tr>
     </script>
-<h1>Speakeasy Plugins</h1>
-
 <div id="aui-message-bar"> </div>
 
 #if ($installAllowed)
@@ -58,5 +60,12 @@
 
 </tbody>
 </table>
+<script type="text/javascript">
+        initSpeakeasy();
+</script>
+</div>
+
+#if ($useUserProfileDecorator)
 </body>
 </html>
+#end

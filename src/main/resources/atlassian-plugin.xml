@@ -27,6 +27,7 @@
     <component key="classPrefixModuleFactory" class="com.atlassian.plugin.module.ClassPrefixModuleFactory" />
     <component key="speakeasyData" class="com.atlassian.labs.speakeasy.data.SpeakeasyData" />
     <component key="pomProperties" class="com.atlassian.labs.speakeasy.util.PomProperties" />
+    <component key="userProfileRenderer" class="com.atlassian.labs.speakeasy.optin.UserProfileRenderer" />
 
     <component-import key="jsonMarshaller" interface="com.atlassian.plugins.rest.common.json.JaxbJsonMarshaller" />
     <component-import key="userManager" interface="com.atlassian.sal.api.user.UserManager" />
@@ -52,6 +53,19 @@
         <label>Speakeasy Plugins</label>
         <link linkId="speakeasy-admin-link">/plugins/servlet/speakeasy/user</link>
     </web-item>
+
+	<web-item key="speakeasy-plugins" name="Speakeasy Tab" section="system.profile" weight="100" application="com.atlassian.confluence">
+		<label>Speakeasy</label>
+		<link>/plugins/servlet/speakeasy/user</link>
+	</web-item>
+
+    <view-profile-panel key="speakeasy-plugins" i18n-name-key="Speakeasy"
+                       name="User Profile Roadmap Panel"
+                       class="com.atlassian.labs.speakeasy.optin.jira.SpeakeasyViewProfilePanel"
+                       application="jira">
+       <order>30</order>
+   </view-profile-panel>
+
 
     <!-- admin links -->
     <web-item key="refimpl-speakeasy-admin-menu" name="Plugin Access" section="system.admin/general"  weight="1" application="refapp">

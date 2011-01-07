@@ -1,4 +1,5 @@
-(function() {
+
+function initSpeakeasy() {
     function togglePlugin(link) {
         var method = link.text().trim() == 'Enable' ? 'PUT' : 'DELETE';
         link.html('<img alt="waiting" src="' + staticResourcesPrefix + '/download/resources/com.atlassian.labs.speakeasy-plugin:optin-js/wait.gif" />');
@@ -31,23 +32,27 @@
                 });
     }
 
-    jQuery(document).ready(function() {
 
-        var pluginsTable = jQuery("#pluginsTableBody");
+    var pluginsTable = jQuery("#pluginsTableBody");
 
-        function addRow(plugin)
+    function addRow(plugin)
+    {
+        var rowTemplate = AJS.template.load("row");
+        var uninstallTemplate = AJS.template.load("uninstall");
+
+        var data = {};
+        jQuery.extend(data, plugin);
+        data.enableText = plugin.enabled ? "Disable" : "Enable";
+        if (data.author == currentUser)
         {
-            var rowTemplate = AJS.template.load("row");
-            var uninstallTemplate = AJS.template.load("uninstall");
+            data["uninstall:html"] = uninstallTemplate.fill(data);
+        } else {
+            data.uninstall = "";
+        }
 
-            var data = {};
-            jQuery.extend(data, plugin);
-            data.enableText = plugin.enabled ? "Disable" : "Enable";
-            if (data.author == currentUser)
-            {
-                data["uninstall:html"] = uninstallTemplate.fill(data);
-            } else {
-                data.uninstall = "";
+        jQuery(pluginsTable.children()).each(function() {
+            if (jQuery(this).attr("data-pluginKey") == plugin.key){
+                jQuery(this).detach();
             }
             data.user = currentUser;
 
@@ -66,57 +71,56 @@
                     return false;
                 });
             });
-
-            jQuery('.pk_enable_toggle', attachedRow).each(function(idx) {
-                var link = jQuery(this);
-                jQuery(link).click(function(event) {
-                    event.preventDefault();
-                    togglePlugin(link);
-                    return false;
-                });
-            });
-        }
-
-
-        jQuery(plugins.plugins).each(function () {
-            addRow(this);
         });
 
-        var pluginFile = jQuery('#pluginFile');
-        var uploadForm = jQuery('#uploadForm');
-
-        var changeForm = function() {
-            uploadForm.ajaxSubmit({
-                dataType: null, //"json",
-                iframe: "true",
-                beforeSubmit: function() {
-                   console.log('beforeSubmit');
-                   var extension = pluginFile.val().substring(pluginFile.val().lastIndexOf('.'));
-                   if (extension != '.jar') {
-                      AJS.messages.error({body: "The extension '" + extension + "' is not allowed"});
-                      return false;
-                   }
-                },
-                success: function(response, status, xhr, $form) {
-                    var data = jQuery.parseJSON(response.substring(response.indexOf('{'), response.lastIndexOf("}") + 1));
-                    console.log('success');
-                    if (data.error) {
-                        AJS.messages.error({title: "Error installing plugin '" + data.key + "'", body: data.error});
-                    } else {
-                        addRow(data);
-                        AJS.messages.success({body: "The plugin '" + data.key + "' was uploaded successfully"});
-                    }
-                    pluginFile.val("");
-                }
+        jQuery('.pk_enable_toggle', attachedRow).each(function(idx) {
+            var link = jQuery(this);
+            jQuery(link).click(function(event) {
+                event.preventDefault();
+                togglePlugin(link);
+                return false;
             });
-        };
-
-        uploadForm.change(function() {
-            setTimeout(changeForm, 1);
         });
+    }
 
-        uploadForm.resetForm();
 
+    jQuery(plugins.plugins).each(function () {
+        addRow(this);
     });
 
-})();
+    var pluginFile = jQuery('#pluginFile');
+    var uploadForm = jQuery('#uploadForm');
+
+    var changeForm = function() {
+        uploadForm.ajaxSubmit({
+            dataType: null, //"json",
+            iframe: "true",
+            beforeSubmit: function() {
+               console.log('beforeSubmit');
+               var extension = pluginFile.val().substring(pluginFile.val().lastIndexOf('.'));
+               if (extension != '.jar') {
+                  AJS.messages.error({body: "The extension '" + extension + "' is not allowed"});
+                  return false;
+               }
+            },
+            success: function(response, status, xhr, $form) {
+                var data = jQuery.parseJSON(response.substring(response.indexOf('{'), response.lastIndexOf("}") + 1));
+                console.log('success');
+                if (data.error) {
+                    AJS.messages.error({title: "Error installing plugin '" + data.key + "'", body: data.error});
+                } else {
+                    addRow(data);
+                    AJS.messages.success({body: "The plugin '" + data.key + "' was uploaded successfully"});
+                }
+                pluginFile.val("");
+            }
+        });
+    };
+
+    uploadForm.change(function() {
+        setTimeout(changeForm, 1);
+    });
+
+    uploadForm.resetForm();
+
+}

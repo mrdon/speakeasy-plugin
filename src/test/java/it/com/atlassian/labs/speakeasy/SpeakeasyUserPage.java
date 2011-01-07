@@ -2,8 +2,10 @@ package it.com.atlassian.labs.speakeasy;
 
 import com.atlassian.pageobjects.Page;
 import com.atlassian.pageobjects.ProductInstance;
+import com.atlassian.pageobjects.TestedProduct;
 import com.atlassian.pageobjects.binder.WaitUntil;
 import com.atlassian.webdriver.AtlassianWebDriver;
+import com.atlassian.webdriver.jira.JiraTestedProduct;
 import com.google.common.base.Function;
 import org.apache.commons.io.IOUtils;
 import org.apache.http.HttpResponse;
@@ -31,7 +33,7 @@ import java.util.*;
 public class SpeakeasyUserPage implements Page
 {
     @Inject
-    private AtlassianWebDriver driver;
+    AtlassianWebDriver driver;
 
     @Inject
     ProductInstance productInstance;
@@ -44,6 +46,9 @@ public class SpeakeasyUserPage implements Page
 
     @FindBy(id = "aui-message-bar")
     private WebElement messageBar;
+
+    @Inject
+    private TestedProduct testedProduct;
 
     @WaitUntil
     public void waitForTableLoad()

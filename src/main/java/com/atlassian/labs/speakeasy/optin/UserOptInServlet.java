@@ -23,75 +23,24 @@ import java.util.concurrent.Callable;
 
 public class UserOptInServlet extends HttpServlet
 {
-    private final TemplateRenderer templateRenderer;
-    private final SpeakeasyManager speakeasyManager;
-    private final UserManager userManager;
-    private final WebResourceManager webResourceManager;
-    private final JaxbJsonMarshaller jaxbJsonMarshaller;
-    private final PluginManager pluginManager;
+    private final UserProfileRenderer renderer;
 
-    public UserOptInServlet(TemplateRenderer templateRenderer, SpeakeasyManager speakeasyManager, UserManager userManager, WebResourceManager webResourceManager, JaxbJsonMarshaller jaxbJsonMarshaller, PluginManager pluginManager)
+    public UserOptInServlet(UserProfileRenderer renderer)
     {
-        this.templateRenderer = templateRenderer;
-        this.speakeasyManager = speakeasyManager;
-        this.userManager = userManager;
-        this.webResourceManager = webResourceManager;
-        this.jaxbJsonMarshaller = jaxbJsonMarshaller;
-        this.pluginManager = pluginManager;
+        this.renderer = renderer;
     }
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse res) throws ServletException, IOException
     {
-        webResourceManager.requireResource("com.atlassian.auiplugin:ajs");
-        webResourceManager.requireResource("com.atlassian.labs.speakeasy-plugin:optin-js");
-        String user = userManager.getRemoteUsername(req);
-        if (user == null)
+        try
         {
-            res.sendError(403, "Unauthorized - must be a valid user");
-            return;
+            res.setContentType("text/html; charset=utf-8");
+            renderer.render(req, res.getWriter(), true);
         }
-        if (ServletFileUpload.isMultipartContent(req))
+        catch (UnauthorizedAccessException e)
         {
-
-        }
-
-        final UserPlugins plugins = speakeasyManager.getUserAccessList(user);
-        final String pluginJson = jaxbJsonMarshaller.marshal(plugins);
-        render("templates/user-optin.vm", ImmutableMap.<String,Object>builder().
-                put("accessList", speakeasyManager.getUserAccessList(user)).
-                put("user", user).
-                put("contextPath", req.getContextPath()).
-                put("plugins", new JsonGetter(pluginJson)).
-                put("installAllowed", pluginManager.canUserInstallPlugins(user)).
-                put("staticResourcesPrefix", webResourceManager.getStaticResourcePrefix(UrlMode.RELATIVE)).
-                build(),
-                res);
-    }
-
-    protected void render(final String template, final Map<String, Object> renderContext,
-                          final HttpServletResponse response)
-            throws IOException
-    {
-        response.setContentType("text/html; charset=utf-8");
-        templateRenderer.render(template, renderContext, response.getWriter());
-    }
-
-    public static class JsonGetter
-    {
-        private final String json;
-
-        public JsonGetter(String json)
-        {
-            this.json = json;
-        }
-
-        @HtmlSafe
-        @com.atlassian.velocity.htmlsafe.HtmlSafe
-        public String getRenderJson()
-        {
-            return json;
+            res.sendError(403, e.getMessage());
         }
     }
-
 }
