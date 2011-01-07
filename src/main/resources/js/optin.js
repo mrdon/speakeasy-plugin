@@ -54,15 +54,22 @@ function initSpeakeasy() {
             if (jQuery(this).attr("data-pluginKey") == plugin.key){
                 jQuery(this).detach();
             }
-        });
-        var filledRow = jQuery(rowTemplate.fill(data).toString());
-        var attachedRow = filledRow.appendTo(pluginsTable);
-        jQuery('.pk_uninstall', attachedRow).each(function(idx) {
-            var link = jQuery(this);
-            jQuery(link).click(function(event) {
-                event.preventDefault();
-                uninstallPlugin(link);
-                return false;
+            data.user = currentUser;
+
+            jQuery(pluginsTable.children()).each(function() {
+                if (jQuery(this).attr("data-pluginKey") == plugin.key){
+                    jQuery(this).detach();
+                }
+            });
+            var filledRow = jQuery(rowTemplate.fill(data).toString());
+            var attachedRow = filledRow.appendTo(pluginsTable);
+            jQuery('.pk_uninstall', attachedRow).each(function(idx) {
+                var link = jQuery(this);
+                jQuery(link).click(function(event) {
+                    event.preventDefault();
+                    uninstallPlugin(link);
+                    return false;
+                });
             });
         });
 

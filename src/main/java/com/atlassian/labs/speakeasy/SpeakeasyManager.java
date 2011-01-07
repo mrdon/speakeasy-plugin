@@ -17,8 +17,6 @@ import com.atlassian.plugin.osgi.external.SingleModuleDescriptorFactory;
 import com.atlassian.plugin.osgi.factory.OsgiPlugin;
 import com.atlassian.plugin.util.WaitUntil;
 import com.atlassian.plugin.webresource.transformer.WebResourceTransformerModuleDescriptor;
-import com.atlassian.sal.api.pluginsettings.PluginSettings;
-import com.atlassian.sal.api.pluginsettings.PluginSettingsFactory;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceRegistration;
@@ -26,10 +24,11 @@ import org.springframework.beans.factory.DisposableBean;
 
 import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+
+import static com.atlassian.labs.speakeasy.util.BundleUtil.findBundleForPlugin;
 
 /**
  *
@@ -151,7 +150,7 @@ public class SpeakeasyManager implements DisposableBean
 
             // generate and register new services
             Integer pluginStateIdentifier = data.getPluginStateIdentifier(pluginKey);
-            Bundle targetBundle = findBundleForPlugin(pluginKey);
+            Bundle targetBundle = findBundleForPlugin(bundleContext, pluginKey);
             List<ModuleDescriptor> generatedDescriptors = new ArrayList<ModuleDescriptor>();
             for (DescriptorGenerator generator : generators)
             {
@@ -187,19 +186,6 @@ public class SpeakeasyManager implements DisposableBean
                 return "Waiting until the enabled plugins are available";
             }
         });
-    }
-
-    private Bundle findBundleForPlugin(String pluginKey)
-    {
-        for (Bundle bundle : bundleContext.getBundles())
-                {
-                    String maybePluginKey = (String) bundle.getHeaders().get(OsgiPlugin.ATLASSIAN_PLUGIN_KEY);
-                    if (pluginKey.equals(maybePluginKey))
-                    {
-                        return bundle;
-                    }
-                }
-        throw new IllegalArgumentException("Cannot find the bundle for the plugin '" + pluginKey + "'");
     }
 
     private List<DescriptorGenerator> findGeneratorsInPlugin(String pluginKey)
