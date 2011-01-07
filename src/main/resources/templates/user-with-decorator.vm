@@ -1,0 +1,10 @@
+<html>
+<head>
+
+    <meta name="decorator" content="atl.userprofile"/>
+    <title>Speakeasy Plugins</title>
+</head>
+<body>
+#parse( "templates/user.vm" )
+</body>
+</html>

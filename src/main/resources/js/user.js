@@ -32,6 +32,23 @@ function initSpeakeasy() {
                 });
     }
 
+    function openForkDialog(key, href) {
+        var dialog = new AJS.Dialog({width:470, height:400, id:'forkDialog'});
+        dialog.addHeader("Fork '" + key + "'");
+        var forkDialogContents = AJS.template.load('fork-dialog')
+                                    .fill({
+                                        pluginKey : key,
+                                        href : href,
+                                        product : product
+                                       })
+                                    .toString();
+        dialog.addPanel("Fork", forkDialogContents, "panel-body");
+        dialog.show();
+        jQuery('#forkLink').click(function(e) {
+            dialog.remove();
+        });
+    }
+
 
     var pluginsTable = jQuery("#pluginsTableBody");
 
@@ -77,6 +94,14 @@ function initSpeakeasy() {
             jQuery(link).click(function(event) {
                 event.preventDefault();
                 togglePlugin(link);
+                return false;
+            });
+        });
+        jQuery('.pk_fork', attachedRow).each(function(idx) {
+            var link = jQuery(this);
+            link.click(function(event) {
+                event.preventDefault();
+                openForkDialog(data.key, link.attr("data-fork"));
                 return false;
             });
         });

@@ -252,7 +252,7 @@ public class PluginManager
             }
 
             zout.putNextEntry(new ZipEntry("pom.xml"));
-            String pomContents = renderPom(pluginAccessor.getPlugin(pluginKey), bundle);
+            String pomContents = renderPom(pluginAccessor.getPlugin(pluginKey));
             IOUtils.copy(new StringReader(pomContents), zout);
 
             zout.putNextEntry(new ZipEntry("src/main/resources/atlassian-plugin.xml"));
@@ -292,13 +292,13 @@ public class PluginManager
         return bout.toByteArray();
     }
 
-    private String renderPom(final Plugin plugin, final Bundle bundle) throws IOException
+    private String renderPom(final Plugin plugin) throws IOException
     {
         final String user = userManager.getRemoteUsername();
         StringWriter writer = new StringWriter();
         templateRenderer.render("templates/pom.vm", new HashMap<String,Object>() {{
              put("pluginKey", plugin.getKey());
-             put("user", user);
+             put("user", sanitizeUser(user));
              put("version", plugin.getPluginInformation().getVersion());
              put("author", data.getPluginAuthor(plugin.getKey()));
              put("product", productAccessor.getSdkName());
@@ -307,5 +307,10 @@ public class PluginManager
              put("speakeasyVersion", data.getSpeakeasyVersion());
         }}, writer);
         return writer.toString();
+    }
+
+    private String sanitizeUser(String user)
+    {
+        return user.replace("@", "at");
     }
 }

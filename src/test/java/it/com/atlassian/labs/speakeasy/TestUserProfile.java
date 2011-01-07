@@ -61,7 +61,8 @@ public class TestUserProfile
     {
         File file = product.visit(SpeakeasyUserPage.class)
                 .uploadPlugin(buildSimplePluginFile())
-                .forkPlugin("test");
+                .openForkDialog("test")
+                .fork();
         assertNotNull(file);
         File unzippedPlugin = new File(file.getParent(), "unzipped");
         if (unzippedPlugin.exists())

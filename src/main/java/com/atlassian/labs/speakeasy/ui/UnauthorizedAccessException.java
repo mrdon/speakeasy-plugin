@@ -1,4 +1,4 @@
-package com.atlassian.labs.speakeasy.optin;
+package com.atlassian.labs.speakeasy.ui;
 
 /**
  *

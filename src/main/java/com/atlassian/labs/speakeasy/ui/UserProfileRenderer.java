@@ -1,8 +1,9 @@
-package com.atlassian.labs.speakeasy.optin;
+package com.atlassian.labs.speakeasy.ui;
 
 import com.atlassian.labs.speakeasy.SpeakeasyManager;
 import com.atlassian.labs.speakeasy.install.PluginManager;
 import com.atlassian.labs.speakeasy.model.UserPlugins;
+import com.atlassian.labs.speakeasy.product.ProductAccessor;
 import com.atlassian.plugin.webresource.UrlMode;
 import com.atlassian.plugin.webresource.WebResourceManager;
 import com.atlassian.plugins.rest.common.json.JaxbJsonMarshaller;
@@ -11,9 +12,7 @@ import com.atlassian.templaterenderer.TemplateRenderer;
 import com.atlassian.templaterenderer.annotations.HtmlSafe;
 import com.google.common.collect.ImmutableMap;
 
-import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.Writer;
 import java.util.Map;
@@ -30,8 +29,9 @@ public class UserProfileRenderer
     private final WebResourceManager webResourceManager;
     private final JaxbJsonMarshaller jaxbJsonMarshaller;
     private final PluginManager pluginManager;
+    private final ProductAccessor productAccessor;
 
-    public UserProfileRenderer(TemplateRenderer templateRenderer, SpeakeasyManager speakeasyManager, UserManager userManager, WebResourceManager webResourceManager, JaxbJsonMarshaller jaxbJsonMarshaller, PluginManager pluginManager)
+    public UserProfileRenderer(TemplateRenderer templateRenderer, SpeakeasyManager speakeasyManager, UserManager userManager, WebResourceManager webResourceManager, JaxbJsonMarshaller jaxbJsonMarshaller, PluginManager pluginManager, ProductAccessor productAccessor)
     {
         this.templateRenderer = templateRenderer;
         this.speakeasyManager = speakeasyManager;
@@ -39,6 +39,7 @@ public class UserProfileRenderer
         this.webResourceManager = webResourceManager;
         this.jaxbJsonMarshaller = jaxbJsonMarshaller;
         this.pluginManager = pluginManager;
+        this.productAccessor = productAccessor;
     }
 
     public void render(HttpServletRequest req, Writer output, boolean useUserProfileDecorator) throws UnauthorizedAccessException, IOException
@@ -53,14 +54,14 @@ public class UserProfileRenderer
 
         final UserPlugins plugins = speakeasyManager.getUserAccessList(user);
         final String pluginJson = jaxbJsonMarshaller.marshal(plugins);
-        render("templates/user-optin.vm", ImmutableMap.<String,Object>builder().
+        render("templates/user" + (useUserProfileDecorator ? "-with-decorator" : "") + ".vm", ImmutableMap.<String,Object>builder().
                 put("accessList", speakeasyManager.getUserAccessList(user)).
                 put("user", user).
                 put("contextPath", req.getContextPath()).
                 put("plugins", new JsonGetter(pluginJson)).
                 put("installAllowed", pluginManager.canUserInstallPlugins(user)).
-                put("useUserProfileDecorator", useUserProfileDecorator).
                 put("staticResourcesPrefix", webResourceManager.getStaticResourcePrefix(UrlMode.RELATIVE)).
+                put("product", productAccessor.getSdkName()).
                 build(),
                 output);
     }

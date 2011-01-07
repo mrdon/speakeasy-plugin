@@ -6,7 +6,7 @@
 
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.atlassian.labs</groupId>
-    <artifactId>${pluginKey}-${user}</artifactId>
+    <artifactId>${pluginKey}-fork-${user}</artifactId>
     <version>${version}-${user}-1-SNAPSHOT</version>
 
     <organization>

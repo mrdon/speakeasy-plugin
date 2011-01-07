@@ -5,12 +5,12 @@
         <vendor name="${project.organization.name}" url="${project.organization.url}" />
     </plugin-info>
 
-    <servlet key="optin-userprofile" name="speakeasy-plugin" class="com.atlassian.labs.speakeasy.optin.UserOptInServlet">
+    <servlet key="optin-userprofile" name="speakeasy-plugin" class="com.atlassian.labs.speakeasy.ui.UserOptInServlet">
         <url-pattern>/speakeasy/user</url-pattern>
     </servlet>
 
     <web-resource key="optin-js">
-        <resource type="download" name="optin.js" location="js/optin.js" />
+        <resource type="download" name="optin.js" location="js/user.js" />
         <resource type="download" name="jquery.form.js" location="js/external/jquery.form.js" />
         <resource type="download" name="wait.gif" location="wait.gif" />
     </web-resource>
@@ -27,7 +27,7 @@
     <component key="classPrefixModuleFactory" class="com.atlassian.plugin.module.ClassPrefixModuleFactory" />
     <component key="speakeasyData" class="com.atlassian.labs.speakeasy.data.SpeakeasyData" />
     <component key="pomProperties" class="com.atlassian.labs.speakeasy.util.PomProperties" />
-    <component key="userProfileRenderer" class="com.atlassian.labs.speakeasy.optin.UserProfileRenderer" />
+    <component key="userProfileRenderer" class="com.atlassian.labs.speakeasy.ui.UserProfileRenderer" />
 
     <component-import key="jsonMarshaller" interface="com.atlassian.plugins.rest.common.json.JaxbJsonMarshaller" />
     <component-import key="userManager" interface="com.atlassian.sal.api.user.UserManager" />
@@ -61,7 +61,7 @@
 
     <view-profile-panel key="speakeasy-plugins" i18n-name-key="Speakeasy"
                        name="User Profile Roadmap Panel"
-                       class="com.atlassian.labs.speakeasy.optin.jira.SpeakeasyViewProfilePanel"
+                       class="com.atlassian.labs.speakeasy.ui.jira.SpeakeasyViewProfilePanel"
                        application="jira">
        <order>30</order>
    </view-profile-panel>

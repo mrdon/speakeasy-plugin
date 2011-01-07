@@ -1,14 +1,12 @@
-package com.atlassian.labs.speakeasy.optin.jira;
+package com.atlassian.labs.speakeasy.ui.jira;
 
 import com.atlassian.jira.plugin.profile.ViewProfilePanel;
 import com.atlassian.jira.plugin.profile.ViewProfilePanelModuleDescriptor;
-import com.atlassian.labs.speakeasy.optin.UnauthorizedAccessException;
-import com.atlassian.labs.speakeasy.optin.UserProfileRenderer;
+import com.atlassian.labs.speakeasy.ui.UnauthorizedAccessException;
+import com.atlassian.labs.speakeasy.ui.UserProfileRenderer;
 import com.opensymphony.user.User;
-import org.apache.commons.logging.LogFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import webwork.action.ActionContext;
 import webwork.action.ServletActionContext;
 
 import javax.servlet.http.HttpServletRequest;
