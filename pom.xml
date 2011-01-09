@@ -13,11 +13,6 @@
     <artifactId>speakeasy-plugin</artifactId>
     <version>1.0-SNAPSHOT</version>
 
-    <organization>
-        <name>Example Company</name>
-        <url>http://www.example.com/</url>
-    </organization>
-
     <name>speakeasy-plugin</name>
     <description>A plugin that provides per-user plugin module management</description>
     <packaging>atlassian-plugin</packaging>
