@@ -145,15 +145,8 @@
     </dependencies>
 
     <build>
-         <extensions>
-            <extension>
-                <groupId>org.jvnet.wagon-svn</groupId>
-                <artifactId>wagon-svn</artifactId>
-                <version>1.8</version>
-            </extension>
-        </extensions>
         <plugins>
-            <plugin>
+            <!--plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-release-plugin</artifactId>
                 <dependencies>
@@ -174,7 +167,7 @@
                         <version>1.1-db-1</version>
                     </dependency>
                 </dependencies>
-            </plugin>
+            </plugin-->
             <plugin>
                 <groupId>com.atlassian.maven.plugins</groupId>
                 <artifactId>maven-refapp-plugin</artifactId>
