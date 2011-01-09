@@ -5,12 +5,12 @@
         <vendor name="${project.organization.name}" url="${project.organization.url}" />
     </plugin-info>
 
-    <servlet key="optin-userprofile" name="speakeasy-plugin" class="com.atlassian.labs.speakeasy.optin.UserOptInServlet">
+    <servlet key="optin-userprofile" name="speakeasy-plugin" class="com.atlassian.labs.speakeasy.ui.UserOptInServlet">
         <url-pattern>/speakeasy/user</url-pattern>
     </servlet>
 
     <web-resource key="optin-js">
-        <resource type="download" name="optin.js" location="js/optin.js" />
+        <resource type="download" name="optin.js" location="js/user.js" />
         <resource type="download" name="jquery.form.js" location="js/external/jquery.form.js" />
         <resource type="download" name="wait.gif" location="wait.gif" />
     </web-resource>
@@ -26,6 +26,8 @@
     <component key="pluginManager" class="com.atlassian.labs.speakeasy.install.PluginManager" />
     <component key="classPrefixModuleFactory" class="com.atlassian.plugin.module.ClassPrefixModuleFactory" />
     <component key="speakeasyData" class="com.atlassian.labs.speakeasy.data.SpeakeasyData" />
+    <component key="pomProperties" class="com.atlassian.labs.speakeasy.util.PomProperties" />
+    <component key="userProfileRenderer" class="com.atlassian.labs.speakeasy.ui.UserProfileRenderer" />
 
     <component-import key="jsonMarshaller" interface="com.atlassian.plugins.rest.common.json.JaxbJsonMarshaller" />
     <component-import key="userManager" interface="com.atlassian.sal.api.user.UserManager" />
@@ -39,12 +41,31 @@
 
     <module-type key="scoped-web-item" class="com.atlassian.labs.speakeasy.webfragment.SpeakeasyWebItemModuleDescriptor" />
 
+    <!-- product accessors -->
+
+    <component key="productAccessor" class="com.atlassian.labs.speakeasy.product.ConfluenceProductAccessor" application="com.atlassian.confluence" />
+    <component key="productAccessor" class="com.atlassian.labs.speakeasy.product.JiraProductAccessor" application="jira" />
+    <component key="productAccessor" class="com.atlassian.labs.speakeasy.product.RefappProductAccessor" application="refapp" />
+
     <!-- user profile links -->
 
     <web-item key="refimpl-speakeasy-user-menu" name="Speakeasy Plugins" section="system.admin/general"  weight="1" application="refapp">
         <label>Speakeasy Plugins</label>
         <link linkId="speakeasy-admin-link">/plugins/servlet/speakeasy/user</link>
     </web-item>
+
+	<web-item key="speakeasy-plugins" name="Speakeasy Tab" section="system.profile" weight="100" application="com.atlassian.confluence">
+		<label>Speakeasy</label>
+		<link>/plugins/servlet/speakeasy/user</link>
+	</web-item>
+
+    <view-profile-panel key="speakeasy-plugins" i18n-name-key="Speakeasy"
+                       name="User Profile Roadmap Panel"
+                       class="com.atlassian.labs.speakeasy.ui.jira.SpeakeasyViewProfilePanel"
+                       application="jira">
+       <order>30</order>
+   </view-profile-panel>
+
 
     <!-- admin links -->
     <web-item key="refimpl-speakeasy-admin-menu" name="Plugin Access" section="system.admin/general"  weight="1" application="refapp">

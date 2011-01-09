@@ -1,5 +1,6 @@
 package com.atlassian.labs.speakeasy.data;
 
+import com.atlassian.labs.speakeasy.util.PomProperties;
 import com.atlassian.sal.api.pluginsettings.PluginSettings;
 import com.atlassian.sal.api.pluginsettings.PluginSettingsFactory;
 
@@ -13,12 +14,19 @@ import java.util.List;
 public class SpeakeasyData
 {
     private final PluginSettings pluginSettings;
+    private final PomProperties pomProperties;
 
-    public SpeakeasyData(PluginSettingsFactory pluginSettingsFactory)
+    public SpeakeasyData(PluginSettingsFactory pluginSettingsFactory, PomProperties pomProperties)
     {
+        this.pomProperties = pomProperties;
         this.pluginSettings = pluginSettingsFactory.createGlobalSettings();
     }
 
+
+    public String getSpeakeasyVersion()
+    {
+        return pomProperties.get("project.version");
+    }
     public void setPluginAuthor(String pluginKey, String username)
     {
         pluginSettings.put(createAccessKey(pluginKey, "author"), username);

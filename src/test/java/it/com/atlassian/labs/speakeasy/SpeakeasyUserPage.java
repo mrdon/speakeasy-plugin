@@ -1,6 +1,9 @@
 package it.com.atlassian.labs.speakeasy;
 
 import com.atlassian.pageobjects.Page;
+import com.atlassian.pageobjects.PageBinder;
+import com.atlassian.pageobjects.ProductInstance;
+import com.atlassian.pageobjects.TestedProduct;
 import com.atlassian.pageobjects.binder.WaitUntil;
 import com.atlassian.webdriver.AtlassianWebDriver;
 import com.google.common.base.Function;
@@ -11,6 +14,7 @@ import org.openqa.selenium.support.FindBy;
 
 import javax.inject.Inject;
 import java.io.File;
+import java.io.IOException;
 import java.util.*;
 
 /**
@@ -19,8 +23,13 @@ import java.util.*;
 public class SpeakeasyUserPage implements Page
 {
     @Inject
-    private AtlassianWebDriver driver;
+    AtlassianWebDriver driver;
 
+    @Inject
+    ProductInstance productInstance;
+
+    @Inject
+    PageBinder pageBinder;
 
     @FindBy(id = "pluginsTableBody")
     private WebElement pluginsTableBody;
@@ -30,6 +39,9 @@ public class SpeakeasyUserPage implements Page
 
     @FindBy(id = "aui-message-bar")
     private WebElement messageBar;
+
+    @Inject
+    private TestedProduct testedProduct;
 
     @WaitUntil
     public void waitForTableLoad()
@@ -136,6 +148,16 @@ public class SpeakeasyUserPage implements Page
         }
         return messages;
     }
+
+    public ForkDialog openForkDialog(String pluginKey) throws IOException
+    {
+        WebElement pluginRow = getPluginRow(pluginKey);
+        WebElement forkAction =  pluginRow.findElement(By.className("pk_fork"));
+        forkAction.click();
+
+        return pageBinder.bind(ForkDialog.class, pluginKey);
+    }
+
 
     public SpeakeasyUserPage uninstallPlugin(String pluginKey)
     {

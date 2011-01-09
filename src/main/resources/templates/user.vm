@@ -1,16 +1,29 @@
-<html>
-<head>
-    <meta name="decorator" content="atl.userprofile"/>
-    <meta name="tab" content=""/>
-    <title>Speakeasy Plugins</title>
-</head>
-<body>
+<div>
 <script type="text/javascript">
         var staticResourcesPrefix = "$staticResourcesPrefix";
         var contextPath = "$contextPath";
         var plugins = $plugins.renderJson;
         var currentUser = "$user";
+        var product = "$product";
     </script>
+
+    <script type="text/x-template" title="fork-dialog">
+        <p>
+            This will create a forked project for the plugin '{pluginKey}'.
+            To use it:
+        </p>
+        <ol>
+            <li>Unzip the file into an empty directory</li>
+            <li>Start the target product with the plugin installed by running:
+<pre>
+mvn {product}:run
+</pre></li>
+            <li>Open up the plugin files, usually in <code>src/main/resources</code>, and refresh your browser
+            to see the changes.</li>
+        </ol>
+        <a id="forkLink" href="{href}">Download</a>
+    </script>
+
     <script type="text/x-template" title="uninstall">
         <a class="pk_uninstall" href="$contextPath/rest/speakeasy/1/plugins/{key}">
             Uninstall
@@ -29,10 +42,12 @@
                     {enableText}
                 </a>
                 {uninstall}
+                <a class="pk_fork" href="javascript:void(0)" data-fork="$contextPath/rest/speakeasy/1/plugins/fork/{key}-fork.zip">
+                    Fork
+                </a>
             </td>
         </tr>
     </script>
-
 <div id="aui-message-bar"> </div>
 
 #if ($installAllowed)
@@ -56,5 +71,7 @@
 
 </tbody>
 </table>
-</body>
-</html>
+<script type="text/javascript">
+        initSpeakeasy();
+</script>
+</div>
