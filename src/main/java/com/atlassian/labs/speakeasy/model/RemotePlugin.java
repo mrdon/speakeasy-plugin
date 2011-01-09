@@ -22,6 +22,8 @@ public class RemotePlugin
 
     private String description;
 
+    private int numUsers = 5;
+
     private boolean enabled;
 
     public RemotePlugin()
@@ -99,5 +101,14 @@ public class RemotePlugin
     public void setEnabled(boolean enabled)
     {
         this.enabled = enabled;
+    }
+
+    @XmlElement
+    public int getNumUsers() {
+        return numUsers;
+    }
+
+    public void setNumUsers(int numUsers) {
+        this.numUsers = numUsers;
     }
 }

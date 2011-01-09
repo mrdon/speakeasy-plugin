@@ -23,6 +23,7 @@
             <td headers="pluginDescription">{description}</td>
             <td headers="pluginAuthor">{author}</td>
             <td headers="pluginVersion">{version}</td>
+            <td headers="pluginUsers">{numUsers}</td>
             <td headers="action">
                 <a class="pk_enable_toggle" href="$contextPath/rest/speakeasy/1/user/{key}">
                     {enableText}
@@ -31,7 +32,6 @@
             </td>
         </tr>
     </script>
-<h1>Speakeasy Plugins</h1>
 
 <div id="aui-message-bar"> </div>
 
@@ -48,6 +48,7 @@
         <th id="pluginDescription">Description</th>
         <th id="pluginAuthor">Author</th>
         <th id="pluginVersion">Version</th>
+        <th id="pluginUsers">Users</th>
         <th id="action">Action</th>
     </tr>
 </thead>
