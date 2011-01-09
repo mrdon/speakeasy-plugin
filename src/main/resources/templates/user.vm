@@ -18,16 +18,14 @@
 <pre>
 mvn {product}:run
 </pre></li>
-            <li>Open up the plugin files, usually in <code>src/main/resources</code>, and refresh your browser
+            <li>Edit the plugin files, usually in <code>src/main/resources</code>, and refresh your browser
             to see the changes.</li>
         </ol>
         <a id="forkLink" href="{href}">Download</a>
     </script>
 
     <script type="text/x-template" title="uninstall">
-        <a class="pk_uninstall" href="$contextPath/rest/speakeasy/1/plugins/{key}">
-            Uninstall
-        </a>
+        <a class="pk_uninstall" href="$contextPath/rest/speakeasy/1/plugins/{key}">Uninstall</a>
     </script>
 
     <script type="text/x-template" title="row">
@@ -37,13 +35,9 @@ mvn {product}:run
             <td headers="pluginAuthor">{author}</td>
             <td headers="pluginVersion">{version}</td>
             <td headers="action">
-                <a class="pk_enable_toggle" href="$contextPath/rest/speakeasy/1/user/{key}">
-                    {enableText}
-                </a>
+                <a class="pk_enable_toggle" href="$contextPath/rest/speakeasy/1/user/{key}">{enableText}</a>
                 {uninstall}
-                <a class="pk_fork" href="javascript:void(0)" data-fork="$contextPath/rest/speakeasy/1/plugins/fork/{key}-fork.zip">
-                    Fork
-                </a>
+                <a class="pk_fork" href="javascript:void(0)" data-fork="$contextPath/rest/speakeasy/1/plugins/fork/{key}-fork.zip">Fork</a>
             </td>
         </tr>
     </script>
@@ -51,7 +45,7 @@ mvn {product}:run
 
 #if ($installAllowed)
     <form id="uploadForm" action="$contextPath/rest/speakeasy/1/plugins" enctype="multipart/form-data" method="post">
-        <input id="pluginFile" type="file" name="pluginFile" size="40">
+        <label for="pluginFile">Install a plugin:</label> <input id="pluginFile" type="file" name="pluginFile" size="40">
     </form>
 #end
 
