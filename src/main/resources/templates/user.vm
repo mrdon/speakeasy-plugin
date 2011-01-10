@@ -27,13 +27,9 @@ mvn {product}:run
     <script type="text/x-template" title="ide-dialog">
         <link id="bespin_base" href="/refapp/download/resources/com.atlassian.labs.speakeasy-plugin:bespin/"/>
 
-        <div id="header">
-            <h1>Speakeasy Extension IDE (Highly Experimental)</h1>
-        </div>
-
         <div id="content">
-            <div id="sidebar">
-                <b>inline-commenting.jar</b>
+            <div id="file-contents-panel">
+                <b>Plugin Contents</b>
                 <ul id="browser" class="filetree">
                 </ul>
             </div>

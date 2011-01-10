@@ -7,10 +7,7 @@
     height: 500px;
     margin: 0;
     padding: 0;
-    border: 0;
-    border: 10px solid #ddd;
-    -moz-border-radius: 10px;
-    -webkit-border-radius: 10px;
+    border: 1px solid #f0f0f0;
 }
 
 .clear {
@@ -30,12 +27,15 @@
     max-width: 100%;
 }
 
-#sidebar {
+#file-contents-panel {
     width: 145px;
     float: left;
     padding: 0 0 0 15px;
-    font-family : Verdana, helvetica, arial, sans-serif;
-    font-size: 68.75%;
+    font-size: 75%;
+}
+
+#file-contents-panel b {
+    color: #666;
 }
 
 body {

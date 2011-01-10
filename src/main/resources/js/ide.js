@@ -2,7 +2,7 @@ function initIDE($, pluginKey, dialog, href){
 
     function createTreeview(container, data) {
         function createNode(parent) {
-			var current = $("<li/>").attr("id", this.id || "").html("<span>" + this.text + "</span>").appendTo(parent);
+			var current = $("<li/>").html("<span>" + this.text + "</span>").appendTo(parent);
 			if (this.classes) {
 				current.children("span").addClass(this.classes);
 			}
@@ -61,6 +61,7 @@ function initIDE($, pluginKey, dialog, href){
         }
 
         var $browser = $("#browser");
+        $browser.treeview();
         jQuery.get(href, function(data) {
             var tree = [], path;
             jQuery.each(data.files, function(){
