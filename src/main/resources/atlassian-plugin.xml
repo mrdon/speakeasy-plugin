@@ -10,7 +10,8 @@
     </servlet>
 
     <web-resource key="optin-js">
-        <resource type="download" name="optin.js" location="js/user.js" />
+        <resource type="download" name="user.js" location="js/user.js" />
+        <resource type="download" name="user.css" location="css/user.css" />
         <resource type="download" name="jquery.form.js" location="js/external/jquery.form.js" />
         <resource type="download" name="wait.gif" location="wait.gif" />
     </web-resource>
@@ -68,7 +69,7 @@
 
 
     <!-- admin links -->
-    <web-item key="refimpl-speakeasy-admin-menu" name="Plugin Access" section="system.admin/general"  weight="1" application="refapp">
+    <!--web-item key="refimpl-speakeasy-admin-menu" name="Plugin Access" section="system.admin/general"  weight="1" application="refapp">
         <label>Plugin Access</label>
         <link linkId="speakeasy-admin-link">/plugins/servlet/speakeasy</link>
     </web-item>
@@ -91,7 +92,7 @@
     <web-item key="fecru-speakeasy-admin-menu" name="Plugin Access" section="system.admin/system"  weight="15" application="fisheye">
         <label>Plugin Access</label>
         <link linkId="speakeasy-admin-link">/plugins/servlet/speakeasy</link>
-    </web-item>
+    </web-item-->
     
 
 </atlassian-plugin>
