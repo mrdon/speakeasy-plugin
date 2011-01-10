@@ -10,7 +10,8 @@
     </servlet>
 
     <web-resource key="optin-js">
-        <resource type="download" name="optin.js" location="js/user.js" />
+        <resource type="download" name="user.js" location="js/user.js" />
+        <resource type="download" name="user.css" location="css/user.css" />
         <resource type="download" name="jquery.form.js" location="js/external/jquery.form.js" />
         <resource type="download" name="wait.gif" location="wait.gif" />
     </web-resource>

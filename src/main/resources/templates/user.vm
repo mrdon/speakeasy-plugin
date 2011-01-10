@@ -1,4 +1,4 @@
-<div>
+<div id="speakeasyUserMain">
 <script type="text/javascript">
         var staticResourcesPrefix = "$staticResourcesPrefix";
         var contextPath = "$contextPath";
