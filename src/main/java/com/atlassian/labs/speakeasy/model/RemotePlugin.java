@@ -22,7 +22,7 @@ public class RemotePlugin
 
     private String description;
 
-    private int numUsers = 5;
+    private int numUsers = 0;
 
     private boolean enabled;
 

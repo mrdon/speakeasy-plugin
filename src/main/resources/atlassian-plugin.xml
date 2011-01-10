@@ -16,6 +16,17 @@
         <resource type="download" name="wait.gif" location="wait.gif" />
     </web-resource>
 
+    <!--
+        Bespin-based IDE sample served from below.
+
+        Load sample from this URL:
+
+        http://localhost:1990/confluence/download/resources/com.atlassian.labs.speakeasy-plugin:ide/ide/samples/speakeasy.html
+    -->
+    <web-resource key="ide">
+        <resource type="download" name="ide/" location="prebuilt"/>
+    </web-resource>
+
     <web-resource-transformer key="userTransformer" class="com.atlassian.labs.speakeasy.UserScopedTransformer" />
 
     <rest key="rest" path="/speakeasy" version="1">

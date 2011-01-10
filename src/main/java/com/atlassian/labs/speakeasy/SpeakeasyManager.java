@@ -83,6 +83,7 @@ public class SpeakeasyManager implements DisposableBean
                     remotePlugin.setAuthor(data.getPluginAuthor(plugin.getKey()));
                     List<String> accessList = data.getUsersList(plugin.getKey());
                     remotePlugin.setEnabled(accessList.contains(userName));
+                    remotePlugin.setNumUsers(accessList.size());
                     plugins.add(remotePlugin);
                     break;
                 }

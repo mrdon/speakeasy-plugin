@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Speakeasy Editor Prototype</title>
+<link id="bespin_base" href="../">
+<link rel="stylesheet" type="text/css" href="../BespinEmbedded.css">
+<script type="text/javascript" src="../BespinEmbedded.uncompressed.js"></script>
+ <script src="http://code.jquery.com/jquery-latest.js"></script>
+  <link rel="stylesheet" href="http://view.jquery.com/trunk/plugins/treeview/jquery.treeview.css" type="text/css" media="screen" />
+  <script type="text/javascript" src="http://view.jquery.com/trunk/plugins/treeview/jquery.treeview.js"></script>
+  <script type="text/javascript" src="http://view.jquery.com/trunk/plugins/treeview/jquery.treeview.async.js"></script>
+  <style type="text/css">
+	* {
+	    margin: 0;
+	    padding: 0;
+	}
+
+	.bespin {
+		height: 400px;
+		margin: 0; padding: 0; border: 0; border: 10px solid #ddd; -moz-border-radius: 10px; -webkit-border-radius: 10px; 
+	}
+
+	.clear { clear: both; }
+
+	#header {
+	    padding: 15px 0 15px 15px;
+	}
+
+	#content {
+	    padding: 15px 30px 0 0;
+    }
+
+    #main-content {
+        margin-left: 175px;
+        max-width: 700px;
+    }
+
+	#sidebar {
+	    width: 145px;
+	    float: left;
+	    padding: 0 0 0 15px;
+	
+		// tree styles
+	    font-family: Verdana, helvetica, arial, sans-serif;
+	    font-size: 68.75%;
+	}
+
+	body {
+		font-family: Helvetica, Arial, Sans-Serif;
+	}
+	</style>
+	<script>
+	$(document).ready(function(){
+		// setup a mock data structure for files
+		var xml = "<atlassian-plugin key=\"${project.groupId}.${project.artifactId}\" name=\"${project.name}\" plugins-version=\"2\">\n" + 
+"		    <plugin-info>\n" + 
+"		        <description>${project.description}</description>\n" + 
+"		        <version>${project.version}</version>\n" + 
+"		        <vendor name=\"${project.organization.name}\" url=\"${project.organization.url}\" />\n" + 
+"		    </plugin-info>\n" + 
+"\n" + 
+"		    <scoped-web-resource key=\"annotate\">\n" + 
+"		        <resource type=\"download\" name=\"annotate.js\" location=\"js/annotate.js\" />\n" + 
+"		        <context>page</context>\n" + 
+"		        <context>blogpost</context>\n" + 
+"		    </scoped-web-resource>\n" + 
+"		</atlassian-plugin>";
+	
+		var js = "function foo(){\n  var two = 1 + 1;\n}";
+
+		var html = "<div id='foo'>\n  <a href='#'>Link goes here</a>\n</div>\n";
+
+        // eventually retrieve this from a REST service for the plugin fork
+		var fileContents = {
+			"atlassian-plugin.xml": xml,
+		    "com/annotate.js": js,
+			"com/test.html": html
+		};
+		
+	  // JQuery Async tree view 
+	  // http://www.dynamicdrive.com/dynamicindex1/treeview/treeview_suppliment.htm
+	  // we load all the files in one go, but we could do that on expand too (for performance)
+	  // replace the below query with a REST service that returns the plugin files / folders
+	  $("#browser").treeview({url: "json/tree.json"});
+	
+		function handler(event) {
+			var $target = $(event.target);
+		
+			if( $target.is(".editable-bespin") ) {
+				var edit = $("#editor")[0]
+				// Get the environment variable.
+			    var env = edit.bespin;
+			    // Get the editor.
+			    var editor = env.editor;
+			    // Change the value and move to the secound line.
+			    editor.value = fileContents[event.target.id];
+			
+				if (event.target.id.match(/([^\/\\]+)\.(xml|html|js)$/i))
+				{
+					if (RegExp.$2 == 'xml')
+						editor.syntax = 'html'
+					else	
+						editor.syntax = RegExp.$2;
+				}
+
+			    editor.setLineNumber(1);
+				editor.stealFocus = true;
+		  	}
+		}
+		
+		$("#browser").click(handler);
+	});
+	</script>
+  </head>
+<body>
+	<div id="header">
+		<h1>Speakeasy Extension IDE</h1>
+	</div>
+
+	<div id="content">
+		<div id="sidebar">
+			<b>inline-commenting.jar</b>
+			<ul id="browser" class="filetree"></ul>
+		</div>
+		<div id="main-content">
+			<div id="editor" class="bespin" data-bespinoptions='{ "stealFocus": true, "syntax": "html", "settings": { "tabstop": 4, "theme": "white" } }'></div>
+			<div style="float:right; font-size: 1em;">
+				<button>Save</button> <a href="">Cancel</a>
+			</div>
+		</div>
+		<div class="clear"></div>
+	</div>
+</body>
+</html>
+
+

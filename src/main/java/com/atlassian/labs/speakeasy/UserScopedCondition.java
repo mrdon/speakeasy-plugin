@@ -31,7 +31,7 @@ public class UserScopedCondition implements Condition
     {
         String userString = props.get("users");
 
-        users = new HashSet<String>((userString != null && userString.length() > 0) ? asList(userString.split("|")) : Collections.<String>emptySet());
+        users = new HashSet<String>((userString != null && userString.length() > 0) ? asList(userString.split("\\|")) : Collections.<String>emptySet());
     }
 
     public boolean shouldDisplay(Map<String, Object> stringObjectMap)

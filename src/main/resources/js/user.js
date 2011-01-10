@@ -1,6 +1,6 @@
 
 function initSpeakeasy() {
-    function togglePlugin(link) {
+    function togglePlugin(link, attachedRow) {
         var method = link.text().trim() == 'Enable' ? 'PUT' : 'DELETE';
         link.html('<img alt="waiting" src="' + staticResourcesPrefix + '/download/resources/com.atlassian.labs.speakeasy-plugin:optin-js/wait.gif" />');
         jQuery.ajax({
@@ -93,7 +93,7 @@ function initSpeakeasy() {
             var link = jQuery(this);
             jQuery(link).click(function(event) {
                 event.preventDefault();
-                togglePlugin(link);
+                togglePlugin(link, attachedRow);
                 return false;
             });
         });
