@@ -32,6 +32,11 @@ public class SpeakeasyData
         pluginSettings.put(createAccessKey(pluginKey, "author"), username);
     }
 
+    public void clearPluginAuthor(String pluginKey)
+    {
+        pluginSettings.remove(createAccessKey(pluginKey, "author"));
+    }
+
     public String getPluginAuthor(String pluginKey)
     {
         return (String) pluginSettings.get(createAccessKey(pluginKey, "author"));

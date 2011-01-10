@@ -89,7 +89,7 @@ public class PluginManager
         {
             PluginArtifact pluginArtifact = pluginArtifactFactory.create(pluginFile.toURI());
             verifyContents(pluginArtifact);
-            verifyModules(pluginArtifact);
+            verifyDescriptor(pluginArtifact, user);
             Set<String> pluginKeys = pluginController.installPlugins(pluginArtifact);
             if (pluginKeys.size() == 1)
             {
@@ -131,25 +131,37 @@ public class PluginManager
         }
     }
 
-    private void verifyModules(PluginArtifact plugin) throws PluginOperationFailedException
+    private void verifyDescriptor(PluginArtifact plugin, String user) throws PluginOperationFailedException
+    {
+        Document doc = loadPluginDescriptor(plugin);
+        for (Element module : ((List<Element>)doc.getRootElement().elements()))
+        {
+            if (!pluginModulesWhitelist.contains(module.getName()))
+            {
+                throw new PluginOperationFailedException("Invalid plugin module: " + module.getName());
+            }
+        }
+
+        String pluginKey = doc.getRootElement().attributeValue("key");
+        if (!user.equals(data.getPluginAuthor(pluginKey)))
+        {
+            throw new PluginOperationFailedException("Unable to upgrade the '" + pluginKey + "' as you didn't install it");
+        }
+
+    }
+
+    private Document loadPluginDescriptor(PluginArtifact plugin) throws PluginOperationFailedException
     {
         InputStream in = null;
         try
         {
             in = plugin.getResourceAsStream("atlassian-plugin.xml");
-            Document doc = new SAXReader().read(in);
-            for (Element module : ((List<Element>)doc.getRootElement().elements()))
-            {
-                if (!pluginModulesWhitelist.contains(module.getName()))
-                {
-                    throw new PluginOperationFailedException("Invalid plugin module: " + module.getName());
-                }
-            }
+            return new SAXReader().read(in);
         }
         catch (final DocumentException e)
-            {
-                throw new PluginOperationFailedException("Cannot parse XML plugin descriptor", e);
-            }
+        {
+            throw new PluginOperationFailedException("Cannot parse XML plugin descriptor", e);
+        }
         finally
         {
             IOUtils.closeQuietly(in);
@@ -210,6 +222,7 @@ public class PluginManager
 
         if (user.equals(data.getPluginAuthor(pluginKey))) {
             pluginController.uninstall(plugin);
+            data.clearPluginAuthor(pluginKey);
         } else {
             throw new PluginOperationFailedException("User '" + user + "' is not the author of plugin '" + pluginKey + "' and cannot uninstall it");
         }
