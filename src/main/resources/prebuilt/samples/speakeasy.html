@@ -4,6 +4,16 @@
 <title>Speakeasy Editor Prototype</title>
 <link id="bespin_base" href="../">
 <link rel="stylesheet" type="text/css" href="../BespinEmbedded.css">
+
+      <link type="text/css" rel="stylesheet" href="http://docs.atlassian.com/aui/latest/AUI/css/atlassian/basic.css" media="all">
+     <link type="text/css" rel="stylesheet" href="http://docs.atlassian.com/aui/latest/AUI/css/atlassian/firebug.css" media="all">
+     <link type="text/css" rel="stylesheet" href="http://docs.atlassian.com/aui/latest/AUI/css/atlassian/dialog.css" media="all">
+     <link type="text/css" rel="stylesheet" href="http://docs.atlassian.com/aui/latest/AUI/css/atlassian/dropdown.css" media="all">
+     <link type="text/css" rel="stylesheet" href="http://docs.atlassian.com/aui/latest/AUI/css/atlassian/forms.css" media="all">
+     <link type="text/css" rel="stylesheet" href="http://docs.atlassian.com/aui/latest/AUI/css/atlassian/icons.css" media="all">
+     <link type="text/css" rel="stylesheet" href="http://docs.atlassian.com/aui/latest/AUI/css/atlassian/toolbar.css" media="all">
+
+    <script type="text/javascript" src="http://docs.atlassian.com/aui/latest/demo-pages/aui.js"></script>
 <script type="text/javascript" src="../BespinEmbedded.uncompressed.js"></script>
  <script src="http://code.jquery.com/jquery-latest.js"></script>
   <link rel="stylesheet" href="http://view.jquery.com/trunk/plugins/treeview/jquery.treeview.css" type="text/css" media="screen" />
@@ -17,7 +27,10 @@
 
 	.bespin {
 		height: 400px;
-		margin: 0; padding: 0; border: 0; border: 10px solid #ddd; -moz-border-radius: 10px; -webkit-border-radius: 10px; 
+		margin: 0; padding: 0;
+        border-width: 1px  1px 0 0;
+        border-color: #bbb;
+        border-style: solid;
 	}
 
 	.clear { clear: both; }
@@ -27,7 +40,7 @@
 	}
 
 	#content {
-	    padding: 15px 30px 0 0;
+	    padding: 15px 0 0 0;
     }
 
     #main-content {
@@ -48,6 +61,47 @@
 	body {
 		font-family: Helvetica, Arial, Sans-Serif;
 	}
+
+        /* CSS for demo only. specific icon mappings are still done at the product level, standard icons will be done in AUI only when finalised. */
+        .aui-toolbar .icon {
+            text-indent: -9999em;
+            width: 24px;
+            float: left;
+            height: 100%;
+            margin: 0 -5px;
+            display: inline-block;
+            background: transparent url("http://docs.atlassian.com/auiplugin/src/main/resources/css/atlassian/images/toolbar/aui-toolbar-24px.png") 0 0 no-repeat;
+        }
+
+        .aui-toolbar span.icon-labels {
+            background-position: -164px -19px;
+        }
+
+        .aui-toolbar span.icon-permissions {
+            background-position: -188px -19px;
+        }
+
+        .aui-toolbar span.icon-link {
+            background-position: 4px -18px;
+        }
+
+        .aui-toolbar span.icon-insert {
+            background-position: -212px 5px;
+        }
+
+        /* fake active style */
+        #active-button {
+            background: #d8e4f0 url("http://docs.atlassian.com//aui/latest/demo-pages/toolbar/images/toolbar/aui-toolbar-button-active-bg.png") top left repeat-x;
+        }
+
+        /* fake active for demo purposes. */
+
+        /* example with borders/bg set */
+        #demo-toolbar-with-bg {
+            background: #f0f0f0;
+            width: 100%;
+            border-top: 1px solid #bbb;
+        }
 	</style>
 	<script>
 	$(document).ready(function(){
@@ -124,12 +178,29 @@
 		</div>
 		<div id="main-content">
 			<div id="editor" class="bespin" data-bespinoptions='{ "stealFocus": true, "syntax": "html", "settings": { "tabstop": 4, "theme": "white" } }'></div>
-			<div style="float:right; font-size: 1em;">
-				<button>Save</button> <a href="">Cancel</a>
-			</div>
 		</div>
-		<div class="clear"></div>
-	</div>
+
+        <div class="clear"></div>
+
+        <div id="demo-toolbar-with-bg" class="aui-toolbar">
+            <div class="toolbar-split toolbar-split-right">
+
+                <!-- Active/Inactive Button -->
+                <ul class="toolbar-group">
+                    <li class="toolbar-item">
+                        <a class="toolbar-trigger" href="#" id="save-button2">Save</a>
+                    </li>
+                </ul>
+
+                <!-- Link style button -->
+                <ul class="toolbar-group">
+                    <li class="toolbar-item toolbar-item-link">
+                        <a href="#" class="toolbar-trigger" id="cancel-button2">Cancel</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
 </body>
 </html>
 
