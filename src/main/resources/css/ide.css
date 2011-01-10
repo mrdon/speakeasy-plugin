@@ -1,0 +1,43 @@
+* {
+    margin: 0;
+    padding: 0;
+}
+
+.bespin {
+    height: 500px;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    border: 10px solid #ddd;
+    -moz-border-radius: 10px;
+    -webkit-border-radius: 10px;
+}
+
+.clear {
+    clear: both;
+}
+
+#header {
+    padding: 15px 0 15px 15px;
+}
+
+#content {
+    padding: 15px 30px 0 0;
+}
+
+#main-content {
+    margin-left: 175px;
+    max-width: 100%;
+}
+
+#sidebar {
+    width: 145px;
+    float: left;
+    padding: 0 0 0 15px;
+    font-family : Verdana, helvetica, arial, sans-serif;
+    font-size: 68.75%;
+}
+
+body {
+    font-family: Helvetica, Arial, Sans-Serif;
+}

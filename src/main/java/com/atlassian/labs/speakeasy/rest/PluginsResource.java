@@ -2,6 +2,7 @@ package com.atlassian.labs.speakeasy.rest;
 
 import com.atlassian.labs.speakeasy.install.PluginOperationFailedException;
 import com.atlassian.labs.speakeasy.install.PluginManager;
+import com.atlassian.labs.speakeasy.model.PluginIndex;
 import com.atlassian.labs.speakeasy.model.RemotePlugin;
 import com.atlassian.plugin.Plugin;
 import com.atlassian.plugins.rest.common.json.JaxbJsonMarshaller;
@@ -65,6 +66,55 @@ public class PluginsResource
         else
         {
             return Response.status(404).entity("Invalid plugin key - " + pluginKey).build();
+        }
+    }
+
+    @GET
+    @Path("{pluginKey}/index")
+    @Produces("application/json")
+    public Response getIndex(@PathParam("pluginKey") String pluginKey)
+    {
+        // todo: should only allow speakeasy and devmode plugins
+        PluginIndex index = new PluginIndex();
+        try
+        {
+            index.setFiles(pluginManager.getPluginFileNames(pluginKey));
+            return Response.ok().entity(index).build();
+        }
+        catch (IllegalArgumentException ex)
+        {
+            return Response.status(404).entity("Invalid plugin key - " + pluginKey).build();
+        }
+    }
+
+    @GET
+    @Path("{pluginKey}/file")
+    @Produces("text/plain")
+    public Response getIndex(@PathParam("pluginKey") String pluginKey, @QueryParam("path") String fileName)
+    {
+        // todo: should only allow speakeasy and devmode plugins; handle wrong key or file
+        return Response.ok().entity(pluginManager.getPluginFile(pluginKey, fileName)).build();
+    }
+
+    @PUT
+    @Path("{pluginKey}/file")
+    @Consumes("text/plain")
+    @Produces("application/json")
+    public Response saveAndRebuild(@PathParam("pluginKey") String pluginKey, @QueryParam("path") String fileName, String contents)
+    {
+        // todo: should only allow speakeasy and devmode plugins; handle wrong key or file
+        try
+        {
+            final RemotePlugin remotePlugin = pluginManager.saveAndRebuild(pluginKey, userManager.getRemoteUsername(), fileName, contents);
+            return Response.ok().entity(jaxbJsonMarshaller.marshal(remotePlugin)).build();
+        }
+        catch (RuntimeException e)
+        {
+            return Response.ok().entity("{\"error\":\"" + e.getMessage() + "\"}").build();
+        }
+        catch (PluginOperationFailedException e)
+        {
+            return Response.ok().entity("{\"error\":\"" + e.getMessage() + "\"}").build();
         }
     }
 

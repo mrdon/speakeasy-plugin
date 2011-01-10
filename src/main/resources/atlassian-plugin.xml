@@ -23,9 +23,32 @@
 
         http://localhost:1990/confluence/download/resources/com.atlassian.labs.speakeasy-plugin:ide/ide/samples/speakeasy.html
     -->
-    <web-resource key="ide">
-        <resource type="download" name="ide/" location="prebuilt"/>
+    <web-resource key="bespin-css">
+        <resource type="download" name="BespinEmbedded.css" location="bespin/BespinEmbedded.css" />
+
     </web-resource>
+
+    <web-resource key="bespin">
+        <resource type="download" name="BespinEmbedded.js" location="bespin/BespinEmbedded.js" />
+        <resource type="download" name="BespinMain.js" location="bespin/BespinMain.js" />
+        <resource type="download" name="BespinWorker.js" location="bespin/BespinWorker.js" />
+        <resource type="download" name="resources/" location="bespin/resources/"/>
+    </web-resource>
+
+    <web-resource key="treeview">
+        <resource type="download" name="jquery.treeview.js" location="treeview/jquery.treeview.js" />
+        <resource type="download" name="jquery.treeview.css" location="treeview/jquery.treeview.css" />
+
+        <resource type="download" name="images/" location="treeview/images/"/>
+    </web-resource>
+
+    <web-resource key="ide">
+        <dependency>${project.groupId}.${project.artifactId}:bespin-css</dependency>
+        <dependency>${project.groupId}.${project.artifactId}:treeview</dependency>
+        <resource type="download" name="ide.js" location="js/ide.js" />
+        <resource type="download" name="ide.css" location="css/ide.css" />
+    </web-resource>
+
 
     <web-resource-transformer key="userTransformer" class="com.atlassian.labs.speakeasy.UserScopedTransformer" />
 

@@ -1,5 +1,7 @@
 package com.atlassian.labs.speakeasy.install;
 
+import com.atlassian.jira.issue.attachment.AttachmentZipKit;
+import com.atlassian.jira.util.collect.MapBuilder;
 import com.atlassian.labs.speakeasy.data.SpeakeasyData;
 import com.atlassian.labs.speakeasy.model.RemotePlugin;
 import com.atlassian.labs.speakeasy.product.ProductAccessor;
@@ -21,6 +23,7 @@ import java.io.InputStream;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Enumeration;
 import java.util.HashMap;
@@ -143,7 +146,8 @@ public class PluginManager
         }
 
         String pluginKey = doc.getRootElement().attributeValue("key");
-        if (!user.equals(data.getPluginAuthor(pluginKey)))
+        String recordedAuthor = data.getPluginAuthor(pluginKey);
+        if (pluginAccessor.getPlugin(pluginKey) != null && !user.equals(recordedAuthor))
         {
             throw new PluginOperationFailedException("Unable to upgrade the '" + pluginKey + "' as you didn't install it");
         }
@@ -249,19 +253,16 @@ public class PluginManager
             zout.putNextEntry(new ZipEntry("src/main/"));
             zout.putNextEntry(new ZipEntry("src/main/resources/"));
 
-            for (Enumeration<String> e = bundle.getEntryPaths(""); e.hasMoreElements(); )
+            List<String> paths = getPluginFileNames(bundle);
+            paths.remove("atlassian-plugin.xml");
+            for (String path : paths)
             {
-                String path = e.nextElement();
-                if (!path.endsWith("/") && !path.startsWith("META-INF") && !path.equals("pom.xml") && !path.equals("atlassian-plugin.xml"))
-                {
-                    byte[] data = readEntry(bundle, path);
-
-                    String actualPath = "src/main/resources/" + path;
-                    ZipEntry entry = new ZipEntry(actualPath);
-                    entry.setSize(data.length);
-                    zout.putNextEntry(entry);
-                    zout.write(data, 0, data.length);
-                }
+                byte[] data = readEntry(bundle, path);
+                String actualPath = "src/main/resources/" + path;
+                ZipEntry entry = new ZipEntry(actualPath);
+                entry.setSize(data.length);
+                zout.putNextEntry(entry);
+                zout.write(data, 0, data.length);
             }
 
             zout.putNextEntry(new ZipEntry("pom.xml"));
@@ -286,6 +287,27 @@ public class PluginManager
         }
         return file;
     }
+
+    public List<String> getPluginFileNames(String pluginKey)
+    {
+        return getPluginFileNames(findBundleForPlugin(bundleContext, pluginKey));
+    }
+
+    private List<String> getPluginFileNames(Bundle bundle)
+    {
+        notNull(bundle);
+        List<String> contents = new ArrayList<String>();
+        for (Enumeration<String> e = bundle.getEntryPaths(""); e.hasMoreElements(); )
+        {
+            String path = e.nextElement();
+            if (!path.startsWith("META-INF") && !path.equals("pom.xml") && !path.endsWith("/"))
+            {
+                contents.add(path);
+            }
+        }
+        return contents;
+    }
+
 
     private byte[] readEntry(Bundle bundle, String path)
             throws IOException
@@ -325,5 +347,60 @@ public class PluginManager
     private String sanitizeUser(String user)
     {
         return user.replace("@", "at");
+    }
+
+    public String getPluginFile(String pluginKey, String fileName)
+    {
+        try
+        {
+            return new String(readEntry(findBundleForPlugin(bundleContext, pluginKey), fileName));
+        }
+        catch (IOException e)
+        {
+            throw new IllegalArgumentException(e);
+        }
+    }
+
+    public RemotePlugin saveAndRebuild(String pluginKey, String user, String fileName, String contents) throws PluginOperationFailedException
+    {
+        Bundle bundle = findBundleForPlugin(bundleContext, pluginKey);
+        notNull(bundle);
+        ZipOutputStream zout = null;
+        File tmpFile = null;
+        try
+        {
+            tmpFile = File.createTempFile("speakeasy-edit", ".jar");
+            zout = new ZipOutputStream(new FileOutputStream(tmpFile));
+            for (Enumeration<String> e = bundle.getEntryPaths(""); e.hasMoreElements(); )
+            {
+                String path = e.nextElement();
+                if (!path.equals(fileName))
+                {
+                    byte[] data = readEntry(bundle, path);
+                    ZipEntry entry = new ZipEntry(path);
+                    entry.setSize(data.length);
+                    zout.putNextEntry(entry);
+                    zout.write(data);
+                }
+            }
+            ZipEntry entry = new ZipEntry(fileName);
+            byte[] data = contents.getBytes();
+            entry.setSize(data.length);
+            zout.putNextEntry(entry);
+            zout.write(data);
+            zout.close();
+
+            return install(user, tmpFile);
+        }
+        catch (IOException e)
+        {
+            e.printStackTrace();
+
+            throw new PluginOperationFailedException("Unable to create zip file", e);
+        }
+        finally
+        {
+            IOUtils.closeQuietly(zout);
+        }
     }
 }

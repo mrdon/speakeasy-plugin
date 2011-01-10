@@ -53,6 +53,12 @@ function initSpeakeasy() {
         });
     }
 
+    function openIDE(key, href) {
+        var $win = jQuery(window);
+        var dialog = new AJS.Dialog({width: $win.width() * .95, height: $win.height() * .95, id:'ideDialog'});
+        initIDE(jQuery, key, dialog, href);
+    }
+
 
     var pluginsTable = jQuery("#pluginsTableBody");
 
@@ -98,6 +104,14 @@ function initSpeakeasy() {
             jQuery(link).click(function(event) {
                 event.preventDefault();
                 togglePlugin(link, attachedRow);
+                return false;
+            });
+        });
+        jQuery('.pk_edit', attachedRow).each(function(idx) {
+            var link = jQuery(this);
+            jQuery(link).click(function(event) {
+                event.preventDefault();
+                openIDE(data.key, link.attr("href"));
                 return false;
             });
         });
@@ -151,4 +165,11 @@ function initSpeakeasy() {
 
     uploadForm.resetForm();
 
-};
+    AJS.whenIType('shift+e').execute(function() {
+            var selection = getSelected();
+            if(selection && (selection = new String(selection).replace(/^\s+|\s+$/g,''))) {
+                handleSelection(selection);
+            }
+        });
+
+}
