@@ -80,16 +80,40 @@ public class SpeakeasyManager implements DisposableBean
                 if (moduleDescriptor instanceof DescriptorGenerator)
                 {
                     RemotePlugin remotePlugin = new RemotePlugin(plugin);
-                    remotePlugin.setAuthor(data.getPluginAuthor(plugin.getKey()));
+                    remotePlugin.setAuthor(getPluginAuthor(plugin));
                     List<String> accessList = data.getUsersList(plugin.getKey());
                     remotePlugin.setEnabled(accessList.contains(userName));
                     remotePlugin.setNumUsers(accessList.size());
+                    boolean canUninstall = userName.equals(remotePlugin.getAuthor()) && onlyContainsSpeakeasyModules(plugin);
+                    remotePlugin.setCanUninstall(canUninstall);
                     plugins.add(remotePlugin);
                     break;
                 }
             }
         }
         return new UserPlugins(plugins);
+    }
+
+    private String getPluginAuthor(Plugin plugin)
+    {
+        String author = data.getPluginAuthor(plugin.getKey());
+        if (author == null)
+        {
+            author = plugin.getPluginInformation().getVendorName();
+        }
+        return author;
+    }
+
+    private boolean onlyContainsSpeakeasyModules(Plugin plugin)
+    {
+        for (ModuleDescriptor descriptor : plugin.getModuleDescriptors())
+        {
+            if (!(descriptor instanceof DescriptorGenerator))
+            {
+                return false;
+            }
+        }
+        return true;
     }
 
     public void allowUserAccess(String pluginKey, String user)
