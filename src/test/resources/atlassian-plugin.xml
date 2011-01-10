@@ -2,7 +2,7 @@
     <plugin-info>
         <version>1</version>
         <description>Alerts 'loaded' on non-admin pages</description>
-        <vendor name="admin"/>
+        <vendor name="Some Guy"/>
     </plugin-info>
 
     <scoped-web-resource key="testScoping">

@@ -32,9 +32,27 @@ public class SpeakeasyData
         pluginSettings.put(createAccessKey(pluginKey, "author"), username);
     }
 
+    public void clearPluginAuthor(String pluginKey)
+    {
+        pluginSettings.remove(createAccessKey(pluginKey, "author"));
+    }
+
     public String getPluginAuthor(String pluginKey)
     {
         return (String) pluginSettings.get(createAccessKey(pluginKey, "author"));
+    }
+
+    public void setDeveloperModeEnabled(String username, boolean devmode)
+    {
+        pluginSettings.put(createAccessKey("devmode", username), String.valueOf(devmode));
+    }
+
+    public boolean isDeveloperModuleEnabled(String username)
+    {
+        String val = (String) pluginSettings.get(createAccessKey("devmode", username));
+
+        // TODO: Make the default false once the dev mode stuff is in place
+        return val == null ? true : Boolean.parseBoolean(val);
     }
 
 
@@ -80,5 +98,10 @@ public class SpeakeasyData
     private String createAccessKey(String pluginKey, String propertyName)
     {
         return "speakeasy-" + pluginKey + "-" + propertyName;
+    }
+
+    private String createAccessKey(String propertyName)
+    {
+        return "speakeasy-" + propertyName;
     }
 }

@@ -24,8 +24,31 @@ mvn {product}:run
         <a id="forkLink" href="{href}">Download</a>
     </script>
 
+    <script type="text/x-template" title="ide-dialog">
+        <link id="bespin_base" href="/refapp/download/resources/com.atlassian.labs.speakeasy-plugin:bespin/"/>
+
+        <div id="header">
+            <h1>Speakeasy Extension IDE (Highly Experimental)</h1>
+        </div>
+
+        <div id="content">
+            <div id="sidebar">
+                <b>inline-commenting.jar</b>
+                <ul id="browser" class="filetree">
+                </ul>
+            </div>
+            <div id="main-content">
+                <div id="editor" class="bespin" data-bespinoptions='{ "stealFocus": true, "syntax": "html", "settings": { "tabstop": 4, "theme": "white" } }'></div>
+            </div>
+        </div>
+    </script>
+
     <script type="text/x-template" title="uninstall">
         <a class="pk_uninstall" href="$contextPath/rest/speakeasy/1/plugins/{key}">Uninstall</a>
+    </script>
+
+    <script type="text/x-template" title="browser-leaf">
+        <li><span class="{class}">{text}</span>{children}</li>
     </script>
 
     <script type="text/x-template" title="row">
@@ -39,12 +62,13 @@ mvn {product}:run
                 <a class="pk_enable_toggle" href="$contextPath/rest/speakeasy/1/user/{key}">{enableText}</a>
                 {uninstall}
                 <a class="pk_fork" href="javascript:void(0)" data-fork="$contextPath/rest/speakeasy/1/plugins/fork/{key}-fork.zip">Fork</a>
+                <a class="pk_edit" href="$contextPath/rest/speakeasy/1/plugins/{key}/index">Edit</a>
             </td>
         </tr>
     </script>
 <div id="aui-message-bar"> </div>
 
-#if ($installAllowed)
+#if ($devmode && $installAllowed)
     <form id="uploadForm" action="$contextPath/rest/speakeasy/1/plugins" enctype="multipart/form-data" method="post">
         <label for="pluginFile">Install a plugin:</label> <input id="pluginFile" type="file" name="pluginFile" size="40">
     </form>

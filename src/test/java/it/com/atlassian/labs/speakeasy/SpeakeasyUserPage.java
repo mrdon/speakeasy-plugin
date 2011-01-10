@@ -189,6 +189,19 @@ public class SpeakeasyUserPage implements Page
         }
     }
 
+    public List<String> getErrorMessages()
+    {
+        List<String> messages = new ArrayList<String>();
+        for (WebElement msg : messageBar.findElements(By.className("aui-message")))
+        {
+            if (msg.getAttribute("class").contains("error"))
+            {
+                messages.add(msg.getText().trim());
+            }
+        }
+        return messages;
+    }
+
     public static class PluginRow
     {
         private String key;

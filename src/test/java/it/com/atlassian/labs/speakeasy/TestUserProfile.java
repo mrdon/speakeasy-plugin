@@ -153,6 +153,31 @@ public class TestUserProfile
     }
 
     @Test
+    public void testCannotInstallOtherUsersPlugin() throws IOException
+    {
+        File jar = new PluginJarBuilder()
+                .addFormattedResource("atlassian-plugin.xml",
+                        "<atlassian-plugin key='plugin-tests' pluginsVersion='2' name='Test'>",
+                        "    <plugin-info>",
+                        "        <version>2</version>",
+                        "    </plugin-info>",
+                        "    <scoped-web-item key='item' section='foo' />",
+                        "</atlassian-plugin>")
+                .build();
+
+        SpeakeasyUserPage page = product.visit(SpeakeasyUserPage.class)
+                .uploadPlugin(jar);
+
+        List<String> messages = page.getErrorMessages();
+        assertEquals(1, messages.size());
+        assertTrue(messages.get(0).contains("'plugin-tests'"));
+
+        SpeakeasyUserPage.PluginRow row = page.getPlugins().get("plugin-tests");
+        assertEquals("1", row.getVersion());
+        assertEquals("Some Guy", row.getAuthor());
+    }
+
+    @Test
     public void testUninstallPlugin() throws IOException
     {
         File jar = buildSimplePluginFile();

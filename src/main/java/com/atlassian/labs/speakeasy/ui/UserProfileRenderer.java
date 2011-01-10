@@ -1,6 +1,7 @@
 package com.atlassian.labs.speakeasy.ui;
 
 import com.atlassian.labs.speakeasy.SpeakeasyManager;
+import com.atlassian.labs.speakeasy.data.SpeakeasyData;
 import com.atlassian.labs.speakeasy.install.PluginManager;
 import com.atlassian.labs.speakeasy.model.UserPlugins;
 import com.atlassian.labs.speakeasy.product.ProductAccessor;
@@ -30,8 +31,9 @@ public class UserProfileRenderer
     private final JaxbJsonMarshaller jaxbJsonMarshaller;
     private final PluginManager pluginManager;
     private final ProductAccessor productAccessor;
+    private final SpeakeasyData data;
 
-    public UserProfileRenderer(TemplateRenderer templateRenderer, SpeakeasyManager speakeasyManager, UserManager userManager, WebResourceManager webResourceManager, JaxbJsonMarshaller jaxbJsonMarshaller, PluginManager pluginManager, ProductAccessor productAccessor)
+    public UserProfileRenderer(TemplateRenderer templateRenderer, SpeakeasyManager speakeasyManager, UserManager userManager, WebResourceManager webResourceManager, JaxbJsonMarshaller jaxbJsonMarshaller, PluginManager pluginManager, ProductAccessor productAccessor, SpeakeasyData data)
     {
         this.templateRenderer = templateRenderer;
         this.speakeasyManager = speakeasyManager;
@@ -40,16 +42,23 @@ public class UserProfileRenderer
         this.jaxbJsonMarshaller = jaxbJsonMarshaller;
         this.pluginManager = pluginManager;
         this.productAccessor = productAccessor;
+        this.data = data;
     }
 
     public void render(HttpServletRequest req, Writer output, boolean useUserProfileDecorator) throws UnauthorizedAccessException, IOException
     {
-        webResourceManager.requireResource("com.atlassian.auiplugin:ajs");
-        webResourceManager.requireResource("com.atlassian.labs.speakeasy-plugin:optin-js");
         String user = userManager.getRemoteUsername(req);
         if (user == null)
         {
             throw new UnauthorizedAccessException("Unauthorized - must be a valid user");
+        }
+
+        webResourceManager.requireResource("com.atlassian.auiplugin:ajs");
+        webResourceManager.requireResource("com.atlassian.labs.speakeasy-plugin:optin-js");
+        boolean devMode = data.isDeveloperModuleEnabled(user);
+        if (devMode)
+        {
+            webResourceManager.requireResource("com.atlassian.labs.speakeasy-plugin:ide");
         }
 
         final UserPlugins plugins = speakeasyManager.getUserAccessList(user);
@@ -62,6 +71,7 @@ public class UserProfileRenderer
                 put("installAllowed", pluginManager.canUserInstallPlugins(user)).
                 put("staticResourcesPrefix", webResourceManager.getStaticResourcePrefix(UrlMode.RELATIVE)).
                 put("product", productAccessor.getSdkName()).
+                put("devmode", devMode).
                 build(),
                 output);
     }

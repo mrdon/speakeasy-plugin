@@ -26,6 +26,8 @@ public class RemotePlugin
 
     private boolean enabled;
 
+    private boolean canUninstall;
+
     public RemotePlugin()
     {}
 
@@ -110,5 +112,16 @@ public class RemotePlugin
 
     public void setNumUsers(int numUsers) {
         this.numUsers = numUsers;
+    }
+
+    @XmlElement
+    public boolean isCanUninstall()
+    {
+        return canUninstall;
+    }
+
+    public void setCanUninstall(boolean canUninstall)
+    {
+        this.canUninstall = canUninstall;
     }
 }
