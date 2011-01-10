@@ -2,6 +2,8 @@
 function initSpeakeasy() {
     function togglePlugin(link, attachedRow) {
         var method = link.text().trim() == 'Enable' ? 'PUT' : 'DELETE';
+        var usersTd = jQuery('td[headers=pluginUsers]', attachedRow);
+        var curUsers = parseInt(usersTd.text());
         link.html('<img alt="waiting" src="' + staticResourcesPrefix + '/download/resources/com.atlassian.labs.speakeasy-plugin:optin-js/wait.gif" />');
         jQuery.ajax({
                   url: link.attr('href'),
@@ -9,9 +11,11 @@ function initSpeakeasy() {
                   success: function(data) {
                       if (method == 'PUT') {
                         link.html("Disable");
+                        usersTd.text(curUsers + 1);
                         AJS.messages.success({body: "The plugin was enabled successfully"});
                       } else {
                         link.html("Enable");
+                        usersTd.text(curUsers - 1);
                         AJS.messages.success({body: "The plugin was disabled successfully"});
                       }
                   }

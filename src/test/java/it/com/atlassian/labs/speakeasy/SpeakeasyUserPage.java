@@ -17,6 +17,8 @@ import java.io.File;
 import java.io.IOException;
 import java.util.*;
 
+import static java.lang.Integer.parseInt;
+
 /**
  *
  */
@@ -76,6 +78,7 @@ public class SpeakeasyUserPage implements Page
             row.setName(e.findElement(By.xpath("td[@headers='pluginName']")).getText());
             row.setDescription(e.findElement(By.xpath("td[@headers='pluginDescription']")).getText());
             row.setAuthor(e.findElement(By.xpath("td[@headers='pluginAuthor']")).getText());
+            row.setUsers(parseInt(e.findElement(By.xpath("td[@headers='pluginUsers']")).getText()));
             row.setVersion(e.findElement(By.xpath("td[@headers='pluginVersion']")).getText());
             plugins.put(key,row);
         }
@@ -191,6 +194,7 @@ public class SpeakeasyUserPage implements Page
         private String key;
         private String name;
         private String author;
+        private int users;
         private String description;
         private String version;
 
@@ -202,6 +206,16 @@ public class SpeakeasyUserPage implements Page
         public void setKey(String key)
         {
             this.key = key;
+        }
+
+        public int getUsers()
+        {
+            return users;
+        }
+
+        public void setUsers(int users)
+        {
+            this.users = users;
         }
 
         public String getName()
