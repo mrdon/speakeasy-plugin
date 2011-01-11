@@ -151,7 +151,7 @@ function initSpeakeasy() {
                 var data = jQuery.parseJSON(response.substring(response.indexOf('{'), response.lastIndexOf("}") + 1));
                 console.log('success');
                 if (data.error) {
-                    AJS.messages.error({title: "Error installing plugin <b>" + data.name + "</b> (" + data.key + ")", body: data.error, shadowed: false});
+                    AJS.messages.error({title: "Error installing extension <b>" + data.name + "</b> (" + data.key + ")", body: data.error, shadowed: false});
                 } else {
                     addRow(data);
                     AJS.messages.success({body: "<b>" + data.name + "</b> was uploaded successfully", shadowed: false});

@@ -115,15 +115,15 @@ function initIDE($, pluginKey, dialog, href){
             success : function(data) {
                 console.log('success');
                 if (data.error) {
-                    AJS.messages.error({title: "Error saving plugin '" + data.key + "'", body: data.error, shadowed: false});
+                    AJS.messages.error({title: "Error saving extension '" + data.key + "'", body: data.error, shadowed: false});
                 } else {
-                    AJS.messages.success({body: "The plugin '" + data.key + "' was updated successfully", shadowed: false});
+                    AJS.messages.success({body: "The extension '" + data.key + "' was updated successfully", shadowed: false});
                 }
             }
         })
 
     }
-    dialog.addHeader("Edit '" + pluginKey + "'");
+    dialog.addHeader("Edit Extension : " + pluginKey);
     dialog.addButton("Save", function (dialog) {
         var editor = $("#editor")[0].bespin.editor;
         saveAndReload(pluginKey, editor.fileName, editor.value);

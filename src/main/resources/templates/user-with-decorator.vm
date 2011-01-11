@@ -2,7 +2,7 @@
 <head>
 
     <meta name="decorator" content="atl.userprofile"/>
-    <title>Speakeasy Plugins</title>
+    <title>Speakeasy Extensions</title>
 </head>
 <body>
 #parse( "templates/user.vm" )

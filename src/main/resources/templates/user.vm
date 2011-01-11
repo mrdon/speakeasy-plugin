@@ -9,16 +9,16 @@
 
     <script type="text/x-template" title="fork-dialog">
         <p>
-            This will create a forked project for the plugin '{pluginKey}'.
+            This will create a forked project for the extension '{pluginKey}'.
             To use it:
         </p>
         <ol>
             <li>Unzip the file into an empty directory</li>
-            <li>Start the target product with the plugin installed by running:
+            <li>Start the target product with the extension installed by running:
 <pre>
 mvn {product}:run
 </pre></li>
-            <li>Edit the plugin files, usually in <code>src/main/resources</code>, and refresh your browser
+            <li>Edit the extension files, usually in <code>src/main/resources</code>, and refresh your browser
             to see the changes.</li>
         </ol>
         <a id="forkLink" href="{href}">Download</a>
@@ -29,7 +29,7 @@ mvn {product}:run
 
         <div id="content">
             <div id="file-contents-panel">
-                <b>Plugin Contents</b>
+                <b>Extension Contents</b>
                 <ul id="browser" class="filetree">
                 </ul>
             </div>
@@ -66,10 +66,11 @@ mvn {product}:run
 
 #if ($devmode && $installAllowed)
     <form id="uploadForm" action="$contextPath/rest/speakeasy/1/plugins" enctype="multipart/form-data" method="post">
-        <label for="pluginFile">Install a plugin:</label> <input id="pluginFile" type="file" name="pluginFile" size="40">
+        <label for="pluginFile">Install a new extension:</label> <input id="pluginFile" type="file" name="pluginFile" size="40">
     </form>
 #end
 
+<h2>Installed Extensions</h2>
 <table class="aui" id="pluginsTable">
 <thead>
     <tr>
