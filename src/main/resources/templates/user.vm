@@ -49,8 +49,7 @@ mvn {product}:run
 
     <script type="text/x-template" title="row">
         <tr data-pluginKey="{key}">
-            <td headers="pluginName">{name}</td>
-            <td headers="pluginDescription">{description}</td>
+            <td headers="pluginName"><span class="pluginName">{name}</span><br><span class="pluginDescription">{description}</span></td>
             <td headers="pluginAuthor">{author}</td>
             <td headers="pluginVersion">{version}</td>
             <td headers="pluginUsers">{numUsers}</td>
@@ -62,14 +61,14 @@ mvn {product}:run
             </td>
         </tr>
     </script>
-<div id="aui-message-bar"> </div>
+
+<div style="margin-top: -55px; margin-left: 350px;" id="aui-message-bar"> </div>
 
 <h2>Installed Extensions</h2>
 <table class="aui" id="pluginsTable">
 <thead>
     <tr>
         <th id="pluginName">Name</th>
-        <th id="pluginDescription">Description</th>
         <th id="pluginAuthor">Author</th>
         <th id="pluginVersion">Version</th>
         <th id="pluginUsers">Users</th>

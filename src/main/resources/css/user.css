@@ -1,1 +1,10 @@
-#speakeasyUserMain {margin-left: 1em;}
+/*#speakeasyUserMain {margin-left: 1em;}*/
+
+#aui-message-bar {
+    height:45px;
+}
+
+td .pluginDescription {
+    font-size: 80%;
+    color: #777;
+}

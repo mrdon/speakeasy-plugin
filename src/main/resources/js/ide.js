@@ -115,9 +115,9 @@ function initIDE($, pluginKey, dialog, href){
             success : function(data) {
                 console.log('success');
                 if (data.error) {
-                    AJS.messages.error({title: "Error saving extension '" + data.key + "'", body: data.error, shadowed: false});
+                    addMessage('error', {title: "Error saving extension <b>" + data.name + "</b>", body: data.error, shadowed: false});
                 } else {
-                    AJS.messages.success({body: "The extension '" + data.key + "' was updated successfully", shadowed: false});
+                    addMessage('success', {body: "<b>" + data.name + "</b> was saved successfully", shadowed: false});
                 }
             }
         })
