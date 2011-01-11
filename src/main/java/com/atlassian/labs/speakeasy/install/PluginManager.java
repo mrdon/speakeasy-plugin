@@ -53,10 +53,14 @@ public class PluginManager
     private final ProductAccessor productAccessor;
 
     private static final Iterable<Pattern> pluginContentsWhitelist = asList(
-            Pattern.compile("it/.*\\.class"),
-            Pattern.compile(".*\\.js"),
-            Pattern.compile(".*\\.gif"),
-            Pattern.compile(".*\\.png"),
+            Pattern.compile("it/.*\\.class", Pattern.CASE_INSENSITIVE),
+            Pattern.compile(".*\\.js", Pattern.CASE_INSENSITIVE),
+            Pattern.compile(".*\\.gif", Pattern.CASE_INSENSITIVE),
+            Pattern.compile(".*\\.png", Pattern.CASE_INSENSITIVE),
+            Pattern.compile(".*\\.jpg", Pattern.CASE_INSENSITIVE),
+            Pattern.compile(".*\\.jpeg", Pattern.CASE_INSENSITIVE),
+            // Pattern.compile(".*\\.xml", Pattern.CASE_INSENSITIVE), // excluded for now as you could add a spring XML file and load other classes
+            Pattern.compile(".*\\.css", Pattern.CASE_INSENSITIVE),
             Pattern.compile(".*/$"),
             Pattern.compile("META-INF/MANIFEST.MF"),
             Pattern.compile(".*/pom.xml"),
