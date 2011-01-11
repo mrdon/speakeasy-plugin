@@ -26,6 +26,26 @@
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
+            <dependency>
+                <groupId>atlassian-browsers</groupId>
+                <artifactId>atlassian-browsers-auto</artifactId>
+                <version>1.1-beta4</version>
+            </dependency>
+            <dependency>
+                <groupId>atlassian-browsers</groupId>
+                <artifactId>atlassian-browsers-linux</artifactId>
+                <version>1.1-beta4</version>
+            </dependency>
+            <dependency>
+                <groupId>atlassian-browsers</groupId>
+                <artifactId>atlassian-browsers-osx</artifactId>
+                <version>1.1-beta4</version>
+            </dependency>
+            <dependency>
+                <groupId>atlassian-browsers</groupId>
+                <artifactId>atlassian-browsers-windows</artifactId>
+                <version>1.1-beta4</version>
+            </dependency>
         </dependencies>
     </dependencyManagement>
     <dependencies>
@@ -124,6 +144,12 @@
             <scope>test</scope>
         </dependency>
         <dependency>
+            <groupId>atlassian-browsers</groupId>
+            <artifactId>atlassian-browsers-auto</artifactId>
+            <version>1.1-beta4</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
             <groupId>com.atlassian.selenium</groupId>
             <artifactId>atlassian-webdriver-jira</artifactId>
             <version>2.0.0-m16</version>
@@ -169,6 +195,7 @@
                 <configuration>
                     <systemPropertyVariables>
                         <xvfb.enable>${xvfb.enable}</xvfb.enable>
+                        <webdriver.browser>firefox-3.6</webdriver.browser>
                     </systemPropertyVariables>
                     <instructions>
                         <Import-Package>

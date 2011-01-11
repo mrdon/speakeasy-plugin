@@ -42,6 +42,7 @@ if (typeof(bespin) === 'undefined') {
 if (typeof(document) !== 'undefined') {
     var link = document.getElementById("bespin_base");
     if (link) {
+
         var href = link.href;
         bespin.base = href.substring(href.length - 1) !== "/" ? href + "/" : href;
     } else {

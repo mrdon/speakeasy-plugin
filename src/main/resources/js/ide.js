@@ -28,13 +28,6 @@ function initIDE($, pluginKey, dialog, href){
         container.treeview({add: container});
     }
 
-    function loadBespin() {
-        var mainscript = document.createElement("script");
-        mainscript.setAttribute("src", $('#bespin_base').attr('href') + "BespinEmbedded.js");
-        var head = document.getElementsByTagName("head")[0];
-        head.appendChild(mainscript);
-    }
-
     function populateBrowser() {
         function fill(tree, path) {
             var pos = path.indexOf('/');
@@ -60,7 +53,7 @@ function initIDE($, pluginKey, dialog, href){
             }
         }
 
-        var $browser = $("#browser");
+        var $browser = $("#ide-browser");
         $browser.treeview();
         jQuery.get(href, function(data) {
             var tree = [], path;
@@ -74,15 +67,13 @@ function initIDE($, pluginKey, dialog, href){
         });
     }
 
-    function handleBrowserFileClick(event) {
-        var $target = $(event.target);
+    function handleBrowserFileClick(event, env) {
+        var $target = jQuery(event.target);
 
         if( $target.is(".editable-bespin") ) {
-            var edit = $("#editor")[0];
-            // Get the environment variable.
-            var env = edit.bespin;
             // Get the editor.
             var editor = env.editor;
+
 
             var filePath = event.target.id;
             $.get(contextPath + "/rest/speakeasy/1/plugins/" + pluginKey + "/file", {path:filePath}, function(data) {
@@ -125,22 +116,34 @@ function initIDE($, pluginKey, dialog, href){
     }
     dialog.addHeader("Edit Extension : " + pluginKey);
     dialog.addButton("Save", function (dialog) {
-        var editor = $("#editor")[0].bespin.editor;
+        var editor = ideBespin.editor;
         saveAndReload(pluginKey, editor.fileName, editor.value);
         dialog.remove();
-    });
-    dialog.addLink("Cancel", function (dialog) {
+    }, "ide-save");
+    // addLink not compatible with JIRA 4.2
+    dialog.addButton("Cancel", function (dialog) {
         dialog.remove();
-    });
+    }, "ide-cancel");
     var ideDialogContents = AJS.template.load('ide-dialog')
         .fill({
-            pluginKey : pluginKey
+            pluginKey : pluginKey,
+            "firstScript:html" : '<script src="' + staticResourcesPrefix + '/download/resources/com.atlassian.labs.speakeasy-plugin:bespin/BespinEmbedded.js"></script>',
+            "secondScript:html" : '<script>loadIdeEditor();</script>'
            })
         .toString();
     dialog.addPanel("IDE", ideDialogContents, "panel-body");
-    $('#browser').click(handleBrowserFileClick);
-    loadBespin();
     populateBrowser();
-    dialog.show();
+
+
+    window.loadIdeEditor = function() {
+        bespin.useBespin("ide-editor", { "stealFocus": true, "syntax": "html", "settings": { "tabstop": 4, "theme": "white" } }).then(function(env) {
+            jQuery('#ide-browser').click(function(e) {
+                handleBrowserFileClick(e, env);
+            });
+            window.ideBespin = env;
+            dialog.show();
+        });
+    };
 
 }
+

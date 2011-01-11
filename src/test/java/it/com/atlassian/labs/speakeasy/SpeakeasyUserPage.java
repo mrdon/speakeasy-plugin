@@ -134,9 +134,10 @@ public class SpeakeasyUserPage implements Page
         return this;
     }
 
-    private void waitForMessages()
+    public SpeakeasyUserPage waitForMessages()
     {
         driver.waitUntilElementIsVisibleAt(By.className("aui-message"), messageBar);
+        return this;
     }
 
     public List<String> getSuccessMessages()
@@ -200,6 +201,16 @@ public class SpeakeasyUserPage implements Page
             }
         }
         return messages;
+    }
+
+    public IdeDialog openEditDialog(String pluginKey)
+    {
+        WebElement pluginRow = getPluginRow(pluginKey);
+        WebElement editAction =  pluginRow.findElement(By.className("pk_edit"));
+        editAction.click();
+
+        return pageBinder.bind(IdeDialog.class, pluginKey);
+
     }
 
     public static class PluginRow

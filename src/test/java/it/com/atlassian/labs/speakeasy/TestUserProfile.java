@@ -6,28 +6,21 @@ import com.atlassian.pageobjects.page.HomePage;
 import com.atlassian.pageobjects.page.LoginPage;
 import com.atlassian.plugin.test.PluginJarBuilder;
 import com.atlassian.plugin.util.zip.FileUnzipper;
-import com.atlassian.plugin.util.zip.Unzipper;
 import com.atlassian.webdriver.jira.JiraTestedProduct;
 import com.atlassian.webdriver.refapp.RefappTestedProduct;
 import com.google.common.collect.Sets;
 import org.apache.commons.io.FileUtils;
 import org.junit.BeforeClass;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.Enumeration;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
-import java.util.jar.JarEntry;
-import java.util.jar.JarFile;
 import java.util.zip.ZipEntry;
-import java.util.zip.ZipFile;
 
+import static java.util.Arrays.asList;
 import static org.junit.Assert.*;
 
 public class TestUserProfile
@@ -54,6 +47,27 @@ public class TestUserProfile
                 .getPluginKeys();
         assertTrue(pluginKeys.size() > 0);
         assertTrue(pluginKeys.contains("plugin-tests"));
+    }
+
+    @Test
+    public void testEditPlugin() throws IOException
+    {
+        product.visit(SpeakeasyUserPage.class)
+                .uploadPlugin(buildSimplePluginFile());
+        IdeDialog ide =  product.visit(SpeakeasyUserPage.class)
+                .openEditDialog("test");
+
+        assertEquals(asList("foo.js", "atlassian-plugin.xml"), ide.getFileNames());
+
+        SpeakeasyUserPage userPage = ide.editAndSaveFile("foo.js", "var foo;");
+        List<String> messages = userPage.getSuccessMessages();
+        assertEquals(1, messages.size());
+        assertTrue(messages.get(0).contains("'test'"));
+
+        String contents = userPage.openEditDialog("test")
+                .getFileContents("foo.js");
+        assertEquals("var foo;", contents);
+
     }
 
     @Test

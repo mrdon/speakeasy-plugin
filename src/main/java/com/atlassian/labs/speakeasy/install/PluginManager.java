@@ -380,11 +380,13 @@ public class PluginManager
                 String path = e.nextElement();
                 if (!path.equals(fileName))
                 {
-                    byte[] data = readEntry(bundle, path);
                     ZipEntry entry = new ZipEntry(path);
-                    entry.setSize(data.length);
                     zout.putNextEntry(entry);
-                    zout.write(data);
+                    if (!path.endsWith("/"))
+                    {
+                        byte[] data = readEntry(bundle, path);
+                        zout.write(data, 0, data.length);
+                    }
                 }
             }
             ZipEntry entry = new ZipEntry(fileName);

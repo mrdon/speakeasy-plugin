@@ -1,4 +1,5 @@
 <div id="speakeasyUserMain">
+    <a style="display:none" id="bespin_base" href="$staticResourcesPrefix/download/resources/com.atlassian.labs.speakeasy-plugin:bespin/">asdfasfd</a>
 <script type="text/javascript">
         var staticResourcesPrefix = "$staticResourcesPrefix";
         var contextPath = "$contextPath";
@@ -25,17 +26,17 @@ mvn {product}:run
     </script>
 
     <script type="text/x-template" title="ide-dialog">
-        <link id="bespin_base" href="$staticResourcesPrefix/download/resources/com.atlassian.labs.speakeasy-plugin:bespin/"/>
-
-        <div id="content">
-            <div id="file-contents-panel">
+        <div id="ide-content">
+            {firstScript}
+            <div id="ide-file-contents-panel">
                 <b>Extension Contents</b>
-                <ul id="browser" class="filetree">
+                <ul id="ide-browser" class="filetree">
                 </ul>
             </div>
-            <div id="main-content">
-                <div id="editor" class="bespin" data-bespinoptions='{ "stealFocus": true, "syntax": "html", "settings": { "tabstop": 4, "theme": "white" } }'></div>
+            <div id="ide-main-content">
+                <div id="ide-editor"></div>
             </div>
+            {secondScript}
         </div>
     </script>
 
