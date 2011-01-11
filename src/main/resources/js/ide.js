@@ -129,7 +129,7 @@ function initIDE($, pluginKey, dialog, href){
         saveAndReload(pluginKey, editor.fileName, editor.value);
         dialog.remove();
     });
-    dialog.addButton("Cancel", function (dialog) {
+    dialog.addLink("Cancel", function (dialog) {
         dialog.remove();
     });
     var ideDialogContents = AJS.template.load('ide-dialog')

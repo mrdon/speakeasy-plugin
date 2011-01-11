@@ -55,7 +55,7 @@ function initSpeakeasy() {
 
     function openIDE(key, href) {
         var $win = jQuery(window);
-        var dialog = new AJS.Dialog({width: $win.width() * .95, height: $win.height() * .95, id:'ideDialog'});
+        var dialog = new AJS.Dialog({width: $win.width() * .95, height: $win.height() * .65, id:'ideDialog'});
         initIDE(jQuery, key, dialog, href);
     }
 
