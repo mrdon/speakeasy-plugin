@@ -64,12 +64,6 @@ mvn {product}:run
     </script>
 <div id="aui-message-bar"> </div>
 
-#if ($devmode && $installAllowed)
-    <form id="uploadForm" action="$contextPath/rest/speakeasy/1/plugins" enctype="multipart/form-data" method="post">
-        <label for="pluginFile">Install a new extension:</label> <input id="pluginFile" type="file" name="pluginFile" size="40">
-    </form>
-#end
-
 <h2>Installed Extensions</h2>
 <table class="aui" id="pluginsTable">
 <thead>
@@ -86,6 +80,17 @@ mvn {product}:run
 
 </tbody>
 </table>
+
+
+#if ($devmode && $installAllowed)
+    <div style="background-color: #f0f0f0; margin: 20px; padding: 10px; border: 1px solid #bbb;">
+        <form id="uploadForm" action="$contextPath/rest/speakeasy/1/plugins" enctype="multipart/form-data" method="post">
+            <b>Upload New Extension:</b>
+            <label for="pluginFile">Install a new extension by uploading from your computer:</label> <input id="pluginFile" type="file" name="pluginFile" size="40">
+        </form>
+    </div>
+#end
+
 <script type="text/javascript">
         initSpeakeasy();
 </script>
