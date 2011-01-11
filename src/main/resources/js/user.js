@@ -4,6 +4,7 @@ function initSpeakeasy() {
         var method = link.text().trim() == 'Enable' ? 'PUT' : 'DELETE';
         var usersTd = jQuery('td[headers=pluginUsers]', attachedRow);
         var curUsers = parseInt(usersTd.text());
+        var pluginName = jQuery('td[headers=pluginName]', attachedRow).text();
         link.html('<img alt="waiting" src="' + staticResourcesPrefix + '/download/resources/com.atlassian.labs.speakeasy-plugin:optin-js/wait.gif" />');
         jQuery.ajax({
                   url: link.attr('href'),
@@ -12,11 +13,11 @@ function initSpeakeasy() {
                       if (method == 'PUT') {
                         link.html("Disable");
                         usersTd.text(curUsers + 1);
-                        AJS.messages.success({body: "The plugin was enabled successfully"});
+                        AJS.messages.success({body: "<b>" + pluginName + "</b> was enabled successfully", shadowed: false});
                       } else {
                         link.html("Enable");
                         usersTd.text(curUsers - 1);
-                        AJS.messages.success({body: "The plugin was disabled successfully"});
+                        AJS.messages.success({body: "<b>" + pluginName + "</b>  was disabled successfully", shadowed: false});
                       }
                   }
                 });
@@ -24,13 +25,14 @@ function initSpeakeasy() {
 
     function uninstallPlugin(link) {
         link.html('<img alt="waiting" src="' + staticResourcesPrefix + '/download/resources/com.atlassian.labs.speakeasy-plugin:optin-js/wait.gif" />');
+        var pluginName = jQuery('td[headers=pluginName]', attachedRow).text();
         jQuery.ajax({
                   url: link.attr('href'),
                   type: 'DELETE',
                   success: function(data) {
                       link.closest("tr").each(function() {
                           jQuery(this).detach();
-                          AJS.messages.success({body: "The plugin was uninstalled successfully"});
+                          AJS.messages.success({body: "<b>" + pluginName + "</b> was uninstalled successfully", shadowed: false});
                       })
                   }
                 });
@@ -141,7 +143,7 @@ function initSpeakeasy() {
                console.log('beforeSubmit');
                var extension = pluginFile.val().substring(pluginFile.val().lastIndexOf('.'));
                if (extension != '.jar') {
-                  AJS.messages.error({body: "The extension '" + extension + "' is not allowed"});
+                  AJS.messages.error({body: "The extension '" + extension + "' is not allowed", shadowed: false});
                   return false;
                }
             },
@@ -149,10 +151,10 @@ function initSpeakeasy() {
                 var data = jQuery.parseJSON(response.substring(response.indexOf('{'), response.lastIndexOf("}") + 1));
                 console.log('success');
                 if (data.error) {
-                    AJS.messages.error({title: "Error installing plugin '" + data.key + "'", body: data.error});
+                    AJS.messages.error({title: "Error installing plugin <b>" + data.name + "</b> (" + data.key + ")", body: data.error, shadowed: false});
                 } else {
                     addRow(data);
-                    AJS.messages.success({body: "The plugin '" + data.key + "' was uploaded successfully"});
+                    AJS.messages.success({body: "<b>" + data.name + "</b> was uploaded successfully", shadowed: false});
                 }
                 pluginFile.val("");
             }

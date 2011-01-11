@@ -115,9 +115,9 @@ function initIDE($, pluginKey, dialog, href){
             success : function(data) {
                 console.log('success');
                 if (data.error) {
-                    AJS.messages.error({title: "Error saving plugin '" + data.key + "'", body: data.error});
+                    AJS.messages.error({title: "Error saving plugin '" + data.key + "'", body: data.error, shadowed: false});
                 } else {
-                    AJS.messages.success({body: "The plugin '" + data.key + "' was updated successfully"});
+                    AJS.messages.success({body: "The plugin '" + data.key + "' was updated successfully", shadowed: false});
                 }
             }
         })
