@@ -130,13 +130,13 @@ public class TestUserProfile
 
         List<String> messages = page.getSuccessMessages();
         assertEquals(1, messages.size());
-        assertTrue(messages.get(0).contains("'test'"));
+        assertTrue(messages.get(0).contains("Test Plugin"));
         assertTrue(page.getPluginKeys().contains("test"));
 
         SpeakeasyUserPage.PluginRow row = page.getPlugins().get("test");
         assertNotNull(row);
         assertEquals("test", row.getKey());
-        assertEquals("Test", row.getName());
+        assertEquals("Test Plugin", row.getName());
         assertEquals("Desc", row.getDescription());
         assertEquals("admin", row.getAuthor());
 
@@ -147,7 +147,7 @@ public class TestUserProfile
         row = page.getPlugins().get("test");
         assertNotNull(row);
         assertEquals("test", row.getKey());
-        assertEquals("Test", row.getName());
+        assertEquals("Test Plugin", row.getName());
         assertEquals("Desc", row.getDescription());
         assertEquals("admin", row.getAuthor());
     }
@@ -157,7 +157,7 @@ public class TestUserProfile
     {
         File jar = new PluginJarBuilder()
                 .addFormattedResource("atlassian-plugin.xml",
-                        "<atlassian-plugin key='plugin-tests' pluginsVersion='2' name='Test'>",
+                        "<atlassian-plugin key='plugin-tests' pluginsVersion='2' name='Plugin Tests'>",
                         "    <plugin-info>",
                         "        <version>2</version>",
                         "    </plugin-info>",
@@ -211,7 +211,7 @@ public class TestUserProfile
     {
         return new PluginJarBuilder()
                 .addFormattedResource("atlassian-plugin.xml",
-                        "<atlassian-plugin key='test' pluginsVersion='2' name='Test'>",
+                        "<atlassian-plugin key='test' pluginsVersion='2' name='Test Plugin'>",
                         "    <plugin-info>",
                         "        <version>1</version>",
                         "        <description>Desc</description>",

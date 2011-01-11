@@ -23,7 +23,7 @@ function initSpeakeasy() {
                 });
     }
 
-    function uninstallPlugin(link) {
+    function uninstallPlugin(link, attachedRow) {
         link.html('<img alt="waiting" src="' + staticResourcesPrefix + '/download/resources/com.atlassian.labs.speakeasy-plugin:optin-js/wait.gif" />');
         var pluginName = jQuery('td[headers=pluginName]', attachedRow).text();
         jQuery.ajax({
@@ -97,7 +97,7 @@ function initSpeakeasy() {
             var link = jQuery(this);
             jQuery(link).click(function(event) {
                 event.preventDefault();
-                uninstallPlugin(link);
+                uninstallPlugin(link, attachedRow);
                 return false;
             });
         });
