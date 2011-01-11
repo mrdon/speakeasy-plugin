@@ -25,7 +25,6 @@
     -->
     <web-resource key="bespin-css">
         <resource type="download" name="BespinEmbedded.css" location="bespin/BespinEmbedded.css" />
-
     </web-resource>
 
     <web-resource key="bespin">
@@ -38,7 +37,6 @@
     <web-resource key="treeview">
         <resource type="download" name="jquery.treeview.js" location="treeview/jquery.treeview.js" />
         <resource type="download" name="jquery.treeview.css" location="treeview/jquery.treeview.css" />
-
         <resource type="download" name="images/" location="treeview/images/"/>
     </web-resource>
 

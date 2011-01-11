@@ -25,7 +25,7 @@ mvn {product}:run
     </script>
 
     <script type="text/x-template" title="ide-dialog">
-        <link id="bespin_base" href="/refapp/download/resources/com.atlassian.labs.speakeasy-plugin:bespin/"/>
+        <link id="bespin_base" href="$staticResourcesPrefix/download/resources/com.atlassian.labs.speakeasy-plugin:bespin/"/>
 
         <div id="content">
             <div id="file-contents-panel">
