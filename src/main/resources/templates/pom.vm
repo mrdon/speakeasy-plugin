@@ -6,7 +6,7 @@
 
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.atlassian.labs</groupId>
-    <artifactId>${pluginKey}-fork-${user}</artifactId>
+    <artifactId>${pluginKey}</artifactId>
     <version>${version}-${user}-1-SNAPSHOT</version>
 
     <organization>
@@ -14,8 +14,8 @@
         <url>http://atlassian.com</url>
     </organization>
 
-    <name>Fork of ${author}'s ${pluginKey} plugin</name>
-    <description>This is a fork of the ${author}'s ${pluginKey} plugin for ${product}.</description>
+    <name>${author}'s ${pluginKey} plugin</name>
+    <description>This is the ${author}'s ${pluginKey} plugin for ${product}.</description>
     <packaging>atlassian-plugin</packaging>
 
     <dependencies>
@@ -49,6 +49,6 @@
         </plugins>
     </build>
     <properties>
-        <plugin.key>${pluginKey}-${user}</plugin.key>
+        <plugin.key>${pluginKey}</plugin.key>
     </properties>
 </project>

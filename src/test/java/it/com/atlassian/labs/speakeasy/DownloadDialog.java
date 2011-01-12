@@ -21,7 +21,7 @@ import java.io.IOException;
 /**
  *
  */
-public class ForkDialog
+public class DownloadDialog
 {
     @Inject
     private AtlassianWebDriver driver;
@@ -29,15 +29,15 @@ public class ForkDialog
     @Inject
     private ProductInstance productInstance;
 
-    @FindBy(id="forkDialog")
+    @FindBy(id="downloadDialog")
     private WebElement dialogElement;
 
-    @FindBy(id="forkLink")
-    private WebElement forkLink;
+    @FindBy(id="downloadLink")
+    private WebElement downloadLink;
 
     private final String pluginKey;
 
-    public ForkDialog(String pluginKey)
+    public DownloadDialog(String pluginKey)
     {
         this.pluginKey = pluginKey;
     }
@@ -45,23 +45,23 @@ public class ForkDialog
     @WaitUntil
     public void waitUntilOpen()
     {
-        driver.waitUntilElementIsVisible(By.id("forkLink"));
+        driver.waitUntilElementIsVisible(By.id("downloadLink"));
     }
 
-    public File fork() throws IOException
+    public File download() throws IOException
     {
-        String href = forkLink.getAttribute("href");
+        String href = downloadLink.getAttribute("href");
 
         DefaultHttpClient httpclient = new DefaultHttpClient();
         httpclient.getCredentialsProvider().setCredentials(AuthScope.ANY, new UsernamePasswordCredentials("admin", "admin"));
         HttpGet get = new HttpGet("http://localhost:" + productInstance.getHttpPort() + href + "?os_username=admin&os_password=admin");
         HttpResponse res = httpclient.execute(get);
-        File tmpFile = File.createTempFile("speakeasy-fork-", ".zip");
+        File tmpFile = File.createTempFile("speakeasy-download-", ".zip");
         FileOutputStream fout = new FileOutputStream(tmpFile);
         res.getEntity().writeTo(fout);
         fout.close();
         dialogElement.sendKeys(Keys.ESCAPE);
-        driver.waitUntilElementIsNotVisible(By.id("forkLink"));
+        driver.waitUntilElementIsNotVisible(By.id("downloadLink"));
         return tmpFile;
     }
 

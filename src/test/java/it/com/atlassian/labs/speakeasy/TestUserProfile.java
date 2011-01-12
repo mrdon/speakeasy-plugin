@@ -71,12 +71,12 @@ public class TestUserProfile
     }
 
     @Test
-    public void testForkPlugin() throws IOException
+    public void testDownloadPlugin() throws IOException
     {
         File file = product.visit(SpeakeasyUserPage.class)
                 .uploadPlugin(buildSimplePluginFile())
-                .openForkDialog("test-2")
-                .fork();
+                .openDownloadDialog("test-2")
+                .download();
         assertNotNull(file);
         File unzippedPlugin = new File(file.getParent(), "unzipped");
         if (unzippedPlugin.exists())
@@ -111,7 +111,9 @@ public class TestUserProfile
 
         File fooFile = new File(unzippedPlugin, "src/main/resources/foo.js");
         assertEquals("alert(\"hi\");", FileUtils.readFileToString(fooFile).trim());
-        assertFalse(FileUtils.readFileToString(new File(unzippedPlugin, "pom.xml")).contains("${"));
+        String pomContents = FileUtils.readFileToString(new File(unzippedPlugin, "pom.xml"));
+        assertFalse(pomContents.contains("${"));
+        assertTrue(pomContents.contains("plugin.key>test-2</plugin.key"));
     }
 
     @Test

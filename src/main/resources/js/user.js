@@ -38,19 +38,19 @@ function initSpeakeasy() {
                 });
     }
 
-    function openForkDialog(key, href) {
-        var dialog = new AJS.Dialog({width:470, height:400, id:'forkDialog'});
-        dialog.addHeader("Fork '" + key + "'");
-        var forkDialogContents = AJS.template.load('fork-dialog')
+    function openDownloadDialog(key, href) {
+        var dialog = new AJS.Dialog({width:470, height:400, id:'downloadDialog'});
+        dialog.addHeader("Download '" + key + "'");
+        var downloadDialogContents = AJS.template.load('download-dialog')
                                     .fill({
                                         pluginKey : key,
                                         href : href,
                                         product : product
                                        })
                                     .toString();
-        dialog.addPanel("Fork", forkDialogContents, "panel-body");
+        dialog.addPanel("Download", downloadDialogContents, "panel-body");
         dialog.show();
-        jQuery('#forkLink').click(function(e) {
+        jQuery('#downloadLink').click(function(e) {
             dialog.remove();
         });
     }
@@ -117,11 +117,11 @@ function initSpeakeasy() {
                 return false;
             });
         });
-        jQuery('.pk_fork', attachedRow).each(function(idx) {
+        jQuery('.pk_download', attachedRow).each(function(idx) {
             var link = jQuery(this);
             link.click(function(event) {
                 event.preventDefault();
-                openForkDialog(data.key, link.attr("data-fork"));
+                openDownloadDialog(data.key, link.attr("data-download"));
                 return false;
             });
         });

@@ -153,13 +153,13 @@ public class SpeakeasyUserPage implements Page
         return messages;
     }
 
-    public ForkDialog openForkDialog(String pluginKey) throws IOException
+    public DownloadDialog openDownloadDialog(String pluginKey) throws IOException
     {
         WebElement pluginRow = getPluginRow(pluginKey);
-        WebElement forkAction =  pluginRow.findElement(By.className("pk_fork"));
-        forkAction.click();
+        WebElement downloadAction =  pluginRow.findElement(By.className("pk_download"));
+        downloadAction.click();
 
-        return pageBinder.bind(ForkDialog.class, pluginKey);
+        return pageBinder.bind(DownloadDialog.class, pluginKey);
     }
 
 

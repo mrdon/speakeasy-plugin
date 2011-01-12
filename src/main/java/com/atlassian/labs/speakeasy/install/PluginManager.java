@@ -259,7 +259,6 @@ public class PluginManager
             zout.putNextEntry(new ZipEntry("src/main/resources/"));
 
             List<String> paths = getPluginFileNames(bundle);
-            paths.remove("atlassian-plugin.xml");
             for (String path : paths)
             {
 
@@ -277,11 +276,11 @@ public class PluginManager
             String pomContents = renderPom(pluginAccessor.getPlugin(pluginKey));
             IOUtils.copy(new StringReader(pomContents), zout);
 
-            zout.putNextEntry(new ZipEntry("src/main/resources/atlassian-plugin.xml"));
-            String desc = new String(readEntry(bundle, "atlassian-plugin.xml"));
-            desc = desc.replaceAll("<version>.*</version>", "<version>\\${project.version}</version>");
-            desc = desc.replaceFirst("key=\"" + pluginKey + "\"", "key=\"\\${plugin.key}\"");
-            IOUtils.copy(new StringReader(desc), zout);
+//            zout.putNextEntry(new ZipEntry("src/main/resources/atlassian-plugin.xml"));
+//            String desc = new String(readEntry(bundle, "atlassian-plugin.xml"));
+//            desc = desc.replaceAll("<version>.*</version>", "<version>\\${project.version}</version>");
+//            desc = desc.replaceFirst("key=\"" + pluginKey + "\"", "key=\"\\${plugin.key}\"");
+//            IOUtils.copy(new StringReader(desc), zout);
 
         }
         catch (IOException e)
