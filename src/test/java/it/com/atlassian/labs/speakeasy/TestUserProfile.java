@@ -62,7 +62,7 @@ public class TestUserProfile
         SpeakeasyUserPage userPage = ide.editAndSaveFile("foo.js", "var foo;");
         List<String> messages = userPage.getSuccessMessages();
         assertEquals(1, messages.size());
-        assertTrue(messages.get(0).contains("'test-2'"));
+        assertTrue(messages.get(0).contains("Test Plugin"));
 
         String contents = userPage.openEditDialog("test-2")
                 .getFileContents("foo.js");

@@ -77,8 +77,9 @@ public class SpeakeasyUserPage implements Page
             PluginRow row = new PluginRow();
             final String key = e.getAttribute("data-pluginkey");
             row.setKey(key);
-            row.setName(e.findElement(By.xpath("td[@headers='pluginName']")).getText());
-            row.setDescription(e.findElement(By.xpath("td[@headers='pluginDescription']")).getText());
+            WebElement nameTd = e.findElement(By.xpath("td[@headers='pluginName']"));
+            row.setName(nameTd.findElement(By.className("pluginName")).getText());
+            row.setDescription(nameTd.findElement(By.className("pluginDescription")).getText());
             row.setAuthor(e.findElement(By.xpath("td[@headers='pluginAuthor']")).getText());
             row.setUsers(parseInt(e.findElement(By.xpath("td[@headers='pluginUsers']")).getText()));
             row.setVersion(e.findElement(By.xpath("td[@headers='pluginVersion']")).getText());
