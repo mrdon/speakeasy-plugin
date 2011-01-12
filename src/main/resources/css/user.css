@@ -8,3 +8,7 @@ td .pluginDescription {
     font-size: 80%;
     color: #777;
 }
+
+#availableExtensionsTable {
+    display: none;
+}

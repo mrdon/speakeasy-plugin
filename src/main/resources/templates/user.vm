@@ -62,33 +62,85 @@ mvn {product}:run
         </tr>
     </script>
 
+    <script type="text/x-template" title="availableExtensionRow">
+        <tr data-pluginKey="{key}">
+            <td headers="pluginName"><span class="pluginName">{name}</span><br><span class="pluginDescription">{description}</span></td>
+            <td headers="pluginAuthor"><a href="{authorUrl}">{author}</a></td>
+            <td headers="pluginVersion">{version}</td>
+            <td headers="action" nowrap="true">
+                <a href="{binaryUrl}"'>Download</a>
+                <a href="http://plugins.atlassian.com/{id}">Learn More</a>
+            </td>
+        </tr>
+    </script>
+
 <div style="margin-top: -55px; margin-left: 350px;" id="aui-message-bar"> </div>
 
-<h2>Installed Extensions</h2>
-<table class="aui" id="pluginsTable">
-<thead>
-    <tr>
-        <th id="pluginName">Name</th>
-        <th id="pluginAuthor">Author</th>
-        <th id="pluginVersion">Version</th>
-        <th id="pluginUsers">Users</th>
-        <th id="action">Action</th>
-    </tr>
-</thead>
-<tbody id="pluginsTableBody">
+<div class="aui-tabs horizontal-tabs" id="horizontal">
+    <ul class="tabs-menu">
+        <li class="menu-item active-tab">
+            <a href="#horizontal-first"><strong>Installed Extensions</strong></a>
+        </li>
+        <li class="menu-item">
+            <a href="#horizontal-second" id="available-extensions-tab"><strong>Available Extensions</strong></a>
+        </li>
+    </ul>
+    <div class="tabs-pane active-pane" id="horizontal-first">
+        <p style="margin: 10px 0 15px 0;">
+            These are the extensions installed on your server.<br />
+            To use an extension, click <b>Enable</b>. <br />
+            To upload a new extension, use the <b>Upload</b> form.<br />
+            To develop your own extensions, <a href="mailto:don@atlassian.com">learn more</a>.
+        </p>
+        <table class="aui" id="pluginsTable">
+        <thead>
+            <tr>
+                <th id="pluginName">Name</th>
+                <th id="pluginAuthor">Author</th>
+                <th id="pluginVersion">Version</th>
+                <th id="pluginUsers">Users</th>
+                <th id="action">Action</th>
+            </tr>
+        </thead>
+        <tbody id="pluginsTableBody">
 
-</tbody>
-</table>
+        </tbody>
+        </table>
 
 
-#if ($devmode && $installAllowed)
-    <div style="background-color: #f0f0f0; margin: 20px; padding: 10px; border: 1px solid #bbb;">
-        <form id="uploadForm" action="$contextPath/rest/speakeasy/1/plugins" enctype="multipart/form-data" method="post">
-            <b>Upload New Extension:</b>
-            <label for="pluginFile">Install a new extension by uploading from your computer:</label> <input id="pluginFile" type="file" name="pluginFile" size="40">
-        </form>
+        #if ($devmode && $installAllowed)
+            <div style="background-color: #f0f0f0; margin: 20px; padding: 10px; border: 1px solid #bbb;">
+                <form id="uploadForm" action="$contextPath/rest/speakeasy/1/plugins" enctype="multipart/form-data" method="post">
+                    <b>Upload New Extension:</b>
+                    <label for="pluginFile">Install a new extension by uploading from your computer:</label> <input id="pluginFile" type="file" name="pluginFile" size="40">
+                </form>
+            </div>
+        #end
     </div>
-#end
+    <div class="tabs-pane" id="horizontal-second">
+        <p style="margin: 10px 0 15px 0;">
+            These extensions are hosted on <a href="http://plugins.atlassian.com">http://plugins.atlassian.com</a>.<br />
+            To install an extension, <b>Download</b> it locally, then <b>Upload</b> it to Speakeasy. <br />
+            You should consult the extension's page before installing - click <b>Learn More</b>.<br />
+        </p>
+        
+        <p id="loading"><img alt="waiting" src="$staticResourcesPrefix/download/resources/com.atlassian.labs.speakeasy-plugin:optin-js/wait.gif" /> Loading available extensions from plugins.atlassian.com ..</p>
+
+        <table class="aui" id="availableExtensionsTable">
+        <thead>
+            <tr>
+                <th id="pluginName">Name</th>
+                <th id="pluginAuthor">Author</th>
+                <th id="pluginVersion">Version</th>
+                <th id="action">Action</th>
+            </tr>
+        </thead>
+        <tbody id="availableExtensionsTableBody">
+
+        </tbody>
+        </table>
+    </div>
+</div>
 
 <script type="text/javascript">
         initSpeakeasy();
