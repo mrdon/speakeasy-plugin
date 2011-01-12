@@ -6,9 +6,11 @@ import com.atlassian.pageobjects.ProductInstance;
 import com.atlassian.pageobjects.TestedProduct;
 import com.atlassian.pageobjects.binder.WaitUntil;
 import com.atlassian.webdriver.AtlassianWebDriver;
+import com.atlassian.webdriver.utils.Check;
 import com.google.common.base.Function;
 import org.openqa.selenium.By;
 import org.openqa.selenium.NoSuchElementException;
+import org.openqa.selenium.RenderedWebElement;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 
@@ -90,24 +92,36 @@ public class SpeakeasyUserPage implements Page
         return "/plugins/servlet/speakeasy/user";
     }
 
-    public void enablePlugin(String pluginKey)
+    public SpeakeasyUserPage enablePlugin(String pluginKey)
     {
-        clickToggleIf(pluginKey, "Enable");
+        clickToggleIf(pluginKey, false);
         waitForMessages();
+        return this;
     }
 
-    public void disablePlugin(String pluginKey)
+    public SpeakeasyUserPage disablePlugin(String pluginKey)
     {
-        clickToggleIf(pluginKey, "Disable");
+        clickToggleIf(pluginKey, true);
         waitForMessages();
+        return this;
     }
 
-    private void clickToggleIf(String pluginKey, String toggleText)
+    public boolean isPluginEnabled(String pluginKey)
     {
-        WebElement toggle = getPluginRow(pluginKey).findElement(By.className("pk_enable_toggle"));
-        if (toggle.getText().contains(toggleText))
+        WebElement toggle = getEnableToggleLink(pluginKey);
+        return toggle.getText().contains("Disable");
+    }
+
+    private WebElement getEnableToggleLink(String pluginKey)
+    {
+        return getPluginRow(pluginKey).findElement(By.className("pk_enable_toggle"));
+    }
+
+    private void clickToggleIf(String pluginKey, boolean enabled)
+    {
+        if (isPluginEnabled(pluginKey) == enabled)
         {
-            toggle.click();
+            getEnableToggleLink(pluginKey).click();
         }
         else
         {
@@ -211,6 +225,14 @@ public class SpeakeasyUserPage implements Page
 
         return pageBinder.bind(IdeDialog.class, pluginKey);
 
+    }
+
+    public SpeakeasyUserPage fork(String pluginKey)
+    {
+        WebElement pluginRow = getPluginRow(pluginKey);
+        pluginRow.findElement(By.className("pk_fork")).click();
+        waitForMessages();
+        return this;
     }
 
     public static class PluginRow

@@ -34,7 +34,7 @@ public class BundleUtil
         List<String> paths = new ArrayList<String>();
         for (String path : getDirContents(bundle, startPath))
         {
-            if (paths.contains(path))
+            if (paths.contains(path) || path.startsWith("META-INF"))
             {
                 continue;
             }

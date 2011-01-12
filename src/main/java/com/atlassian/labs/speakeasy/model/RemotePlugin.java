@@ -124,4 +124,19 @@ public class RemotePlugin
     {
         this.canUninstall = canUninstall;
     }
+
+    public void setForkedPluginKey(String ntohing)
+    {
+    }
+
+    @XmlElement
+    public String getForkedPluginKey()
+    {
+        if (key != null && key.contains("-fork-"))
+        {
+            return key.substring(0, key.indexOf("-fork-"));
+        }
+        return null;
+    }
+
 }

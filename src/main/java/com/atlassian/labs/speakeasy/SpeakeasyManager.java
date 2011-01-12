@@ -275,4 +275,8 @@ public class SpeakeasyManager implements DisposableBean
         return removedDescriptors;
     }
 
+    public boolean hasAccess(String pluginKey, String remoteUser)
+    {
+        return data.getUsersList(pluginKey).contains(remoteUser);
+    }
 }

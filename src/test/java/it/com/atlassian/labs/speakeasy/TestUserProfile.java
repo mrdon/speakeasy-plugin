@@ -171,6 +171,38 @@ public class TestUserProfile
     }
 
     @Test
+    public void testForkPlugin() throws IOException
+    {
+        File jar = buildSimplePluginFile();
+
+        SpeakeasyUserPage page = product.visit(SpeakeasyUserPage.class)
+                .uploadPlugin(jar)
+                .enablePlugin("test-2")
+                .fork("test-2");
+
+        List<String> messages = page.getSuccessMessages();
+        assertEquals(1, messages.size());
+        assertTrue(messages.get(0).contains("was forked successfully"));
+        assertTrue(page.getPluginKeys().contains("test-2-fork-admin"));
+
+        SpeakeasyUserPage.PluginRow row = page.getPlugins().get("test-2-fork-admin");
+        assertEquals("test-2-fork-admin", row.getKey());
+        assertFalse(page.isPluginEnabled("test-2"));
+        assertTrue(page.isPluginEnabled("test-2-fork-admin"));
+
+        // verify on reload
+        page = product.visit(SpeakeasyUserPage.class);
+        assertTrue(page.getPluginKeys().contains("test-2-fork-admin"));
+
+        row = page.getPlugins().get("test-2-fork-admin");
+        assertEquals("test-2-fork-admin", row.getKey());
+
+        page.uninstallPlugin("test-2-fork-admin");
+        assertTrue(page.isPluginEnabled("test-2"));
+        assertTrue(product.visit(SpeakeasyUserPage.class).isPluginEnabled("test-2"));
+    }
+
+    @Test
     public void testCannotInstallOtherUsersPlugin() throws IOException
     {
         File jar = new PluginJarBuilder()

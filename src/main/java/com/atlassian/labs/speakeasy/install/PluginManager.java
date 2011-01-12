@@ -102,6 +102,8 @@ public class PluginManager
             if (pluginKeys.size() == 1)
             {
                 final String installedKey = pluginKeys.iterator().next();
+                data.setPluginAuthor(installedKey, user);
+                RemotePlugin remotePlugin = getRemotePlugin(installedKey);
                 final Plugin plugin = pluginAccessor.getPlugin(installedKey);
                 WaitUntil.invoke(new WaitUntil.WaitCondition()
                 {
@@ -123,9 +125,7 @@ public class PluginManager
                         return "Waiting for all module descriptors to be resolved and enabled";
                     }
                 });
-                data.setPluginAuthor(installedKey, user);
-                RemotePlugin remotePlugin = new RemotePlugin(plugin);
-                remotePlugin.setAuthor(user);
+
                 return remotePlugin;
             }
             else
@@ -275,13 +275,6 @@ public class PluginManager
             zout.putNextEntry(new ZipEntry("pom.xml"));
             String pomContents = renderPom(pluginAccessor.getPlugin(pluginKey));
             IOUtils.copy(new StringReader(pomContents), zout);
-
-//            zout.putNextEntry(new ZipEntry("src/main/resources/atlassian-plugin.xml"));
-//            String desc = new String(readEntry(bundle, "atlassian-plugin.xml"));
-//            desc = desc.replaceAll("<version>.*</version>", "<version>\\${project.version}</version>");
-//            desc = desc.replaceFirst("key=\"" + pluginKey + "\"", "key=\"\\${plugin.key}\"");
-//            IOUtils.copy(new StringReader(desc), zout);
-
         }
         catch (IOException e)
         {
@@ -303,15 +296,7 @@ public class PluginManager
     private List<String> getPluginFileNames(Bundle bundle)
     {
         notNull(bundle);
-        List<String> contents = new ArrayList<String>();
-        for (String path : getBundlePathsRecursive(bundle, ""))
-        {
-            if (!path.startsWith("META-INF"))
-            {
-                contents.add(path);
-            }
-        }
-        return contents;
+        return getBundlePathsRecursive(bundle, "");
     }
 
 
@@ -409,5 +394,62 @@ public class PluginManager
         {
             IOUtils.closeQuietly(zout);
         }
+    }
+
+    public RemotePlugin forkAndInstall(String pluginKey, String user) throws PluginOperationFailedException
+    {
+        if (pluginKey.contains("-fork-"))
+        {
+            throw new PluginOperationFailedException("Cannot fork an existing fork");
+        }
+        Bundle bundle = findBundleForPlugin(bundleContext, pluginKey);
+        notNull(bundle);
+        ZipOutputStream zout = null;
+        File tmpFile = null;
+        try
+        {
+            tmpFile = File.createTempFile("speakeasy-fork", ".jar");
+            zout = new ZipOutputStream(new FileOutputStream(tmpFile));
+            List<String> bundlePaths = getBundlePathsRecursive(bundle, "");
+            bundlePaths.remove("atlassian-plugin.xml");
+            for (String path : bundlePaths)
+            {
+                ZipEntry entry = new ZipEntry(path);
+                zout.putNextEntry(entry);
+                if (!path.endsWith("/"))
+                {
+                    byte[] data = readEntry(bundle, path);
+                    zout.write(data, 0, data.length);
+                }
+            }
+
+            zout.putNextEntry(new ZipEntry("atlassian-plugin.xml"));
+            String desc = new String(readEntry(bundle, "atlassian-plugin.xml"));
+            desc = desc.replaceAll("key=\"" + pluginKey + "\"", "key=\"" + pluginKey + "-fork-" + user + "\"");
+            IOUtils.copy(new StringReader(desc), zout);
+
+            zout.close();
+
+            return install(user, tmpFile);
+        }
+        catch (IOException e)
+        {
+            e.printStackTrace();
+
+            throw new PluginOperationFailedException("Unable to create forked plugin jar", e);
+        }
+        finally
+        {
+            IOUtils.closeQuietly(zout);
+        }
+    }
+
+    public RemotePlugin getRemotePlugin(String pluginKey)
+    {
+        final Plugin plugin = pluginAccessor.getPlugin(pluginKey);
+
+        RemotePlugin remotePlugin = new RemotePlugin(plugin);
+        remotePlugin.setAuthor(data.getPluginAuthor(pluginKey));
+        return remotePlugin;
     }
 }

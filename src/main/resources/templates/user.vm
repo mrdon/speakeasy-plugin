@@ -40,8 +40,14 @@ mvn {product}:run
         </div>
     </script>
 
-    <script type="text/x-template" title="uninstall">
+    <script type="text/x-template" title="owner-actions">
         <a class="pk_uninstall" href="$contextPath/rest/speakeasy/1/plugins/{key}">Uninstall</a>
+
+        <a class="pk_edit" href="$contextPath/rest/speakeasy/1/plugins/{key}/index">Edit</a>
+    </script>
+
+    <script type="text/x-template" title="non-fork-actions">
+        <a class="pk_fork" href="$contextPath/rest/speakeasy/1/plugins/fork/{key}">Fork</a>
     </script>
 
     <script type="text/x-template" title="browser-leaf">
@@ -57,9 +63,9 @@ mvn {product}:run
             <td headers="pluginUsers">{numUsers}</td>
             <td headers="action">
                 <a class="pk_enable_toggle" href="$contextPath/rest/speakeasy/1/user/{key}">{enableText}</a>
-                {uninstall}
                 <a class="pk_download" href="javascript:void(0)" data-download="$contextPath/rest/speakeasy/1/plugins/download/{key}.zip">Download</a>
-                <a class="pk_edit" href="$contextPath/rest/speakeasy/1/plugins/{key}/index">Edit</a>
+                {ownerActions}
+                {nonForkActions}
             </td>
         </tr>
     </script>
