@@ -35,6 +35,7 @@ import java.util.zip.ZipFile;
 import java.util.zip.ZipOutputStream;
 
 import static com.atlassian.labs.speakeasy.util.BundleUtil.findBundleForPlugin;
+import static com.atlassian.labs.speakeasy.util.BundleUtil.getBundlePathsRecursive;
 import static java.util.Arrays.asList;
 import static org.apache.commons.lang.Validate.notNull;
 
@@ -261,12 +262,15 @@ public class PluginManager
             paths.remove("atlassian-plugin.xml");
             for (String path : paths)
             {
-                byte[] data = readEntry(bundle, path);
+
                 String actualPath = "src/main/resources/" + path;
                 ZipEntry entry = new ZipEntry(actualPath);
-                entry.setSize(data.length);
                 zout.putNextEntry(entry);
-                zout.write(data, 0, data.length);
+                if (!path.endsWith("/"))
+                {
+                    byte[] data = readEntry(bundle, path);
+                    zout.write(data, 0, data.length);
+                }
             }
 
             zout.putNextEntry(new ZipEntry("pom.xml"));
@@ -301,10 +305,9 @@ public class PluginManager
     {
         notNull(bundle);
         List<String> contents = new ArrayList<String>();
-        for (Enumeration<String> e = bundle.getEntryPaths(""); e.hasMoreElements(); )
+        for (String path : getBundlePathsRecursive(bundle, ""))
         {
-            String path = e.nextElement();
-            if (!path.startsWith("META-INF") && !path.equals("pom.xml") && !path.endsWith("/"))
+            if (!path.startsWith("META-INF"))
             {
                 contents.add(path);
             }
@@ -375,9 +378,8 @@ public class PluginManager
         {
             tmpFile = File.createTempFile("speakeasy-edit", ".jar");
             zout = new ZipOutputStream(new FileOutputStream(tmpFile));
-            for (Enumeration<String> e = bundle.getEntryPaths(""); e.hasMoreElements(); )
+            for (String path : getBundlePathsRecursive(bundle, ""))
             {
-                String path = e.nextElement();
                 if (!path.equals(fileName))
                 {
                     ZipEntry entry = new ZipEntry(path);

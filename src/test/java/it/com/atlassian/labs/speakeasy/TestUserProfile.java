@@ -57,7 +57,7 @@ public class TestUserProfile
         IdeDialog ide =  product.visit(SpeakeasyUserPage.class)
                 .openEditDialog("test");
 
-        assertEquals(asList("foo.js", "atlassian-plugin.xml"), ide.getFileNames());
+        assertEquals(asList("bar/baz.js", "atlassian-plugin.xml", "foo.js"), ide.getFileNames());
 
         SpeakeasyUserPage userPage = ide.editAndSaveFile("foo.js", "var foo;");
         List<String> messages = userPage.getSuccessMessages();
@@ -104,7 +104,9 @@ public class TestUserProfile
                 "src/main/",
                 "src/main/resources/",
                 "src/main/resources/atlassian-plugin.xml",
-                "src/main/resources/foo.js"
+                "src/main/resources/foo.js",
+                "src/main/resources/bar/",
+                "src/main/resources/bar/baz.js"
         ), entries);
 
         File fooFile = new File(unzippedPlugin, "src/main/resources/foo.js");
@@ -236,6 +238,8 @@ public class TestUserProfile
                         "    </scoped-web-resource>",
                         "</atlassian-plugin>")
                 .addFormattedResource("foo.js", "alert('hi');")
+                .addFormattedResource("bar/baz.js", "alert('hoho');")
+                .addResource("bar/", "")
                 .build();
     }
 }

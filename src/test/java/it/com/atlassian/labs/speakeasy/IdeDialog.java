@@ -63,9 +63,9 @@ public class IdeDialog
     public List<String> getFileNames()
     {
         List<String> names = new ArrayList<String>();
-        for (WebElement li : ideBrowser.findElements(By.tagName("li")))
+        for (WebElement li : ideBrowser.findElements(By.className("editable-bespin")))
         {
-            names.add(li.getText());
+            names.add(li.getAttribute("id"));
         }
         return names;
     }

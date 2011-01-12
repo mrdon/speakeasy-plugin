@@ -31,25 +31,25 @@ function initIDE($, pluginKey, dialog, href){
     function populateBrowser() {
         function fill(tree, path) {
             var pos = path.indexOf('/');
+            var children = tree.children ? tree.children : tree;
             if (pos > -1) {
                 var dir = path.substring(0, pos);
-                if (tree.children.length == 0 || tree.children[tree.length - 1].text != dir) {
-                    tree.children.push({
+                if (children.length == 0 || children[children.length - 1].text != dir) {
+                    children.push({
                         text: dir,
-                        expanded : true,
+                        expanded : false,
                         classes : "folder",
                         children : []
                     });
                 }
 
-                fill(tree.children[tree.length - 1], path.substring(pos));
+                return fill(children[children.length - 1], path.substring(pos + 1));
             } else {
-                var node = tree.children ? tree.children : tree;
-                node.push({
+                children.push({
                     text: path,
                     classes : "file"
                 });
-                return node[node.length - 1];
+                return children[children.length - 1];
             }
         }
 
@@ -59,8 +59,10 @@ function initIDE($, pluginKey, dialog, href){
             var tree = [], path;
             jQuery.each(data.files, function(){
                 path = this;
-                var node = fill(tree, path);
-                node.text = "<a href='javascript:void(0)' id='" + path + "' class='editable-bespin'>" + node.text + "</a>";
+                if (path.indexOf('/') != path.length - 1) {
+                    var node = fill(tree, path);
+                    node.text = "<a href='javascript:void(0)' id='" + path + "' class='editable-bespin'>" + node.text + "</a>";
+                }
             });
             createTreeview($browser, tree);
 
@@ -71,28 +73,28 @@ function initIDE($, pluginKey, dialog, href){
         var $target = jQuery(event.target);
 
         if( $target.is(".editable-bespin") ) {
-            // Get the editor.
-            var editor = env.editor;
-
-
-            var filePath = event.target.id;
-            $.get(contextPath + "/rest/speakeasy/1/plugins/" + pluginKey + "/file", {path:filePath}, function(data) {
-                // Change the value and move to the secound line.
-                editor.value = data;
-                editor.fileName = filePath;
-
-                if (event.target.id.match(/([^\/\\]+)\.(xml|html|js)$/i))
-                {
-                    if (RegExp.$2 == 'xml')
-                        editor.syntax = 'html'
-                    else
-                        editor.syntax = RegExp.$2;
-                }
-
-                editor.setLineNumber(1);
-                editor.stealFocus = true;
-            });
+            loadFile(event.target.id);
         }
+    }
+
+    function loadFile(filePath) {
+        $.get(contextPath + "/rest/speakeasy/1/plugins/" + pluginKey + "/file", {path:filePath}, function(data) {
+            // Change the value and move to the secound line.
+            var editor = ideBespin.editor;
+            editor.value = data;
+            editor.fileName = filePath;
+
+            if (filePath.match(/([^\/\\]+)\.(xml|html|js)$/i))
+            {
+                if (RegExp.$2 == 'xml')
+                    editor.syntax = 'html'
+                else
+                    editor.syntax = RegExp.$2;
+            }
+
+            editor.setLineNumber(1);
+            editor.stealFocus = true;
+        });
     }
 
     function saveAndReload(pluginKey, fileName, contents) {
@@ -142,6 +144,7 @@ function initIDE($, pluginKey, dialog, href){
             });
             window.ideBespin = env;
             dialog.show();
+            loadFile("atlassian-plugin.xml");
         });
     };
 
