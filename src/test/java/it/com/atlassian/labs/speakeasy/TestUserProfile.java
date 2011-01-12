@@ -55,16 +55,16 @@ public class TestUserProfile
         product.visit(SpeakeasyUserPage.class)
                 .uploadPlugin(buildSimplePluginFile());
         IdeDialog ide =  product.visit(SpeakeasyUserPage.class)
-                .openEditDialog("test");
+                .openEditDialog("test-2");
 
         assertEquals(asList("bar/baz.js", "atlassian-plugin.xml", "foo.js"), ide.getFileNames());
 
         SpeakeasyUserPage userPage = ide.editAndSaveFile("foo.js", "var foo;");
         List<String> messages = userPage.getSuccessMessages();
         assertEquals(1, messages.size());
-        assertTrue(messages.get(0).contains("'test'"));
+        assertTrue(messages.get(0).contains("'test-2'"));
 
-        String contents = userPage.openEditDialog("test")
+        String contents = userPage.openEditDialog("test-2")
                 .getFileContents("foo.js");
         assertEquals("var foo;", contents);
 
@@ -75,7 +75,7 @@ public class TestUserProfile
     {
         File file = product.visit(SpeakeasyUserPage.class)
                 .uploadPlugin(buildSimplePluginFile())
-                .openForkDialog("test")
+                .openForkDialog("test-2")
                 .fork();
         assertNotNull(file);
         File unzippedPlugin = new File(file.getParent(), "unzipped");
@@ -147,22 +147,22 @@ public class TestUserProfile
         List<String> messages = page.getSuccessMessages();
         assertEquals(1, messages.size());
         assertTrue(messages.get(0).contains("Test Plugin"));
-        assertTrue(page.getPluginKeys().contains("test"));
+        assertTrue(page.getPluginKeys().contains("test-2"));
 
-        SpeakeasyUserPage.PluginRow row = page.getPlugins().get("test");
+        SpeakeasyUserPage.PluginRow row = page.getPlugins().get("test-2");
         assertNotNull(row);
-        assertEquals("test", row.getKey());
+        assertEquals("test-2", row.getKey());
         assertEquals("Test Plugin", row.getName());
         assertEquals("Desc", row.getDescription());
         assertEquals("admin", row.getAuthor());
 
         // verify on reload
         page = product.visit(SpeakeasyUserPage.class);
-        assertTrue(page.getPluginKeys().contains("test"));
+        assertTrue(page.getPluginKeys().contains("test-2"));
 
-        row = page.getPlugins().get("test");
+        row = page.getPlugins().get("test-2");
         assertNotNull(row);
-        assertEquals("test", row.getKey());
+        assertEquals("test-2", row.getKey());
         assertEquals("Test Plugin", row.getName());
         assertEquals("Desc", row.getDescription());
         assertEquals("admin", row.getAuthor());
@@ -202,16 +202,16 @@ public class TestUserProfile
                 .uploadPlugin(jar);
 
         SpeakeasyUserPage page = product.visit(SpeakeasyUserPage.class);
-        assertTrue(page.getPluginKeys().contains("test"));
-        page.uninstallPlugin("test");
+        assertTrue(page.getPluginKeys().contains("test-2"));
+        page.uninstallPlugin("test-2");
         List<String> messages = page.getSuccessMessages();
         assertEquals(1, messages.size());
         assertTrue(messages.get(0).contains("uninstalled"));
-        assertFalse(page.getPluginKeys().contains("test"));
+        assertFalse(page.getPluginKeys().contains("test-2"));
 
         // verify on reload
         page = product.visit(SpeakeasyUserPage.class);
-        assertFalse(page.getPluginKeys().contains("test"));
+        assertFalse(page.getPluginKeys().contains("test-2"));
     }
 
     @Test
@@ -227,7 +227,7 @@ public class TestUserProfile
     {
         return new PluginJarBuilder()
                 .addFormattedResource("atlassian-plugin.xml",
-                        "<atlassian-plugin key='test' pluginsVersion='2' name='Test Plugin'>",
+                        "<atlassian-plugin key='test-2' pluginsVersion='2' name='Test Plugin'>",
                         "    <plugin-info>",
                         "        <version>1</version>",
                         "        <description>Desc</description>",

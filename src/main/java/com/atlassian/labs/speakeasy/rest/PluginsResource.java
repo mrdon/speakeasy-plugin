@@ -54,10 +54,11 @@ public class PluginsResource
     }
 
     @GET
-    @Path("fork/{pluginKey}-{user}.zip")
+    @Path("fork/{pluginKeyAndUser}.zip")
     @Produces("application/octet-stream")
-    public Response get(@PathParam("pluginKey") String pluginKey)
+    public Response get(@PathParam("pluginKeyAndUser") String pluginKeyAndUser)
     {
+        String pluginKey = pluginKeyAndUser.substring(0, pluginKeyAndUser.lastIndexOf('-'));
         File file = pluginManager.getPluginFileAsProject(pluginKey);
         if (file != null)
         {
