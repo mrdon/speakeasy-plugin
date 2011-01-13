@@ -9,6 +9,10 @@
         <url-pattern>/speakeasy/user</url-pattern>
     </servlet>
 
+    <servlet key="unsubscribe-servlet" name="Unsubscribe Page" class="com.atlassian.labs.speakeasy.ui.UserOptOutServlet">
+        <url-pattern>/speakeasy/unsubscribe</url-pattern>
+    </servlet>
+
     <web-resource key="optin-js">
         <resource type="download" name="user.js" location="js/user.js" />
         <resource type="download" name="user.css" location="css/user.css" />

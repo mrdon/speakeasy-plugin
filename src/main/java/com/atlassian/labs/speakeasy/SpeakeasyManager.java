@@ -279,4 +279,16 @@ public class SpeakeasyManager implements DisposableBean
     {
         return data.getUsersList(pluginKey).contains(remoteUser);
     }
+
+    public void disallowAllUserAccess(String user)
+    {
+        for (Plugin plugin : pluginAccessor.getEnabledPlugins())
+        {
+            if (data.getUsersList(plugin.getKey()).contains(user))
+            {
+                disallowUserAccess(plugin.getKey(), user);
+            }
+            unregisterGeneratedDescriptorsForPlugin(plugin.getKey());
+        }
+    }
 }

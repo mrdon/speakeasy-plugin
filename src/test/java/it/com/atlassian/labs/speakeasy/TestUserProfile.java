@@ -203,6 +203,26 @@ public class TestUserProfile
     }
 
     @Test
+    public void testUnsubscribeFromAllPlugins() throws IOException
+    {
+        File jar = buildSimplePluginFile();
+
+        SpeakeasyUserPage page = product.visit(SpeakeasyUserPage.class)
+                .uploadPlugin(jar)
+                .enablePlugin("test-2")
+                .enablePlugin("plugin-tests");
+
+        assertTrue(page.isPluginEnabled("test-2"));
+        assertTrue(page.isPluginEnabled("plugin-tests"));
+
+        product.visit(UnsubscribePage.class);
+        page = product.visit(SpeakeasyUserPage.class);
+
+        assertFalse(page.isPluginEnabled("test-2"));
+        assertFalse(page.isPluginEnabled("plugin-tests"));
+    }
+
+    @Test
     public void testCannotInstallOtherUsersPlugin() throws IOException
     {
         File jar = new PluginJarBuilder()
