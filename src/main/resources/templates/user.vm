@@ -56,11 +56,11 @@ mvn {product}:run
 
     <script type="text/x-template" title="row">
         <tr data-pluginKey="{key}">
-            <td headers="pluginName"><span class="pluginName">{name}</span><br><span class="pluginDescription">{description}</span></td>
+            <td headers="pluginName"><div class="pluginSummary"><span class="pluginName">{name}</span><br><span class="pluginDescription">{description}</span></div></td>
             <td headers="pluginAuthor">{author}</td>
             <td headers="pluginVersion">{version}</td>
             <td headers="pluginUsers">{numUsers}</td>
-            <td headers="action">
+            <td headers="pluginActions">
                 <a class="pk_enable_toggle" href="$contextPath/rest/speakeasy/1/user/{key}">{enableText}</a>
                 <a class="pk_download" href="javascript:void(0)" data-download="$contextPath/rest/speakeasy/1/plugins/download/{key}.zip">Download</a>
                 {ownerActions}
@@ -74,7 +74,7 @@ mvn {product}:run
             <td headers="pluginName"><span class="pluginName">{name}</span><br><span class="pluginDescription">{description}</span></td>
             <td headers="pluginAuthor"><a href="{authorUrl}">{author}</a></td>
             <td headers="pluginVersion">{version}</td>
-            <td headers="action" nowrap="true">
+            <td headers="pluginActions" nowrap="true">
                 <a href="{binaryUrl}"'>Download</a>
                 <a href="http://plugins.atlassian.com/{id}">Learn More</a>
             </td>
@@ -130,6 +130,20 @@ mvn {product}:run
             To install an extension, <b>Download</b> it locally, then <b>Upload</b> it to Speakeasy. <br />
             You should consult the extension's page before installing - click <b>Learn More</b>.<br />
         </p>
+
+        <div class="aui-message warning">
+            <p class="title">These are not the extensions you're looking for!</p>
+            <p>
+                Yes - the items below are not extensions, because extensions don't have a category on PAC yet.
+                This is a proof of concept of accessing PAC via Javascript + REST from within the browser.
+            </p>
+            <p>
+                When Speakeasy is released, there will be a PAC extensions category per product, the contents of which will show up below. We will also indicate which ones you already have installed etc.
+            </p>
+            <p>
+                If you want to share extensions, for now please attach them to <a href="https://extranet.atlassian.com/x/pJrEbw">this EAC page</a>.
+            </p>
+        </div>
         
         <p id="loading"><img alt="waiting" src="$staticResourcesPrefix/download/resources/com.atlassian.labs.speakeasy-plugin:optin-js/wait.gif" /> Loading available extensions from plugins.atlassian.com ..</p>
 

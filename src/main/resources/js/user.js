@@ -61,6 +61,7 @@ function initSpeakeasy() {
         clearMessage();
         link.html('<img alt="waiting" src="' + staticResourcesPrefix + '/download/resources/com.atlassian.labs.speakeasy-plugin:optin-js/wait.gif" />');
         var pluginName = jQuery('td[headers=pluginName] .pluginName', attachedRow).text();
+        var wasEnabled = jQuery('td[headers=pluginActions] .pk_enable_toggle', attachedRow).text() == "Disable";
         jQuery.ajax({
                   url: link.attr('href'),
                   type: 'DELETE',
@@ -70,7 +71,7 @@ function initSpeakeasy() {
                           var forkStart = pluginKey.indexOf("-fork-");
                           if (forkStart > -1) {
                               var parentTr = link.closest("table").find("tr[data-pluginkey=" + pluginKey.substring(0, forkStart) + "]")[0];
-                              if (parentTr) {
+                              if (parentTr && wasEnabled) {
                                   togglePluginLink(jQuery(parentTr), true);
                               }
                           }
@@ -86,6 +87,7 @@ function initSpeakeasy() {
 
     function forkPlugin(link, attachedRow) {
         clearMessage();
+        var enabled = "Disable" == link.html()
         link.append('<img class="waiting" alt="waiting" src="' + staticResourcesPrefix + '/download/resources/com.atlassian.labs.speakeasy-plugin:optin-js/wait.gif" />');
         var pluginName = jQuery('td[headers=pluginName]', attachedRow).text();
         jQuery.ajax({
@@ -93,7 +95,9 @@ function initSpeakeasy() {
                   type: 'POST',
                   success: function(data) {
                     addRow(data);
-                    togglePluginLink(link.closest("tr"), false);
+                    if (enabled) {
+                        togglePluginLink(link.closest("tr"), false);
+                    }
                     addMessage('success', {body: "<b>" + pluginName + "</b> was forked successfully", shadowed: false});
                     jQuery('.waiting', link).remove();
                   },
@@ -150,6 +154,9 @@ function initSpeakeasy() {
         if (!data.forkedPluginKey) {
             data["nonForkActions:html"] = nonForkActions.fill(data);
         } else {
+            data.name = data.name + " (forked)";
+            data.author = "Forked by " + data.author;
+            data.version = data.version + "-fork"
             data.nonForkActions = "";
         }
 
@@ -207,6 +214,10 @@ function initSpeakeasy() {
                 return false;
             });
         });
+
+        if (data.forkedPluginKey) {
+            attachedRow.addClass("forkedRow")
+        }
     }
 
 

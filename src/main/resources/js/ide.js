@@ -110,7 +110,7 @@ function initIDE($, pluginKey, dialog, href){
                 if (data.error) {
                     addMessage('error', {title: "Error saving extension <b>" + data.name + "</b>", body: data.error, shadowed: false});
                 } else {
-                    addMessage('success', {body: "<b>" + data.name + "</b> was saved successfully", shadowed: false});
+                    addMessage('success', {body: "<b>" + data.name + "</b> was saved successfully and reloaded", shadowed: false});
                 }
             }
         })

@@ -20,6 +20,11 @@
         <resource type="download" name="wait.gif" location="wait.gif" />
     </web-resource>
 
+    <web-resource key="optin-js-jira" application="jira">
+        <context>speakeasy.user-profile</context>
+        <resource type="download" name="user-jira.css" location="css/user-jira.css" />
+    </web-resource>
+
     <!--
         Bespin-based IDE sample served from below.
 
@@ -36,6 +41,10 @@
         <resource type="download" name="BespinMain.js" location="bespin/BespinMain.js" />
         <resource type="download" name="BespinWorker.js" location="bespin/BespinWorker.js" />
         <resource type="download" name="resources/" location="bespin/resources/"/>
+    </web-resource>
+
+    <web-resource key="images">
+        <resource type="download" name="images/" location="images/"/>
     </web-resource>
 
     <web-resource key="treeview">
@@ -92,6 +101,11 @@
     </web-item>
 
 	<web-item key="speakeasy-plugins" name="Speakeasy Tab" section="system.profile" weight="100" application="com.atlassian.confluence">
+		<label>Speakeasy</label>
+		<link>/plugins/servlet/speakeasy/user</link>
+	</web-item>
+
+	<web-item key="speakeasy-plugins.menu" name="Speakeasy User Menu Item" section="system.user/user-content" weight="100" application="com.atlassian.confluence">
 		<label>Speakeasy</label>
 		<link>/plugins/servlet/speakeasy/user</link>
 	</web-item>
