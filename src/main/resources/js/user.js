@@ -85,7 +85,7 @@ function initSpeakeasy() {
 
     function forkPlugin(link, attachedRow) {
         clearMessage();
-        var enabled = "Disable" == link.html()
+        //var enabled = ("Disable" == link.text());
         link.append('<img class="waiting" alt="waiting" src="' + staticResourcesPrefix + '/download/resources/com.atlassian.labs.speakeasy-plugin:optin-js/wait.gif" />');
         var pluginName = jQuery('td[headers=pluginName] .pluginName', attachedRow).text();
         jQuery.ajax({
@@ -93,9 +93,9 @@ function initSpeakeasy() {
                   type: 'POST',
                   success: function(data) {
                     addRow(data);
-                    if (enabled) {
+                    //if (enabled) {
                         togglePluginLink(link.closest("tr"), false);
-                    }
+                    //}
                     addMessage('success', {body: "<b>" + pluginName + "</b> was forked successfully", shadowed: false});
                     jQuery('.waiting', link).remove();
                   },
