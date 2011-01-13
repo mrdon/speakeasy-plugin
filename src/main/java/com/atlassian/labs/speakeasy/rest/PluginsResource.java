@@ -132,6 +132,15 @@ public class PluginsResource
         return Response.ok().entity(pluginManager.getPluginFile(pluginKey, fileName)).build();
     }
 
+    @GET
+    @Path("{pluginKey}/binary")
+    @Produces("application/octet-stream")
+    public Response getIndexBinary(@PathParam("pluginKey") String pluginKey, @QueryParam("path") String fileName)
+    {
+        // todo: should only allow speakeasy and devmode plugins; handle wrong key or file
+        return Response.ok().entity(pluginManager.getPluginFile(pluginKey, fileName)).build();
+    }
+
     @PUT
     @Path("{pluginKey}/file")
     @Consumes("text/plain")

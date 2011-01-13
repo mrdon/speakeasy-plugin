@@ -9,23 +9,19 @@
     clear: both;
 }
 
-#ide-header {
-    padding: 15px 0 15px 15px;
-}
-
 #ide-content {
-    padding: 15px 30px 0 0;
+    padding: 0;
 }
 
 #ide-main-content {
-    margin-left: 175px;
+    margin-left: 245px;
     max-width: 100%;
 }
 
 #ide-file-contents-panel {
-    width: 145px;
+    width: 245px;
     float: left;
-    padding: 0 0 0 15px;
+    padding: 0;
     font-size: 75%;
 }
 
