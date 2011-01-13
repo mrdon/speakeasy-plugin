@@ -1,3 +1,12 @@
+function retrieveEditor() {
+        // Change the value and move to the secound line.
+        var edit = jQuery("#ide-editor")[0];
+        // Get the environment variable.
+        var env = edit.bespin;
+        // Get the editor.
+        return env.editor;
+    }
+
 function initIDE($, pluginKey, dialog, href){
 
     function createTreeview(container, data) {
@@ -66,7 +75,7 @@ function initIDE($, pluginKey, dialog, href){
                         // node.text = "<a href='" + contextPath + "/rest/speakeasy/1/plugins/" + pluginKey + "/binary?path=" + path + "'>" + node.text + "</a>";
                         node.text = node.text + "";
                     }
-                    else {
+                    else if (!node.text.match(/([^\/\\]+)\.(class)$/i)) {
                         node.text = "<a href='javascript:void(0)' id='" + path + "' class='editable-bespin'>" + node.text + "</a>";
                     }
                 }
@@ -119,15 +128,6 @@ function initIDE($, pluginKey, dialog, href){
                 }
             }
         })
-    }
-
-    function retrieveEditor() {
-        // Change the value and move to the secound line.
-        var edit = $("#ide-editor")[0]
-        // Get the environment variable.
-        var env = edit.bespin;
-        // Get the editor.
-        return env.editor;
     }
 
     dialog.addHeader("Edit Extension : " + pluginKey);
