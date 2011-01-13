@@ -137,11 +137,11 @@ mvn {product}:run
         <div class="aui-message warning">
             <p class="title">These are not the extensions you're looking for!</p>
             <p>
-                Yes - the items below are not extensions, because extensions don't have a category on PAC yet.
-                This is a proof of concept of accessing PAC via Javascript + REST from within the browser.
+                Yes - the items below are not extensions because extensions don't have a category on PAC yet.
+                This is a proof of concept of accessing PAC via Javascript + REST + DropBox + YQL from within the browser. It's all very shiny, new and cool.
             </p>
             <p>
-                When Speakeasy is released, there will be a PAC extensions category per product, the contents of which will show up below. We will also indicate which ones you already have installed etc.
+                When Speakeasy is released there will be a PAC extensions category per product. Those contents will show up below. We will also indicate which ones you already have installed etc.
             </p>
             <p>
                 If you want to share extensions, for now please attach them to <a href="https://extranet.atlassian.com/x/pJrEbw">this EAC page</a>.
