@@ -126,6 +126,12 @@
             <version>2.1.6</version>
             <scope>provided</scope>
         </dependency>
+		<dependency>
+            <groupId>com.atlassian.applinks</groupId>
+            <artifactId>applinks-api</artifactId>
+            <version>3.2-SNAPSHOT</version>
+            <scope>provided</scope>
+        </dependency>
         <dependency>
             <groupId>com.atlassian.sal</groupId>
             <artifactId>sal-api</artifactId>
@@ -271,8 +277,8 @@
 
     <properties>
         <xvfb.enable>true</xvfb.enable>
-        <platform.version>2.8.8</platform.version>
-        <refapp.version>2.8.8</refapp.version>
+        <platform.version>2.9.0-alpha6</platform.version>
+        <refapp.version>2.9.0-alpha6</refapp.version>
         <confluence.version>3.4</confluence.version>
         <confluence.data.version>3.0</confluence.data.version>
         <jira.version>4.2.1-b588</jira.version>

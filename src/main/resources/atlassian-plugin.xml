@@ -19,6 +19,10 @@
         <resource type="download" name="jquery.form.js" location="js/external/jquery.form.js" />
         <resource type="download" name="wait.gif" location="wait.gif" />
     </web-resource>
+    
+    <web-resource key="proxy-js">
+    	<resource type="download" name="proxy.js" location="js/proxy.js" />
+    </web-resource>
 
     <web-resource key="optin-js-jira" application="jira">
         <context>speakeasy.user-profile</context>
@@ -82,6 +86,7 @@
 
     <component-import key="pluginController" interface="com.atlassian.plugin.PluginController" />
     <component-import key="pluginAccessor" interface="com.atlassian.plugin.PluginAccessor" />
+    <component-import key="applicationLinkService" interface="com.atlassian.applinks.api.ApplicationLinkService" />
 
     <module-type key="scoped-web-resource" class="com.atlassian.labs.speakeasy.SpeakeasyWebResourceModuleDescriptor" />
 
