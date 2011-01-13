@@ -29,14 +29,17 @@ mvn {product}:run
         <div id="ide-content">
             {firstScript}
             <div id="ide-file-contents-panel">
-                <b>Extension Contents</b>
+                <b>Contents</b>
                 <ul id="ide-browser" class="filetree">
                 </ul>
             </div>
             <div id="ide-main-content">
-                <div id="ide-editor"></div>
+                <div id="ide-loading" style="padding: 100px;">
+                    <img alt="waiting" src="$staticResourcesPrefix/download/resources/com.atlassian.labs.speakeasy-plugin:optin-js/wait.gif" align="absmiddle" /> Loading IDE... </p>
+                </div>
+                <div id="ide-editor" style="display: none;" class="bespin" data-bespinoptions='{ "stealFocus": true, "syntax": "html", "settings": { "tabstop": 4, "theme": "white" } }'>
+                </div>
             </div>
-            {secondScript}
         </div>
     </script>
 
@@ -145,7 +148,8 @@ mvn {product}:run
             </p>
         </div>
         
-        <p id="loading"><img alt="waiting" src="$staticResourcesPrefix/download/resources/com.atlassian.labs.speakeasy-plugin:optin-js/wait.gif" /> Loading available extensions from plugins.atlassian.com ..</p>
+        <p id="loading"><img alt="waiting"
+align="absmiddle" src="$staticResourcesPrefix/download/resources/com.atlassian.labs.speakeasy-plugin:optin-js/wait.gif" /> Loading available extensions from plugins.atlassian.com ..</p>
 
         <table class="aui" id="availableExtensionsTable">
         <thead>
