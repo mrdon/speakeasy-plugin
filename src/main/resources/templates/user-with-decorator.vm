@@ -1,5 +1,12 @@
 <html>
 <head>
+    <!-- Confluence breadcrumbs, TODO: invent a better way of doing this -->
+    <content tag="breadcrumbs">
+        <ol id="breadcrumbs">
+            <li class="first" ><span><a href="$contextPath/dashboard.action">Dashboard</a></span></li>
+            <li><span>Speakeasy Extensions</span></li>
+        </ol>
+    </content>
 
     <meta name="decorator" content="atl.userprofile"/>
     <title>Speakeasy Extensions</title>
