@@ -55,7 +55,7 @@ public class IdeDialog
             public Object apply(@Nullable Object from)
             {
                 System.out.print(".");
-                return driver.executeScript("return window.ideBespin != null");
+                return driver.executeScript("return window.retrieveEditor() != null");
             }
         });
     }
@@ -93,14 +93,14 @@ public class IdeDialog
                 return editorText != null && editorText.length() > 0;
             }
         });
-        driver.executeScript("window.ideBespin.editor.value=arguments[0]", contents);
+        driver.executeScript("window.retrieveEditor().value=arguments[0]", contents);
         dialogElement.findElement(By.className("ide-save")).click();
         return binder.bind(SpeakeasyUserPage.class).waitForMessages();
     }
 
     private String getEditorContents()
     {
-         return (String) JavaScriptUtils.execute("return window.ideBespin.editor.value", driver);
+         return (String) JavaScriptUtils.execute("return window.retrieveEditor().value", driver);
     }
 
 }

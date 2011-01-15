@@ -1,3 +1,12 @@
+function retrieveEditor() {
+        // Change the value and move to the secound line.
+        var edit = jQuery("#ide-editor")[0];
+        // Get the environment variable.
+        var env = edit.bespin;
+        // Get the editor.
+        return env.editor;
+    }
+
 function initIDE($, pluginKey, dialog, href){
 
     function createTreeview(container, data) {
@@ -61,15 +70,21 @@ function initIDE($, pluginKey, dialog, href){
                 path = this;
                 if (path.indexOf('/') != path.length - 1) {
                     var node = fill(tree, path);
-                    node.text = "<a href='javascript:void(0)' id='" + path + "' class='editable-bespin'>" + node.text + "</a>";
+                    if (node.text.match(/([^\/\\]+)\.(gif|jpg|jpeg)$/i)) {
+                        // todo - fix the binary download REST service so we can show images in the editor - talk to Don! Seems to half work.
+                        // node.text = "<a href='" + contextPath + "/rest/speakeasy/1/plugins/" + pluginKey + "/binary?path=" + path + "'>" + node.text + "</a>";
+                        node.text = node.text + "";
+                    }
+                    else if (!node.text.match(/([^\/\\]+)\.(class)$/i)) {
+                        node.text = "<a href='javascript:void(0)' id='" + path + "' class='editable-bespin'>" + node.text + "</a>";
+                    }
                 }
             });
             createTreeview($browser, tree);
-
         });
     }
 
-    function handleBrowserFileClick(event, env) {
+    function handleBrowserFileClick(event) {
         var $target = jQuery(event.target);
 
         if( $target.is(".editable-bespin") ) {
@@ -79,12 +94,11 @@ function initIDE($, pluginKey, dialog, href){
 
     function loadFile(filePath) {
         $.get(contextPath + "/rest/speakeasy/1/plugins/" + pluginKey + "/file", {path:filePath}, function(data) {
-            // Change the value and move to the secound line.
-            var editor = ideBespin.editor;
+            var editor = retrieveEditor();
             editor.value = data;
             editor.fileName = filePath;
 
-            if (filePath.match(/([^\/\\]+)\.(xml|html|js)$/i))
+            if (filePath.match(/([^\/\\]+)\.(xml|html|js|css)$/i))
             {
                 if (RegExp.$2 == 'xml')
                     editor.syntax = 'html'
@@ -114,39 +128,42 @@ function initIDE($, pluginKey, dialog, href){
                 }
             }
         })
-
     }
+
     dialog.addHeader("Edit Extension : " + pluginKey);
+
     dialog.addButton("Save", function (dialog) {
-        var editor = ideBespin.editor;
+        var editor = retrieveEditor();
         saveAndReload(pluginKey, editor.fileName, editor.value);
         dialog.remove();
     }, "ide-save");
+
     // addLink not compatible with JIRA 4.2
     dialog.addButton("Cancel", function (dialog) {
         dialog.remove();
     }, "ide-cancel");
+
     var ideDialogContents = AJS.template.load('ide-dialog')
         .fill({
             pluginKey : pluginKey,
             "firstScript:html" : '<script src="' + staticResourcesPrefix + '/download/resources/com.atlassian.labs.speakeasy-plugin:bespin/BespinEmbedded.js"></script>',
-            "secondScript:html" : '<script>loadIdeEditor();</script>'
            })
         .toString();
+
     dialog.addPanel("IDE", ideDialogContents, "panel-body");
+
     populateBrowser();
 
+    jQuery('#ide-browser').click(function(e) {
+        handleBrowserFileClick(e);
+    });
 
-    window.loadIdeEditor = function() {
-        bespin.useBespin("ide-editor", { "stealFocus": true, "syntax": "html", "settings": { "tabstop": 4, "theme": "white" } }).then(function(env) {
-            jQuery('#ide-browser').click(function(e) {
-                handleBrowserFileClick(e, env);
-            });
-            window.ideBespin = env;
-            dialog.show();
-            loadFile("atlassian-plugin.xml");
-        });
-    };
+    window.onBespinLoad = function() {
+        loadFile("atlassian-plugin.xml");
+        $("#ide-loading").hide();
+        $("#ide-editor").show();
+    }
 
+    dialog.show();
 }
 

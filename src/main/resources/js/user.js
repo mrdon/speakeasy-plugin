@@ -20,8 +20,6 @@ function addMessage(type, params) {
     window.setTimeout(function() { msg.fadeOut(1500) }, 5000);
 }
 
-var url = "https://plugins.atlassian.com/server/1.0/plugin/recent?max-results=5&category=52";
-
 function initSpeakeasy() {
 
     function togglePluginLink(attachedRow, toEnable) {
@@ -89,7 +87,7 @@ function initSpeakeasy() {
         clearMessage();
         //var enabled = ("Disable" == link.text());
         link.append('<img class="waiting" alt="waiting" src="' + staticResourcesPrefix + '/download/resources/com.atlassian.labs.speakeasy-plugin:optin-js/wait.gif" />');
-        var pluginName = jQuery('td[headers=pluginName]', attachedRow).text();
+        var pluginName = jQuery('td[headers=pluginName] .pluginName', attachedRow).text();
         jQuery.ajax({
                   url: link.attr('href'),
                   type: 'POST',
@@ -129,7 +127,7 @@ function initSpeakeasy() {
     function openIDE(key, href) {
         clearMessage();
         var $win = jQuery(window);
-        var dialog = new AJS.Dialog({width: $win.width() * .95, height: $win.height() * .65, id:'ideDialog'});
+        var dialog = new AJS.Dialog({width: $win.width() * .95, height: 620, id:'ideDialog'});
         initIDE(jQuery, key, dialog, href);
     }
 
@@ -154,9 +152,8 @@ function initSpeakeasy() {
         if (!data.forkedPluginKey) {
             data["nonForkActions:html"] = nonForkActions.fill(data);
         } else {
-            data.name = data.name + " (forked)";
-            data.author = "Forked by " + data.author;
-            data.version = data.version + "-fork"
+            data['name:html'] = "<span class='forkBlue'>"+ data.name + " (forked)</span>";
+            data['version:html'] = "<span class='forkBlue'>" + data.version + "-fork-" + data.author + "</span>"
             data.nonForkActions = "";
         }
 
@@ -219,7 +216,6 @@ function initSpeakeasy() {
             attachedRow.addClass("forkedRow")
         }
     }
-
 
     jQuery(plugins.plugins).each(function () {
         addRow(this);

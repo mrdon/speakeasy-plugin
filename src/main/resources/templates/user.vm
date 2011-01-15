@@ -29,14 +29,17 @@ mvn {product}:run
         <div id="ide-content">
             {firstScript}
             <div id="ide-file-contents-panel">
-                <b>Extension Contents</b>
+                <b>Contents</b>
                 <ul id="ide-browser" class="filetree">
                 </ul>
             </div>
             <div id="ide-main-content">
-                <div id="ide-editor"></div>
+                <div id="ide-loading" style="padding: 100px;">
+                    <img alt="waiting" src="$staticResourcesPrefix/download/resources/com.atlassian.labs.speakeasy-plugin:optin-js/wait.gif" align="absmiddle" /> Loading IDE... </p>
+                </div>
+                <div id="ide-editor" style="display: none;" class="bespin" data-bespinoptions='{ "stealFocus": true, "syntax": "html", "settings": { "tabstop": 4, "theme": "white" } }'>
+                </div>
             </div>
-            {secondScript}
         </div>
     </script>
 
@@ -134,18 +137,19 @@ mvn {product}:run
         <div class="aui-message warning">
             <p class="title">These are not the extensions you're looking for!</p>
             <p>
-                Yes - the items below are not extensions, because extensions don't have a category on PAC yet.
-                This is a proof of concept of accessing PAC via Javascript + REST from within the browser.
+                Yes - the items below are not extensions because extensions don't have a category on PAC yet.
+                This is a proof of concept of accessing PAC via Javascript + REST + DropBox + YQL from within the browser. It's all very shiny, new and cool.
             </p>
             <p>
-                When Speakeasy is released, there will be a PAC extensions category per product, the contents of which will show up below. We will also indicate which ones you already have installed etc.
+                When Speakeasy is released there will be a PAC extensions category per product. Those contents will show up below. We will also indicate which ones you already have installed etc.
             </p>
             <p>
                 If you want to share extensions, for now please attach them to <a href="https://extranet.atlassian.com/x/pJrEbw">this EAC page</a>.
             </p>
         </div>
         
-        <p id="loading"><img alt="waiting" src="$staticResourcesPrefix/download/resources/com.atlassian.labs.speakeasy-plugin:optin-js/wait.gif" /> Loading available extensions from plugins.atlassian.com ..</p>
+        <p id="loading"><img alt="waiting"
+align="absmiddle" src="$staticResourcesPrefix/download/resources/com.atlassian.labs.speakeasy-plugin:optin-js/wait.gif" /> Loading available extensions from plugins.atlassian.com ..</p>
 
         <table class="aui" id="availableExtensionsTable">
         <thead>
