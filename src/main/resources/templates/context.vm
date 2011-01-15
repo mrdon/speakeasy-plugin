@@ -1,0 +1,3 @@
+<script>
+var contextPath = '$request.contextPath';
+</script>

@@ -12,6 +12,10 @@
     <servlet key="unsubscribe-servlet" name="Unsubscribe Page" class="com.atlassian.labs.speakeasy.ui.UserOptOutServlet">
         <url-pattern>/speakeasy/unsubscribe</url-pattern>
     </servlet>
+    
+    <servlet key="applinks-proxy" name="Applinks Proxy" class="com.atlassian.labs.speakeasy.rest.AppLinksProxyRequestServlet">
+        <url-pattern>/applinks/proxy</url-pattern>
+    </servlet>
 
     <web-resource key="optin-js">
         <resource type="download" name="user.js" location="js/user.js" />
@@ -122,6 +126,9 @@
        <order>30</order>
    </view-profile-panel>
 
+	<web-panel key="context" location="atl.refapp.index">
+        <resource name="view" type="velocity" location="templates/context.vm"/>
+    </web-panel>
 
     <!-- admin links -->
     <!--web-item key="refimpl-speakeasy-admin-menu" name="Plugin Access" section="system.admin/general"  weight="1" application="refapp">

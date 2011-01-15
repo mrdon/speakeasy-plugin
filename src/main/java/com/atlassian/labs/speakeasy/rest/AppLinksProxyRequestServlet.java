@@ -146,7 +146,7 @@ public class AppLinksProxyRequestServlet extends HttpServlet
             final ApplicationLinkRequestFactory requestFactory = appLink.createAuthenticatedRequestFactory();
             Request request = prepareRequest(req, methodType, url, parameters,
                     requestFactory);
-            request.setFollowRedirects(false);
+            //request.setFollowRedirects(false);
             
             request.execute(new ResponseHandler<Response>()
             {
@@ -154,56 +154,30 @@ public class AppLinksProxyRequestServlet extends HttpServlet
                 {
                     if (response.isSuccessful())
                     {
-                        // this is to work around a APL-503. We intercepts any redirects and re-sign if necessary.
-                        if (response.getStatusCode() >= 300 && response.getStatusCode() < 400)
+                        InputStream responseStream = response.getResponseBodyAsStream();
+                        Map<String, String> headers = response.getHeaders();
+                        for (String key : headers.keySet())
                         {
-                            try
+                            // don't pass on cookies set by linked application.
+                            if (key.equalsIgnoreCase("Set-Cookie"))
                             {
-                                Request request = prepareRequest(req, methodType, response.getHeader("location"), parameters,
-                                        requestFactory);
-                                request.setFollowRedirects(false);
-                                request.execute(this);
+                                continue;
                             }
-                            catch (UnsupportedEncodingException e)
+                            resp.setHeader(key, headers.get(key));
+                        }
+                        try
+                        {
+                            if (responseStream != null)
                             {
-                                throw new RuntimeException(e);
-                            }
-                            catch (CredentialsRequiredException e)
-                            {
-                                throw new RuntimeException(e);
-                            }
-                            catch (IOException e)
-                            {
-                                throw new RuntimeException(e);
+                                ServletOutputStream outputStream = resp.getOutputStream();
+                                IOUtils.copy(responseStream, outputStream);
+                                outputStream.flush();
+                                outputStream.close();
                             }
                         }
-                        else
+                        catch (IOException e)
                         {
-                            InputStream responseStream = response.getResponseBodyAsStream();
-                            Map<String, String> headers = response.getHeaders();
-                            for (String key : headers.keySet())
-                            {
-                                // don't pass on cookies set by linked application.
-                                if (key.equalsIgnoreCase("Set-Cookie"))
-                                {
-                                    continue;
-                                }
-                                resp.setHeader(key, headers.get(key));
-                            }
-                            try
-                            {
-                                if (responseStream != null)
-                                {
-                                    ServletOutputStream outputStream = resp.getOutputStream();
-                                    IOUtils.copy(responseStream, outputStream);
-                                    outputStream.flush();
-                                    outputStream.close();
-                                }
-                            }
-                            catch (IOException e)
-                            {
-                                throw new RuntimeException(e);
-                            }
+                            throw new RuntimeException(e);
                         }
                     }
                     else
