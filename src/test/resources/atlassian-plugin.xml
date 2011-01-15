@@ -3,6 +3,7 @@
         <version>1</version>
         <description>Alerts 'loaded' on non-admin pages</description>
         <vendor name="Some Guy"/>
+        <param name="foo">bar</param>
     </plugin-info>
 
     <scoped-web-resource key="testScoping">
