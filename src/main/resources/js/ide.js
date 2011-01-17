@@ -37,6 +37,11 @@ function initIDE($, pluginKey, dialog, href){
         container.treeview({add: container});
     }
 
+    function updateStatus(status)
+    {
+        jQuery('#ide-status').html(status);
+    }
+
     function populateBrowser() {
         function fill(tree, path) {
             var pos = path.indexOf('/');
@@ -112,6 +117,7 @@ function initIDE($, pluginKey, dialog, href){
     }
 
     function saveAndReload(pluginKey, fileName, contents) {
+        updateStatus("Saving " + fileName + " and reloading plugin '" + pluginKey + "' . . . ");
         $.ajax({
             url: contextPath + "/rest/speakeasy/1/plugins/" + pluginKey + "/file?path=" + fileName,
             data: contents,
@@ -122,9 +128,9 @@ function initIDE($, pluginKey, dialog, href){
             success : function(data) {
                 console.log('success');
                 if (data.error) {
-                    addMessage('error', {title: "Error saving extension <b>" + data.name + "</b>", body: data.error, shadowed: false});
+                    updateStatus("Error - " + data.error);
                 } else {
-                    addMessage('success', {body: "<b>" + data.name + "</b> was saved successfully and reloaded", shadowed: false});
+                    updateStatus(data.name + " was saved successfully and reloaded");
                 }
             }
         })
@@ -135,18 +141,17 @@ function initIDE($, pluginKey, dialog, href){
     dialog.addButton("Save", function (dialog) {
         var editor = retrieveEditor();
         saveAndReload(pluginKey, editor.fileName, editor.value);
-        dialog.remove();
     }, "ide-save");
 
     // addLink not compatible with JIRA 4.2
-    dialog.addButton("Cancel", function (dialog) {
+    dialog.addButton("Done", function (dialog) {
         dialog.remove();
-    }, "ide-cancel");
+    }, "ide-done");
 
     var ideDialogContents = AJS.template.load('ide-dialog')
         .fill({
             pluginKey : pluginKey,
-            "firstScript:html" : '<script src="' + staticResourcesPrefix + '/download/resources/com.atlassian.labs.speakeasy-plugin:bespin/BespinEmbedded.js"></script>',
+            "firstScript:html" : '<script src="' + staticResourcesPrefix + '/download/resources/com.atlassian.labs.speakeasy-plugin:bespin/BespinEmbedded.js"></script>'
            })
         .toString();
 
@@ -161,8 +166,9 @@ function initIDE($, pluginKey, dialog, href){
     window.onBespinLoad = function() {
         loadFile("atlassian-plugin.xml");
         $("#ide-loading").hide();
+        updateStatus("Ready")
         $("#ide-editor").show();
-    }
+    };
 
     dialog.show();
 }

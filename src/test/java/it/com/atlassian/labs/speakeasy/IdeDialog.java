@@ -38,6 +38,12 @@ public class IdeDialog
     @FindBy(id="ide-browser")
     private WebElement ideBrowser;
 
+    @FindBy(id="ide-status")
+    private WebElement ideStatus;
+
+    @FindBy(className="ide-done")
+    private WebElement ideDoneLink;
+
     private final String pluginKey;
 
     public IdeDialog(String pluginKey)
@@ -82,7 +88,7 @@ public class IdeDialog
     }
 
 
-    public SpeakeasyUserPage editAndSaveFile(String fileName, String contents)
+    public IdeDialog editAndSaveFile(String fileName, String contents)
     {
         ideBrowser.findElement(By.id(fileName)).click();
         driver.waitUntil(new Function() {
@@ -95,7 +101,19 @@ public class IdeDialog
         });
         driver.executeScript("window.retrieveEditor().value=arguments[0]", contents);
         dialogElement.findElement(By.className("ide-save")).click();
-        return binder.bind(SpeakeasyUserPage.class).waitForMessages();
+        driver.waitUntil(new Function()
+        {
+            public Object apply(@Nullable Object from)
+            {
+                return ideStatus.getText().contains("saved");
+            }
+        });
+        return this;
+    }
+    public SpeakeasyUserPage done()
+    {
+        ideDoneLink.click();
+        return binder.bind(SpeakeasyUserPage.class);
     }
 
     private String getEditorContents()

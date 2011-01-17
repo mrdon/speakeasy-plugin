@@ -59,13 +59,12 @@ public class TestUserProfile
 
         assertEquals(asList("bar/baz.js", "atlassian-plugin.xml", "foo.js"), ide.getFileNames());
 
-        SpeakeasyUserPage userPage = ide.editAndSaveFile("foo.js", "var foo;");
-        List<String> messages = userPage.getSuccessMessages();
-        assertEquals(1, messages.size());
-        assertTrue(messages.get(0).contains("Test Plugin"));
+        ide = ide.editAndSaveFile("foo.js", "var foo;")
+           .done()
+           .openEditDialog("test-2");
 
-        String contents = userPage.openEditDialog("test-2")
-                .getFileContents("foo.js");
+        String contents = ide.getFileContents("foo.js");
+
         assertEquals("var foo;", contents);
 
     }
