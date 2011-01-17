@@ -6,6 +6,7 @@ import com.atlassian.plugin.descriptors.AbstractModuleDescriptor;
 import com.atlassian.plugin.web.descriptors.DefaultWebItemModuleDescriptor;
 import com.atlassian.plugin.web.descriptors.WebItemModuleDescriptor;
 import com.atlassian.plugin.webresource.WebResourceModuleDescriptor;
+import com.google.common.collect.Sets;
 import org.dom4j.DocumentFactory;
 import org.dom4j.Element;
 import org.dom4j.io.OutputFormat;
@@ -15,7 +16,11 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.io.StringWriter;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
+
+import static java.util.Arrays.asList;
 
 /**
  *
@@ -24,6 +29,8 @@ public class SpeakeasyWebResourceModuleDescriptor extends AbstractModuleDescript
 {
     private Element originalElement;
     private static final Logger log = LoggerFactory.getLogger(SpeakeasyWebResourceModuleDescriptor.class);
+
+    private static final Set<String> ALLOWED_RESOURCE_EXTENSIONS = new HashSet<String>(asList("js", "css", "gif", "png", "jpg", "jpeg"));
 
     @Override
     public void init(Plugin plugin, Element element) throws PluginParseException
@@ -56,9 +63,7 @@ public class SpeakeasyWebResourceModuleDescriptor extends AbstractModuleDescript
         Element userElement = (Element) originalElement.clone();
         userElement.addAttribute("key", userElement.attributeValue("key") + "-" + state);
 
-
-        addUserTransformer(users, userElement, "js");
-        addUserTransformer(users, userElement, "css");
+        addUserTransformers(users, userElement);
 
         if (log.isDebugEnabled())
         {
@@ -80,18 +85,21 @@ public class SpeakeasyWebResourceModuleDescriptor extends AbstractModuleDescript
         return descriptor;
     }
 
-    private void addUserTransformer(List<String> users, Element userElement, String extension)
+    private void addUserTransformers(List<String> users, Element userElement)
     {
-        Element transElement = userElement.addElement("transformation");
-        transElement.addAttribute("extension", extension);
-        Element userTranElement = transElement.addElement("transformer");
-        userTranElement.addAttribute("key", "userTransformer");
-
-        Element usersElement = userTranElement.addElement("users");
-        for (String user : users)
+        for (String extension : ALLOWED_RESOURCE_EXTENSIONS)
         {
-            Element e = usersElement.addElement("user");
-            e.setText(user);
+            Element transElement = userElement.addElement("transformation");
+            transElement.addAttribute("extension", extension);
+            Element userTranElement = transElement.addElement("transformer");
+            userTranElement.addAttribute("key", "userTransformer");
+
+            Element usersElement = userTranElement.addElement("users");
+            for (String user : users)
+            {
+                Element e = usersElement.addElement("user");
+                e.setText(user);
+            }
         }
     }
 }
