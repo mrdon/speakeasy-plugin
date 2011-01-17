@@ -1,6 +1,5 @@
 <div id="speakeasyUserMain">
-    <a style="display:none" id="bespin_base" href="$staticResourcesPrefix/download/resources/com.atlassian.labs.speakeasy-plugin:bespin/">asdfasfd</a>
-<script type="text/javascript">
+    <script type="text/javascript">
         var staticResourcesPrefix = "$staticResourcesPrefix";
         var contextPath = "$contextPath";
         var plugins = $plugins.renderJson;
@@ -37,8 +36,8 @@ mvn {product}:run
                 <div id="ide-loading" style="padding: 100px;">
                     <img alt="waiting" src="$staticResourcesPrefix/download/resources/com.atlassian.labs.speakeasy-plugin:optin-js/wait.gif" align="absmiddle" /> Loading IDE... </p>
                 </div>
-                <div id="ide-editor" style="display: none;" class="bespin" data-bespinoptions='{ "stealFocus": true, "syntax": "html", "settings": { "tabstop": 4, "theme": "white" } }'>
-                </div>
+                <textarea id="ide-editor" style="display: none;">
+                </textarea>
             </div>
             <div id="ide-status">
                 <span>Status: </span><span id="ide-status-text"></span>

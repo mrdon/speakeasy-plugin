@@ -25,22 +25,9 @@
         <resource type="download" name="user-jira.css" location="css/user-jira.css" />
     </web-resource>
 
-    <!--
-        Bespin-based IDE sample served from below.
-
-        Load sample from this URL:
-
-        http://localhost:1990/confluence/download/resources/com.atlassian.labs.speakeasy-plugin:ide/ide/samples/speakeasy.html
-    -->
-    <web-resource key="bespin-css">
-        <resource type="download" name="BespinEmbedded.css" location="bespin/BespinEmbedded.css" />
-    </web-resource>
-
-    <web-resource key="bespin">
-        <resource type="download" name="BespinEmbedded.js" location="bespin/BespinEmbedded.js" />
-        <resource type="download" name="BespinMain.js" location="bespin/BespinMain.js" />
-        <resource type="download" name="BespinWorker.js" location="bespin/BespinWorker.js" />
-        <resource type="download" name="resources/" location="bespin/resources/"/>
+    <web-resource key="codemirror">
+        <resource type="download" name="js/" location="codemirror/js/"/>
+        <resource type="download" name="css/" location="codemirror/css/"/>
     </web-resource>
 
     <web-resource key="images">
@@ -54,7 +41,6 @@
     </web-resource>
 
     <web-resource key="ide">
-        <dependency>${project.groupId}.${project.artifactId}:bespin-css</dependency>
         <dependency>${project.groupId}.${project.artifactId}:treeview</dependency>
         <resource type="download" name="ide.js" location="js/ide.js" />
         <resource type="download" name="ide.css" location="css/ide.css" />

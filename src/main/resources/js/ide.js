@@ -1,11 +1,8 @@
+var editor;
+
 function retrieveEditor() {
-        // Change the value and move to the secound line.
-        var edit = jQuery("#ide-editor")[0];
-        // Get the environment variable.
-        var env = edit.bespin;
-        // Get the editor.
-        return env.editor;
-    }
+    return jQuery("#ide-editor");
+}
 
 function initIDE($, pluginKey, dialog, href){
 
@@ -100,20 +97,25 @@ function initIDE($, pluginKey, dialog, href){
     function loadFile(filePath) {
         updateStatus("Loading " + filePath + " . . .");
         $.get(contextPath + "/rest/speakeasy/1/plugins/" + pluginKey + "/file", {path:filePath}, function(data) {
-            var editor = retrieveEditor();
-            editor.value = data;
-            editor.fileName = filePath;
+            editor.setCode(data);
+            var editorEl = retrieveEditor();
+            editorEl.text(data);
+            editorEl.data('filename', filePath);
 
             if (filePath.match(/([^\/\\]+)\.(xml|html|js|css)$/i))
             {
                 if (RegExp.$2 == 'xml')
-                    editor.syntax = 'html'
-                else
-                    editor.syntax = RegExp.$2;
+                    editor.setParser('XMLParser');
+                else if (RegExp.$2 == 'html')
+                    editor.setParser('HTMLMixedParser');
+                else if (RegExp.$2 == 'js')
+                    editor.setParser('JSParser');
+                else if (RegExp.$2 == 'css')
+                    editor.setParser('CSSParser');
             }
 
-            editor.setLineNumber(1);
-            editor.stealFocus = true;
+//            editor.setLineNumber(1);
+//            editor.stealFocus = true;
             updateStatus("Loaded " + filePath);
         });
     }
@@ -141,8 +143,8 @@ function initIDE($, pluginKey, dialog, href){
     dialog.addHeader("Edit Extension : " + pluginKey);
 
     dialog.addButton("Save", function (dialog) {
-        var editor = retrieveEditor();
-        saveAndReload(pluginKey, editor.fileName, editor.value);
+        var editorEl = retrieveEditor();
+        saveAndReload(pluginKey,  editorEl.data('filename'), editor.getCode());
     }, "ide-save");
 
     // addLink not compatible with JIRA 4.2
@@ -153,7 +155,9 @@ function initIDE($, pluginKey, dialog, href){
     var ideDialogContents = AJS.template.load('ide-dialog')
         .fill({
             pluginKey : pluginKey,
-            "firstScript:html" : '<script src="' + staticResourcesPrefix + '/download/resources/com.atlassian.labs.speakeasy-plugin:bespin/BespinEmbedded.js"></script>'
+//            "firstScript:html" : '<script src="' + staticResourcesPrefix + '/download/resources/com.atlassian.labs.speakeasy-plugin:bespin/BespinEmbedded.js"></script>'
+            "firstScript:html" : '<script src="' + staticResourcesPrefix + '/download/resources/com.atlassian.labs.speakeasy-plugin:codemirror/js/codemirror.js"></script>'
+//            "firstScript:html" : '<script src="http://www.codemirror.net/js/codemirror.js" type="text/javascript"></script>'
            })
         .toString();
 
@@ -165,12 +169,22 @@ function initIDE($, pluginKey, dialog, href){
         handleBrowserFileClick(e);
     });
 
-    window.onBespinLoad = function() {
-        loadFile("atlassian-plugin.xml");
-        $("#ide-loading").hide();
-        $("#ide-editor").show();
-    };
-
     dialog.show();
+
+    // loadFile("atlassian-plugin.xml");
+    $("#ide-loading").hide();
+    $("#ide-editor").show();
+
+    editor = CodeMirror.fromTextArea('ide-editor', {
+        height: '480px',
+        width: '95%',
+        autoMatchParens: true,
+        parserfile: ["parsexml.js", "parsecss.js", "tokenizejavascript.js", "parsejavascript.js", "parsehtmlmixed.js"],
+        stylesheet: [ staticResourcesPrefix + '/download/resources/com.atlassian.labs.speakeasy-plugin:codemirror/css/xmlcolors.css', staticResourcesPrefix + '/download/resources/com.atlassian.labs.speakeasy-plugin:codemirror/css/jscolors.css', staticResourcesPrefix + '/download/resources/com.atlassian.labs.speakeasy-plugin:codemirror/css/csscolors.css'],
+        path: staticResourcesPrefix + '/download/resources/com.atlassian.labs.speakeasy-plugin:codemirror/js/',
+        onLoad: function() { loadFile("atlassian-plugin.xml"); }
+
+        //, lineNumbers: true
+    });
 }
 
