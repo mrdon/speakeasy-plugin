@@ -59,13 +59,12 @@ public class TestUserProfile
 
         assertEquals(asList("bar/baz.js", "atlassian-plugin.xml", "foo.js"), ide.getFileNames());
 
-        SpeakeasyUserPage userPage = ide.editAndSaveFile("foo.js", "var foo;");
-        List<String> messages = userPage.getSuccessMessages();
-        assertEquals(1, messages.size());
-        assertTrue(messages.get(0).contains("Test Plugin"));
+        ide = ide.editAndSaveFile("foo.js", "var foo;")
+           .done()
+           .openEditDialog("test-2");
 
-        String contents = userPage.openEditDialog("test-2")
-                .getFileContents("foo.js");
+        String contents = ide.getFileContents("foo.js");
+
         assertEquals("var foo;", contents);
 
     }
@@ -122,20 +121,23 @@ public class TestUserProfile
         SpeakeasyUserPage page = product.visit(SpeakeasyUserPage.class);
 
         assertEquals(0, page.getPlugins().get("plugin-tests").getUsers());
-        assertFalse(product.getPageBinder().bind(PluginTestBanner.class).isBannerVisible());
+        PluginTestBanner banner = product.getPageBinder().bind(PluginTestBanner.class);
+        assertFalse(banner.isBannerVisible());
+        assertTrue(banner.isUploadFormVisible());
         page.enablePlugin("plugin-tests");
         assertEquals(1, page.getPlugins().get("plugin-tests").getUsers());
         page = product.visit(SpeakeasyUserPage.class);
         assertEquals(1, page.getPlugins().get("plugin-tests").getUsers());
-        assertTrue(product.getPageBinder().
-                bind(PluginTestBanner.class).
-                waitForBanner().
-                isBannerVisible());
+        banner.waitForBanner();
+        assertTrue(banner.isBannerVisible());
+        assertFalse(banner.isUploadFormVisible());
         page.disablePlugin("plugin-tests");
         assertEquals(0, page.getPlugins().get("plugin-tests").getUsers());
         product.visit(SpeakeasyUserPage.class);
         assertEquals(0, page.getPlugins().get("plugin-tests").getUsers());
-        assertFalse(product.getPageBinder().bind(PluginTestBanner.class).isBannerVisible());
+        banner = product.getPageBinder().bind(PluginTestBanner.class);
+        assertFalse(banner.isBannerVisible());
+        assertTrue(banner.isUploadFormVisible());
     }
 
     @Test

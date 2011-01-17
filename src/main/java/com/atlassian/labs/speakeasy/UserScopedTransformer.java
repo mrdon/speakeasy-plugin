@@ -40,20 +40,23 @@ public class UserScopedTransformer implements WebResourceTransformer
         {
             users.add(user.getText());
         }
-        return new UserFilteredDownloadableResource(users, downloadableResource, salUserManager);
+        return new UserFilteredDownloadableResource(users, downloadableResource, resourceLocation, salUserManager);
     }
 
     private static class UserFilteredDownloadableResource extends AbstractTransformedDownloadableResource
     {
         private final Set<String> allowedUsers;
+        private final ResourceLocation resourceLocation;
         private final UserManager salUserManager;
         private static final Logger log = LoggerFactory.getLogger(UserFilteredDownloadableResource.class);
 
-        public UserFilteredDownloadableResource(Set<String> allowedUsers, DownloadableResource originalResource, UserManager salUserManager)
+        public UserFilteredDownloadableResource(Set<String> allowedUsers, DownloadableResource originalResource, ResourceLocation resourceLocation, UserManager salUserManager)
         {
             super(originalResource);
             this.allowedUsers = allowedUsers;
+            this.resourceLocation = resourceLocation;
             this.salUserManager = salUserManager;
+            log.debug("Creating resource {} viewable by the users {}", new Object[]{resourceLocation.getLocation(), allowedUsers});
         }
 
         @Override
@@ -95,7 +98,12 @@ public class UserScopedTransformer implements WebResourceTransformer
             }
             if (allowedUsers.contains(username))
             {
+                log.debug("Serving resource {} to {} with allowed users {}", new Object[]{resourceLocation.getLocation(), username, allowedUsers});
                 streamResource(out);
+            }
+            else
+            {
+                log.debug("NOT Serving resource {} to {} with allowed users {}", new Object[]{resourceLocation.getLocation(), username, allowedUsers});
             }
         }
 

@@ -1,13 +1,17 @@
-You have successfully created a plugin using the Refapp plugin archetype!
+When getting started developing the Speakeasy plugin, these commands will come in handy
 
-Here are the SDK commands you'll use immediately:
+* Start the plugin in the desired product:
+  Refapp: mvn refapp:debug
+  Confluence: mvn refapp:debug -Dproduct=confluence
+  JIRA: mvn refapp:debug -Dproduct=jira
 
-* atlas-run   -- installs this plugin into the refapp and starts it on http://localhost:5990/refapp
-* atlas-debug -- same as atlas-run, but allows a debugger to attach at port 5005
-* atlas-cli   -- after atlas-run or atlas-debug, opens a Maven command line window:
-                 - 'pi' reinstalls the plugin into the running refapp instance
-* atlas-help  -- prints description for all commands in the SDK
+* Deploy the plugin at runtime in the desired product:
+  Refapp: mvn refapp:cli
+  Confluence: mvn refapp:cli -Dproduct=confluence
+  JIRA: mvn refapp:cli -Dproduct=jira
 
-Full documentation is always available at:
+* Deploy the test plugin (code in src/test/resources) with the cli
+  'tpi' for test plugin installation, works like the usual 'pi'
 
-http://confluence.atlassian.com/display/DEVNET/Developing+your+Plugin+using+the+Atlassian+Plugin+SDK
+* Test your changes in all three products at once - open up three terminals and execute the above refapp:debug commands,
+  one per product.  You will also need three more tabs for each of the 'cli' invocations.

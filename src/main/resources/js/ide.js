@@ -1,3 +1,12 @@
+function retrieveEditor() {
+        // Change the value and move to the secound line.
+        var edit = jQuery("#ide-editor")[0];
+        // Get the environment variable.
+        var env = edit.bespin;
+        // Get the editor.
+        return env.editor;
+    }
+
 function initIDE($, pluginKey, dialog, href){
 
     function createTreeview(container, data) {
@@ -26,6 +35,11 @@ function initIDE($, pluginKey, dialog, href){
 		}
 		$.each(data, createNode, [container]);
         container.treeview({add: container});
+    }
+
+    function updateStatus(status)
+    {
+        jQuery('#ide-status-text').html(status);
     }
 
     function populateBrowser() {
@@ -66,7 +80,7 @@ function initIDE($, pluginKey, dialog, href){
                         // node.text = "<a href='" + contextPath + "/rest/speakeasy/1/plugins/" + pluginKey + "/binary?path=" + path + "'>" + node.text + "</a>";
                         node.text = node.text + "";
                     }
-                    else {
+                    else if (!node.text.match(/([^\/\\]+)\.(class)$/i)) {
                         node.text = "<a href='javascript:void(0)' id='" + path + "' class='editable-bespin'>" + node.text + "</a>";
                     }
                 }
@@ -84,6 +98,7 @@ function initIDE($, pluginKey, dialog, href){
     }
 
     function loadFile(filePath) {
+        updateStatus("Loading " + filePath + " . . .");
         $.get(contextPath + "/rest/speakeasy/1/plugins/" + pluginKey + "/file", {path:filePath}, function(data) {
             var editor = retrieveEditor();
             editor.value = data;
@@ -99,10 +114,12 @@ function initIDE($, pluginKey, dialog, href){
 
             editor.setLineNumber(1);
             editor.stealFocus = true;
+            updateStatus("Loaded " + filePath);
         });
     }
 
     function saveAndReload(pluginKey, fileName, contents) {
+        updateStatus("Saving " + fileName + " and reloading plugin '" + pluginKey + "' . . . ");
         $.ajax({
             url: contextPath + "/rest/speakeasy/1/plugins/" + pluginKey + "/file?path=" + fileName,
             data: contents,
@@ -113,21 +130,12 @@ function initIDE($, pluginKey, dialog, href){
             success : function(data) {
                 console.log('success');
                 if (data.error) {
-                    addMessage('error', {title: "Error saving extension <b>" + data.name + "</b>", body: data.error, shadowed: false});
+                    updateStatus("Error - " + data.error);
                 } else {
-                    addMessage('success', {body: "<b>" + data.name + "</b> was saved successfully and reloaded", shadowed: false});
+                    updateStatus(data.name + " was saved successfully and reloaded");
                 }
             }
         })
-    }
-
-    function retrieveEditor() {
-        // Change the value and move to the secound line.
-        var edit = $("#ide-editor")[0]
-        // Get the environment variable.
-        var env = edit.bespin;
-        // Get the editor.
-        return env.editor;
     }
 
     dialog.addHeader("Edit Extension : " + pluginKey);
@@ -135,18 +143,17 @@ function initIDE($, pluginKey, dialog, href){
     dialog.addButton("Save", function (dialog) {
         var editor = retrieveEditor();
         saveAndReload(pluginKey, editor.fileName, editor.value);
-        dialog.remove();
     }, "ide-save");
 
     // addLink not compatible with JIRA 4.2
-    dialog.addButton("Cancel", function (dialog) {
+    dialog.addButton("Done", function (dialog) {
         dialog.remove();
-    }, "ide-cancel");
+    }, "ide-done");
 
     var ideDialogContents = AJS.template.load('ide-dialog')
         .fill({
             pluginKey : pluginKey,
-            "firstScript:html" : '<script src="' + staticResourcesPrefix + '/download/resources/com.atlassian.labs.speakeasy-plugin:bespin/BespinEmbedded.js"></script>',
+            "firstScript:html" : '<script src="' + staticResourcesPrefix + '/download/resources/com.atlassian.labs.speakeasy-plugin:bespin/BespinEmbedded.js"></script>'
            })
         .toString();
 
@@ -162,7 +169,7 @@ function initIDE($, pluginKey, dialog, href){
         loadFile("atlassian-plugin.xml");
         $("#ide-loading").hide();
         $("#ide-editor").show();
-    }
+    };
 
     dialog.show();
 }

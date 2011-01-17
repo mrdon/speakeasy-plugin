@@ -20,6 +20,11 @@ public class PluginTestBanner
         return Check.elementIsVisible(By.id("plugin_tests_enabled"), driver);
     }
 
+    public boolean isUploadFormVisible()
+    {
+        return Check.elementIsVisible(By.id("uploadForm"), driver);
+    }
+
     public PluginTestBanner waitForBanner()
     {
         driver.waitUntilElementIsVisible(By.id("plugin_tests_enabled"));

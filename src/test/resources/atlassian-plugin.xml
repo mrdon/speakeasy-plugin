@@ -3,10 +3,12 @@
         <version>1</version>
         <description>Alerts 'loaded' on non-admin pages</description>
         <vendor name="Some Guy"/>
+        <param name="foo">bar</param>
     </plugin-info>
 
     <scoped-web-resource key="testScoping">
         <resource type="download" name="test.js" location="test.js" />
+        <resource type="download" name="test.css" location="test.css" />
         <context>atl.general</context>
     </scoped-web-resource>
 </atlassian-plugin>
