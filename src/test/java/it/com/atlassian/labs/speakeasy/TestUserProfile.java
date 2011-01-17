@@ -122,20 +122,23 @@ public class TestUserProfile
         SpeakeasyUserPage page = product.visit(SpeakeasyUserPage.class);
 
         assertEquals(0, page.getPlugins().get("plugin-tests").getUsers());
-        assertFalse(product.getPageBinder().bind(PluginTestBanner.class).isBannerVisible());
+        PluginTestBanner banner = product.getPageBinder().bind(PluginTestBanner.class);
+        assertFalse(banner.isBannerVisible());
+        assertTrue(banner.isUploadFormVisible());
         page.enablePlugin("plugin-tests");
         assertEquals(1, page.getPlugins().get("plugin-tests").getUsers());
         page = product.visit(SpeakeasyUserPage.class);
         assertEquals(1, page.getPlugins().get("plugin-tests").getUsers());
-        assertTrue(product.getPageBinder().
-                bind(PluginTestBanner.class).
-                waitForBanner().
-                isBannerVisible());
+        banner.waitForBanner();
+        assertTrue(banner.isBannerVisible());
+        assertFalse(banner.isUploadFormVisible());
         page.disablePlugin("plugin-tests");
         assertEquals(0, page.getPlugins().get("plugin-tests").getUsers());
         product.visit(SpeakeasyUserPage.class);
         assertEquals(0, page.getPlugins().get("plugin-tests").getUsers());
-        assertFalse(product.getPageBinder().bind(PluginTestBanner.class).isBannerVisible());
+        banner = product.getPageBinder().bind(PluginTestBanner.class);
+        assertFalse(banner.isBannerVisible());
+        assertTrue(banner.isUploadFormVisible());
     }
 
     @Test
