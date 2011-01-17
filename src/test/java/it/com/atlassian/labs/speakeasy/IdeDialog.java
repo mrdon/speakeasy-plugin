@@ -38,7 +38,7 @@ public class IdeDialog
     @FindBy(id="ide-browser")
     private WebElement ideBrowser;
 
-    @FindBy(id="ide-status")
+    @FindBy(id="ide-status-text")
     private WebElement ideStatus;
 
     @FindBy(className="ide-done")

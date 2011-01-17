@@ -39,7 +39,7 @@ function initIDE($, pluginKey, dialog, href){
 
     function updateStatus(status)
     {
-        jQuery('#ide-status').html(status);
+        jQuery('#ide-status-text').html(status);
     }
 
     function populateBrowser() {
@@ -98,6 +98,7 @@ function initIDE($, pluginKey, dialog, href){
     }
 
     function loadFile(filePath) {
+        updateStatus("Loading " + filePath + " . . .");
         $.get(contextPath + "/rest/speakeasy/1/plugins/" + pluginKey + "/file", {path:filePath}, function(data) {
             var editor = retrieveEditor();
             editor.value = data;
@@ -113,6 +114,7 @@ function initIDE($, pluginKey, dialog, href){
 
             editor.setLineNumber(1);
             editor.stealFocus = true;
+            updateStatus("Loaded " + filePath);
         });
     }
 
@@ -166,7 +168,6 @@ function initIDE($, pluginKey, dialog, href){
     window.onBespinLoad = function() {
         loadFile("atlassian-plugin.xml");
         $("#ide-loading").hide();
-        updateStatus("Ready")
         $("#ide-editor").show();
     };
 

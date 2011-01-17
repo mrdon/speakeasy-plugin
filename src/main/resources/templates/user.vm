@@ -40,8 +40,8 @@ mvn {product}:run
                 <div id="ide-editor" style="display: none;" class="bespin" data-bespinoptions='{ "stealFocus": true, "syntax": "html", "settings": { "tabstop": 4, "theme": "white" } }'>
                 </div>
             </div>
-            <div>
-                <span>Status: </span><span id="ide-status"></span>
+            <div id="ide-status">
+                <span>Status: </span><span id="ide-status-text"></span>
             </div>
         </div>
     </script>

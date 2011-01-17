@@ -28,3 +28,7 @@
 #ide-file-contents-panel b {
     color: #666;
 }
+
+#ide-status {
+    font-size: .8em;
+}
