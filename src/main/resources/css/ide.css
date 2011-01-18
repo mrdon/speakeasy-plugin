@@ -22,13 +22,18 @@
     color: #666;
 }
 
+/* unused? style of the textarea that codemirror hides */
 #ide-editor {
     width: 100%;
     margin: 0;
     padding: 0;
-    border: 1px solid #f0f0f0;
     height: 480px;
 }
+
+.CodeMirror-wrapping {
+    border: 1px solid #f0f0f0;
+}
+
 #ide-status {
     font-size: .8em;
 }
