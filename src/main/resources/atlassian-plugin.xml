@@ -91,9 +91,14 @@
 		<link>/plugins/servlet/speakeasy/user</link>
 	</web-item>
 
-	<web-item key="speakeasy-plugins.menu" name="Speakeasy User Menu Item" section="system.user/user-content" weight="100" application="com.atlassian.confluence">
+	<web-item key="conf-speakeasy-plugins.menu" name="Speakeasy Confluence User Menu Item" section="system.user/user-content" weight="100" application="com.atlassian.confluence">
 		<label>Speakeasy</label>
 		<link>/plugins/servlet/speakeasy/user</link>
+	</web-item>
+
+	<web-item key="jira-speakeasy-plugins.menu" name="Speakeasy JIRA User Menu Item" section="system.user.options/personal" weight="100" application="jira">
+		<label>Speakeasy</label>
+		<link>/secure/ViewProfile.jspa#selectedTab=com.atlassian.labs.speakeasy-plugin:speakeasy-plugins</link>
 	</web-item>
 
     <view-profile-panel key="speakeasy-plugins" i18n-name-key="Speakeasy"
