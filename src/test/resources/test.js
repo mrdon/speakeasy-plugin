@@ -1,5 +1,5 @@
 function addBanner() {
-    jQuery("body").prepend('<h1 id="plugin_tests_enabled">Plugin Tests enabled</h1>');
+    jQuery("body").prepend('<h1 id="plugin-tests-enabled">Plugin Tests enabled</h1>');
 }
 addBanner();
 jQuery(document).ready(function() {

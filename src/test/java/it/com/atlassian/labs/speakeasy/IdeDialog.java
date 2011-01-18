@@ -29,7 +29,7 @@ public class IdeDialog
     @Inject
     private PageBinder binder;
 
-    @FindBy(id="ideDialog")
+    @FindBy(id="ide-dialog")
     private WebElement dialogElement;
 
     @FindBy(id="ide-editor")

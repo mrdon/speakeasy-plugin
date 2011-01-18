@@ -17,17 +17,17 @@ public class PluginTestBanner
 
     public boolean isBannerVisible()
     {
-        return Check.elementIsVisible(By.id("plugin_tests_enabled"), driver);
+        return Check.elementIsVisible(By.id("plugin-tests-enabled"), driver);
     }
 
     public boolean isUploadFormVisible()
     {
-        return Check.elementIsVisible(By.id("uploadForm"), driver);
+        return Check.elementIsVisible(By.id("upload-form"), driver);
     }
 
     public PluginTestBanner waitForBanner()
     {
-        driver.waitUntilElementIsVisible(By.id("plugin_tests_enabled"));
+        driver.waitUntilElementIsVisible(By.id("plugin-tests-enabled"));
         return this;
     }
 

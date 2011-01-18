@@ -35,10 +35,10 @@ public class SpeakeasyUserPage implements Page
     @Inject
     PageBinder pageBinder;
 
-    @FindBy(id = "pluginsTableBody")
+    @FindBy(id = "plugins-table-body")
     private WebElement pluginsTableBody;
 
-    @FindBy(name = "pluginFile")
+    @FindBy(name = "plugin-file")
     private WebElement pluginFileUpload;
 
     @FindBy(id = "aui-message-bar")
@@ -77,12 +77,12 @@ public class SpeakeasyUserPage implements Page
             PluginRow row = new PluginRow();
             final String key = e.getAttribute("data-pluginkey");
             row.setKey(key);
-            WebElement nameTd = e.findElement(By.xpath("td[@headers='pluginName']"));
-            row.setName(nameTd.findElement(By.className("pluginName")).getText());
-            row.setDescription(nameTd.findElement(By.className("pluginDescription")).getText());
-            row.setAuthor(e.findElement(By.xpath("td[@headers='pluginAuthor']")).getText());
-            row.setUsers(parseInt(e.findElement(By.xpath("td[@headers='pluginUsers']")).getText()));
-            row.setVersion(e.findElement(By.xpath("td[@headers='pluginVersion']")).getText());
+            WebElement nameTd = e.findElement(By.xpath("td[@headers='plugin-name']"));
+            row.setName(nameTd.findElement(By.className("plugin-name")).getText());
+            row.setDescription(nameTd.findElement(By.className("plugin-description")).getText());
+            row.setAuthor(e.findElement(By.xpath("td[@headers='plugin-author']")).getText());
+            row.setUsers(parseInt(e.findElement(By.xpath("td[@headers='plugin-users']")).getText()));
+            row.setVersion(e.findElement(By.xpath("td[@headers='plugin-version']")).getText());
             plugins.put(key,row);
         }
         return plugins;
@@ -115,7 +115,7 @@ public class SpeakeasyUserPage implements Page
 
     private WebElement getEnableToggleLink(String pluginKey)
     {
-        return getPluginRow(pluginKey).findElement(By.className("pk_enable_toggle"));
+        return getPluginRow(pluginKey).findElement(By.className("pk-enable-toggle"));
     }
 
     private void clickToggleIf(String pluginKey, boolean enabled)
@@ -171,7 +171,7 @@ public class SpeakeasyUserPage implements Page
     public DownloadDialog openDownloadDialog(String pluginKey) throws IOException
     {
         WebElement pluginRow = getPluginRow(pluginKey);
-        WebElement downloadAction =  pluginRow.findElement(By.className("pk_download"));
+        WebElement downloadAction =  pluginRow.findElement(By.className("pk-download"));
         downloadAction.click();
 
         return pageBinder.bind(DownloadDialog.class, pluginKey);
@@ -189,7 +189,7 @@ public class SpeakeasyUserPage implements Page
     private WebElement getUninstallLink(String pluginKey)
     {
         WebElement pluginRow = getPluginRow(pluginKey);
-        return pluginRow.findElement(By.className("pk_uninstall"));
+        return pluginRow.findElement(By.className("pk-uninstall"));
     }
 
     public boolean canUninstall(String pluginKey)
@@ -221,19 +221,20 @@ public class SpeakeasyUserPage implements Page
     public IdeDialog openEditDialog(String pluginKey)
     {
         WebElement pluginRow = getPluginRow(pluginKey);
-        WebElement editAction =  pluginRow.findElement(By.className("pk_edit"));
+        WebElement editAction =  pluginRow.findElement(By.className("pk-edit"));
         editAction.click();
 
         return pageBinder.bind(IdeDialog.class, pluginKey);
 
     }
 
-    public SpeakeasyUserPage fork(String pluginKey)
+    public ForkDialog openForkDialog(String pluginKey)
     {
         WebElement pluginRow = getPluginRow(pluginKey);
-        pluginRow.findElement(By.className("pk_fork")).click();
-        waitForMessages();
-        return this;
+        WebElement forkAction =  pluginRow.findElement(By.className("pk-fork"));
+        forkAction.click();
+
+        return pageBinder.bind(ForkDialog.class, pluginKey);
     }
 
     public static class PluginRow

@@ -23,8 +23,8 @@ function addMessage(type, params) {
 function initSpeakeasy() {
 
     function togglePluginLink(attachedRow, toEnable) {
-        var usersTd = attachedRow.children('td[headers=pluginUsers]');
-        var link = jQuery('.pk_enable_toggle', attachedRow);
+        var usersTd = attachedRow.children('td[headers=plugin-users]');
+        var link = jQuery('.pk-enable-toggle', attachedRow);
         var curUsers = parseInt(usersTd.text());
         if (toEnable) {
             link.html("Disable");
@@ -38,7 +38,7 @@ function initSpeakeasy() {
     function togglePlugin(link, attachedRow) {
         clearMessage();
         var method = link.text().trim() == 'Enable' ? 'PUT' : 'DELETE';
-        var pluginName = jQuery('td[headers=pluginName] .pluginName', attachedRow).text();
+        var pluginName = jQuery('td[headers=plugin-name] .plugin-name', attachedRow).text();
         link.html('<img alt="waiting" src="' + staticResourcesPrefix + '/download/resources/com.atlassian.labs.speakeasy-plugin:optin-js/wait.gif" />');
         jQuery.ajax({
                   url: link.attr('href'),
@@ -58,8 +58,8 @@ function initSpeakeasy() {
     function uninstallPlugin(link, attachedRow) {
         clearMessage();
         link.html('<img alt="waiting" src="' + staticResourcesPrefix + '/download/resources/com.atlassian.labs.speakeasy-plugin:optin-js/wait.gif" />');
-        var pluginName = jQuery('td[headers=pluginName] .pluginName', attachedRow).text();
-        var wasEnabled = jQuery('td[headers=pluginActions] .pk_enable_toggle', attachedRow).text() == "Disable";
+        var pluginName = jQuery('td[headers=plugin-name] .plugin-name', attachedRow).text();
+        var wasEnabled = jQuery('td[headers=plugin-actions] .pk-enable-toggle', attachedRow).text() == "Disable";
         jQuery.ajax({
                   url: link.attr('href'),
                   type: 'DELETE',
@@ -83,14 +83,42 @@ function initSpeakeasy() {
                 });
     }
 
-    function forkPlugin(link, attachedRow) {
+    function openForkDialog(link, attachedRow) {
+        clearMessage();
+        var href = link.attr("href");
+        var desc = jQuery('.plugin-description', attachedRow).text();
+        var pluginKey = jQuery(attachedRow).attr("data-pluginkey");
+        var dialog = new AJS.Dialog({width:500, height:450, id:'fork-dialog'});
+        var pluginName = jQuery('td[headers=plugin-name] .plugin-name', attachedRow).text();
+        dialog.addHeader("Fork '" + pluginName + "'");
+        var forkDialogContents = AJS.template.load('fork-dialog')
+                                    .fill({
+                                        pluginKey : pluginKey,
+                                        href : href,
+                                        description : desc
+                                       })
+                                    .toString();
+        dialog.addPanel("Fork", forkDialogContents, "panel-body");
+        dialog.addButton("Fork", function (dialog) {
+            var description = jQuery('#fork-description').val();
+            dialog.remove();
+            forkPlugin(link, attachedRow, description);
+        }, "fork-submit");
+        dialog.addButton("Cancel", function (dialog) {
+            dialog.remove();
+        }, "fork-cancel");
+        dialog.show();
+    }
+
+    function forkPlugin(link, attachedRow, description) {
         clearMessage();
         //var enabled = ("Disable" == link.text());
         link.append('<img class="waiting" alt="waiting" src="' + staticResourcesPrefix + '/download/resources/com.atlassian.labs.speakeasy-plugin:optin-js/wait.gif" />');
-        var pluginName = jQuery('td[headers=pluginName] .pluginName', attachedRow).text();
+        var pluginName = jQuery('td[headers=plugin-name] .plugin-name', attachedRow).text();
         jQuery.ajax({
                   url: link.attr('href'),
                   type: 'POST',
+                  data: {description:description},
                   success: function(data) {
                     addRow(data);
                     //if (enabled) {
@@ -108,7 +136,7 @@ function initSpeakeasy() {
 
     function openDownloadDialog(key, href) {
         clearMessage();
-        var dialog = new AJS.Dialog({width:470, height:400, id:'downloadDialog'});
+        var dialog = new AJS.Dialog({width:470, height:400, id:'download-dialog'});
         dialog.addHeader("Download '" + key + "'");
         var downloadDialogContents = AJS.template.load('download-dialog')
                                     .fill({
@@ -119,7 +147,7 @@ function initSpeakeasy() {
                                     .toString();
         dialog.addPanel("Download", downloadDialogContents, "panel-body");
         dialog.show();
-        jQuery('#downloadLink').click(function(e) {
+        jQuery('#download-link').click(function(e) {
             dialog.remove();
         });
     }
@@ -127,12 +155,12 @@ function initSpeakeasy() {
     function openIDE(key, href) {
         clearMessage();
         var $win = jQuery(window);
-        var dialog = new AJS.Dialog({width: $win.width() * .95, height: 620, id:'ideDialog'});
+        var dialog = new AJS.Dialog({width: $win.width() * .95, height: 620, id:'ide-dialog'});
         initIDE(jQuery, key, dialog, href);
     }
 
 
-    var pluginsTable = jQuery("#pluginsTableBody");
+    var pluginsTable = jQuery("#plugins-table-body");
 
     function addRow(plugin)
     {
@@ -152,8 +180,8 @@ function initSpeakeasy() {
         if (!data.forkedPluginKey) {
             data["nonForkActions:html"] = nonForkActions.fill(data);
         } else {
-            data['name:html'] = "<span class='forkBlue'>"+ data.name + " (forked)</span>";
-            data['version:html'] = "<span class='forkBlue'>" + data.version + "-fork-" + data.author + "</span>"
+            data['name:html'] = "<span class='fork-blue'>"+ data.name + " (forked)</span>";
+            data['version:html'] = "<span class='fork-blue'>" + data.version + "-fork-" + data.author + "</span>"
             data.nonForkActions = "";
         }
 
@@ -171,7 +199,7 @@ function initSpeakeasy() {
         });
         var filledRow = jQuery(rowTemplate.fill(data).toString());
         var attachedRow = filledRow.appendTo(pluginsTable);
-        jQuery('.pk_uninstall', attachedRow).each(function(idx) {
+        jQuery('.pk-uninstall', attachedRow).each(function(idx) {
             var link = jQuery(this);
             jQuery(link).click(function(event) {
                 event.preventDefault();
@@ -179,15 +207,15 @@ function initSpeakeasy() {
                 return false;
             });
         });
-        jQuery('.pk_fork', attachedRow).each(function(idx) {
+        jQuery('.pk-fork', attachedRow).each(function(idx) {
             var link = jQuery(this);
             jQuery(link).click(function(event) {
                 event.preventDefault();
-                forkPlugin(link, attachedRow);
+                openForkDialog(link, attachedRow);
                 return false;
             });
         });
-        jQuery('.pk_enable_toggle', attachedRow).each(function(idx) {
+        jQuery('.pk-enable-toggle', attachedRow).each(function(idx) {
             var link = jQuery(this);
             jQuery(link).click(function(event) {
                 event.preventDefault();
@@ -195,7 +223,7 @@ function initSpeakeasy() {
                 return false;
             });
         });
-        jQuery('.pk_edit', attachedRow).each(function(idx) {
+        jQuery('.pk-edit', attachedRow).each(function(idx) {
             var link = jQuery(this);
             jQuery(link).click(function(event) {
                 event.preventDefault();
@@ -203,7 +231,7 @@ function initSpeakeasy() {
                 return false;
             });
         });
-        jQuery('.pk_download', attachedRow).each(function(idx) {
+        jQuery('.pk-download', attachedRow).each(function(idx) {
             var link = jQuery(this);
             link.click(function(event) {
                 event.preventDefault();
@@ -213,7 +241,7 @@ function initSpeakeasy() {
         });
 
         if (data.forkedPluginKey) {
-            attachedRow.addClass("forkedRow")
+            attachedRow.addClass("forked-row")
         }
     }
 
@@ -221,15 +249,14 @@ function initSpeakeasy() {
         addRow(this);
     });
 
-    var pluginFile = jQuery('#pluginFile');
-    var uploadForm = jQuery('#uploadForm');
+    var pluginFile = jQuery('#plugin-file');
+    var uploadForm = jQuery('#upload-form');
 
     var changeForm = function() {
         uploadForm.ajaxSubmit({
             dataType: null, //"json",
             iframe: "true",
             beforeSubmit: function() {
-               console.log('beforeSubmit');
                var extension = pluginFile.val().substring(pluginFile.val().lastIndexOf('.'));
                if (extension != '.jar') {
                   addMessage('error', {body: "The extension '" + extension + "' is not allowed", shadowed: false});
@@ -263,8 +290,6 @@ function initSpeakeasy() {
             }
         });
 
-    var availableExtensionsTable = jQuery("#availableExtensionsTableBody");
-
     jQuery('#available-extensions-tab').bind('click.loadextensions', function(e) {
         loadAvailableExtensions();
     });
@@ -283,14 +308,14 @@ function initSpeakeasy() {
             function(data) {
                 jQuery(data.query.results.json).each(function () { addPACRow(this); });
                 jQuery("#loading").hide();
-                jQuery("#availableExtensionsTable").show();
+                jQuery("#available-extensions-table").show();
             }
         );
     }
 
 
     function addPACRow(item) {
-        var rowTemplate = AJS.template.load("availableExtensionRow");
+        var rowTemplate = AJS.template.load("available-extension-row");
 
         var data = {};
         data.id = item.item.id;
@@ -304,6 +329,6 @@ function initSpeakeasy() {
 //        console.dir(item)
 
         var filledRow = jQuery(rowTemplate.fill(data).toString());
-        var attachedRow = filledRow.appendTo(availableExtensionsTable);
+        var attachedRow = filledRow.appendTo(available-extensions-table);
     }
 }

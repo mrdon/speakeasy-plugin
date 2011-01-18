@@ -11,10 +11,13 @@ import com.atlassian.sal.api.user.UserManager;
 import com.atlassian.templaterenderer.TemplateRenderer;
 import org.apache.commons.io.IOUtils;
 import org.dom4j.*;
+import org.dom4j.io.OutputFormat;
 import org.dom4j.io.SAXReader;
+import org.dom4j.io.XMLWriter;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 
+import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -391,7 +394,7 @@ public class PluginManager
         }
     }
 
-    public RemotePlugin forkAndInstall(String pluginKey, String user) throws PluginOperationFailedException
+    public RemotePlugin forkAndInstall(String pluginKey, String user, String description) throws PluginOperationFailedException
     {
         if (pluginKey.contains("-fork-"))
         {
@@ -419,9 +422,15 @@ public class PluginManager
             }
 
             zout.putNextEntry(new ZipEntry("atlassian-plugin.xml"));
-            String desc = new String(readEntry(bundle, "atlassian-plugin.xml"));
-            desc = desc.replaceAll("key=\"" + pluginKey + "\"", "key=\"" + pluginKey + "-fork-" + user + "\"");
-            IOUtils.copy(new StringReader(desc), zout);
+            Document doc = new SAXReader().read(new ByteArrayInputStream(readEntry(bundle, "atlassian-plugin.xml")));
+            doc.getRootElement().addAttribute("key", pluginKey + "-fork-" + user);
+            Element pluginInfo = doc.getRootElement().element("plugin-info");
+            if (pluginInfo.element("description") != null)
+            {
+                pluginInfo.addElement("description");
+            }
+            pluginInfo.element("description").setText(description);
+            new XMLWriter( zout, OutputFormat.createPrettyPrint() ).write(doc);
 
             zout.close();
 
@@ -432,6 +441,12 @@ public class PluginManager
             e.printStackTrace();
 
             throw new PluginOperationFailedException("Unable to create forked plugin jar", e);
+        }
+        catch (DocumentException e)
+        {
+            e.printStackTrace();
+
+            throw new PluginOperationFailedException("Unable transform plugin descriptor xml", e);
         }
         finally
         {

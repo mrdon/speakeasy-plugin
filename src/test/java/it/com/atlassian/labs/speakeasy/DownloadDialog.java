@@ -29,10 +29,10 @@ public class DownloadDialog
     @Inject
     private ProductInstance productInstance;
 
-    @FindBy(id="downloadDialog")
+    @FindBy(id="download-dialog")
     private WebElement dialogElement;
 
-    @FindBy(id="downloadLink")
+    @FindBy(id="download-link")
     private WebElement downloadLink;
 
     private final String pluginKey;
@@ -45,7 +45,7 @@ public class DownloadDialog
     @WaitUntil
     public void waitUntilOpen()
     {
-        driver.waitUntilElementIsVisible(By.id("downloadLink"));
+        driver.waitUntilElementIsVisible(By.id("download-link"));
     }
 
     public File download() throws IOException
@@ -61,7 +61,7 @@ public class DownloadDialog
         res.getEntity().writeTo(fout);
         fout.close();
         dialogElement.sendKeys(Keys.ESCAPE);
-        driver.waitUntilElementIsNotVisible(By.id("downloadLink"));
+        driver.waitUntilElementIsNotVisible(By.id("download-link"));
         return tmpFile;
     }
 

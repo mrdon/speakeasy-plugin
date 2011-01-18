@@ -84,12 +84,12 @@ public class PluginsResource
     @POST
     @Path("fork/{pluginKey}")
     @Produces("application/json")
-    public Response fork(@PathParam("pluginKey") String pluginKey)
+    public Response fork(@PathParam("pluginKey") String pluginKey, @FormParam("description") String description)
     {
         try
         {
             String remoteUser = userManager.getRemoteUsername();
-            RemotePlugin plugin = pluginManager.forkAndInstall(pluginKey, remoteUser);
+            RemotePlugin plugin = pluginManager.forkAndInstall(pluginKey, remoteUser, description);
             if (speakeasyManager.hasAccess(pluginKey, remoteUser))
             {
                 speakeasyManager.disallowUserAccess(pluginKey, remoteUser);
@@ -200,7 +200,7 @@ public class PluginsResource
             {
                 for (FileItem item : items)
                 {
-                    if (!item.isFormField() && item.getSize() > 0 && "pluginFile".equals(item.getFieldName()))
+                    if (!item.isFormField() && item.getSize() > 0 && "plugin-file".equals(item.getFieldName()))
                     {
                         try
                         {
