@@ -54,7 +54,7 @@ public class IdeDialog
     @WaitUntil
     public void waitUntilOpen()
     {
-        driver.waitUntilElementIsVisible(By.id("ide-editor"));
+        driver.waitUntilElementIsVisible(By.id("ide-main-content"));
         driver.waitUntil(new Function()
         {
 
@@ -99,7 +99,7 @@ public class IdeDialog
                 return editorText != null && editorText.length() > 0;
             }
         });
-        driver.executeScript("window.retrieveEditor().value=arguments[0]", contents);
+        driver.executeScript("window.editor.setCode(arguments[0])", contents);
         dialogElement.findElement(By.className("ide-save")).click();
         driver.waitUntil(new Function()
         {
@@ -118,7 +118,7 @@ public class IdeDialog
 
     private String getEditorContents()
     {
-         return (String) JavaScriptUtils.execute("return window.retrieveEditor().value", driver);
+         return (String) JavaScriptUtils.execute("return window.retrieveEditor().text()", driver);
     }
 
 }
