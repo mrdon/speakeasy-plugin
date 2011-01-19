@@ -264,8 +264,12 @@ function initSpeakeasy() {
                }
             },
             success: function(response, status, xhr, $form) {
-                var data = jQuery.parseJSON(response.substring(response.indexOf('{'), response.lastIndexOf("}") + 1));
                 console.log('success');
+
+                // marker necessary as sometimes Confluence decides to decorate the response
+                var start = response.indexOf("JSON_MARKER||") + "JSON_MARKER||".length;
+                var end = response.indexOf("||", start);
+                var data = jQuery.parseJSON(response.substring(start, end));
                 if (data.error) {
                     addMessage('error', {title: "Error installing extension", body: data.error, shadowed: false});
                 } else {

@@ -219,16 +219,21 @@ public class PluginsResource
                 throw new RuntimeException("Couldn't find the plugin in the request");
             }
             final RemotePlugin remotePlugin = pluginManager.install(user, pluginFile);
-            return Response.ok().entity(jaxbJsonMarshaller.marshal(remotePlugin)).build();
+            return Response.ok().entity(wrapBodyInTextArea(jaxbJsonMarshaller.marshal(remotePlugin))).build();
         }
         catch (RuntimeException e)
         {
-            return Response.ok().entity("{\"error\":\"" + e.getMessage() + "\"}").build();
+            return Response.ok().entity(wrapBodyInTextArea("{\"error\":\"" + e.getMessage() + "\"}")).build();
         }
         catch (PluginOperationFailedException e)
         {
-            return Response.ok().entity("{\"error\":\"" + e.getMessage() + "\"}").build();
+            return Response.ok().entity(wrapBodyInTextArea("{\"error\":\"" + e.getMessage() + "\"}")).build();
         }
+    }
+
+    private String wrapBodyInTextArea(String body)
+    {
+        return "JSON_MARKER||" + body + "||";
     }
 
     private String processFileName(String fileNameInput)
