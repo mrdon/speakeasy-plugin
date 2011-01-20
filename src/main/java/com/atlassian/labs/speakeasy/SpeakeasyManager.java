@@ -1,6 +1,8 @@
 package com.atlassian.labs.speakeasy;
 
 import com.atlassian.labs.speakeasy.data.SpeakeasyData;
+import com.atlassian.labs.speakeasy.install.PluginManager;
+import com.atlassian.labs.speakeasy.install.PluginOperationFailedException;
 import com.atlassian.labs.speakeasy.model.RemotePlugin;
 import com.atlassian.labs.speakeasy.model.UserPlugins;
 import com.atlassian.plugin.ModuleDescriptor;
@@ -29,6 +31,7 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 import static com.atlassian.labs.speakeasy.util.BundleUtil.findBundleForPlugin;
+import static java.util.Arrays.asList;
 
 /**
  *
@@ -39,17 +42,18 @@ public class SpeakeasyManager implements DisposableBean
     private final HostContainer hostContainer;
     private final BundleContext bundleContext;
     private final SpeakeasyData data;
+    private final PluginManager pluginManager;
 
     private final Map<String, ServiceRegistration> serviceRegistrations;
     private final PluginEventManager pluginEventManager;
     private ServiceRegistration userTransformerService;
-
-    public SpeakeasyManager(BundleContext bundleContext, PluginAccessor pluginAccessor, PluginEventManager pluginEventManager, HostContainer hostContainer, SpeakeasyData data)
+    public SpeakeasyManager(BundleContext bundleContext, PluginAccessor pluginAccessor, PluginEventManager pluginEventManager, HostContainer hostContainer, SpeakeasyData data, PluginManager pluginManager)
     {
         this.bundleContext = bundleContext;
         this.pluginAccessor = pluginAccessor;
         this.hostContainer = hostContainer;
         this.data = data;
+        this.pluginManager = pluginManager;
         this.serviceRegistrations = new ConcurrentHashMap<String, ServiceRegistration>();
         this.pluginEventManager = pluginEventManager;
         pluginEventManager.register(this);
@@ -70,7 +74,11 @@ public class SpeakeasyManager implements DisposableBean
         unregisterGeneratedDescriptorsForPlugin(event.getPlugin().getKey());
     }
 
-    public UserPlugins getUserAccessList(String userName)
+    public UserPlugins getUserAccessList(String userName, String... modifiedKeys)
+    {
+        return getUserAccessList(userName, asList(modifiedKeys));
+    }
+    public UserPlugins getUserAccessList(String userName, List<String> modifiedKeys)
     {
         List<RemotePlugin> plugins = new ArrayList<RemotePlugin>();
         for (Plugin plugin : pluginAccessor.getPlugins())
@@ -79,19 +87,29 @@ public class SpeakeasyManager implements DisposableBean
             {
                 if (moduleDescriptor instanceof DescriptorGenerator)
                 {
-                    RemotePlugin remotePlugin = new RemotePlugin(plugin);
-                    remotePlugin.setAuthor(getPluginAuthor(plugin));
-                    List<String> accessList = data.getUsersList(plugin.getKey());
-                    remotePlugin.setEnabled(accessList.contains(userName));
-                    remotePlugin.setNumUsers(accessList.size());
-                    boolean canUninstall = userName.equals(remotePlugin.getAuthor()) && onlyContainsSpeakeasyModules(plugin);
-                    remotePlugin.setCanUninstall(canUninstall);
+                    RemotePlugin remotePlugin = getRemotePlugin(plugin.getKey(), userName);
                     plugins.add(remotePlugin);
                     break;
                 }
             }
         }
-        return new UserPlugins(plugins);
+        UserPlugins userPlugins = new UserPlugins(plugins);
+        userPlugins.setUpdated(modifiedKeys);
+        return userPlugins;
+    }
+
+    public RemotePlugin getRemotePlugin(String pluginKey, String userName)
+    {
+        final Plugin plugin = pluginAccessor.getPlugin(pluginKey);
+
+        RemotePlugin remotePlugin = new RemotePlugin(plugin);
+        remotePlugin.setAuthor(getPluginAuthor(plugin));
+        List<String> accessList = data.getUsersList(plugin.getKey());
+        remotePlugin.setEnabled(accessList.contains(userName));
+        remotePlugin.setNumUsers(accessList.size());
+        boolean canUninstall = userName.equals(remotePlugin.getAuthor()) && onlyContainsSpeakeasyModules(plugin);
+        remotePlugin.setCanUninstall(canUninstall);
+        return remotePlugin;
     }
 
     private String getPluginAuthor(Plugin plugin)
@@ -137,6 +155,14 @@ public class SpeakeasyManager implements DisposableBean
 
             updateModuleDescriptorsForPlugin(pluginKey, accessList);
         }
+    }
+
+    public void disallowAllPluginAccess(String pluginKey)
+    {
+        List<String> accessList = data.getUsersList(pluginKey);
+        accessList.clear();
+        data.saveUsersList(pluginKey, accessList);
+        updateModuleDescriptorsForPlugin(pluginKey, accessList);
     }
 
     private void waitUntilModulesAreDisabled(final List<ModuleDescriptor> descriptors)
@@ -290,5 +316,40 @@ public class SpeakeasyManager implements DisposableBean
             }
             unregisterGeneratedDescriptorsForPlugin(plugin.getKey());
         }
+    }
+
+    public UserPlugins uninstallPlugin(String pluginKey, String user)
+            throws PluginOperationFailedException
+    {
+        List<String> keysModified = new ArrayList<String>();
+        RemotePlugin plugin = getRemotePlugin(pluginKey, user);
+        String originalKey = plugin.getForkedPluginKey();
+        if (originalKey != null)
+        {
+            if (hasAccess(pluginKey, user))
+            {
+                keysModified.add(originalKey);
+                allowUserAccess(originalKey, user);
+
+            }
+        }
+        disallowAllPluginAccess(pluginKey);
+        pluginManager.uninstall(pluginKey, user);
+        return getUserAccessList(user, keysModified);
+    }
+
+    public UserPlugins fork(String pluginKey, String remoteUser, String description)
+            throws PluginOperationFailedException
+    {
+        String forkedPluginKey = pluginManager.forkAndInstall(pluginKey, remoteUser, description);
+        List<String> modifiedKeys = new ArrayList<String>();
+        modifiedKeys.add(forkedPluginKey);
+        if (hasAccess(pluginKey, remoteUser))
+        {
+            disallowUserAccess(pluginKey, remoteUser);
+            modifiedKeys.add(pluginKey);
+            allowUserAccess(forkedPluginKey, remoteUser);
+        }
+        return getUserAccessList(remoteUser, modifiedKeys);
     }
 }

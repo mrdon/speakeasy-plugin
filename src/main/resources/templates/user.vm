@@ -39,6 +39,11 @@ mvn {product}:run
         </form>
     </script>
 
+    <script type="text/x-template" title="browser-leaf">
+        <li><span class="{class}">{text}</span>{children}</li>
+    </script>
+
+
     <script type="text/x-template" title="ide-dialog">
         <div id="ide-content">
             {firstScript}
@@ -60,20 +65,24 @@ mvn {product}:run
         </div>
     </script>
 
-    <script type="text/x-template" title="owner-actions">
-        <a class="pk-uninstall" href="$contextPath/rest/speakeasy/1/plugins/{key}">Uninstall</a>
-
+    <script type="text/x-template" title="uninstall-action">
+        <a class="pk-uninstall"  href="$contextPath/rest/speakeasy/1/plugins/{key}">Uninstall</a>
+    </script>
+    <script type="text/x-template" title="edit-action">
         <a class="pk-edit" href="$contextPath/rest/speakeasy/1/plugins/{key}/index">Edit</a>
     </script>
-
-    <script type="text/x-template" title="non-fork-actions">
+    <script type="text/x-template" title="fork-action">
         <a class="pk-fork" href="$contextPath/rest/speakeasy/1/plugins/fork/{key}">Fork</a>
     </script>
-
-    <script type="text/x-template" title="browser-leaf">
-        <li><span class="{class}">{text}</span>{children}</li>
+    <script type="text/x-template" title="disable-action">
+        <a class="pk-disable" href="$contextPath/rest/speakeasy/1/user/{key}">Disable</a>
     </script>
-
+    <script type="text/x-template" title="enable-action">
+        <a class="pk-enable" href="$contextPath/rest/speakeasy/1/user/{key}">Enable</a>
+    </script>
+    <script type="text/x-template" title="download-action">
+        <a class="pk-download" href="$contextPath/rest/speakeasy/1/plugins/download/{key}.zip">Download</a>
+    </script>
     <script type="text/x-template" title="row">
         <tr data-pluginKey="{key}">
             <td headers="plugin-name"><div class="plugin-summary"><span class="plugin-name">{name}</span><br><span class="plugin-description">{description}</span></div></td>
@@ -81,10 +90,7 @@ mvn {product}:run
             <td headers="plugin-version">{version}</td>
             <td headers="plugin-users">{numUsers}</td>
             <td headers="plugin-actions">
-                <a class="pk-enable-toggle" href="$contextPath/rest/speakeasy/1/user/{key}">{enableText}</a>
-                <a class="pk-download" href="javascript:void(0)" data-download="$contextPath/rest/speakeasy/1/plugins/download/{key}.zip">Download</a>
-                {ownerActions}
-                {nonForkActions}
+                {actions}
             </td>
         </tr>
     </script>

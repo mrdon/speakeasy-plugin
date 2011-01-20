@@ -170,6 +170,7 @@ public class TestUserProfile
         assertEquals("Test Plugin", row.getName());
         assertEquals("Desc", row.getDescription());
         assertEquals("admin", row.getAuthor());
+        page.uninstallPlugin("test-2");
     }
 
     @Test
@@ -206,6 +207,7 @@ public class TestUserProfile
         page.uninstallPlugin("test-2-fork-admin");
         assertTrue(page.isPluginEnabled("test-2"));
         assertTrue(product.visit(SpeakeasyUserPage.class).isPluginEnabled("test-2"));
+        page.uninstallPlugin("test-2");
     }
 
     @Test

@@ -95,39 +95,21 @@ public class SpeakeasyUserPage implements Page
 
     public SpeakeasyUserPage enablePlugin(String pluginKey)
     {
-        clickToggleIf(pluginKey, false);
+        getPluginRow(pluginKey).findElement(By.className("pk-enable")).click();
         waitForMessages();
         return this;
     }
 
     public SpeakeasyUserPage disablePlugin(String pluginKey)
     {
-        clickToggleIf(pluginKey, true);
+        getPluginRow(pluginKey).findElement(By.className("pk-disable")).click();
         waitForMessages();
         return this;
     }
 
     public boolean isPluginEnabled(String pluginKey)
     {
-        WebElement toggle = getEnableToggleLink(pluginKey);
-        return toggle.getText().contains("Disable");
-    }
-
-    private WebElement getEnableToggleLink(String pluginKey)
-    {
-        return getPluginRow(pluginKey).findElement(By.className("pk-enable-toggle"));
-    }
-
-    private void clickToggleIf(String pluginKey, boolean enabled)
-    {
-        if (isPluginEnabled(pluginKey) == enabled)
-        {
-            getEnableToggleLink(pluginKey).click();
-        }
-        else
-        {
-            throw new IllegalStateException("Cannot toggle");
-        }
+        return Check.elementExists(By.className("pk-disable"), getPluginRow(pluginKey));
     }
 
     private WebElement getPluginRow(String key)

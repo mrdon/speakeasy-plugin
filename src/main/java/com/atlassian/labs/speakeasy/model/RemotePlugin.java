@@ -5,6 +5,7 @@ import com.atlassian.plugin.Plugin;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -29,7 +30,7 @@ public class RemotePlugin
 
     private boolean canUninstall;
 
-    private Map<String,String> params;
+    private HashMap<String,String> params;
 
     public RemotePlugin()
     {}
@@ -40,7 +41,7 @@ public class RemotePlugin
         name = plugin.getName() != null ? plugin.getName() : plugin.getKey();
         description = plugin.getPluginInformation().getDescription();
         version = plugin.getPluginInformation().getVersion();
-        params = plugin.getPluginInformation().getParameters();
+        params = new HashMap<String,String>(plugin.getPluginInformation().getParameters());
     }
 
     @XmlElement
@@ -66,12 +67,12 @@ public class RemotePlugin
     }
 
     @XmlElement
-    public Map<String, String> getParams()
+    public HashMap<String, String> getParams()
     {
         return params;
     }
 
-    public void setParams(Map<String, String> params)
+    public void setParams(HashMap<String, String> params)
     {
         this.params = params;
     }

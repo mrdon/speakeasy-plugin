@@ -1,62 +1,84 @@
-function clearMessage() {
-    var msg = AJS.$("#aui-message-bar").children(".aui-message");
-    if (msg)
-        msg.remove();
-}
-
-function addMessage(type, params) {
-    var msg = AJS.$("#aui-message-bar").children(".aui-message");
-    if (msg)
-        msg.remove();
-
-    if (type == "success") {
-        AJS.messages.success(params);
-    }
-    else if (type == "error") {
-        AJS.messages.error(params);
-    }
-
-    msg = AJS.$("#aui-message-bar").children(".aui-message");
-    window.setTimeout(function() { msg.fadeOut(1500) }, 5000);
-}
-
 function initSpeakeasy() {
 
-    function togglePluginLink(attachedRow, toEnable) {
-        var usersTd = attachedRow.children('td[headers=plugin-users]');
-        var link = jQuery('.pk-enable-toggle', attachedRow);
-        var curUsers = parseInt(usersTd.text());
-        if (toEnable) {
-            link.html("Disable");
-            usersTd.text(curUsers + 1);
-        } else {
-            link.html("Enable");
-            usersTd.text(curUsers - 1);
+
+    var pluginsTable = jQuery("#plugins-table-body");
+    var pluginActions = {
+        'edit' : {
+            isApplicable : function(plugin) { return plugin.author == currentUser; },
+            template : 'edit-action',
+            onClick : openIDE
+        },
+        'uninstall' : {
+            isApplicable : function(plugin) { return plugin.author == currentUser; },
+            template : 'uninstall-action',
+            onClick : uninstallPlugin
+        },
+        'fork' : {
+            isApplicable : function(plugin) { return !plugin.forkedPluginKey; },
+            template : 'fork-action',
+            onClick : openForkDialog
+        },
+        'enable' : {
+            isApplicable : function(plugin) { return !plugin.enabled; },
+            template : 'enable-action',
+            onClick : enablePlugin
+        },
+        'disable' : {
+            isApplicable : function(plugin) { return plugin.enabled; },
+            template : 'disable-action',
+            onClick : disablePlugin
+        },
+        'download' : {
+            isApplicable : function(plugin) { return true; },
+            template : 'download-action',
+            onClick : openDownloadDialog
         }
+    };
+    var pluginActionsOrder = ['enable', 'disable', 'fork', 'edit', 'uninstall', 'download'];
+
+    function addMessage(type, params) {
+        var msg = AJS.$("#aui-message-bar").children(".aui-message");
+        if (msg)
+            msg.remove();
+
+        if (type == "success") {
+            AJS.messages.success(params);
+        }
+        else if (type == "error") {
+            AJS.messages.error(params);
+        }
+
+        msg = AJS.$("#aui-message-bar").children(".aui-message");
+        window.setTimeout(function() { msg.fadeOut(1500) }, 5000);
     }
 
-    function togglePlugin(link, attachedRow) {
-        clearMessage();
-        var method = link.text().trim() == 'Enable' ? 'PUT' : 'DELETE';
+    function enablePlugin(pluginKey, link, attachedRow) {
         var pluginName = jQuery('td[headers=plugin-name] .plugin-name', attachedRow).text();
         link.html('<img alt="waiting" src="' + staticResourcesPrefix + '/download/resources/com.atlassian.labs.speakeasy-plugin:optin-js/wait.gif" />');
         jQuery.ajax({
                   url: link.attr('href'),
-                  type: method,
+                  type: 'PUT',
                   success: function(data) {
-                      if (method == 'PUT') {
-                        togglePluginLink(attachedRow, true);
-                        addMessage('success', {body: "<b>" + pluginName + "</b> was enabled successfully", shadowed: false});
-                      } else {
-                        togglePluginLink(attachedRow, false);
-                        addMessage('success', {body: "<b>" + pluginName + "</b>  was disabled successfully", shadowed: false});
-                      }
+                      updateTable(data);
+                      addMessage('success', {body: "<b>" + pluginName + "</b> was enabled successfully", shadowed: false});
                   }
                 });
     }
 
-    function uninstallPlugin(link, attachedRow) {
-        clearMessage();
+    function disablePlugin(pluginKey, link, attachedRow) {
+        var pluginName = jQuery('td[headers=plugin-name] .plugin-name', attachedRow).text();
+        link.html('<img alt="waiting" src="' + staticResourcesPrefix + '/download/resources/com.atlassian.labs.speakeasy-plugin:optin-js/wait.gif" />');
+        jQuery.ajax({
+                  url: link.attr('href'),
+                  type: 'DELETE',
+                  success: function(data) {
+                      updateTable(data);
+                      addMessage('success', {body: "<b>" + pluginName + "</b> was disabled successfully", shadowed: false});
+                  }
+                });
+    }
+
+    function uninstallPlugin(pluginKey, link, attachedRow) {
         link.html('<img alt="waiting" src="' + staticResourcesPrefix + '/download/resources/com.atlassian.labs.speakeasy-plugin:optin-js/wait.gif" />');
         var pluginName = jQuery('td[headers=plugin-name] .plugin-name', attachedRow).text();
         var wasEnabled = jQuery('td[headers=plugin-actions] .pk-enable-toggle', attachedRow).text() == "Disable";
@@ -65,15 +87,8 @@ function initSpeakeasy() {
                   type: 'DELETE',
                   success: function(data) {
                       link.closest("tr").each(function() {
-                          var pluginKey = jQuery(this).attr("data-pluginkey");
-                          var forkStart = pluginKey.indexOf("-fork-");
-                          if (forkStart > -1) {
-                              var parentTr = link.closest("table").find("tr[data-pluginkey=" + pluginKey.substring(0, forkStart) + "]")[0];
-                              if (parentTr && wasEnabled) {
-                                  togglePluginLink(jQuery(parentTr), true);
-                              }
-                          }
                           jQuery(this).detach();
+                          updateTable(data);
                           addMessage('success', {body: "<b>" + pluginName + "</b> was uninstalled successfully", shadowed: false});
                       })
                   },
@@ -83,11 +98,9 @@ function initSpeakeasy() {
                 });
     }
 
-    function openForkDialog(link, attachedRow) {
-        clearMessage();
+    function openForkDialog(pluginKey, link, attachedRow) {
         var href = link.attr("href");
         var desc = jQuery('.plugin-description', attachedRow).text();
-        var pluginKey = jQuery(attachedRow).attr("data-pluginkey");
         var dialog = new AJS.Dialog({width:500, height:450, id:'fork-dialog'});
         var pluginName = jQuery('td[headers=plugin-name] .plugin-name', attachedRow).text();
         dialog.addHeader("Fork '" + pluginName + "'");
@@ -111,7 +124,6 @@ function initSpeakeasy() {
     }
 
     function forkPlugin(link, attachedRow, description) {
-        clearMessage();
         //var enabled = ("Disable" == link.text());
         link.append('<img class="waiting" alt="waiting" src="' + staticResourcesPrefix + '/download/resources/com.atlassian.labs.speakeasy-plugin:optin-js/wait.gif" />');
         var pluginName = jQuery('td[headers=plugin-name] .plugin-name', attachedRow).text();
@@ -120,10 +132,7 @@ function initSpeakeasy() {
                   type: 'POST',
                   data: {description:description},
                   success: function(data) {
-                    addRow(data);
-                    //if (enabled) {
-                        togglePluginLink(link.closest("tr"), false);
-                    //}
+                    updateTable(data);
                     addMessage('success', {body: "<b>" + pluginName + "</b> was forked successfully", shadowed: false});
                     jQuery('.waiting', link).remove();
                   },
@@ -134,8 +143,8 @@ function initSpeakeasy() {
                 });
     }
 
-    function openDownloadDialog(key, href) {
-        clearMessage();
+    function openDownloadDialog(key, link, attachedRow) {
+        var href = link.attr("href");
         var dialog = new AJS.Dialog({width:470, height:400, id:'download-dialog'});
         dialog.addHeader("Download '" + key + "'");
         var downloadDialogContents = AJS.template.load('download-dialog')
@@ -152,97 +161,74 @@ function initSpeakeasy() {
         });
     }
 
-    function openIDE(key, href) {
-        clearMessage();
+    function openIDE(key, link, attachedRow) {
+        var href = link.attr("href");
         var $win = jQuery(window);
         var dialog = new AJS.Dialog({width: $win.width() * .95, height: 620, id:'ide-dialog'});
         initIDE(jQuery, key, dialog, href);
     }
 
 
-    var pluginsTable = jQuery("#plugins-table-body");
 
-    function addRow(plugin)
-    {
+    function addActionsClickHandler($row) {
+        $row.find('a').click(function(e) {
+            e.preventDefault();
+            var $link = jQuery(e.target);
+            var action = pluginActions[$link.attr("class").substring(3)];
+            var msg = AJS.$("#aui-message-bar").children(".aui-message");
+            if (msg)
+                msg.remove();
+            action.onClick($row.attr("data-pluginkey"), $link, $row);
+        });
+    }
+
+    function updateTable(plugins) {
+        var updatedPlugins = [];
+        if (plugins.plugins) {
+            pluginsTable.find('tr').remove();
+            jQuery.each(plugins.plugins, function() {
+                var plugin = this;
+                if (jQuery.inArray(plugin.key, plugins.updated) > -1) {
+                    updatedPlugins.push(plugin);
+                }
+                addRow(plugin);
+            })
+        } else {
+            addRow(plugins);
+            updatedPlugins.push(plugins);
+        }
+        return updatedPlugins;
+    }
+
+    function addRow(plugin) {
+
         var rowTemplate = AJS.template.load("row");
-        var ownerActions = AJS.template.load("owner-actions");
-        var  nonForkActions = AJS.template.load("non-fork-actions");
 
         var data = {};
         jQuery.extend(data, plugin);
-        data.enableText = plugin.enabled ? "Disable" : "Enable";
-        if (data.author == currentUser) {
-            data["ownerActions:html"] = ownerActions.fill(data);
-        } else {
-            data.ownerActions = "";
-        }
-
-        if (!data.forkedPluginKey) {
-            data["nonForkActions:html"] = nonForkActions.fill(data);
-        } else {
+        if (data.forkedPluginKey) {
             data['name:html'] = "<span class='fork-blue'>"+ data.name + " (forked)</span>";
             data['version:html'] = "<span class='fork-blue'>" + data.version + "-fork-" + data.author + "</span>"
-            data.nonForkActions = "";
         }
-
-        jQuery(pluginsTable.children()).each(function() {
-            if (jQuery(this).attr("data-pluginKey") == plugin.key){
-                jQuery(this).detach();
-            }
-        });
         data.user = currentUser;
-
-        jQuery(pluginsTable.children()).each(function() {
-            if (jQuery(this).attr("data-pluginKey") == plugin.key){
-                jQuery(this).detach();
+        var actionsHtml = "";
+        jQuery.each(pluginActionsOrder, function() {
+            var action = pluginActions[this];
+            if (action.isApplicable(data)) {
+                actionsHtml += AJS.template.load(action.template).fill(data);
             }
         });
-        var filledRow = jQuery(rowTemplate.fill(data).toString());
-        var attachedRow = filledRow.appendTo(pluginsTable);
-        jQuery('.pk-uninstall', attachedRow).each(function(idx) {
-            var link = jQuery(this);
-            jQuery(link).click(function(event) {
-                event.preventDefault();
-                uninstallPlugin(link, attachedRow);
-                return false;
-            });
-        });
-        jQuery('.pk-fork', attachedRow).each(function(idx) {
-            var link = jQuery(this);
-            jQuery(link).click(function(event) {
-                event.preventDefault();
-                openForkDialog(link, attachedRow);
-                return false;
-            });
-        });
-        jQuery('.pk-enable-toggle', attachedRow).each(function(idx) {
-            var link = jQuery(this);
-            jQuery(link).click(function(event) {
-                event.preventDefault();
-                togglePlugin(link, attachedRow);
-                return false;
-            });
-        });
-        jQuery('.pk-edit', attachedRow).each(function(idx) {
-            var link = jQuery(this);
-            jQuery(link).click(function(event) {
-                event.preventDefault();
-                openIDE(data.key, link.attr("href"));
-                return false;
-            });
-        });
-        jQuery('.pk-download', attachedRow).each(function(idx) {
-            var link = jQuery(this);
-            link.click(function(event) {
-                event.preventDefault();
-                openDownloadDialog(data.key, link.attr("data-download"));
-                return false;
-            });
-        });
+        data['actions:html'] = actionsHtml;
 
-        if (data.forkedPluginKey) {
+        var filledRow = jQuery(rowTemplate.fill(data).toString());
+
+        var attachedRow = filledRow.appendTo(pluginsTable);
+
+        if (!!data.forkedPluginKey) {
             attachedRow.addClass("forked-row")
         }
+
+        addActionsClickHandler(attachedRow);
     }
 
     jQuery(plugins.plugins).each(function () {
@@ -273,8 +259,8 @@ function initSpeakeasy() {
                 if (data.error) {
                     addMessage('error', {title: "Error installing extension", body: data.error, shadowed: false});
                 } else {
-                    addRow(data);
-                    addMessage('success', {body: "<b>" + data.name + "</b> was uploaded successfully", shadowed: false});
+                    var updatedPlugin = updateTable(data)[0];
+                    addMessage('success', {body: "<b>" + updatedPlugin.name + "</b> was uploaded successfully", shadowed: false});
                 }
                 pluginFile.val("");
             }

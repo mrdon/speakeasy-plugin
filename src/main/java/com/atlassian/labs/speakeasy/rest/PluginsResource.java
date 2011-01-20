@@ -5,7 +5,7 @@ import com.atlassian.labs.speakeasy.install.PluginOperationFailedException;
 import com.atlassian.labs.speakeasy.install.PluginManager;
 import com.atlassian.labs.speakeasy.model.PluginIndex;
 import com.atlassian.labs.speakeasy.model.RemotePlugin;
-import com.atlassian.plugin.Plugin;
+import com.atlassian.labs.speakeasy.model.UserPlugins;
 import com.atlassian.plugins.rest.common.json.JaxbJsonMarshaller;
 import com.atlassian.sal.api.user.UserManager;
 import org.apache.commons.fileupload.FileItem;
@@ -19,6 +19,8 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
 import java.io.File;
 import java.util.List;
+
+import static java.util.Arrays.asList;
 
 /**
  *
@@ -44,20 +46,15 @@ public class PluginsResource
     @Produces("application/json")
     public Response uninstallPlugin(@PathParam("pluginKey") String pluginKey)
     {
+        if (!pluginManager.doesPluginExist(pluginKey))
+        {
+            return Response.status(404).entity("Invalid plugin key: " + pluginKey).build();
+        }
         String user = userManager.getRemoteUsername();
         try
         {
-            RemotePlugin plugin = pluginManager.getRemotePlugin(pluginKey);
-            String originalKey = plugin.getForkedPluginKey();
-            if (originalKey != null)
-            {
-                if (speakeasyManager.hasAccess(pluginKey, user))
-                {
-                    speakeasyManager.allowUserAccess(originalKey, user);
-                }
-            }
-            pluginManager.uninstall(user, pluginKey);
-            return Response.ok().build();
+            UserPlugins entity = speakeasyManager.uninstallPlugin(pluginKey, user);
+            return Response.ok().entity(entity).build();
         }
         catch (PluginOperationFailedException e)
         {
@@ -88,16 +85,8 @@ public class PluginsResource
     {
         try
         {
-            String remoteUser = userManager.getRemoteUsername();
-            RemotePlugin plugin = pluginManager.forkAndInstall(pluginKey, remoteUser, description);
-            if (speakeasyManager.hasAccess(pluginKey, remoteUser))
-            {
-                speakeasyManager.disallowUserAccess(pluginKey, remoteUser);
-                speakeasyManager.allowUserAccess(plugin.getKey(), remoteUser);
-                plugin.setEnabled(true);
-                plugin.setNumUsers(1);
-            }
-            return Response.ok().entity(plugin).build();
+            UserPlugins entity = speakeasyManager.fork(pluginKey, userManager.getRemoteUsername(), description);
+            return Response.ok().entity(entity).build();
         }
         catch (PluginOperationFailedException e)
         {
@@ -150,7 +139,7 @@ public class PluginsResource
         // todo: should only allow speakeasy and devmode plugins; handle wrong key or file
         try
         {
-            final RemotePlugin remotePlugin = pluginManager.saveAndRebuild(pluginKey, userManager.getRemoteUsername(), fileName, contents);
+            final RemotePlugin remotePlugin = speakeasyManager.getRemotePlugin(pluginManager.saveAndRebuild(pluginKey, userManager.getRemoteUsername(), fileName, contents), userManager.getRemoteUsername());
             return Response.ok().entity(jaxbJsonMarshaller.marshal(remotePlugin)).build();
         }
         catch (RuntimeException e)
@@ -218,8 +207,9 @@ public class PluginsResource
             {
                 throw new RuntimeException("Couldn't find the plugin in the request");
             }
-            final RemotePlugin remotePlugin = pluginManager.install(user, pluginFile);
-            return Response.ok().entity(wrapBodyInTextArea(jaxbJsonMarshaller.marshal(remotePlugin))).build();
+            String pluginKey = pluginManager.install(user, pluginFile);
+            UserPlugins plugins = speakeasyManager.getUserAccessList(user, pluginKey);
+            return Response.ok().entity(wrapBodyInTextArea(jaxbJsonMarshaller.marshal(plugins))).build();
         }
         catch (RuntimeException e)
         {

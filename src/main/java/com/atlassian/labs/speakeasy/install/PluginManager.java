@@ -85,7 +85,7 @@ public class PluginManager
         pluginArtifactFactory = new DefaultPluginArtifactFactory();
     }
 
-    public RemotePlugin install(String user, File pluginFile) throws PluginOperationFailedException
+    public String install(String user, File pluginFile) throws PluginOperationFailedException
     {
         if (!canUserInstallPlugins(user)) {
             throw new PluginOperationFailedException("User '" + user + "' doesn't have access to install plugins");
@@ -101,7 +101,6 @@ public class PluginManager
             {
                 final String installedKey = pluginKeys.iterator().next();
                 data.setPluginAuthor(installedKey, user);
-                RemotePlugin remotePlugin = getRemotePlugin(installedKey);
                 final Plugin plugin = pluginAccessor.getPlugin(installedKey);
                 WaitUntil.invoke(new WaitUntil.WaitCondition()
                 {
@@ -124,7 +123,7 @@ public class PluginManager
                     }
                 });
 
-                return remotePlugin;
+                return plugin.getKey();
             }
             else
             {
@@ -220,7 +219,7 @@ public class PluginManager
 
     }
 
-    public void uninstall(String user, String pluginKey) throws PluginOperationFailedException
+    public void uninstall(String pluginKey, String user) throws PluginOperationFailedException
     {
         if (!canUserInstallPlugins(user)) {
             throw new PluginOperationFailedException("User '" + user + "' doesn't have access to uninstall the '" + pluginKey + "' plugin");
@@ -350,7 +349,7 @@ public class PluginManager
         }
     }
 
-    public RemotePlugin saveAndRebuild(String pluginKey, String user, String fileName, String contents) throws PluginOperationFailedException
+    public String saveAndRebuild(String pluginKey, String user, String fileName, String contents) throws PluginOperationFailedException
     {
         Bundle bundle = findBundleForPlugin(bundleContext, pluginKey);
         notNull(bundle);
@@ -394,7 +393,7 @@ public class PluginManager
         }
     }
 
-    public RemotePlugin forkAndInstall(String pluginKey, String user, String description) throws PluginOperationFailedException
+    public String forkAndInstall(String pluginKey, String user, String description) throws PluginOperationFailedException
     {
         if (pluginKey.contains("-fork-"))
         {
@@ -454,12 +453,8 @@ public class PluginManager
         }
     }
 
-    public RemotePlugin getRemotePlugin(String pluginKey)
+    public boolean doesPluginExist(String pluginKey)
     {
-        final Plugin plugin = pluginAccessor.getPlugin(pluginKey);
-
-        RemotePlugin remotePlugin = new RemotePlugin(plugin);
-        remotePlugin.setAuthor(data.getPluginAuthor(pluginKey));
-        return remotePlugin;
+        return pluginAccessor.getPlugin(pluginKey) != null;
     }
 }
