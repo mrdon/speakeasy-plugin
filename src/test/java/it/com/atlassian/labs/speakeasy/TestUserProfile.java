@@ -196,6 +196,11 @@ public class TestUserProfile
         assertFalse(page.isPluginEnabled("test-2"));
         assertTrue(page.isPluginEnabled("test-2-fork-admin"));
 
+        page.enablePlugin("test-2");
+        assertFalse(page.isPluginEnabled("test-2-fork-admin"));
+        page.enablePlugin("test-2-fork-admin");
+        assertFalse(page.isPluginEnabled("test-2"));
+
         // verify on reload
         page = product.visit(SpeakeasyUserPage.class);
         assertTrue(page.getPluginKeys().contains("test-2-fork-admin"));

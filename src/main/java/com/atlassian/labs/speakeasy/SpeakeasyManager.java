@@ -80,6 +80,14 @@ public class SpeakeasyManager implements DisposableBean
     }
     public UserPlugins getUserAccessList(String userName, List<String> modifiedKeys)
     {
+        List<RemotePlugin> plugins = getAllSpeakeasyPlugins(userName);
+        UserPlugins userPlugins = new UserPlugins(plugins);
+        userPlugins.setUpdated(modifiedKeys);
+        return userPlugins;
+    }
+
+    private List<RemotePlugin> getAllSpeakeasyPlugins(String userName)
+    {
         List<RemotePlugin> plugins = new ArrayList<RemotePlugin>();
         for (Plugin plugin : pluginAccessor.getPlugins())
         {
@@ -93,9 +101,7 @@ public class SpeakeasyManager implements DisposableBean
                 }
             }
         }
-        UserPlugins userPlugins = new UserPlugins(plugins);
-        userPlugins.setUpdated(modifiedKeys);
-        return userPlugins;
+        return plugins;
     }
 
     public RemotePlugin getRemotePlugin(String pluginKey, String userName)
@@ -134,18 +140,41 @@ public class SpeakeasyManager implements DisposableBean
         return true;
     }
 
-    public void allowUserAccess(String pluginKey, String user)
+    public List<String> allowUserAccess(String pluginKey, String user)
     {
+        List<String> affectedPluginKeys = new ArrayList<String>();
         List<String> accessList = data.getUsersList(pluginKey);
         if (!accessList.contains(user))
         {
             accessList.add(user);
             data.saveUsersList(pluginKey, accessList);
             updateModuleDescriptorsForPlugin(pluginKey, accessList);
+            affectedPluginKeys.add(pluginKey);
         }
+
+        // clear other allowed forks
+        RemotePlugin targetPlugin = getRemotePlugin(pluginKey, user);
+        String parentKey = targetPlugin.getForkedPluginKey() != null ? targetPlugin.getForkedPluginKey() : targetPlugin.getKey();
+
+        for (RemotePlugin plugin : getAllSpeakeasyPlugins(user))
+        {
+            if (!plugin.getKey().equals(targetPlugin.getKey()) && (plugin.getKey().equals(parentKey) || parentKey.equals(plugin.getForkedPluginKey())))
+            {
+                if (removeFromAccessList(plugin.getKey(), user) != null)
+                {
+                    affectedPluginKeys.add(plugin.getKey());
+                }
+            }
+        }
+        return affectedPluginKeys;
     }
 
-    public void disallowUserAccess(String pluginKey, String user)
+    public String disallowUserAccess(String pluginKey, String user)
+    {
+        return removeFromAccessList(pluginKey, user);
+    }
+
+    private String removeFromAccessList(String pluginKey, String user)
     {
         List<String> accessList = data.getUsersList(pluginKey);
         if (accessList.contains(user))
@@ -154,7 +183,9 @@ public class SpeakeasyManager implements DisposableBean
             data.saveUsersList(pluginKey, accessList);
 
             updateModuleDescriptorsForPlugin(pluginKey, accessList);
+            return pluginKey;
         }
+        return null;
     }
 
     public void disallowAllPluginAccess(String pluginKey)
@@ -346,7 +377,6 @@ public class SpeakeasyManager implements DisposableBean
         modifiedKeys.add(forkedPluginKey);
         if (hasAccess(pluginKey, remoteUser))
         {
-            disallowUserAccess(pluginKey, remoteUser);
             modifiedKeys.add(pluginKey);
             allowUserAccess(forkedPluginKey, remoteUser);
         }

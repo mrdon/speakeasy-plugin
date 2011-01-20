@@ -4,6 +4,7 @@ import com.atlassian.labs.speakeasy.SpeakeasyManager;
 import com.atlassian.labs.speakeasy.data.SpeakeasyData;
 import com.atlassian.labs.speakeasy.install.PluginManager;
 import com.atlassian.labs.speakeasy.model.RemotePlugin;
+import com.atlassian.labs.speakeasy.model.UserPlugins;
 import com.atlassian.sal.api.user.UserManager;
 
 import javax.ws.rs.DELETE;
@@ -13,6 +14,9 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.Response;
+import java.util.List;
+
+import static java.util.Arrays.asList;
 
 /**
  *
@@ -64,8 +68,10 @@ public class UserResource
     public Response enableAccess(@PathParam("pluginKey") String pluginKey)
     {
         String user = userManager.getRemoteUsername();
-        speakeasyManager.allowUserAccess(pluginKey, user);
-        return Response.ok().entity(speakeasyManager.getUserAccessList(user, pluginKey)).build();
+        List<String> affectedKeys = speakeasyManager.allowUserAccess(pluginKey, user);
+        UserPlugins entity = speakeasyManager.getUserAccessList(user, pluginKey);
+        entity.setUpdated(affectedKeys);
+        return Response.ok().entity(entity).build();
     }
 
     @DELETE
@@ -74,7 +80,13 @@ public class UserResource
     public Response disableAccess(@PathParam("pluginKey") String pluginKey)
     {
         String user = userManager.getRemoteUsername();
-        speakeasyManager.disallowUserAccess(pluginKey, user);
-        return Response.ok().entity(speakeasyManager.getUserAccessList(user, pluginKey)).build();
+        String affectedKey = speakeasyManager.disallowUserAccess(pluginKey, user);
+
+        UserPlugins entity = speakeasyManager.getUserAccessList(user, pluginKey);
+        if (affectedKey != null)
+        {
+            entity.setUpdated(asList(affectedKey));
+        }
+        return Response.ok().entity(entity).build();
     }
 }
