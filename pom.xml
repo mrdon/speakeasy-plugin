@@ -294,7 +294,7 @@
         <xvfb.enable>true</xvfb.enable>
         <platform.version>2.8.8</platform.version>
         <refapp.version>2.8.8</refapp.version>
-        <confluence.version>3.5-m5</confluence.version>
+        <confluence.version>3.5-m4</confluence.version>
         <confluence.4.0.version>4.0-m14</confluence.4.0.version>
         <confluence.data.version>3.0</confluence.data.version>
         <jira.version>4.2.1-b588</jira.version>
