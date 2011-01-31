@@ -39,62 +39,6 @@ mvn {product}:run
         </form>
     </script>
 
-    <script type="text/x-template" title="browser-leaf">
-        <li><span class="{class}">{text}</span>{children}</li>
-    </script>
-
-
-    <script type="text/x-template" title="ide-dialog">
-        <div id="ide-content">
-            {firstScript}
-            <div id="ide-file-contents-panel">
-                <b>Contents</b>
-                <ul id="ide-browser" class="filetree">
-                </ul>
-            </div>
-            <div id="ide-main-content">
-                <div id="ide-loading" style="padding: 100px;">
-                    <img alt="waiting" src="$staticResourcesPrefix/download/resources/com.atlassian.labs.speakeasy-plugin:optin-js/wait.gif" align="absmiddle" /> Loading IDE... </p>
-                </div>
-                <textarea id="ide-editor" style="display: none;">
-                </textarea>
-            </div>
-            <div id="ide-status">
-                <span>Status: </span><span id="ide-status-text"></span>
-            </div>
-        </div>
-    </script>
-
-    <script type="text/x-template" title="uninstall-action">
-        <a class="pk-uninstall"  href="$contextPath/rest/speakeasy/1/plugins/{key}">Uninstall</a>
-    </script>
-    <script type="text/x-template" title="edit-action">
-        <a class="pk-edit" href="$contextPath/rest/speakeasy/1/plugins/{key}/index">Edit</a>
-    </script>
-    <script type="text/x-template" title="fork-action">
-        <a class="pk-fork" href="$contextPath/rest/speakeasy/1/plugins/fork/{key}">Fork</a>
-    </script>
-    <script type="text/x-template" title="disable-action">
-        <a class="pk-disable" href="$contextPath/rest/speakeasy/1/user/{key}">Disable</a>
-    </script>
-    <script type="text/x-template" title="enable-action">
-        <a class="pk-enable" href="$contextPath/rest/speakeasy/1/user/{key}">Enable</a>
-    </script>
-    <script type="text/x-template" title="download-action">
-        <a class="pk-download" href="$contextPath/rest/speakeasy/1/plugins/download/{key}.zip">Download</a>
-    </script>
-    <script type="text/x-template" title="row">
-        <tr data-pluginKey="{key}">
-            <td headers="plugin-name"><div class="plugin-summary"><span class="plugin-name">{name}</span><br><span class="plugin-description">{description}</span></div></td>
-            <td headers="plugin-author">{author}</td>
-            <td headers="plugin-version">{version}</td>
-            <td headers="plugin-users">{numUsers}</td>
-            <td headers="plugin-actions">
-                {actions}
-            </td>
-        </tr>
-    </script>
-
     <script type="text/x-template" title="available-extension-row">
         <tr data-pluginKey="{key}">
             <td headers="plugin-name"><span class="plugin-name">{name}</span><br><span class="plugin-description">{description}</span></td>
@@ -106,6 +50,7 @@ mvn {product}:run
             </td>
         </tr>
     </script>
+
 
 <div style="margin-top: -55px; margin-left: 350px;" id="aui-message-bar"> </div>
 
@@ -125,21 +70,21 @@ mvn {product}:run
             To upload a new extension, use the <b>Upload</b> form.<br />
             To develop your own extensions, <a href="mailto:don@atlassian.com">learn more</a>.
         </p>
+
         <table class="aui" id="plugins-table">
-        <thead>
-            <tr>
-                <th id="plugin-name">Name</th>
-                <th id="plugin-author">Author</th>
-                <th id="plugin-version">Version</th>
-                <th id="plugin-users">Users</th>
-                <th id="action">Action</th>
-            </tr>
-        </thead>
-        <tbody id="plugins-table-body">
+            <thead>
+                <tr>
+                    <th id="plugin-name">Name</th>
+                    <th id="plugin-author">Author</th>
+                    <th id="plugin-version">Version</th>
+                    <th id="plugin-users">Users</th>
+                    <th id="action">Action</th>
+                </tr>
+            </thead>
+            <tbody id="plugins-table-body">
 
-        </tbody>
+            </tbody>
         </table>
-
 
         #if ($devmode && $installAllowed)
             <div style="background-color: #f0f0f0; margin: 20px; padding: 10px; border: 1px solid #bbb;">
@@ -172,7 +117,7 @@ mvn {product}:run
         </div>
         
         <p id="loading"><img alt="waiting"
-align="absmiddle" src="$staticResourcesPrefix/download/resources/com.atlassian.labs.speakeasy-plugin:optin-js/wait.gif" /> Loading available extensions from plugins.atlassian.com ..</p>
+align="absmiddle" src="$staticResourcesPrefix/download/resources/com.atlassian.labs.speakeasy-plugin:shared/images/wait.gif" /> Loading available extensions from plugins.atlassian.com ..</p>
 
         <table class="aui" id="available-extensions-table">
         <thead>

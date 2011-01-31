@@ -34,7 +34,6 @@ function initSpeakeasy() {
             onClick : openDownloadDialog
         }
     };
-    var pluginActionsOrder = ['enable', 'disable', 'fork', 'edit', 'uninstall', 'download'];
 
     function addMessage(type, params) {
         var msg = AJS.$("#aui-message-bar").children(".aui-message");
@@ -54,7 +53,7 @@ function initSpeakeasy() {
 
     function enablePlugin(pluginKey, link, attachedRow) {
         var pluginName = jQuery('td[headers=plugin-name] .plugin-name', attachedRow).text();
-        link.html('<img alt="waiting" src="' + staticResourcesPrefix + '/download/resources/com.atlassian.labs.speakeasy-plugin:optin-js/wait.gif" />');
+        link.html('<img alt="waiting" src="' + staticResourcesPrefix + '/download/resources/com.atlassian.labs.speakeasy-plugin:shared/images/wait.gif" />');
         jQuery.ajax({
                   url: link.attr('href'),
                   type: 'PUT',
@@ -67,7 +66,7 @@ function initSpeakeasy() {
 
     function disablePlugin(pluginKey, link, attachedRow) {
         var pluginName = jQuery('td[headers=plugin-name] .plugin-name', attachedRow).text();
-        link.html('<img alt="waiting" src="' + staticResourcesPrefix + '/download/resources/com.atlassian.labs.speakeasy-plugin:optin-js/wait.gif" />');
+        link.html('<img alt="waiting" src="' + staticResourcesPrefix + '/download/resources/com.atlassian.labs.speakeasy-plugin:shared/images/wait.gif" />');
         jQuery.ajax({
                   url: link.attr('href'),
                   type: 'DELETE',
@@ -79,7 +78,7 @@ function initSpeakeasy() {
     }
 
     function uninstallPlugin(pluginKey, link, attachedRow) {
-        link.html('<img alt="waiting" src="' + staticResourcesPrefix + '/download/resources/com.atlassian.labs.speakeasy-plugin:optin-js/wait.gif" />');
+        link.html('<img alt="waiting" src="' + staticResourcesPrefix + '/download/resources/com.atlassian.labs.speakeasy-plugin:shared/images/wait.gif" />');
         var pluginName = jQuery('td[headers=plugin-name] .plugin-name', attachedRow).text();
         var wasEnabled = jQuery('td[headers=plugin-actions] .pk-enable-toggle', attachedRow).text() == "Disable";
         jQuery.ajax({
@@ -125,7 +124,7 @@ function initSpeakeasy() {
 
     function forkPlugin(link, attachedRow, description) {
         //var enabled = ("Disable" == link.text());
-        link.append('<img class="waiting" alt="waiting" src="' + staticResourcesPrefix + '/download/resources/com.atlassian.labs.speakeasy-plugin:optin-js/wait.gif" />');
+        link.append('<img class="waiting" alt="waiting" src="' + staticResourcesPrefix + '/download/resources/com.atlassian.labs.speakeasy-plugin:shared/images/wait.gif" />');
         var pluginName = jQuery('td[headers=plugin-name] .plugin-name', attachedRow).text();
         jQuery.ajax({
                   url: link.attr('href'),
@@ -202,33 +201,17 @@ function initSpeakeasy() {
 
     function addRow(plugin) {
 
-        var rowTemplate = AJS.template.load("row");
-
-        var data = {};
-        jQuery.extend(data, plugin);
-        if (data.forkedPluginKey) {
-            data['name:html'] = "<span class='fork-blue'>"+ data.name + " (forked)</span>";
-            data['version:html'] = "<span class='fork-blue'>" + data.version + "-fork-" + data.author + "</span>"
-        }
+        var data = jQuery.extend({}, plugin);
         data.user = currentUser;
-        var actionsHtml = "";
-        jQuery.each(pluginActionsOrder, function() {
-            var action = pluginActions[this];
+        data.contextPath = contextPath;
+        jQuery.each(pluginActions, function(name, action) {
             if (action.isApplicable(data)) {
-                actionsHtml += AJS.template.load(action.template).fill(data);
+                data[name] = true;
             }
         });
-        data['actions:html'] = actionsHtml;
 
-        var filledRow = jQuery(rowTemplate.fill(data).toString());
-
-        var attachedRow = filledRow.appendTo(pluginsTable);
-
-        if (!!data.forkedPluginKey) {
-            attachedRow.addClass("forked-row")
-        }
-
-        addActionsClickHandler(attachedRow);
+        var filledRow = jQuery(Mustache.to_html(extensionRow, data));
+        addActionsClickHandler(filledRow.appendTo(pluginsTable));
     }
 
     jQuery(plugins.plugins).each(function () {

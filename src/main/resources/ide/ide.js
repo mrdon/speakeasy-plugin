@@ -152,14 +152,11 @@ function initIDE($, pluginKey, dialog, href){
         dialog.remove();
     }, "ide-done");
 
-    var ideDialogContents = AJS.template.load('ide-dialog')
-        .fill({
+    var ideDialogContents = Mustache.to_html(ideDialog, {
             pluginKey : pluginKey,
-//            "firstScript:html" : '<script src="' + staticResourcesPrefix + '/download/resources/com.atlassian.labs.speakeasy-plugin:bespin/BespinEmbedded.js"></script>'
-            "firstScript:html" : '<script src="' + staticResourcesPrefix + '/download/resources/com.atlassian.labs.speakeasy-plugin:codemirror/js/codemirror.js"></script>'
-//            "firstScript:html" : '<script src="http://www.codemirror.net/js/codemirror.js" type="text/javascript"></script>'
-           })
-        .toString();
+            staticResourcesPrefix : staticResourcesPrefix,
+            "firstScript" : '<script src="' + staticResourcesPrefix + '/download/resources/com.atlassian.labs.speakeasy-plugin:codemirror/js/codemirror.js"></script>'
+           });
 
     dialog.addPanel("IDE", ideDialogContents, "panel-body");
 

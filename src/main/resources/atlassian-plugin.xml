@@ -2,111 +2,131 @@
     <plugin-info>
         <description>${project.description}</description>
         <version>${project.version}</version>
-        <vendor name="${project.organization.name}" url="${project.organization.url}" />
+        <vendor name="${project.organization.name}" url="${project.organization.url}"/>
     </plugin-info>
 
     <servlet key="optin-userprofile" name="speakeasy-plugin" class="com.atlassian.labs.speakeasy.ui.UserOptInServlet">
         <url-pattern>/speakeasy/user</url-pattern>
     </servlet>
 
-    <servlet key="unsubscribe-servlet" name="Unsubscribe Page" class="com.atlassian.labs.speakeasy.ui.UserOptOutServlet">
+    <servlet key="unsubscribe-servlet" name="Unsubscribe Page"
+             class="com.atlassian.labs.speakeasy.ui.UserOptOutServlet">
         <url-pattern>/speakeasy/unsubscribe</url-pattern>
     </servlet>
 
-    <web-resource key="optin-js">
-        <resource type="download" name="user.js" location="js/user.js" />
-        <resource type="download" name="user.css" location="css/user.css" />
-        <resource type="download" name="jquery.form.js" location="js/external/jquery.form.js" />
-        <resource type="download" name="wait.gif" location="wait.gif" />
+    <web-resource key="user">
+        <transformation extension="mu">
+            <transformer key="template"/>
+        </transformation>
+        <dependency>${project.groupId}.${project.artifactId}:shared</dependency>
+        <resource type="download" name="user.js" location="user/user.js"/>
+        <resource type="download" name="user.css" location="user/user.css"/>
+        <resource type="download" name="extensionRow.js" location="user/row.mu"/>
+        <resource type="download" name="images/" location="user/images/"/>
     </web-resource>
 
-    <web-resource key="optin-js-jira" application="jira">
+    <web-resource key="user-jira" application="jira">
         <context>speakeasy.user-profile</context>
-        <resource type="download" name="user-jira.css" location="css/user-jira.css" />
+        <resource type="download" name="user-jira.css" location="user/user-jira.css"/>
+    </web-resource>
+
+    <web-resource key="shared">
+        <resource type="download" name="jquery.form.js" location="shared/jquery.form.js"/>
+        <resource type="download" name="mustache.js" location="shared/mustache.js"/>
+        <resource type="download" name="images/" location="shared/images/"/>
     </web-resource>
 
     <web-resource key="codemirror">
-        <resource type="download" name="js/" location="codemirror/js/"/>
-        <resource type="download" name="css/" location="codemirror/css/"/>
-    </web-resource>
-
-    <web-resource key="images">
-        <resource type="download" name="images/" location="images/"/>
+        <resource type="download" name="js/" location="ide/codemirror/js/"/>
+        <resource type="download" name="css/" location="ide/codemirror/css/"/>
     </web-resource>
 
     <web-resource key="treeview">
-        <resource type="download" name="jquery.treeview.js" location="treeview/jquery.treeview.js" />
-        <resource type="download" name="jquery.treeview.css" location="treeview/jquery.treeview.css" />
-        <resource type="download" name="images/" location="treeview/images/"/>
+        <resource type="download" name="jquery.treeview.js" location="ide/treeview/jquery.treeview.js"/>
+        <resource type="download" name="jquery.treeview.css" location="ide/treeview/jquery.treeview.css"/>
+        <resource type="download" name="images/" location="ide/treeview/images/"/>
     </web-resource>
 
     <web-resource key="ide">
+        <transformation extension="mu">
+            <transformer key="template"/>
+        </transformation>
         <dependency>${project.groupId}.${project.artifactId}:treeview</dependency>
-        <resource type="download" name="ide.js" location="js/ide.js" />
-        <resource type="download" name="ide.css" location="css/ide.css" />
+        <resource type="download" name="ide.js" location="ide/ide.js"/>
+        <resource type="download" name="ide.css" location="ide/ide.css"/>
+        <resource type="download" name="ideDialog.js" location="ide/dialog.mu"/>
     </web-resource>
 
+    <web-resource-transformer key="template" class="com.atlassian.labs.speakeasy.ui.mustache.TemplateTransformer"/>
 
-    <web-resource-transformer key="userTransformer" class="com.atlassian.labs.speakeasy.UserScopedTransformer" />
+    <web-resource-transformer key="userTransformer" class="com.atlassian.labs.speakeasy.UserScopedTransformer"/>
 
     <rest key="rest" path="/speakeasy" version="1">
         <dispatcher>REQUEST</dispatcher>
         <dispatcher>INCLUDE</dispatcher>
     </rest>
-    
-    <component key="speakeasyManager" class="com.atlassian.labs.speakeasy.SpeakeasyManager" />
-    <component key="pluginManager" class="com.atlassian.labs.speakeasy.install.PluginManager" />
-    <component key="classPrefixModuleFactory" class="com.atlassian.plugin.module.ClassPrefixModuleFactory" />
-    <component key="speakeasyData" class="com.atlassian.labs.speakeasy.data.SpeakeasyData" />
-    <component key="pomProperties" class="com.atlassian.labs.speakeasy.util.PomProperties" />
-    <component key="userProfileRenderer" class="com.atlassian.labs.speakeasy.ui.UserProfileRenderer" />
 
-    <component-import key="jsonMarshaller" interface="com.atlassian.plugins.rest.common.json.JaxbJsonMarshaller" />
-    <component-import key="userManager" interface="com.atlassian.sal.api.user.UserManager" />
-    <component-import key="pluginSettings" interface="com.atlassian.sal.api.pluginsettings.PluginSettingsFactory" />
-    <component-import key="templateRenderer" interface="com.atlassian.templaterenderer.TemplateRenderer" />
+    <component key="speakeasyManager" class="com.atlassian.labs.speakeasy.SpeakeasyManager"/>
+    <component key="pluginManager" class="com.atlassian.labs.speakeasy.install.PluginManager"/>
+    <component key="classPrefixModuleFactory" class="com.atlassian.plugin.module.ClassPrefixModuleFactory"/>
+    <component key="speakeasyData" class="com.atlassian.labs.speakeasy.data.SpeakeasyData"/>
+    <component key="pomProperties" class="com.atlassian.labs.speakeasy.util.PomProperties"/>
+    <component key="userProfileRenderer" class="com.atlassian.labs.speakeasy.ui.UserProfileRenderer"/>
 
-    <component-import key="pluginController" interface="com.atlassian.plugin.PluginController" />
-    <component-import key="pluginAccessor" interface="com.atlassian.plugin.PluginAccessor" />
+    <component-import key="jsonMarshaller" interface="com.atlassian.plugins.rest.common.json.JaxbJsonMarshaller"/>
+    <component-import key="userManager" interface="com.atlassian.sal.api.user.UserManager"/>
+    <component-import key="pluginSettings" interface="com.atlassian.sal.api.pluginsettings.PluginSettingsFactory"/>
+    <component-import key="templateRenderer" interface="com.atlassian.templaterenderer.TemplateRenderer"/>
 
-    <module-type key="scoped-web-resource" class="com.atlassian.labs.speakeasy.SpeakeasyWebResourceModuleDescriptor" />
+    <component-import key="pluginController" interface="com.atlassian.plugin.PluginController"/>
+    <component-import key="pluginAccessor" interface="com.atlassian.plugin.PluginAccessor"/>
 
-    <module-type key="scoped-web-item" class="com.atlassian.labs.speakeasy.webfragment.SpeakeasyWebItemModuleDescriptor" />
+    <module-type key="scoped-web-resource" class="com.atlassian.labs.speakeasy.SpeakeasyWebResourceModuleDescriptor"/>
+
+    <module-type key="scoped-web-item"
+                 class="com.atlassian.labs.speakeasy.webfragment.SpeakeasyWebItemModuleDescriptor"/>
 
     <!-- product accessors -->
 
-    <component key="productAccessor" class="com.atlassian.labs.speakeasy.product.ConfluenceProductAccessor" application="com.atlassian.confluence" />
-    <component key="productAccessor" class="com.atlassian.labs.speakeasy.product.JiraProductAccessor" application="jira" />
-    <component key="productAccessor" class="com.atlassian.labs.speakeasy.product.RefappProductAccessor" application="refapp" />
+    <component key="productAccessor" class="com.atlassian.labs.speakeasy.product.ConfluenceProductAccessor"
+               application="com.atlassian.confluence"/>
+    <component key="productAccessor" class="com.atlassian.labs.speakeasy.product.JiraProductAccessor"
+               application="jira"/>
+    <component key="productAccessor" class="com.atlassian.labs.speakeasy.product.RefappProductAccessor"
+               application="refapp"/>
 
     <!-- user profile links -->
 
-    <web-item key="refimpl-speakeasy-user-menu" name="Speakeasy Plugins" section="system.admin/general"  weight="1" application="refapp">
+    <web-item key="refimpl-speakeasy-user-menu" name="Speakeasy Plugins" section="system.admin/general" weight="1"
+              application="refapp">
         <label>Speakeasy Plugins</label>
         <link linkId="speakeasy-admin-link">/plugins/servlet/speakeasy/user</link>
     </web-item>
 
-	<web-item key="speakeasy-plugins" name="Speakeasy Tab" section="system.profile" weight="100" application="com.atlassian.confluence">
-		<label>Speakeasy</label>
-		<link>/plugins/servlet/speakeasy/user</link>
-	</web-item>
+    <web-item key="speakeasy-plugins" name="Speakeasy Tab" section="system.profile" weight="100"
+              application="com.atlassian.confluence">
+        <label>Speakeasy</label>
+        <link>/plugins/servlet/speakeasy/user</link>
+    </web-item>
 
-	<web-item key="conf-speakeasy-plugins.menu" name="Speakeasy Confluence User Menu Item" section="system.user/user-content" weight="100" application="com.atlassian.confluence">
-		<label>Speakeasy</label>
-		<link>/plugins/servlet/speakeasy/user</link>
-	</web-item>
+    <web-item key="conf-speakeasy-plugins.menu" name="Speakeasy Confluence User Menu Item"
+              section="system.user/user-content" weight="100" application="com.atlassian.confluence">
+        <label>Speakeasy</label>
+        <link>/plugins/servlet/speakeasy/user</link>
+    </web-item>
 
-	<web-item key="jira-speakeasy-plugins.menu" name="Speakeasy JIRA User Menu Item" section="system.user.options/personal" weight="100" application="jira">
-		<label>Speakeasy</label>
-		<link>/secure/ViewProfile.jspa#selectedTab=com.atlassian.labs.speakeasy-plugin:speakeasy-plugins</link>
-	</web-item>
+    <web-item key="jira-speakeasy-plugins.menu" name="Speakeasy JIRA User Menu Item"
+              section="system.user.options/personal" weight="100" application="jira">
+        <label>Speakeasy</label>
+        <link>/secure/ViewProfile.jspa#selectedTab=com.atlassian.labs.speakeasy-plugin:speakeasy-plugins</link>
+    </web-item>
 
     <view-profile-panel key="speakeasy-plugins" i18n-name-key="Speakeasy"
-                       name="User Profile Roadmap Panel"
-                       class="com.atlassian.labs.speakeasy.ui.jira.SpeakeasyViewProfilePanel"
-                       application="jira">
-       <order>30</order>
-   </view-profile-panel>
+                        name="User Profile Roadmap Panel"
+                        class="com.atlassian.labs.speakeasy.ui.jira.SpeakeasyViewProfilePanel"
+                        application="jira">
+        <order>30</order>
+    </view-profile-panel>
 
 
     <!-- admin links -->
@@ -134,6 +154,6 @@
         <label>Plugin Access</label>
         <link linkId="speakeasy-admin-link">/plugins/servlet/speakeasy</link>
     </web-item-->
-    
+
 
 </atlassian-plugin>
