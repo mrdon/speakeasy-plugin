@@ -229,7 +229,7 @@ public class SpeakeasyManager implements DisposableBean
 
     private void updateModuleDescriptorsForPlugin(String pluginKey, List<String> users)
     {
-        List<DescriptorGenerator> generators = findGeneratorsInPlugin(pluginKey);
+        List<DescriptorGenerator<ModuleDescriptor>> generators = findGeneratorsInPlugin(pluginKey);
         if (!generators.isEmpty())
         {
             // unregister any existing services
@@ -240,13 +240,17 @@ public class SpeakeasyManager implements DisposableBean
             Integer pluginStateIdentifier = data.getPluginStateIdentifier(pluginKey);
             Bundle targetBundle = findBundleForPlugin(bundleContext, pluginKey);
             List<ModuleDescriptor> generatedDescriptors = new ArrayList<ModuleDescriptor>();
-            for (DescriptorGenerator generator : generators)
+            for (DescriptorGenerator<ModuleDescriptor> generator : generators)
             {
 
-                ModuleDescriptor generatedDescriptor = generator.getDescriptorToExposeForUsers(users, pluginStateIdentifier);
-                ServiceRegistration reg = targetBundle.getBundleContext().registerService(ModuleDescriptor.class.getName(), generatedDescriptor, null);
-                serviceRegistrations.put(generatedDescriptor.getCompleteKey(), reg);
-                generatedDescriptors.add(generatedDescriptor);
+                for (ModuleDescriptor generatedDescriptor : generator.getDescriptorsToExposeForUsers(users, pluginStateIdentifier))
+                {
+                    ServiceRegistration reg = targetBundle.getBundleContext().registerService(ModuleDescriptor.class.getName(), generatedDescriptor, null);
+                    serviceRegistrations.put(generatedDescriptor.getCompleteKey(), reg);
+                    generatedDescriptors.add(generatedDescriptor);
+                }
+
+
             }
             waitUntilModulesAreEnabled(generatedDescriptors);
         }
@@ -276,9 +280,9 @@ public class SpeakeasyManager implements DisposableBean
         });
     }
 
-    private List<DescriptorGenerator> findGeneratorsInPlugin(String pluginKey)
+    private List<DescriptorGenerator<ModuleDescriptor>> findGeneratorsInPlugin(String pluginKey)
     {
-        List<DescriptorGenerator> generators = new ArrayList<DescriptorGenerator>();
+        List<DescriptorGenerator<ModuleDescriptor>> generators = new ArrayList<DescriptorGenerator<ModuleDescriptor>>();
         for (ModuleDescriptor moduleDescriptor : pluginAccessor.getPlugin(pluginKey).getModuleDescriptors())
         {
             if (moduleDescriptor instanceof DescriptorGenerator)

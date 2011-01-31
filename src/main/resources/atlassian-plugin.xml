@@ -86,6 +86,9 @@
     <module-type key="scoped-web-item"
                  class="com.atlassian.labs.speakeasy.webfragment.SpeakeasyWebItemModuleDescriptor"/>
 
+    <module-type key="scoped-modules"
+                 class="com.atlassian.labs.speakeasy.commonjs.SpeakeasyCommonJsModulesDescriptor"/>
+
     <!-- product accessors -->
 
     <component key="productAccessor" class="com.atlassian.labs.speakeasy.product.ConfluenceProductAccessor"
@@ -154,6 +157,18 @@
         <label>Plugin Access</label>
         <link linkId="speakeasy-admin-link">/plugins/servlet/speakeasy</link>
     </web-item-->
+
+    <!-- commonjs -->
+    <web-resource-transformer key="commonjs-module" class="com.atlassian.labs.speakeasy.commonjs.transformer.CommonJsModuleWrappingTransformer" />
+    <web-resource-transformer key="commonjs-module-entry" class="com.atlassian.labs.speakeasy.commonjs.transformer.CommonJsModuleEntryTransformer" />
+
+    <web-resource key="yabble">
+        <resource type="download" name="yabble.js" location="shared/yabble.js"/>
+    </web-resource>
+
+    <component-import key="appprops" interface="com.atlassian.sal.api.ApplicationProperties" />
+
+    <module-type key="commonjs" class="com.atlassian.labs.speakeasy.commonjs.descriptor.CommonJsModulesDescriptor" />
 
 
 </atlassian-plugin>

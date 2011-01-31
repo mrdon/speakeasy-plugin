@@ -15,6 +15,7 @@ import org.apache.commons.lang.StringUtils;
 import org.dom4j.Element;
 import org.osgi.framework.BundleContext;
 
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -45,7 +46,7 @@ public class SpeakeasyWebItemModuleDescriptor extends AbstractModuleDescriptor<V
         return null;
     }
 
-    public WebItemModuleDescriptor getDescriptorToExposeForUsers(List<String> users, int state)
+    public Iterable<WebItemModuleDescriptor> getDescriptorsToExposeForUsers(List<String> users, int state)
     {
         WebItemModuleDescriptor descriptor;
         try
@@ -84,6 +85,6 @@ public class SpeakeasyWebItemModuleDescriptor extends AbstractModuleDescriptor<V
                 }
             }
         }, userElement);
-        return descriptor;
+        return Collections.singleton(descriptor);
     }
 }
