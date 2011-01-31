@@ -3,37 +3,18 @@ function initSpeakeasy() {
 
     var pluginsTable = jQuery("#plugins-table-body");
     var pluginActions = {
-        'edit' : {
-            isApplicable : function(plugin) { return plugin.author == currentUser; },
-            template : 'edit-action',
-            onClick : openIDE
-        },
-        'uninstall' : {
-            isApplicable : function(plugin) { return plugin.author == currentUser; },
-            template : 'uninstall-action',
-            onClick : uninstallPlugin
-        },
-        'fork' : {
-            isApplicable : function(plugin) { return !plugin.forkedPluginKey; },
-            template : 'fork-action',
-            onClick : openForkDialog
-        },
-        'enable' : {
-            isApplicable : function(plugin) { return !plugin.enabled; },
-            template : 'enable-action',
-            onClick : enablePlugin
-        },
-        'disable' : {
-            isApplicable : function(plugin) { return plugin.enabled; },
-            template : 'disable-action',
-            onClick : disablePlugin
-        },
-        'download' : {
-            isApplicable : function(plugin) { return true; },
-            template : 'download-action',
-            onClick : openDownloadDialog
-        }
+        'edit' : openIDE,
+        'uninstall' : uninstallPlugin,
+        'fork' : openForkDialog,
+        'enable' : enablePlugin,
+        'disable' : disablePlugin,
+        'download' : openDownloadDialog
     };
+
+    function getAbsoluteHref($link) {
+        return contextPath + $link.attr("href");
+    }
+
 
     function addMessage(type, params) {
         var msg = AJS.$("#aui-message-bar").children(".aui-message");
@@ -55,7 +36,7 @@ function initSpeakeasy() {
         var pluginName = jQuery('td[headers=plugin-name] .plugin-name', attachedRow).text();
         link.html('<img alt="waiting" src="' + staticResourcesPrefix + '/download/resources/com.atlassian.labs.speakeasy-plugin:shared/images/wait.gif" />');
         jQuery.ajax({
-                  url: link.attr('href'),
+                  url: getAbsoluteHref(link),
                   type: 'PUT',
                   success: function(data) {
                       updateTable(data);
@@ -68,7 +49,7 @@ function initSpeakeasy() {
         var pluginName = jQuery('td[headers=plugin-name] .plugin-name', attachedRow).text();
         link.html('<img alt="waiting" src="' + staticResourcesPrefix + '/download/resources/com.atlassian.labs.speakeasy-plugin:shared/images/wait.gif" />');
         jQuery.ajax({
-                  url: link.attr('href'),
+                  url: getAbsoluteHref(link),
                   type: 'DELETE',
                   success: function(data) {
                       updateTable(data);
@@ -82,7 +63,7 @@ function initSpeakeasy() {
         var pluginName = jQuery('td[headers=plugin-name] .plugin-name', attachedRow).text();
         var wasEnabled = jQuery('td[headers=plugin-actions] .pk-enable-toggle', attachedRow).text() == "Disable";
         jQuery.ajax({
-                  url: link.attr('href'),
+                  url: getAbsoluteHref(link),
                   type: 'DELETE',
                   success: function(data) {
                       link.closest("tr").each(function() {
@@ -98,7 +79,7 @@ function initSpeakeasy() {
     }
 
     function openForkDialog(pluginKey, link, attachedRow) {
-        var href = link.attr("href");
+        var href = getAbsoluteHref(link);
         var desc = jQuery('.plugin-description', attachedRow).text();
         var dialog = new AJS.Dialog({width:500, height:450, id:'fork-dialog'});
         var pluginName = jQuery('td[headers=plugin-name] .plugin-name', attachedRow).text();
@@ -127,7 +108,7 @@ function initSpeakeasy() {
         link.append('<img class="waiting" alt="waiting" src="' + staticResourcesPrefix + '/download/resources/com.atlassian.labs.speakeasy-plugin:shared/images/wait.gif" />');
         var pluginName = jQuery('td[headers=plugin-name] .plugin-name', attachedRow).text();
         jQuery.ajax({
-                  url: link.attr('href'),
+                  url: getAbsoluteHref(link),
                   type: 'POST',
                   data: {description:description},
                   success: function(data) {
@@ -143,7 +124,7 @@ function initSpeakeasy() {
     }
 
     function openDownloadDialog(key, link, attachedRow) {
-        var href = link.attr("href");
+        var href = getAbsoluteHref(link);
         var dialog = new AJS.Dialog({width:470, height:400, id:'download-dialog'});
         dialog.addHeader("Download '" + key + "'");
         var downloadDialogContents = AJS.template.load('download-dialog')
@@ -161,24 +142,10 @@ function initSpeakeasy() {
     }
 
     function openIDE(key, link, attachedRow) {
-        var href = link.attr("href");
+        var href = getAbsoluteHref(link);
         var $win = jQuery(window);
         var dialog = new AJS.Dialog({width: $win.width() * .95, height: 620, id:'ide-dialog'});
         initIDE(jQuery, key, dialog, href);
-    }
-
-
-
-    function addActionsClickHandler($row) {
-        $row.find('a').click(function(e) {
-            e.preventDefault();
-            var $link = jQuery(e.target);
-            var action = pluginActions[$link.attr("class").substring(3)];
-            var msg = AJS.$("#aui-message-bar").children(".aui-message");
-            if (msg)
-                msg.remove();
-            action.onClick($row.attr("data-pluginkey"), $link, $row);
-        });
     }
 
     function updateTable(plugins) {
@@ -204,18 +171,20 @@ function initSpeakeasy() {
         var data = jQuery.extend({}, plugin);
         data.user = currentUser;
         data.contextPath = contextPath;
-        jQuery.each(pluginActions, function(name, action) {
-            if (action.isApplicable(data)) {
-                data[name] = true;
-            }
-        });
 
         var filledRow = jQuery(Mustache.to_html(extensionRow, data));
-        addActionsClickHandler(filledRow.appendTo(pluginsTable));
+        filledRow.appendTo(pluginsTable);
     }
 
-    jQuery(plugins.plugins).each(function () {
-        addRow(this);
+    jQuery('a', pluginsTable).live('click', function(e) {
+        e.preventDefault();
+        var $link = jQuery(e.target);
+        var $row = $link.closest('tr');
+        var action = pluginActions[$link.attr("class").substring(3)];
+        var msg = AJS.$("#aui-message-bar").children(".aui-message");
+        if (msg)
+            msg.remove();
+        action($row.attr("data-pluginkey"), $link, $row);
     });
 
     var pluginFile = jQuery('#plugin-file');

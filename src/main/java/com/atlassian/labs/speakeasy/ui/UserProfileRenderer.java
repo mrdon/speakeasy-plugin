@@ -3,6 +3,7 @@ package com.atlassian.labs.speakeasy.ui;
 import com.atlassian.labs.speakeasy.SpeakeasyManager;
 import com.atlassian.labs.speakeasy.data.SpeakeasyData;
 import com.atlassian.labs.speakeasy.install.PluginManager;
+import com.atlassian.labs.speakeasy.model.RemotePlugin;
 import com.atlassian.labs.speakeasy.model.UserPlugins;
 import com.atlassian.labs.speakeasy.product.ProductAccessor;
 import com.atlassian.plugin.webresource.UrlMode;
@@ -12,9 +13,14 @@ import com.atlassian.sal.api.user.UserManager;
 import com.atlassian.templaterenderer.TemplateRenderer;
 import com.atlassian.templaterenderer.annotations.HtmlSafe;
 import com.google.common.collect.ImmutableMap;
+import com.samskivert.mustache.Mustache;
+import com.samskivert.mustache.Template;
+import org.apache.commons.io.IOUtils;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.Writer;
 import java.util.Map;
 
@@ -68,7 +74,8 @@ public class UserProfileRenderer
                 put("accessList", speakeasyManager.getUserAccessList(user)).
                 put("user", user).
                 put("contextPath", req.getContextPath()).
-                put("plugins", new JsonGetter(pluginJson)).
+                put("plugins", plugins.getPlugins()).
+                put("rowRenderer", new RowRenderer()).
                 put("installAllowed", pluginManager.canUserInstallPlugins(user)).
                 put("staticResourcesPrefix", webResourceManager.getStaticResourcePrefix(UrlMode.RELATIVE)).
                 put("product", productAccessor.getSdkName()).
@@ -84,20 +91,29 @@ public class UserProfileRenderer
         templateRenderer.render(template, renderContext, output);
     }
 
-    public static class JsonGetter
+    public static class RowRenderer
     {
-        private final String json;
+        private final Template rowTemplate;
 
-        public JsonGetter(String json)
+        public RowRenderer()
         {
-            this.json = json;
+            InputStream in = null;
+            try
+            {
+                in = getClass().getClassLoader().getResourceAsStream("user/row.mu");
+                this.rowTemplate = Mustache.compiler().compile(new InputStreamReader(in));
+            }
+            finally
+            {
+                IOUtils.closeQuietly(in);
+            }
         }
 
         @HtmlSafe
         @com.atlassian.velocity.htmlsafe.HtmlSafe
-        public String getRenderJson()
+        public String render(RemotePlugin plugin)
         {
-            return json;
+            return rowTemplate.execute(plugin);
         }
     }
 }

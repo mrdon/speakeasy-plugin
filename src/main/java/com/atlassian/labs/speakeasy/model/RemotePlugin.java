@@ -2,16 +2,16 @@ package com.atlassian.labs.speakeasy.model;
 
 import com.atlassian.plugin.Plugin;
 
-import javax.xml.bind.annotation.XmlAttribute;
-import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlRootElement;
 import java.util.HashMap;
-import java.util.Map;
 
 /**
  *
  */
 @XmlRootElement(name = "plugin")
+@XmlAccessorType(XmlAccessType.PROPERTY)
 public class RemotePlugin
 {
     private String key;
@@ -28,7 +28,12 @@ public class RemotePlugin
 
     private boolean enabled;
 
-    private boolean canUninstall;
+    private boolean uninstall;
+    private boolean edit;
+    private boolean fork;
+    private boolean enable;
+    private boolean disable;
+    private boolean download;
 
     private HashMap<String,String> params;
 
@@ -44,7 +49,6 @@ public class RemotePlugin
         params = new HashMap<String,String>(plugin.getPluginInformation().getParameters());
     }
 
-    @XmlElement
     public String getKey()
     {
         return key;
@@ -55,7 +59,6 @@ public class RemotePlugin
         this.key = key;
     }
 
-    @XmlElement
     public String getVersion()
     {
         return version;
@@ -66,7 +69,6 @@ public class RemotePlugin
         this.version = version;
     }
 
-    @XmlElement
     public HashMap<String, String> getParams()
     {
         return params;
@@ -78,7 +80,6 @@ public class RemotePlugin
     }
 
 
-    @XmlElement
     public String getName()
     {
         return name;
@@ -89,7 +90,6 @@ public class RemotePlugin
         this.name = name;
     }
 
-    @XmlElement
     public String getAuthor()
     {
         return author;
@@ -100,7 +100,6 @@ public class RemotePlugin
         this.author = author;
     }
 
-    @XmlElement
     public String getDescription()
     {
         return description;
@@ -111,7 +110,6 @@ public class RemotePlugin
         this.description = description;
     }
 
-    @XmlElement
     public boolean isEnabled()
     {
         return enabled;
@@ -122,7 +120,6 @@ public class RemotePlugin
         this.enabled = enabled;
     }
 
-    @XmlElement
     public int getNumUsers() {
         return numUsers;
     }
@@ -131,22 +128,20 @@ public class RemotePlugin
         this.numUsers = numUsers;
     }
 
-    @XmlElement
-    public boolean isCanUninstall()
+    public boolean isUninstall()
     {
-        return canUninstall;
+        return uninstall;
     }
 
-    public void setCanUninstall(boolean canUninstall)
+    public void setUninstall(boolean uninstall)
     {
-        this.canUninstall = canUninstall;
+        this.uninstall = uninstall;
     }
 
     public void setForkedPluginKey(String ntohing)
     {
     }
 
-    @XmlElement
     public String getForkedPluginKey()
     {
         if (key != null && key.contains("-fork-"))
@@ -156,4 +151,53 @@ public class RemotePlugin
         return null;
     }
 
+    public boolean isEdit()
+    {
+        return edit;
+    }
+
+    public void setEdit(boolean edit)
+    {
+        this.edit = edit;
+    }
+
+    public boolean isFork()
+    {
+        return fork;
+    }
+
+    public void setFork(boolean fork)
+    {
+        this.fork = fork;
+    }
+
+    public boolean isEnable()
+    {
+        return enable;
+    }
+
+    public void setEnable(boolean enable)
+    {
+        this.enable = enable;
+    }
+
+    public boolean isDisable()
+    {
+        return disable;
+    }
+
+    public void setDisable(boolean disable)
+    {
+        this.disable = disable;
+    }
+
+    public boolean isDownload()
+    {
+        return download;
+    }
+
+    public void setDownload(boolean download)
+    {
+        this.download = download;
+    }
 }

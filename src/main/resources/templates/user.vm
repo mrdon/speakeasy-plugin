@@ -2,7 +2,6 @@
     <script type="text/javascript">
         var staticResourcesPrefix = "$staticResourcesPrefix";
         var contextPath = "$contextPath";
-        var plugins = $plugins.renderJson;
         var currentUser = "$user";
         var product = "$product";
     </script>
@@ -82,7 +81,9 @@ mvn {product}:run
                 </tr>
             </thead>
             <tbody id="plugins-table-body">
-
+                #foreach ($plugin in $plugins)
+                    $rowRenderer.render($plugin)
+                #end
             </tbody>
         </table>
 

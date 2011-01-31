@@ -113,8 +113,14 @@ public class SpeakeasyManager implements DisposableBean
         List<String> accessList = data.getUsersList(plugin.getKey());
         remotePlugin.setEnabled(accessList.contains(userName));
         remotePlugin.setNumUsers(accessList.size());
-        boolean canUninstall = userName.equals(remotePlugin.getAuthor()) && onlyContainsSpeakeasyModules(plugin);
-        remotePlugin.setCanUninstall(canUninstall);
+        boolean isAuthor = userName.equals(remotePlugin.getAuthor());
+        boolean canUninstall = isAuthor;// && onlyContainsSpeakeasyModules(plugin);
+        remotePlugin.setUninstall(canUninstall);
+        remotePlugin.setEdit(isAuthor);
+        remotePlugin.setFork(remotePlugin.getForkedPluginKey() == null);
+        remotePlugin.setEnable(!remotePlugin.isEnabled());
+        remotePlugin.setDisable(remotePlugin.isEnabled());
+        remotePlugin.setDownload(true);
         return remotePlugin;
     }
 
