@@ -88,6 +88,11 @@ class GeneratedDescriptorsManager
                 regs.addAll(registerEachModuleDescriptor());
                 registrations = regs;
             }
+            else
+            {
+                log.info("Not exposing '{}' as there are unresolved module dependencies: {}", descriptor.getCompleteKey(),
+                        unresolvedExternalDependencies);
+            }
         }
     }
 
@@ -132,8 +137,8 @@ class GeneratedDescriptorsManager
 
             Element root = createElement("web-resource");
             Element dep = root.addElement("dependency");
-            dep.setText(descriptor.getCompleteKey() + "-modules-" + descriptor.getState());
-            addUserTransformers(descriptor.getUsers(), root);
+            dep.setText(descriptor.getCompleteKey() + "-modules");
+            //addUserTransformers(descriptor.getUsers(), root);
             Element jsTransform = getJsTransformation(root);
             Element trans = jsTransform.addElement("transformer");
             trans.addAttribute("key", "commonjs-module-entry");
@@ -142,7 +147,7 @@ class GeneratedDescriptorsManager
             Element res = root.addElement("resource");
             res.addAttribute("type", "download");
             res.addAttribute("name", id + ".js");
-            res.addAttribute("location", descriptor.getLocation() + id + ".js");
+            res.addAttribute("location", modules.getModulePath(id));
 
             webResourceModuleDescriptor.init(dummyPlugin, createDescriptorElement(id, root));
 
@@ -162,12 +167,14 @@ class GeneratedDescriptorsManager
                 return trans;
             }
         }
-        throw new IllegalStateException("Couldn't find js transform");
+        Element trans = root.addElement("transformation");
+        trans.addAttribute("extension", "js");
+        return trans;
     }
 
     private Element createDescriptorElement(String id, Element root)
     {
-        root.addAttribute("key", id + "-" + descriptor.getState());
+        root.addAttribute("key", id.replace('/', '_'));
         if (log.isErrorEnabled())
         {
             StringWriter out = new StringWriter();
@@ -195,7 +202,7 @@ class GeneratedDescriptorsManager
         Element root = createElement("web-resource");
         Element depElement = root.addElement("dependency");
         depElement.setText("com.atlassian.labs.speakeasy-plugin:yabble");
-        addUserTransformers(descriptor.getUsers(), root);
+        //addUserTransformers(descriptor.getUsers(), root);
         Element jsTransform = getJsTransformation(root);
         Element trans = jsTransform.addElement("transformer");
         trans.addAttribute("key", "commonjs-module");
@@ -206,7 +213,7 @@ class GeneratedDescriptorsManager
             Element res = root.addElement("resource");
             res.addAttribute("type", "download");
             res.addAttribute("name", id + ".js");
-            res.addAttribute("location", descriptor.getLocation() + id + ".js");
+            res.addAttribute("location", modules.getModulePath(id));
         }
 
 
@@ -215,6 +222,24 @@ class GeneratedDescriptorsManager
             Element extDep = root.addElement("dependency");
             extDep.setText(dep);
         }
+
+        for (String resourcePath : modules.getResources())
+        {
+            Element res = root.addElement("resource");
+            res.addAttribute("type", "download");
+            res.addAttribute("name", resourcePath);
+            res.addAttribute("location", descriptor.getLocation() + "/" + resourcePath);
+        }
+
+        Element muTrans = root.addElement("transformation");
+        muTrans.addAttribute("extension", "mu");
+        trans = muTrans.addElement("transformer");
+        trans.addAttribute("key", "template");
+
+        Element cssTrans = root.addElement("transformation");
+        cssTrans.addAttribute("extension", "css");
+        trans = cssTrans.addElement("transformer");
+        trans.addAttribute("key", "cssVariables");
 
         webResourceModuleDescriptor.init(dummyPlugin,
                 createDescriptorElement(descriptor.getKey() + "-modules", root));

@@ -100,7 +100,7 @@ public class UserProfileRenderer
             InputStream in = null;
             try
             {
-                in = getClass().getClassLoader().getResourceAsStream("user/row.mu");
+                in = getClass().getClassLoader().getResourceAsStream("modules/speakeasy/user/row.mu");
                 this.rowTemplate = Mustache.compiler().compile(new InputStreamReader(in));
             }
             finally

@@ -110,7 +110,8 @@ mvn {product}:run
                 This is a proof of concept of accessing PAC via Javascript + REST + DropBox + YQL from within the browser. It's all very shiny, new and cool.
             </p>
             <p>
-                When Speakeasy is released there will be a PAC extensions category per product. Those contents will show up below. We will also indicate which ones you already have installed etc.
+                When Speakeasy is released there will be a PAC extensions category per product. Those contents will show up
+                below. We will also indicate which ones you already have installed etc.
             </p>
             <p>
                 If you want to share extensions, for now please attach them to <a href="https://extranet.atlassian.com/x/pJrEbw">this EAC page</a>.
@@ -137,6 +138,6 @@ align="absmiddle" src="$staticResourcesPrefix/download/resources/com.atlassian.l
 </div>
 
 <script type="text/javascript">
-        initSpeakeasy();
+        require.run('speakeasy/user/user').initSpeakeasy();
 </script>
 </div>

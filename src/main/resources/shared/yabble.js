@@ -549,10 +549,11 @@
 	// Start an application via a main program module
 	Yabble.run = function(program, cb) {
 		program = _mainProgram = resolveModuleId(program, '');
-		Yabble.ensure([program], function(require) {
+		/*Yabble.ensure([program], function(require) {
 			require(program);
 			if (cb != null) { cb(); }
-		});
+		});*/
+        return createRequireFunc(".")(program);
 	};
 	
 	// Reset internal state. Used mostly for unit tests. 

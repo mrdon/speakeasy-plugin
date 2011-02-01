@@ -25,20 +25,15 @@ public class CommonJsModulesDescriptor extends AbstractModuleDescriptor<CommonJs
     private final BundleContext bundleContext;
     private final PluginEventManager pluginEventManager;
     private final PluginAccessor pluginAccessor;
-    private final String state;
-    private final List<String> users;
     private Bundle pluginBundle;
     private volatile CommonJsModules modules;
     private volatile GeneratedDescriptorsManager generatedDescriptorsManager;
 
-    public CommonJsModulesDescriptor(BundleContext bundleContext, PluginEventManager pluginEventManager, PluginAccessor pluginAccessor,
-                                     String state, List<String> users)
+    public CommonJsModulesDescriptor(BundleContext bundleContext, PluginEventManager pluginEventManager, PluginAccessor pluginAccessor)
     {
         this.bundleContext = bundleContext;
         this.pluginEventManager = pluginEventManager;
         this.pluginAccessor = pluginAccessor;
-        this.state = state;
-        this.users = users;
     }
 
 
@@ -54,7 +49,7 @@ public class CommonJsModulesDescriptor extends AbstractModuleDescriptor<CommonJs
 
         for (Element dep : new HashSet<Element>(element.elements("dependency")))
         {
-            dependencies.add(dep.getTextTrim() + "-" + state);
+            dependencies.add(dep.getTextTrim());
         }
     }
 
@@ -105,15 +100,5 @@ public class CommonJsModulesDescriptor extends AbstractModuleDescriptor<CommonJs
     Set<String> getDependencies()
     {
         return dependencies;
-    }
-
-    public List<String> getUsers()
-    {
-        return users;
-    }
-
-    public String getState()
-    {
-        return state;
     }
 }

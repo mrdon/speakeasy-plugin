@@ -14,20 +14,16 @@
         <url-pattern>/speakeasy/unsubscribe</url-pattern>
     </servlet>
 
+    <commonjs key="userModules" />
+
     <web-resource key="user">
-        <transformation extension="mu">
-            <transformer key="template"/>
-        </transformation>
         <dependency>${project.groupId}.${project.artifactId}:shared</dependency>
-        <resource type="download" name="user.js" location="user/user.js"/>
-        <resource type="download" name="user.css" location="user/user.css"/>
-        <resource type="download" name="extensionRow.js" location="user/row.mu"/>
-        <resource type="download" name="images/" location="user/images/"/>
+        <dependency>${project.groupId}.${project.artifactId}:speakeasy_user_user</dependency>
     </web-resource>
 
     <web-resource key="user-jira" application="jira">
         <context>speakeasy.user-profile</context>
-        <resource type="download" name="user-jira.css" location="user/user-jira.css"/>
+        <resource type="download" name="user-jira.css" location="jira/user-jira.css"/>
     </web-resource>
 
     <web-resource key="shared">
@@ -37,27 +33,23 @@
     </web-resource>
 
     <web-resource key="codemirror">
-        <resource type="download" name="js/" location="ide/codemirror/js/"/>
-        <resource type="download" name="css/" location="ide/codemirror/css/"/>
+        <resource type="download" name="js/" location="codemirror/js/"/>
+        <resource type="download" name="css/" location="codemirror/css/"/>
     </web-resource>
 
     <web-resource key="treeview">
-        <resource type="download" name="jquery.treeview.js" location="ide/treeview/jquery.treeview.js"/>
-        <resource type="download" name="jquery.treeview.css" location="ide/treeview/jquery.treeview.css"/>
-        <resource type="download" name="images/" location="ide/treeview/images/"/>
+        <resource type="download" name="jquery.treeview.js" location="treeview/jquery.treeview.js"/>
+        <resource type="download" name="jquery.treeview.css" location="treeview/jquery.treeview.css"/>
+        <resource type="download" name="images/" location="treeview/images/"/>
     </web-resource>
 
     <web-resource key="ide">
-        <transformation extension="mu">
-            <transformer key="template"/>
-        </transformation>
         <dependency>${project.groupId}.${project.artifactId}:treeview</dependency>
-        <resource type="download" name="ide.js" location="ide/ide.js"/>
-        <resource type="download" name="ide.css" location="ide/ide.css"/>
-        <resource type="download" name="ideDialog.js" location="ide/dialog.mu"/>
+        <!--resource type="download" name="ideDialog.js" location="ide/dialog.mu"/-->
     </web-resource>
 
     <web-resource-transformer key="template" class="com.atlassian.labs.speakeasy.ui.mustache.TemplateTransformer"/>
+    <web-resource-transformer key="cssVariables" class="com.atlassian.labs.speakeasy.ui.CssVariableTransformer"/>
 
     <web-resource-transformer key="userTransformer" class="com.atlassian.labs.speakeasy.UserScopedTransformer"/>
 
@@ -86,8 +78,8 @@
     <module-type key="scoped-web-item"
                  class="com.atlassian.labs.speakeasy.webfragment.SpeakeasyWebItemModuleDescriptor"/>
 
-    <module-type key="scoped-modules"
-                 class="com.atlassian.labs.speakeasy.commonjs.SpeakeasyCommonJsModulesDescriptor"/>
+    <!--module-type key="scoped-modules"
+                 class="com.atlassian.labs.speakeasy.commonjs.SpeakeasyCommonJsModulesDescriptor"/-->
 
     <!-- product accessors -->
 
@@ -169,6 +161,5 @@
     <component-import key="appprops" interface="com.atlassian.sal.api.ApplicationProperties" />
 
     <module-type key="commonjs" class="com.atlassian.labs.speakeasy.commonjs.descriptor.CommonJsModulesDescriptor" />
-
 
 </atlassian-plugin>

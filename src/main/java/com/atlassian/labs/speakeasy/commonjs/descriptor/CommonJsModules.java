@@ -5,6 +5,8 @@ import com.atlassian.plugin.Plugin;
 import com.atlassian.plugin.PluginParseException;
 import com.atlassian.plugin.util.PluginUtils;
 import com.atlassian.util.concurrent.CopyOnWriteMap;
+import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
 import org.apache.commons.io.IOUtils;
 import org.osgi.framework.Bundle;
 
@@ -29,6 +31,7 @@ public class CommonJsModules
     private final Plugin plugin;
     private final Bundle pluginBundle;
     private final String location;
+    private final Set<String> resources = Sets.newHashSet();
 
     public CommonJsModules(Plugin plugin, Bundle pluginBundle, String location)
     {
@@ -54,6 +57,11 @@ public class CommonJsModules
         return new HashSet<String>(scannedModules.keySet());
     }
 
+    public Set<String> getResources()
+    {
+        return resources;
+    }
+
     public String getModuleContents(String moduleName)
     {
         ScannedModule scannedModule = scannedModules.get(moduleName);
@@ -65,11 +73,11 @@ public class CommonJsModules
         URL url = null;
         if (!Boolean.getBoolean(PluginUtils.ATLASSIAN_DEV_MODE))
         {
-            url = plugin.getResource(getModuleActualPath(moduleName, true));
+            url = plugin.getResource(getMinifiedModulePath(moduleName));
         }
         if (url == null)
         {
-            url = plugin.getResource(getModuleActualPath(moduleName, false));
+            url = plugin.getResource(scannedModule.getActualPath());
         }
 
         long lastModified = determineLastModified(url);
@@ -93,7 +101,7 @@ public class CommonJsModules
         }
     }
 
-    private String getModuleActualPath(String moduleName, boolean minVersion)
+    private String getMinifiedModulePath(String moduleName)
     {
         StringBuilder sb = new StringBuilder();
         sb.append(location);
@@ -102,10 +110,7 @@ public class CommonJsModules
             sb.append("/");
         }
         sb.append(moduleName);
-        if (minVersion)
-        {
-            sb.append("-min");
-        }
+        sb.append("-min");
         sb.append(".js");
         return sb.toString();
     }
@@ -117,7 +122,7 @@ public class CommonJsModules
         {
 
             String modulePath = fullPath.substring(location.length());
-            String moduleName = modulePath.substring(0, modulePath.lastIndexOf(".js"));
+            String moduleName = modulePath.substring(0, modulePath.lastIndexOf("."));
 
             URL moduleUrl = pluginBundle.getEntry(fullPath);
             ScannedModule module = scanModule(moduleName, moduleUrl);
@@ -145,7 +150,7 @@ public class CommonJsModules
 
         return new ScannedModule(
                 moduleName,
-                deps,
+                moduleUrl.getPath(), deps,
                 determineLastModified(moduleUrl)
         );
     }
@@ -190,11 +195,23 @@ public class CommonJsModules
             {
                 scanPath(bundle, fullPath, paths);
             }
-            else if (fullPath.endsWith(".js") && !fullPath.endsWith("-min.js"))
+            else if (!fullPath.contains("-min."))
             {
-                paths.add(fullPath);
+                if (fullPath.endsWith(".js") || fullPath.endsWith(".mu"))
+                {
+                    paths.add(fullPath);
+                }
+                else
+                {
+                    resources.add(fullPath.substring(location.length()));
+                }
             }
         }
+    }
+
+    public String getModulePath(String id)
+    {
+        return scannedModules.get(id).getActualPath();
     }
 
     private static class ScannedModule
@@ -202,10 +219,12 @@ public class CommonJsModules
         private final String id;
         private final Set<String> dependencies;
         private final long lastModified;
+        private final String actualPath;
 
-        public ScannedModule(String id, Set<String> dependencies, long lastModified)
+        public ScannedModule(String id, String actualPath, Set<String> dependencies, long lastModified)
         {
             this.id = id;
+            this.actualPath = actualPath;
             this.dependencies = dependencies;
             this.lastModified = lastModified;
         }
@@ -223,6 +242,11 @@ public class CommonJsModules
         public long getLastModified()
         {
             return lastModified;
+        }
+
+        public String getActualPath()
+        {
+            return actualPath;
         }
     }
 }

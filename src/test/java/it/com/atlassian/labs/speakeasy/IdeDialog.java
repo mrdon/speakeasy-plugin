@@ -61,7 +61,7 @@ public class IdeDialog
             public Object apply(@Nullable Object from)
             {
                 System.out.print(".");
-                return driver.executeScript("return window.retrieveEditor() != null");
+                return driver.executeScript("return require.run('speakeasy/user/ide/ide').text() != null");
             }
         });
     }
@@ -99,7 +99,7 @@ public class IdeDialog
                 return editorText != null && editorText.length() > 0;
             }
         });
-        driver.executeScript("window.editor.setCode(arguments[0])", contents);
+        driver.executeScript("require.run('speakeasy/user/ide/ide').text(arguments[0])", contents);
         dialogElement.findElement(By.className("ide-save")).click();
         driver.waitUntil(new Function()
         {
@@ -118,7 +118,7 @@ public class IdeDialog
 
     private String getEditorContents()
     {
-         return (String) JavaScriptUtils.execute("return window.retrieveEditor().text()", driver);
+         return (String) JavaScriptUtils.execute("return require.run('speakeasy/user/ide/ide').text()", driver);
     }
 
 }

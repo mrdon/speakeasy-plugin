@@ -52,7 +52,7 @@ public class TemplateDownloadableResource implements DownloadableResource
 
         OutputStreamWriter out = new OutputStreamWriter(outputStream);
         try {
-            out.write("var " + variableName + " = \"");
+            out.write("require.def('" + variableName + "', ['require', 'exports'], function(require, exports) {exports.render = function(data) {return require('speakeasy/mustache').to_html(\"");
 
             InputStreamReader reader = new InputStreamReader(new ByteArrayInputStream(buffer.toByteArray()));
 
@@ -78,7 +78,7 @@ public class TemplateDownloadableResource implements DownloadableResource
                     out.write(c);
                 }
             }
-            out.write("\";");
+            out.write("\", data);};});");
             out.flush();
         } catch (IOException e) {
             throw new DownloadException("Unable to read resource", e);

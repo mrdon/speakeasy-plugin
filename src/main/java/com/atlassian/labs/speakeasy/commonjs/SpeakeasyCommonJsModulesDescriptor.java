@@ -58,7 +58,7 @@ public class SpeakeasyCommonJsModulesDescriptor extends AbstractModuleDescriptor
 
     public Iterable<CommonJsModulesDescriptor> getDescriptorsToExposeForUsers(List<String> users, int state)
     {
-        CommonJsModulesDescriptor descriptor = new CommonJsModulesDescriptor(bundleContext, pluginEventManager, pluginAccessor, String.valueOf(state), users);
+        CommonJsModulesDescriptor descriptor = new CommonJsModulesDescriptor(bundleContext, pluginEventManager, pluginAccessor); //, String.valueOf(state), users);
         Element config = originalElement.createCopy();
         config.addAttribute("key", config.attributeValue("key"));
         descriptor.init(getPlugin(), config);
