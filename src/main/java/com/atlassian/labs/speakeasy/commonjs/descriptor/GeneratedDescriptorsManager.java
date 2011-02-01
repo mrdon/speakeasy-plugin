@@ -1,12 +1,12 @@
 package com.atlassian.labs.speakeasy.commonjs.descriptor;
 
+import com.atlassian.labs.speakeasy.util.DefaultPluginModuleTracker;
+import com.atlassian.labs.speakeasy.util.PluginModuleTracker;
 import com.atlassian.plugin.ModuleDescriptor;
 import com.atlassian.plugin.Plugin;
 import com.atlassian.plugin.PluginAccessor;
 import com.atlassian.plugin.event.PluginEventManager;
 import com.atlassian.plugin.impl.StaticPlugin;
-import com.atlassian.plugin.tracker.DefaultPluginModuleTracker;
-import com.atlassian.plugin.tracker.PluginModuleTracker;
 import com.atlassian.plugin.webresource.WebResourceModuleDescriptor;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
@@ -26,7 +26,6 @@ import java.util.List;
 import java.util.Set;
 import java.util.concurrent.CopyOnWriteArraySet;
 
-import static com.atlassian.labs.speakeasy.util.WebResourceUtil.addUserTransformers;
 import static org.dom4j.DocumentHelper.createElement;
 
 /**
@@ -38,7 +37,7 @@ class GeneratedDescriptorsManager
     private final Bundle pluginBundle;
     private final CommonJsModules modules;
 
-    private final PluginModuleTracker<CommonJsModules,CommonJsModulesDescriptor> modulesTracker;
+    private final DefaultPluginModuleTracker<CommonJsModules,CommonJsModulesDescriptor> modulesTracker;
     private final Set<String> unresolvedExternalDependencies;
     private final Set<String> resolvedExternalModules;
 

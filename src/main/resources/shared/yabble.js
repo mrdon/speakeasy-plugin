@@ -34,7 +34,7 @@
 	var _moduleRoot = '',
 		_modules,
 		_callbacks,
-		_fetchFunc,
+		_fetchFunc = function(){},
 		_timeoutLength = 20000,
 		_mainProgram,
         _moduleUrlMap = {};
@@ -295,7 +295,7 @@
 	};
 	
 	// Load an unwrapped module using XHR and eval()
-	var loadModuleByEval = _fetchFunc = function(moduleId) {
+	var loadModuleByEval = function(moduleId) {
 		var timeoutHandle;
 		
 		var errorFunc = function() {

@@ -180,7 +180,7 @@ function addPACRow(item) {
 
 function initSpeakeasy() {
     pluginsTable = $("#plugins-table-body");
-    $('a', pluginsTable).live('click', function(e) {
+    pluginsTable.delegate("a", 'click', function(e) {
         e.preventDefault();
         var $link = $(e.target);
         var $row = $link.closest('tr');
