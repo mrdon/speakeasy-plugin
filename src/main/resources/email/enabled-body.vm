@@ -1,0 +1,20 @@
+$enablerFullName ($enabler) has enabled your Speakeasy extension '$plugin.name'.
+
+#if (!$commonExtensions.isEmpty())
+
+You have these enabled extensions in common with $enablerFullName:
+
+#foreach ($ext in $commonExtensions)
+ * $ext.name
+#end
+#end
+
+#if (!$suggestedExtensions.isEmpty())
+$enablerFullName has these extensions enabled you may want to try:
+
+#foreach ($ext in $suggestedExtensions)
+ * $ext.name
+#end
+#end
+
+This extension has now been enabled by $enabledTotal#if ($enabledTotal > 1) people.#else person.#end

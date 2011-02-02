@@ -19,6 +19,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.*;
 
+import static it.com.atlassian.labs.speakeasy.ProductUtils.flushMailQueue;
 import static java.lang.Integer.parseInt;
 
 /**
@@ -27,7 +28,7 @@ import static java.lang.Integer.parseInt;
 public class SpeakeasyUserPage implements Page
 {
     @Inject
-    AtlassianWebDriver driver;
+    protected AtlassianWebDriver driver;
 
     @Inject
     ProductInstance productInstance;
@@ -50,6 +51,7 @@ public class SpeakeasyUserPage implements Page
     @WaitUntil
     public void waitForTableLoad()
     {
+        driver.elementIsVisible(By.id("plugins-table-body"));
         driver.waitUntil(new Function()
         {
             public Object apply(Object from)
@@ -93,10 +95,11 @@ public class SpeakeasyUserPage implements Page
         return "/plugins/servlet/speakeasy/user";
     }
 
-    public SpeakeasyUserPage enablePlugin(String pluginKey)
+    public SpeakeasyUserPage enablePlugin(String pluginKey) throws IOException
     {
         getPluginRow(pluginKey).findElement(By.className("pk-enable")).click();
         waitForMessages();
+        flushMailQueue(productInstance);
         return this;
     }
 

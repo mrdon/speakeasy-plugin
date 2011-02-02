@@ -1,0 +1,13 @@
+$forkerFullName ($forker) has forked your Speakeasy extension '$plugin.name' with the following description:
+
+$forkedPlugin.description
+
+#if (!$otherForkedExtensions.isEmpty())
+
+$forkerFullName has also forked:
+
+#foreach ($ext in $otherForkedExtensions)
+
+ * $ext.name by $productAccessor.getUserFullName($ext.author)
+#end
+#end

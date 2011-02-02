@@ -19,6 +19,8 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 
+import static it.com.atlassian.labs.speakeasy.ProductUtils.flushMailQueue;
+
 /**
  *
  */
@@ -41,6 +43,9 @@ public class ForkDialog
 
     private final String pluginKey;
 
+    @Inject
+    private ProductInstance productInstance;
+
     public ForkDialog(String pluginKey)
     {
         this.pluginKey = pluginKey;
@@ -62,7 +67,13 @@ public class ForkDialog
     public SpeakeasyUserPage fork() throws IOException
     {
         forkSubmit.click();
-        return binder.bind(SpeakeasyUserPage.class).waitForMessages();
+        driver.waitUntilElementIsNotVisible(By.id("fork-dialog"));
+        driver.waitUntilElementIsNotVisible(By.className("waiting"));
+        SpeakeasyUserPage page = binder.bind(SpeakeasyUserPage.class);
+        page.waitForMessages();
+        flushMailQueue(productInstance);
+        return page;
     }
+
 
 }

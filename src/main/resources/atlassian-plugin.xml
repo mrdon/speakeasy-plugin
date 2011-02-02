@@ -72,6 +72,8 @@
 
     <component-import key="pluginController" interface="com.atlassian.plugin.PluginController"/>
     <component-import key="pluginAccessor" interface="com.atlassian.plugin.PluginAccessor"/>
+    <component-import key="pluginEventManager" interface="com.atlassian.plugin.event.PluginEventManager" />
+    <component-import key="webResourceManager" interface="com.atlassian.plugin.webresource.WebResourceManager" />
 
     <module-type key="scoped-web-resource" class="com.atlassian.labs.speakeasy.SpeakeasyWebResourceModuleDescriptor"/>
 
@@ -85,6 +87,7 @@
 
     <component key="productAccessor" class="com.atlassian.labs.speakeasy.product.ConfluenceProductAccessor"
                application="com.atlassian.confluence"/>
+    <component-import key="atlassianUserManager" interface="com.atlassian.user.UserManager" application="confluence" />
     <component key="productAccessor" class="com.atlassian.labs.speakeasy.product.JiraProductAccessor"
                application="jira"/>
     <component key="productAccessor" class="com.atlassian.labs.speakeasy.product.RefappProductAccessor"

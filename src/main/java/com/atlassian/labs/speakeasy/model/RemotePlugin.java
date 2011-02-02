@@ -5,6 +5,7 @@ import com.atlassian.plugin.Plugin;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlRootElement;
+import java.util.Comparator;
 import java.util.HashMap;
 
 /**
@@ -12,7 +13,7 @@ import java.util.HashMap;
  */
 @XmlRootElement(name = "plugin")
 @XmlAccessorType(XmlAccessType.PROPERTY)
-public class RemotePlugin
+public class RemotePlugin implements Comparable
 {
     private String key;
 
@@ -199,5 +200,10 @@ public class RemotePlugin
     public void setDownload(boolean download)
     {
         this.download = download;
+    }
+
+    public int compareTo(Object o)
+    {
+        return getName().compareTo(((RemotePlugin)o).getName());
     }
 }

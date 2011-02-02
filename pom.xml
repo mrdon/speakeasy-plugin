@@ -61,9 +61,21 @@
             <scope>provided</scope>
         </dependency>
         <dependency>
+            <groupId>com.atlassian.confluence</groupId>
+            <artifactId>confluence</artifactId>
+            <version>${confluence.version}</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
             <version>4.6</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>dumbster</groupId>
+            <artifactId>dumbster</artifactId>
+            <version>1.6</version>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -117,6 +129,12 @@
             <groupId>org.springframework.osgi</groupId>
             <artifactId>spring-osgi-core</artifactId>
             <version>1.2.1</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-email</artifactId>
+            <version>1.2</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
@@ -195,12 +213,13 @@
             <plugin>
                 <groupId>com.atlassian.maven.plugins</groupId>
                 <artifactId>maven-refapp-plugin</artifactId>
-                <version>3.3-m7</version>
+                <version>3.3-m8</version>
                 <extensions>true</extensions>
                 <configuration>
                     <systemPropertyVariables>
                         <xvfb.enable>${xvfb.enable}</xvfb.enable>
                         <webdriver.browser>firefox-3.6</webdriver.browser>
+                        <atlassian.mail.senddisabled>false</atlassian.mail.senddisabled>
                     </systemPropertyVariables>
                     <instructions>
                         <Import-Package>
@@ -213,22 +232,37 @@
                         <product>
                             <id>refapp</id>
                             <version>${platform.version}</version>
+                            <libArtifacts>
+                                <libArtifact>
+                                    <groupId>org.apache.commons</groupId>
+                                    <artifactId>commons-email</artifactId>
+                                    <version>1.2</version>
+                                </libArtifact>
+                                <libArtifact>
+                                    <groupId>javax.mail</groupId>
+                                    <artifactId>mail</artifactId>
+                                    <version>1.4.1</version>
+                                </libArtifact>
+                            </libArtifacts>
                         </product>
                         <product>
                             <id>confluence</id>
                             <version>${confluence.version}</version>
                             <dataVersion>${confluence.data.version}</dataVersion>
+                            <productDataPath>${basedir}/src/test/resources/confluence-generated-test-resources.zip</productDataPath>
                         </product>
                         <product>
                             <instanceId>confluence-4.0</instanceId>
                             <id>confluence</id>
                             <version>${confluence.4.0.version}</version>
                             <dataVersion>${confluence.data.version}</dataVersion>
+                            <productDataPath>${basedir}/src/test/resources/confluence-generated-test-resources.zip</productDataPath>
                         </product>
                         <product>
                             <id>jira</id>
                             <version>${jira.version}</version>
                             <dataVersion>${jira.data.version}</dataVersion>
+                            <productDataPath>${basedir}/src/test/resources/jira-generated-test-resources.zip</productDataPath>
                         </product>
                     </products>
                     <testGroups>

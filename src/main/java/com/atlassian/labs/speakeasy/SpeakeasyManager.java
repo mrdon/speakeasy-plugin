@@ -5,6 +5,7 @@ import com.atlassian.labs.speakeasy.install.PluginManager;
 import com.atlassian.labs.speakeasy.install.PluginOperationFailedException;
 import com.atlassian.labs.speakeasy.model.RemotePlugin;
 import com.atlassian.labs.speakeasy.model.UserPlugins;
+import com.atlassian.labs.speakeasy.product.ProductAccessor;
 import com.atlassian.plugin.ModuleDescriptor;
 import com.atlassian.plugin.Plugin;
 import com.atlassian.plugin.PluginAccessor;
@@ -25,9 +26,11 @@ import org.osgi.framework.ServiceRegistration;
 import org.springframework.beans.factory.DisposableBean;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 import static com.atlassian.labs.speakeasy.util.BundleUtil.findBundleForPlugin;
@@ -43,17 +46,19 @@ public class SpeakeasyManager implements DisposableBean
     private final BundleContext bundleContext;
     private final SpeakeasyData data;
     private final PluginManager pluginManager;
+    private final ProductAccessor productAccessor;
 
     private final Map<String, ServiceRegistration> serviceRegistrations;
     private final PluginEventManager pluginEventManager;
     private ServiceRegistration userTransformerService;
-    public SpeakeasyManager(BundleContext bundleContext, PluginAccessor pluginAccessor, PluginEventManager pluginEventManager, HostContainer hostContainer, SpeakeasyData data, PluginManager pluginManager)
+    public SpeakeasyManager(BundleContext bundleContext, PluginAccessor pluginAccessor, PluginEventManager pluginEventManager, HostContainer hostContainer, SpeakeasyData data, PluginManager pluginManager, ProductAccessor productAccessor)
     {
         this.bundleContext = bundleContext;
         this.pluginAccessor = pluginAccessor;
         this.hostContainer = hostContainer;
         this.data = data;
         this.pluginManager = pluginManager;
+        this.productAccessor = productAccessor;
         this.serviceRegistrations = new ConcurrentHashMap<String, ServiceRegistration>();
         this.pluginEventManager = pluginEventManager;
         pluginEventManager.register(this);
@@ -146,7 +151,7 @@ public class SpeakeasyManager implements DisposableBean
         return true;
     }
 
-    public List<String> allowUserAccess(String pluginKey, String user)
+    public List<String> allowUserAccess(final String pluginKey, final String user)
     {
         List<String> affectedPluginKeys = new ArrayList<String>();
         List<String> accessList = data.getUsersList(pluginKey);
@@ -172,7 +177,71 @@ public class SpeakeasyManager implements DisposableBean
                 }
             }
         }
+
+        sendEnabledEmail(pluginKey, user);
         return affectedPluginKeys;
+    }
+
+    private void sendEnabledEmail(final String pluginKey, final String user)
+    {
+        final String userFullName = productAccessor.getUserFullName(user);
+        String pluginAuthor = data.getPluginAuthor(pluginKey);
+        if (pluginAuthor != null && !user.equals(pluginAuthor))
+        {
+            final Set<RemotePlugin> commonExtensions = new HashSet<RemotePlugin>();
+            final Set<RemotePlugin> suggestedExtensions = new HashSet<RemotePlugin>();
+            for (RemotePlugin plugin : getAllSpeakeasyPlugins(user))
+            {
+                if (plugin.isEnabled())
+                {
+                    List<String> accessList = data.getUsersList(plugin.getKey());
+                    if (accessList.contains(pluginAuthor))
+                    {
+                        commonExtensions.add(plugin);
+                    }
+                    else
+                    {
+                        suggestedExtensions.add(plugin);
+                    }
+                }
+
+            }
+            productAccessor.sendEmail(pluginAuthor, "email/enabled-subject.vm", "email/enabled-body.vm", new HashMap<String,Object>() {{
+                put("plugin", getRemotePlugin(pluginKey, user));
+                put("enablerFullName", userFullName);
+                put("enabler", user);
+                put("commonExtensions", commonExtensions);
+                put("suggestedExtensions", suggestedExtensions);
+                put("enabledTotal", data.getUsersList(pluginKey).size());
+            }});
+        }
+    }
+
+    private void sendForkedEmail(final String pluginKey, final String forkedPluginKey, final String user)
+    {
+        final String userFullName = productAccessor.getUserFullName(user);
+        String pluginAuthor = data.getPluginAuthor(pluginKey);
+        if (pluginAuthor != null && !user.equals(pluginAuthor))
+        {
+            final Set<RemotePlugin> otherForkedExtensions = new HashSet<RemotePlugin>();
+            for (RemotePlugin plugin : getAllSpeakeasyPlugins(user))
+            {
+                if (user.equals(plugin.getAuthor()) && plugin.getForkedPluginKey() != null && !forkedPluginKey.equals(plugin.getKey()))
+                {
+                    otherForkedExtensions.add(getRemotePlugin(plugin.getForkedPluginKey(), user));
+                }
+
+            }
+            productAccessor.sendEmail(pluginAuthor, "email/forked-subject.vm", "email/forked-body.vm", new HashMap<String,Object>() {{
+                RemotePlugin originalPlugin = getRemotePlugin(pluginKey, user);
+                put("plugin", originalPlugin);
+                put("productAccessor", productAccessor);
+                put("forkedPlugin", getRemotePlugin(forkedPluginKey, user));
+                put("forkerFullName", userFullName);
+                put("forker", user);
+                put("otherForkedExtensions", otherForkedExtensions);
+            }});
+        }
     }
 
     public String disallowUserAccess(String pluginKey, String user)
@@ -283,11 +352,15 @@ public class SpeakeasyManager implements DisposableBean
     private List<DescriptorGenerator<ModuleDescriptor>> findGeneratorsInPlugin(String pluginKey)
     {
         List<DescriptorGenerator<ModuleDescriptor>> generators = new ArrayList<DescriptorGenerator<ModuleDescriptor>>();
-        for (ModuleDescriptor moduleDescriptor : pluginAccessor.getPlugin(pluginKey).getModuleDescriptors())
+        Plugin plugin = pluginAccessor.getPlugin(pluginKey);
+        if (plugin != null)
         {
-            if (moduleDescriptor instanceof DescriptorGenerator)
+            for (ModuleDescriptor moduleDescriptor : plugin.getModuleDescriptors())
             {
-                generators.add((DescriptorGenerator) moduleDescriptor);
+                if (moduleDescriptor instanceof DescriptorGenerator)
+                {
+                    generators.add((DescriptorGenerator) moduleDescriptor);
+                }
             }
         }
         return generators;
@@ -365,7 +438,7 @@ public class SpeakeasyManager implements DisposableBean
         List<String> keysModified = new ArrayList<String>();
         RemotePlugin plugin = getRemotePlugin(pluginKey, user);
         String originalKey = plugin.getForkedPluginKey();
-        if (originalKey != null)
+        if (originalKey != null && pluginAccessor.getPlugin(originalKey) != null)
         {
             if (hasAccess(pluginKey, user))
             {
@@ -389,6 +462,10 @@ public class SpeakeasyManager implements DisposableBean
         {
             modifiedKeys.add(pluginKey);
             allowUserAccess(forkedPluginKey, remoteUser);
+        }
+        if (forkedPluginKey != null)
+        {
+            sendForkedEmail(pluginKey, forkedPluginKey, remoteUser);
         }
         return getUserAccessList(remoteUser, modifiedKeys);
     }

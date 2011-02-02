@@ -83,8 +83,8 @@ function openForkDialog(pluginKey, link, attachedRow) {
     dialog.addPanel("Fork", forkDialogContents, "panel-body");
     dialog.addButton("Fork", function (dialog) {
         var description = $('#fork-description').val();
-        dialog.remove();
         forkPlugin(link, attachedRow, description);
+        dialog.remove();
     }, "fork-submit");
     dialog.addButton("Cancel", function (dialog) {
         dialog.remove();

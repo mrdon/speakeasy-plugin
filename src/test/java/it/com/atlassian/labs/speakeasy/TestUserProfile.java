@@ -6,16 +6,32 @@ import com.atlassian.pageobjects.page.HomePage;
 import com.atlassian.pageobjects.page.LoginPage;
 import com.atlassian.plugin.test.PluginJarBuilder;
 import com.atlassian.plugin.util.zip.FileUnzipper;
+import com.atlassian.webdriver.AtlassianWebDriver;
 import com.atlassian.webdriver.jira.JiraTestedProduct;
+import com.atlassian.webdriver.pageobjects.WebDriverTester;
 import com.atlassian.webdriver.refapp.RefappTestedProduct;
+import com.dumbster.smtp.SimpleSmtpServer;
+import com.dumbster.smtp.SmtpMessage;
 import com.google.common.collect.Sets;
+import com.sun.mail.smtp.SMTPMessage;
+import it.com.atlassian.labs.speakeasy.jira.JiraSpeakeasyUserPage;
 import org.apache.commons.io.FileUtils;
+import org.junit.After;
+import org.junit.AfterClass;
+import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.netbeans.lib.cvsclient.commandLine.command.log;
+import org.openqa.selenium.WebDriver;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.security.event.authorization.LoggerListener;
 
+import javax.mail.MessagingException;
 import java.io.File;
 import java.io.IOException;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import java.util.zip.ZipEntry;
@@ -26,18 +42,39 @@ import static org.junit.Assert.*;
 public class TestUserProfile
 {
     private static TestedProduct<?> product = TestedProductFactory.create(System.getProperty("testedProductClass", RefappTestedProduct.class.getName()));
+    private SimpleSmtpServer mailServer;
+    private static Logger log = LoggerFactory.getLogger(TestUserProfile.class);
+
+    @Before
+    public void login()
+    {
+        product.visit(LoginPage.class).loginAsSysAdmin(HomePage.class);
+    }
+
+    @After
+    public void logout()
+    {
+        ((WebDriverTester)product.getTester()).getDriver().manage().deleteAllCookies();
+    }
 
     @BeforeClass
-    public static void login()
+    public static void initPages()
     {
-        if (!product.visit(HomePage.class).getHeader().isLoggedIn())
-        {
-            product.visit(LoginPage.class).loginAsSysAdmin(HomePage.class);
-        }
         if (product instanceof JiraTestedProduct)
         {
             product.getPageBinder().override(SpeakeasyUserPage.class, JiraSpeakeasyUserPage.class);
         }
+    }
+
+    @Before
+    public void startMailServer()
+    {
+        mailServer = SimpleSmtpServer.start(2525);
+    }
+    @After
+    public void stopMailServer()
+    {
+        mailServer.stop();
     }
 
     @Test
@@ -116,7 +153,7 @@ public class TestUserProfile
     }
 
     @Test
-    public void testEnableTestPlugin()
+    public void testEnableTestPlugin() throws IOException
     {
         SpeakeasyUserPage page = product.visit(SpeakeasyUserPage.class);
 
@@ -174,12 +211,61 @@ public class TestUserProfile
     }
 
     @Test
-    public void testForkPlugin() throws IOException
+    public void testEmailAuthorOnEnable() throws IOException, MessagingException
     {
         File jar = buildSimplePluginFile();
 
+        product.visit(SpeakeasyUserPage.class)
+                .uploadPlugin(jar);
+
+        logout();
+        SpeakeasyUserPage page = product.visit(LoginPage.class)
+               .login("barney", "barney", SpeakeasyUserPage.class)
+               .enablePlugin("test-2");
+
+        assertEmailExists("admin@example.com", "Barney User has enabled your Speakeasy extension!", asList(
+                "you may want to try",
+                "Test Plugin"
+        ));
+
+        page.disablePlugin("test-2");
+        logout();
+
+        product.visit(LoginPage.class)
+           .loginAsSysAdmin(SpeakeasyUserPage.class)
+           .enablePlugin("test-2");
+        logout();
+        page = product.visit(LoginPage.class)
+               .login("barney", "barney", SpeakeasyUserPage.class)
+               .enablePlugin("test-2");
+
+        assertEmailExists("admin@example.com", "Barney User has enabled your Speakeasy extension!", asList(
+                "extensions in common",
+                "Test Plugin"
+        ));
+        page.disablePlugin("test-2");
+        logout();
+        product.visit(LoginPage.class)
+           .loginAsSysAdmin(SpeakeasyUserPage.class)
+           .disablePlugin("test-2");
+    }
+
+    @Test
+    public void testForkPlugin() throws IOException, MessagingException
+    {
+        File jar = buildSimplePluginFile("test", "First Plugin");
+        File jar2 = buildSimplePluginFile("test-2", "Second Plugin");
+
         SpeakeasyUserPage page = product.visit(SpeakeasyUserPage.class)
                 .uploadPlugin(jar)
+                .uploadPlugin(jar2);
+
+        logout();
+        page = product.visit(LoginPage.class)
+                .login("barney", "barney", SpeakeasyUserPage.class)
+                .openForkDialog("test")
+                    .setDescription("Fork Description")
+                    .fork()
                 .enablePlugin("test-2")
                 .openForkDialog("test-2")
                     .setDescription("Fork Description")
@@ -188,31 +274,41 @@ public class TestUserProfile
         List<String> messages = page.getSuccessMessages();
         assertEquals(1, messages.size());
         assertTrue(messages.get(0).contains("was forked successfully"));
-        assertTrue(page.getPluginKeys().contains("test-2-fork-admin"));
+        assertTrue(page.getPluginKeys().contains("test-2-fork-barney"));
+        assertEmailExists("admin@example.com", "Barney User has forked your Speakeasy extension!", asList(
+                "'Second Plugin'",
+                "First Plugin by A. D. Ministrator (Sysadmin)"
+        ));
 
-        SpeakeasyUserPage.PluginRow row = page.getPlugins().get("test-2-fork-admin");
-        assertEquals("test-2-fork-admin", row.getKey());
+        SpeakeasyUserPage.PluginRow row = page.getPlugins().get("test-2-fork-barney");
+        assertEquals("test-2-fork-barney", row.getKey());
         assertEquals("Fork Description", row.getDescription());
         assertFalse(page.isPluginEnabled("test-2"));
-        assertTrue(page.isPluginEnabled("test-2-fork-admin"));
+        assertTrue(page.isPluginEnabled("test-2-fork-barney"));
 
         page.enablePlugin("test-2");
-        assertFalse(page.isPluginEnabled("test-2-fork-admin"));
-        page.enablePlugin("test-2-fork-admin");
+        assertFalse(page.isPluginEnabled("test-2-fork-barney"));
+        page.enablePlugin("test-2-fork-barney");
         assertFalse(page.isPluginEnabled("test-2"));
 
         // verify on reload
         page = product.visit(SpeakeasyUserPage.class);
-        assertTrue(page.getPluginKeys().contains("test-2-fork-admin"));
+        assertTrue(page.getPluginKeys().contains("test-2-fork-barney"));
 
-        row = page.getPlugins().get("test-2-fork-admin");
-        assertEquals("test-2-fork-admin", row.getKey());
+        row = page.getPlugins().get("test-2-fork-barney");
+        assertEquals("test-2-fork-barney", row.getKey());
         assertEquals("Fork Description", row.getDescription());
 
-        page.uninstallPlugin("test-2-fork-admin");
+        page.uninstallPlugin("test-2-fork-barney");
         assertTrue(page.isPluginEnabled("test-2"));
         assertTrue(product.visit(SpeakeasyUserPage.class).isPluginEnabled("test-2"));
-        page.uninstallPlugin("test-2");
+        page.uninstallPlugin("test-fork-barney");
+
+        logout();
+        page = product.visit(LoginPage.class)
+                      .loginAsSysAdmin(SpeakeasyUserPage.class)
+                      .uninstallPlugin("test-2")
+                      .uninstallPlugin("test");
     }
 
     @Test
@@ -289,12 +385,42 @@ public class TestUserProfile
         assertFalse(page.canUninstall("plugin-tests"));
     }
 
-    private File buildSimplePluginFile()
+    private void assertEmailExists(String to, String title, List<String> bodyStrings) throws MessagingException, IOException
+    {
+        SmtpMessage lastMessage = null;
+        assertTrue(mailServer.getReceivedEmailSize() > 0);
+
+        Iterator itr = mailServer.getReceivedEmail();
+        while(itr.hasNext())
+        {
+            lastMessage = (SmtpMessage) itr.next();
+        }
+        assertNotNull(lastMessage);
+        log.error("msg: " + lastMessage.toString());
+        String subject = lastMessage.getHeaderValue("Subject");
+        assertEquals("[test] " + title, subject);
+        assertFalse(subject.contains("$"));
+        String body = lastMessage.getBody();
+        assertFalse(body.contains("$"));
+        for (String toMatch : bodyStrings)
+        {
+            assertTrue(body.contains(toMatch));
+        }
+
+        assertTrue(lastMessage.getHeaderValue("To").contains(to));
+    }
+
+    private File buildSimplePluginFile() throws IOException
+    {
+        return buildSimplePluginFile("test-2", "Test Plugin");
+    }
+
+    private File buildSimplePluginFile(String key, String name)
             throws IOException
     {
         return new PluginJarBuilder()
                 .addFormattedResource("atlassian-plugin.xml",
-                        "<atlassian-plugin key='test-2' pluginsVersion='2' name='Test Plugin'>",
+                        "<atlassian-plugin key='" + key + "' pluginsVersion='2' name='" + name + "'>",
                         "    <plugin-info>",
                         "        <version>1</version>",
                         "        <description>Desc</description>",

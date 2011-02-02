@@ -12,5 +12,18 @@
         <context>atl.general</context>
     </scoped-web-resource>
 
+    <servlet key="mailFlush" class="com.atlassian.labs.speakeasy.plugin.test.RefappMailQueueFlushServlet" application="refapp">
+        <url-pattern>/mail-flush</url-pattern>
+    </servlet>
+
+    <servlet key="mailFlush" class="com.atlassian.labs.speakeasy.plugin.test.JiraMailQueueFlushServlet" application="jira">
+        <url-pattern>/mail-flush</url-pattern>
+    </servlet>
+
+    <servlet key="mailFlush" class="com.atlassian.labs.speakeasy.plugin.test.ConfluenceMailQueueFlushServlet" application="confluence">
+        <url-pattern>/mail-flush</url-pattern>
+    </servlet>
+    <component-import key="mail" interface="com.atlassian.core.task.MultiQueueTaskManager" application="confluence" />
+
 
 </atlassian-plugin>
