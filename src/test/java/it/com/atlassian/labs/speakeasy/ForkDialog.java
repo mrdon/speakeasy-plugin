@@ -67,8 +67,8 @@ public class ForkDialog
     public SpeakeasyUserPage fork() throws IOException
     {
         forkSubmit.click();
-        driver.waitUntilElementIsNotVisible(By.id("fork-dialog"));
-        driver.waitUntilElementIsNotVisible(By.className("waiting"));
+        driver.waitUntilElementIsNotLocated(By.id("fork-dialog"));
+        driver.waitUntilElementIsNotLocated(By.className("waiting"));
         SpeakeasyUserPage page = binder.bind(SpeakeasyUserPage.class);
         page.waitForMessages();
         flushMailQueue(productInstance);
