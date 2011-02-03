@@ -5,6 +5,7 @@ import com.atlassian.plugin.PluginAccessor;
 import com.atlassian.plugin.PluginParseException;
 import com.atlassian.plugin.descriptors.AbstractModuleDescriptor;
 import com.atlassian.plugin.event.PluginEventManager;
+import com.atlassian.plugin.hostcontainer.HostContainer;
 import com.atlassian.plugin.osgi.factory.OsgiPlugin;
 import com.atlassian.util.concurrent.NotNull;
 import org.dom4j.Element;
@@ -25,15 +26,17 @@ public class CommonJsModulesDescriptor extends AbstractModuleDescriptor<CommonJs
     private final BundleContext bundleContext;
     private final PluginEventManager pluginEventManager;
     private final PluginAccessor pluginAccessor;
+    private final HostContainer hostContainer;
     private Bundle pluginBundle;
     private volatile CommonJsModules modules;
     private volatile GeneratedDescriptorsManager generatedDescriptorsManager;
 
-    public CommonJsModulesDescriptor(BundleContext bundleContext, PluginEventManager pluginEventManager, PluginAccessor pluginAccessor)
+    public CommonJsModulesDescriptor(BundleContext bundleContext, PluginEventManager pluginEventManager, PluginAccessor pluginAccessor, HostContainer hostContainer)
     {
         this.bundleContext = bundleContext;
         this.pluginEventManager = pluginEventManager;
         this.pluginAccessor = pluginAccessor;
+        this.hostContainer = hostContainer;
     }
 
 
@@ -65,7 +68,7 @@ public class CommonJsModulesDescriptor extends AbstractModuleDescriptor<CommonJs
         super.enabled();
         pluginBundle = findBundleForPlugin(plugin);
         modules = new CommonJsModules(plugin, pluginBundle, location);
-        generatedDescriptorsManager = new GeneratedDescriptorsManager(pluginBundle, modules, pluginAccessor, pluginEventManager, this);
+        generatedDescriptorsManager = new GeneratedDescriptorsManager(pluginBundle, modules, pluginAccessor, pluginEventManager, this, hostContainer);
     }
 
     @Override

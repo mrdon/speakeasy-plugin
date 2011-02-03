@@ -2,10 +2,12 @@ package com.atlassian.labs.speakeasy.commonjs.descriptor;
 
 import com.atlassian.labs.speakeasy.util.DefaultPluginModuleTracker;
 import com.atlassian.labs.speakeasy.util.PluginModuleTracker;
+import com.atlassian.labs.speakeasy.util.WebResourceUtil;
 import com.atlassian.plugin.ModuleDescriptor;
 import com.atlassian.plugin.Plugin;
 import com.atlassian.plugin.PluginAccessor;
 import com.atlassian.plugin.event.PluginEventManager;
+import com.atlassian.plugin.hostcontainer.HostContainer;
 import com.atlassian.plugin.impl.StaticPlugin;
 import com.atlassian.plugin.webresource.WebResourceModuleDescriptor;
 import com.google.common.collect.Lists;
@@ -36,6 +38,7 @@ class GeneratedDescriptorsManager
     private final CommonJsModulesDescriptor descriptor;
     private final Bundle pluginBundle;
     private final CommonJsModules modules;
+    private final HostContainer hostContainer;
 
     private final DefaultPluginModuleTracker<CommonJsModules,CommonJsModulesDescriptor> modulesTracker;
     private final Set<String> unresolvedExternalDependencies;
@@ -44,11 +47,12 @@ class GeneratedDescriptorsManager
     private Set<ServiceRegistration> registrations;
     private final Logger log = LoggerFactory.getLogger(GeneratedDescriptorsManager.class);
 
-    GeneratedDescriptorsManager(Bundle pluginBundle, CommonJsModules modules, PluginAccessor pluginAccessor, PluginEventManager pluginEventManager, CommonJsModulesDescriptor descriptor)
+    GeneratedDescriptorsManager(Bundle pluginBundle, CommonJsModules modules, PluginAccessor pluginAccessor, PluginEventManager pluginEventManager, CommonJsModulesDescriptor descriptor, HostContainer hostContainer)
     {
         this.pluginBundle = pluginBundle;
         this.modules = modules;
         this.descriptor = descriptor;
+        this.hostContainer = hostContainer;
         this.unresolvedExternalDependencies = new HashSet<String>(modules.getExternalModuleDependencies());
         this.resolvedExternalModules = new CopyOnWriteArraySet<String>();
         modulesTracker = new DefaultPluginModuleTracker<CommonJsModules, CommonJsModulesDescriptor>(pluginAccessor, pluginEventManager,
@@ -130,7 +134,7 @@ class GeneratedDescriptorsManager
         Set<ServiceRegistration> registrations = new HashSet<ServiceRegistration>();
         for (String id : modules.getModuleIds())
         {
-            WebResourceModuleDescriptor webResourceModuleDescriptor = new WebResourceModuleDescriptor();
+            WebResourceModuleDescriptor webResourceModuleDescriptor = WebResourceUtil.instantiateDescriptor(hostContainer);
             Plugin dummyPlugin = new StaticPlugin();
             dummyPlugin.setKey(descriptor.getPluginKey());
 
@@ -193,7 +197,7 @@ class GeneratedDescriptorsManager
 
     private ServiceRegistration registerBatchedModulesDescriptor()
     {
-        WebResourceModuleDescriptor webResourceModuleDescriptor = new WebResourceModuleDescriptor();
+        WebResourceModuleDescriptor webResourceModuleDescriptor = WebResourceUtil.instantiateDescriptor(hostContainer);
         Plugin dummyPlugin = new StaticPlugin();
         dummyPlugin.setKey(descriptor.getPluginKey());
 

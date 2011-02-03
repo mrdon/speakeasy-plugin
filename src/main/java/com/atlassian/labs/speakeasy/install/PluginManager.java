@@ -52,8 +52,8 @@ public class PluginManager
     private final ProductAccessor productAccessor;
 
     private static final Iterable<Pattern> pluginContentsWhitelist = asList(
-            Pattern.compile("it/.*\\.class", Pattern.CASE_INSENSITIVE),
             Pattern.compile(".*\\.js", Pattern.CASE_INSENSITIVE),
+            Pattern.compile(".*\\.mu", Pattern.CASE_INSENSITIVE),
             Pattern.compile(".*\\.gif", Pattern.CASE_INSENSITIVE),
             Pattern.compile(".*\\.png", Pattern.CASE_INSENSITIVE),
             Pattern.compile(".*\\.jpg", Pattern.CASE_INSENSITIVE),
@@ -71,7 +71,8 @@ public class PluginManager
             "plugin-info",
             "scoped-web-resource",
             "scoped-web-item",
-            "scoped-web-section");
+            "scoped-web-section",
+            "commonjs");
 
     public PluginManager(PluginController pluginController, PluginAccessor pluginAccessor, SpeakeasyData data, BundleContext bundleContext, TemplateRenderer templateRenderer, UserManager userManager, ProductAccessor productAccessor)
     {

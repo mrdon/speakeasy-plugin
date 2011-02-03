@@ -4,6 +4,7 @@ import com.atlassian.labs.speakeasy.util.WebResourceUtil;
 import com.atlassian.plugin.Plugin;
 import com.atlassian.plugin.PluginParseException;
 import com.atlassian.plugin.descriptors.AbstractModuleDescriptor;
+import com.atlassian.plugin.hostcontainer.HostContainer;
 import com.atlassian.plugin.webresource.WebResourceModuleDescriptor;
 import org.dom4j.Element;
 import org.dom4j.io.OutputFormat;
@@ -24,6 +25,12 @@ public class SpeakeasyWebResourceModuleDescriptor extends AbstractModuleDescript
 {
     private Element originalElement;
     private static final Logger log = LoggerFactory.getLogger(SpeakeasyWebResourceModuleDescriptor.class);
+    private final HostContainer hostContainer;
+
+    public SpeakeasyWebResourceModuleDescriptor(HostContainer hostContainer)
+    {
+        this.hostContainer = hostContainer;
+    }
 
     @Override
     public void init(Plugin plugin, Element element) throws PluginParseException
@@ -40,18 +47,7 @@ public class SpeakeasyWebResourceModuleDescriptor extends AbstractModuleDescript
 
     public Iterable<WebResourceModuleDescriptor> getDescriptorsToExposeForUsers(List<String> users, int state)
     {
-        WebResourceModuleDescriptor descriptor;
-        try
-        {
-            Class cls = getClass().getClassLoader().loadClass("com.atlassian.confluence.plugin.webresource.ConfluenceWebResourceModuleDescriptor");
-            descriptor = (WebResourceModuleDescriptor) cls.getConstructor().newInstance();
-        }
-        catch (Exception e)
-        {
-            // not confluence so ignore
-
-            descriptor = new WebResourceModuleDescriptor();
-        }
+        WebResourceModuleDescriptor descriptor = WebResourceUtil.instantiateDescriptor(hostContainer);
 
         Element userElement = (Element) originalElement.clone();
         for (Element dep : new ArrayList<Element>(userElement.elements("dependency")))
@@ -61,6 +57,8 @@ public class SpeakeasyWebResourceModuleDescriptor extends AbstractModuleDescript
         userElement.addAttribute("key", userElement.attributeValue("key") + "-" + state);
 
         WebResourceUtil.addUserTransformers(users, userElement);
+        //Element cond = userElement.addElement("condition");
+        //cond.addAttribute("class", UserScopedCondition.class.getName());
 
         if (log.isDebugEnabled())
         {
