@@ -224,17 +224,10 @@ function initSpeakeasy() {
     };
 
     uploadForm.change(function() {
-        setTimeout(changeForm, 1);
+        setTimeout(changeForm, 100);
     });
 
     uploadForm.resetForm();
-
-    AJS.whenIType('shift+e').execute(function() {
-            var selection = getSelected();
-            if(selection && (selection = new String(selection).replace(/^\s+|\s+$/g,''))) {
-                handleSelection(selection);
-            }
-        });
 
     $('#available-extensions-tab').bind('click.loadextensions', function(e) {
         loadAvailableExtensions();

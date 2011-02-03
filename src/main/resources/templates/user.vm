@@ -140,4 +140,5 @@ align="absmiddle" src="$staticResourcesPrefix/download/resources/com.atlassian.l
 <script type="text/javascript">
         require.run('speakeasy/user/user').initSpeakeasy();
 </script>
+    <div id="speakeasyLoaded"></div>
 </div>

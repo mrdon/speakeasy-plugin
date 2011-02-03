@@ -5,6 +5,7 @@ import com.atlassian.plugin.Plugin;
 import com.atlassian.plugin.PluginParseException;
 import com.atlassian.plugin.descriptors.AbstractModuleDescriptor;
 import com.atlassian.plugin.hostcontainer.HostContainer;
+import com.atlassian.plugin.impl.AbstractDelegatingPlugin;
 import com.atlassian.plugin.webresource.WebResourceModuleDescriptor;
 import org.dom4j.Element;
 import org.dom4j.io.OutputFormat;
@@ -57,8 +58,7 @@ public class SpeakeasyWebResourceModuleDescriptor extends AbstractModuleDescript
         userElement.addAttribute("key", userElement.attributeValue("key") + "-" + state);
 
         WebResourceUtil.addUserTransformers(users, userElement);
-        //Element cond = userElement.addElement("condition");
-        //cond.addAttribute("class", UserScopedCondition.class.getName());
+        WebResourceUtil.addUsersCondition(users, userElement);
 
         if (log.isDebugEnabled())
         {
@@ -76,7 +76,21 @@ public class SpeakeasyWebResourceModuleDescriptor extends AbstractModuleDescript
 
             log.debug("Creating dynamic descriptor of key {}: {}", getCompleteKey(), out.toString());
         }
-        descriptor.init(getPlugin(), userElement);
+        descriptor.init(new AbstractDelegatingPlugin(getPlugin())
+        {
+            @Override
+            public <T> Class<T> loadClass(String clazz, Class<?> callingClass) throws ClassNotFoundException
+            {
+                if (clazz.equals(UserScopedCondition.class.getName()))
+                {
+                    return (Class<T>) UserScopedCondition.class;
+                }
+                else
+                {
+                    return super.loadClass(clazz, callingClass);
+                }
+            }
+        }, userElement);
         return Collections.singleton(descriptor);
     }
 

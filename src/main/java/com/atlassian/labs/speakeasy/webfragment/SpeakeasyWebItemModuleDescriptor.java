@@ -1,7 +1,7 @@
 package com.atlassian.labs.speakeasy.webfragment;
 
 import com.atlassian.labs.speakeasy.DescriptorGenerator;
-import com.atlassian.labs.speakeasy.UserScopedCondition;
+import com.atlassian.labs.speakeasy.util.WebResourceUtil;
 import com.atlassian.plugin.Plugin;
 import com.atlassian.plugin.PluginParseException;
 import com.atlassian.plugin.descriptors.AbstractModuleDescriptor;
@@ -9,9 +9,6 @@ import com.atlassian.plugin.impl.AbstractDelegatingPlugin;
 import com.atlassian.plugin.web.WebInterfaceManager;
 import com.atlassian.plugin.web.descriptors.DefaultWebItemModuleDescriptor;
 import com.atlassian.plugin.web.descriptors.WebItemModuleDescriptor;
-import com.atlassian.plugin.web.model.WebLabel;
-import com.atlassian.sal.api.user.UserManager;
-import org.apache.commons.lang.StringUtils;
 import org.dom4j.Element;
 import org.osgi.framework.BundleContext;
 
@@ -64,11 +61,7 @@ public class SpeakeasyWebItemModuleDescriptor extends AbstractModuleDescriptor<V
         Element userElement = (Element) originalElement.clone();
         userElement.addAttribute("key", userElement.attributeValue("key") + "-" + state);
 
-        Element condElement = userElement.addElement("condition");
-        condElement.addAttribute("class", UserScopedCondition.class.getName());
-        Element paramElement = condElement.addElement("param");
-        paramElement.addAttribute("name", "users");
-        paramElement.setText(users != null ? StringUtils.join(users, "|") : "");
+        WebResourceUtil.addUsersCondition(users, userElement);
 
         descriptor.init(new AbstractDelegatingPlugin(getPlugin())
         {
@@ -87,4 +80,5 @@ public class SpeakeasyWebItemModuleDescriptor extends AbstractModuleDescriptor<V
         }, userElement);
         return Collections.singleton(descriptor);
     }
+
 }

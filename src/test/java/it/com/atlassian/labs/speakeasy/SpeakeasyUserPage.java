@@ -7,6 +7,7 @@ import com.atlassian.pageobjects.TestedProduct;
 import com.atlassian.pageobjects.binder.WaitUntil;
 import com.atlassian.webdriver.AtlassianWebDriver;
 import com.atlassian.webdriver.utils.Check;
+import com.atlassian.webdriver.utils.by.ByHelper;
 import com.google.common.base.Function;
 import org.openqa.selenium.By;
 import org.openqa.selenium.NoSuchElementException;
@@ -14,6 +15,7 @@ import org.openqa.selenium.RenderedWebElement;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 
+import javax.annotation.Nullable;
 import javax.inject.Inject;
 import java.io.File;
 import java.io.IOException;
@@ -49,16 +51,9 @@ public class SpeakeasyUserPage implements Page
     private TestedProduct testedProduct;
 
     @WaitUntil
-    public void waitForTableLoad()
+    public void waitForSpeakeasyInit()
     {
-        driver.elementIsVisible(By.id("plugins-table-body"));
-        driver.waitUntil(new Function()
-        {
-            public Object apply(Object from)
-            {
-                return getPluginKeys().size() > 0;
-            }
-        });
+        driver.waitUntilElementIsLocated(By.id("speakeasyLoaded"));
     }
 
     public List<String> getPluginKeys()
@@ -130,7 +125,13 @@ public class SpeakeasyUserPage implements Page
     public SpeakeasyUserPage uploadPlugin(File jar)
     {
         pluginFileUpload.sendKeys(jar.getAbsolutePath());
-        waitForMessages();
+        driver.waitUntil(new Function()
+        {
+            public Object apply(Object from)
+            {
+                return "".equals(pluginFileUpload.getValue());
+            }
+        });
         return this;
     }
 
