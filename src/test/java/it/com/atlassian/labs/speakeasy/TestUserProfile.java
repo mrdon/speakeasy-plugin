@@ -92,6 +92,7 @@ public class TestUserProfile
         product.visit(SpeakeasyUserPage.class)
                 .uploadPlugin(buildSimplePluginFile());
         IdeDialog ide =  product.visit(SpeakeasyUserPage.class)
+                .uploadPlugin(buildSimplePluginFile())
                 .openEditDialog("test-2");
 
         assertEquals(asList("bar/baz.js", "atlassian-plugin.xml", "foo.js"), ide.getFileNames());
