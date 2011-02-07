@@ -190,7 +190,7 @@ class GeneratedDescriptorsManager
             {
                 e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
             }
-            log.error("Generated descriptor:\n" + out.toString());
+            log.debug("Generated descriptor:\n" + out.toString());
         }
         return root;
     }
