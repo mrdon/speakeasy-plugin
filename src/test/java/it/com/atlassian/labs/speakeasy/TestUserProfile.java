@@ -346,7 +346,7 @@ public class TestUserProfile
                 .build();
 
         SpeakeasyUserPage page = product.visit(SpeakeasyUserPage.class)
-                .uploadPlugin(jar);
+                .uploadPluginExpectingFailure(jar);
 
         List<String> messages = page.getErrorMessages();
         assertEquals(1, messages.size());

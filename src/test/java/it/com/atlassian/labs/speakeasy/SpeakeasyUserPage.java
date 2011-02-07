@@ -125,6 +125,20 @@ public class SpeakeasyUserPage implements Page
 
     public SpeakeasyUserPage uploadPlugin(File jar)
     {
+        upload(jar);
+        Validate.isTrue(getErrorMessages().isEmpty(), "Error installing '" + jar.getPath() + "': " + getErrorMessages());
+        return this;
+    }
+
+    public SpeakeasyUserPage uploadPluginExpectingFailure(File jar)
+    {
+        upload(jar);
+        Validate.isTrue(!getErrorMessages().isEmpty(), "Expected error installing plugin");
+        return this;
+    }
+
+    private void upload(File jar)
+    {
         pluginFileUpload.sendKeys(jar.getAbsolutePath());
         driver.waitUntil(new Function()
         {
@@ -133,8 +147,6 @@ public class SpeakeasyUserPage implements Page
                 return "".equals(pluginFileUpload.getValue());
             }
         });
-        Validate.isTrue(getErrorMessages().isEmpty(), "Error installing '" + jar.getPath() + "': " + getErrorMessages());
-        return this;
     }
 
     public SpeakeasyUserPage waitForMessages()
