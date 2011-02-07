@@ -9,6 +9,7 @@ import com.atlassian.webdriver.AtlassianWebDriver;
 import com.atlassian.webdriver.utils.Check;
 import com.atlassian.webdriver.utils.by.ByHelper;
 import com.google.common.base.Function;
+import org.apache.commons.lang.Validate;
 import org.openqa.selenium.By;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.RenderedWebElement;
@@ -132,6 +133,7 @@ public class SpeakeasyUserPage implements Page
                 return "".equals(pluginFileUpload.getValue());
             }
         });
+        Validate.isTrue(getErrorMessages().isEmpty(), "Error installing '" + jar.getPath() + "': " + getErrorMessages().get(0));
         return this;
     }
 
