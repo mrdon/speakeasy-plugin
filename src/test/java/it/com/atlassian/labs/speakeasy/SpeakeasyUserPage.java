@@ -133,7 +133,7 @@ public class SpeakeasyUserPage implements Page
                 return "".equals(pluginFileUpload.getValue());
             }
         });
-        Validate.isTrue(getErrorMessages().isEmpty(), "Error installing '" + jar.getPath() + "': " + getErrorMessages().get(0));
+        Validate.isTrue(getErrorMessages().isEmpty(), "Error installing '" + jar.getPath() + "': " + getErrorMessages());
         return this;
     }
 
