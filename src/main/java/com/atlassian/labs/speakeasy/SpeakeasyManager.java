@@ -27,7 +27,8 @@ import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceRegistration;
 import org.springframework.beans.factory.DisposableBean;
 
-import javax.annotation.Nullable;
+import javax.ws.rs.core.Response;
+import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -123,13 +124,17 @@ public class SpeakeasyManager implements DisposableBean
         return plugins;
     }
 
-    public RemotePlugin getRemotePlugin(String pluginKey, String userName)
+    public RemotePlugin getRemotePlugin(String pluginKey, String userName) throws PluginOperationFailedException
     {
         return getRemotePlugin(pluginKey, userName, getAllSpeakeasyPlugins());
     }
-    private RemotePlugin getRemotePlugin(String pluginKey, String userName, Iterable<Plugin> speakeasyPlugins)
+    private RemotePlugin getRemotePlugin(String pluginKey, String userName, Iterable<Plugin> speakeasyPlugins) throws PluginOperationFailedException
     {
         final Plugin plugin = pluginAccessor.getPlugin(pluginKey);
+        if (plugin == null)
+        {
+            throw new PluginOperationFailedException("Plugin not found: " + pluginKey);
+        }
 
         RemotePlugin remotePlugin = new RemotePlugin(plugin);
         remotePlugin.setAuthor(getPluginAuthor(plugin));
@@ -471,6 +476,10 @@ public class SpeakeasyManager implements DisposableBean
     {
         List<String> keysModified = new ArrayList<String>();
         RemotePlugin plugin = getRemotePlugin(pluginKey, user);
+        if (plugin == null || !plugin.isCanUninstall())
+        {
+            throw new PluginOperationFailedException("Not authorized to install " + pluginKey);
+        }
         String originalKey = plugin.getForkedPluginKey();
         if (originalKey != null && pluginAccessor.getPlugin(originalKey) != null)
         {
@@ -489,6 +498,11 @@ public class SpeakeasyManager implements DisposableBean
     public UserPlugins fork(String pluginKey, String remoteUser, String description)
             throws PluginOperationFailedException
     {
+        RemotePlugin plugin = getRemotePlugin(pluginKey, remoteUser);
+        if (!plugin.isCanFork())
+        {
+            throw new PluginOperationFailedException("Not authorized to fork " + pluginKey);
+        }
         String forkedPluginKey = pluginManager.forkAndInstall(pluginKey, remoteUser, description);
         List<String> modifiedKeys = new ArrayList<String>();
         modifiedKeys.add(forkedPluginKey);
@@ -502,5 +516,57 @@ public class SpeakeasyManager implements DisposableBean
             sendForkedEmail(pluginKey, forkedPluginKey, remoteUser);
         }
         return getUserAccessList(remoteUser, modifiedKeys);
+    }
+
+    public File getPluginFileAsProject(String pluginKey, String user)
+    {
+        RemotePlugin plugin = getRemotePlugin(pluginKey, user);
+        if (!plugin.isCanDownload())
+        {
+            throw new PluginOperationFailedException("Not authorized to download " + pluginKey);
+        }
+        return pluginManager.getPluginFileAsProject(pluginKey);
+    }
+
+    public List<String> getPluginFileNames(String pluginKey, String user)
+    {
+        RemotePlugin plugin = getRemotePlugin(pluginKey, user);
+        if (!plugin.isCanEdit())
+        {
+            throw new PluginOperationFailedException("Not authorized to view " + pluginKey);
+        }
+        return pluginManager.getPluginFileNames(pluginKey);
+    }
+
+    public Object getPluginFile(String pluginKey, String fileName, String user)
+    {
+        RemotePlugin plugin = getRemotePlugin(pluginKey, user);
+        if (!plugin.isCanEdit())
+        {
+            throw new PluginOperationFailedException("Not authorized to view " + pluginKey);
+        }
+        return pluginManager.getPluginFile(pluginKey, fileName);
+    }
+
+    public RemotePlugin saveAndRebuild(String pluginKey, String fileName, String contents, String user)
+    {
+        RemotePlugin plugin = getRemotePlugin(pluginKey, user);
+        if (!plugin.isCanEdit())
+        {
+            throw new PluginOperationFailedException("Not authorized to edit " + pluginKey);
+        }
+        String installedPluginKey = pluginManager.saveAndRebuild(pluginKey, fileName, contents, user);
+        return getRemotePlugin(installedPluginKey, user);
+    }
+
+    public UserPlugins installPlugin(File uploadedFile, String user)
+    {
+        if (!pluginManager.canUserInstallPlugins(user))
+        {
+            throw new PluginOperationFailedException("Not authorized to install plugins");
+        }
+
+        String pluginKey = pluginManager.install(uploadedFile, user);
+        return getUserAccessList(user, pluginKey);
     }
 }

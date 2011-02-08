@@ -27,14 +27,12 @@ public class UserResource
     private final SpeakeasyManager speakeasyManager;
     private final SpeakeasyData data;
     private final UserManager userManager;
-    private final PluginManager pluginManager;
 
-    public UserResource(SpeakeasyManager speakeasyManager, UserManager userManager, SpeakeasyData data, PluginManager pluginManager)
+    public UserResource(SpeakeasyManager speakeasyManager, UserManager userManager, SpeakeasyData data)
     {
         this.speakeasyManager = speakeasyManager;
         this.userManager = userManager;
         this.data = data;
-        this.pluginManager = pluginManager;
     }
 
     @GET
@@ -44,23 +42,6 @@ public class UserResource
     {
         return Response.ok(speakeasyManager.getUserAccessList(userManager.getRemoteUsername())).build();
     }
-
-    @PUT
-    @Path("devmode")
-    public Response enableDevMode()
-    {
-        data.setDeveloperModeEnabled(userManager.getRemoteUsername(), true);
-        return Response.ok().build();
-    }
-
-    @DELETE
-    @Path("devmode")
-    public Response disableDevMode()
-    {
-        data.setDeveloperModeEnabled(userManager.getRemoteUsername(), false);
-        return Response.ok().build();
-    }
-
 
     @PUT
     @Path("{pluginKey}")

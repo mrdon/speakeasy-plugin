@@ -3,7 +3,7 @@ package com.atlassian.labs.speakeasy.install;
 /**
  *
  */
-public class PluginOperationFailedException extends Exception
+public class PluginOperationFailedException extends RuntimeException
 {
     public PluginOperationFailedException()
     {

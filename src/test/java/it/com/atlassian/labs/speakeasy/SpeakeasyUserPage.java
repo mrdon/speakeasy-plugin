@@ -147,6 +147,7 @@ public class SpeakeasyUserPage implements Page
                 return "".equals(pluginFileUpload.getValue());
             }
         });
+        waitForMessages();
     }
 
     public SpeakeasyUserPage waitForMessages()

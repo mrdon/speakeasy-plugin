@@ -1,9 +1,6 @@
 package com.atlassian.labs.speakeasy.install;
 
-import com.atlassian.jira.issue.attachment.AttachmentZipKit;
-import com.atlassian.jira.util.collect.MapBuilder;
 import com.atlassian.labs.speakeasy.data.SpeakeasyData;
-import com.atlassian.labs.speakeasy.model.RemotePlugin;
 import com.atlassian.labs.speakeasy.product.ProductAccessor;
 import com.atlassian.plugin.*;
 import com.atlassian.plugin.util.WaitUntil;
@@ -86,7 +83,7 @@ public class PluginManager
         pluginArtifactFactory = new DefaultPluginArtifactFactory();
     }
 
-    public String install(String user, File pluginFile) throws PluginOperationFailedException
+    public String install(File pluginFile, String user) throws PluginOperationFailedException
     {
         if (!canUserInstallPlugins(user)) {
             throw new PluginOperationFailedException("User '" + user + "' doesn't have access to install plugins");
@@ -350,7 +347,7 @@ public class PluginManager
         }
     }
 
-    public String saveAndRebuild(String pluginKey, String user, String fileName, String contents) throws PluginOperationFailedException
+    public String saveAndRebuild(String pluginKey, String fileName, String contents, String user) throws PluginOperationFailedException
     {
         Bundle bundle = findBundleForPlugin(bundleContext, pluginKey);
         notNull(bundle);
@@ -380,7 +377,7 @@ public class PluginManager
             zout.write(data);
             zout.close();
 
-            return install(user, tmpFile);
+            return install(tmpFile, user);
         }
         catch (IOException e)
         {
@@ -434,7 +431,7 @@ public class PluginManager
 
             zout.close();
 
-            return install(user, tmpFile);
+            return install(tmpFile, user);
         }
         catch (IOException e)
         {
