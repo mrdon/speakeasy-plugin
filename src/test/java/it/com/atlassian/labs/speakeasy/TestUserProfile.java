@@ -197,6 +197,11 @@ public class TestUserProfile
         assertEquals("Test Plugin", row.getName());
         assertEquals("Desc", row.getDescription());
         assertEquals("admin", row.getAuthor());
+        assertTrue(page.canExecute("test-2", Actions.UNINSTALL));
+        assertTrue(page.canExecute("test-2", Actions.EDIT));
+        assertTrue(page.canExecute("test-2", Actions.DOWNLOAD));
+        assertFalse(page.canExecute("test-2", Actions.FORK));
+
 
         // verify on reload
         page = product.visit(SpeakeasyUserPage.class);
@@ -257,12 +262,12 @@ public class TestUserProfile
         File jar = buildSimplePluginFile("test", "First Plugin");
         File jar2 = buildSimplePluginFile("test-2", "Second Plugin");
 
-        SpeakeasyUserPage page = product.visit(SpeakeasyUserPage.class)
+        product.visit(SpeakeasyUserPage.class)
                 .uploadPlugin(jar)
                 .uploadPlugin(jar2);
 
         logout();
-        page = product.visit(LoginPage.class)
+        SpeakeasyUserPage page = product.visit(LoginPage.class)
                 .login("barney", "barney", SpeakeasyUserPage.class)
                 .openForkDialog("test")
                     .setDescription("Fork Description")
@@ -286,6 +291,11 @@ public class TestUserProfile
         assertEquals("Fork Description", row.getDescription());
         assertFalse(page.isPluginEnabled("test-2"));
         assertTrue(page.isPluginEnabled("test-2-fork-barney"));
+        assertTrue(page.canExecute("test-2-fork-barney", Actions.UNINSTALL));
+        assertTrue(!page.canExecute("test-2-fork-barney", Actions.FORK));
+        assertTrue(page.canExecute("test-2-fork-barney", Actions.DOWNLOAD));
+        assertTrue(page.canExecute("test-2-fork-barney", Actions.EDIT));
+        assertTrue(!page.canExecute("test-2", Actions.UNINSTALL));
 
         page.enablePlugin("test-2");
         assertFalse(page.isPluginEnabled("test-2-fork-barney"));
@@ -306,10 +316,10 @@ public class TestUserProfile
         page.uninstallPlugin("test-fork-barney");
 
         logout();
-        page = product.visit(LoginPage.class)
-                      .loginAsSysAdmin(SpeakeasyUserPage.class)
-                      .uninstallPlugin("test-2")
-                      .uninstallPlugin("test");
+        product.visit(LoginPage.class)
+               .loginAsSysAdmin(SpeakeasyUserPage.class)
+               .uninstallPlugin("test-2")
+               .uninstallPlugin("test");
     }
 
     @Test
@@ -367,6 +377,7 @@ public class TestUserProfile
 
         SpeakeasyUserPage page = product.visit(SpeakeasyUserPage.class);
         assertTrue(page.getPluginKeys().contains("test-2"));
+        assertTrue(page.canExecute("test-2", Actions.UNINSTALL));
         page.uninstallPlugin("test-2");
         List<String> messages = page.getSuccessMessages();
         assertEquals(1, messages.size());
@@ -379,11 +390,13 @@ public class TestUserProfile
     }
 
     @Test
-    public void testNoUninstallIfNotAuthor() throws IOException
+    public void testActionsIfNotAuthorAndNotPureSpeakeasy() throws IOException
     {
         SpeakeasyUserPage page = product.visit(SpeakeasyUserPage.class);
         assertTrue(page.getPluginKeys().contains("plugin-tests"));
-        assertFalse(page.canUninstall("plugin-tests"));
+        assertFalse(page.canExecute("plugin-tests", Actions.UNINSTALL));
+        assertFalse(page.canExecute("plugin-tests", Actions.DOWNLOAD));
+        assertFalse(page.canExecute("plugin-tests", Actions.FORK));
     }
 
     private void assertEmailExists(String to, String title, List<String> bodyStrings) throws MessagingException, IOException

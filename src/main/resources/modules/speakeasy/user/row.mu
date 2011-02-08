@@ -1,15 +1,15 @@
 <tr data-pluginKey="{{key}}"
-        {{^fork}}
+        {{#fork}}
         class="forked-row"
         {{/fork}}
         >
     <td headers="plugin-name">
         <div class="plugin-summary">
             <span class="plugin-name">
-                {{^fork}}
+                {{#fork}}
                     <span class='fork-blue'>{{name}} (forked)</span>
                 {{/fork}}
-                {{#fork}}
+                {{^fork}}
                     {{name}}
                 {{/fork}}
             </span>
@@ -17,33 +17,33 @@
             <span class="plugin-description">{{description}}</span></div>
     </td>
     <td headers="plugin-author">
-        {{^fork}}
+        {{#fork}}
             <span class='fork-blue'>{{version}}-fork-{{author}}</span>
         {{/fork}}
-        {{#fork}}
+        {{^fork}}
             {{author}}
         {{/fork}}
     </td>
     <td headers="plugin-version">{{version}}</td>
     <td headers="plugin-users">{{numUsers}}</td>
     <td headers="plugin-actions">
-        {{#enable}}
+        {{#canEnable}}
         <a class="pk-enable" href="/rest/speakeasy/1/user/{{key}}">Enable</a>
-        {{/enable}}
-        {{#disable}}
+        {{/canEnable}}
+        {{#canDisable}}
         <a class="pk-disable" href="/rest/speakeasy/1/user/{{key}}">Disable</a>
-        {{/disable}}
-        {{#fork}}
+        {{/canDisable}}
+        {{#canFork}}
         <a class="pk-fork" href="/rest/speakeasy/1/plugins/fork/{{key}}">Fork</a>
-        {{/fork}}
-        {{#edit}}
+        {{/canFork}}
+        {{#canEdit}}
         <a class="pk-edit" href="/rest/speakeasy/1/plugins/{{key}}/index">Edit</a>
-        {{/edit}}
-        {{#uninstall}}
+        {{/canEdit}}
+        {{#canUninstall}}
         <a class="pk-uninstall" href="/rest/speakeasy/1/plugins/{{key}}">Uninstall</a>
-        {{/uninstall}}
-        {{#download}}
+        {{/canUninstall}}
+        {{#canDownload}}
             <a class="pk-download" href="/rest/speakeasy/1/plugins/download/{{key}}.zip">Download</a>
-        {{/download}}
+        {{/canDownload}}
     </td>
 </tr>

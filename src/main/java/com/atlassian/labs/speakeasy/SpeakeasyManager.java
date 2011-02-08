@@ -119,13 +119,15 @@ public class SpeakeasyManager implements DisposableBean
         remotePlugin.setEnabled(accessList.contains(userName));
         remotePlugin.setNumUsers(accessList.size());
         boolean isAuthor = userName.equals(remotePlugin.getAuthor());
-        boolean canUninstall = isAuthor;// && onlyContainsSpeakeasyModules(plugin);
-        remotePlugin.setUninstall(canUninstall);
-        remotePlugin.setEdit(isAuthor);
-        remotePlugin.setFork(remotePlugin.getForkedPluginKey() == null);
-        remotePlugin.setEnable(!remotePlugin.isEnabled());
-        remotePlugin.setDisable(remotePlugin.isEnabled());
-        remotePlugin.setDownload(true);
+        boolean pureSpeakeasy = onlyContainsSpeakeasyModules(plugin);
+        boolean canUninstall = isAuthor && pureSpeakeasy;
+        remotePlugin.setFork(remotePlugin.getForkedPluginKey() != null);
+        remotePlugin.setCanUninstall(canUninstall);
+        remotePlugin.setCanEdit(isAuthor && pureSpeakeasy);
+        remotePlugin.setCanFork(!remotePlugin.isFork() && pureSpeakeasy && !isAuthor);
+        remotePlugin.setCanEnable(!remotePlugin.isEnabled());
+        remotePlugin.setCanDisable(remotePlugin.isEnabled());
+        remotePlugin.setCanDownload(pureSpeakeasy);
         return remotePlugin;
     }
 
@@ -141,9 +143,10 @@ public class SpeakeasyManager implements DisposableBean
 
     private boolean onlyContainsSpeakeasyModules(Plugin plugin)
     {
+        String stateIdentifier = String.valueOf(data.getPluginStateIdentifier(plugin.getKey()));
         for (ModuleDescriptor descriptor : plugin.getModuleDescriptors())
         {
-            if (!(descriptor instanceof DescriptorGenerator))
+            if (!(descriptor instanceof DescriptorGenerator) && !descriptor.getKey().endsWith(stateIdentifier))
             {
                 return false;
             }

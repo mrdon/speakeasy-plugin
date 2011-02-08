@@ -6,6 +6,9 @@ import com.atlassian.labs.speakeasy.install.PluginManager;
 import com.atlassian.labs.speakeasy.model.RemotePlugin;
 import com.atlassian.labs.speakeasy.model.UserPlugins;
 import com.atlassian.labs.speakeasy.product.ProductAccessor;
+import com.atlassian.plugin.Plugin;
+import com.atlassian.plugin.PluginAccessor;
+import com.atlassian.plugin.util.PluginUtils;
 import com.atlassian.plugin.webresource.UrlMode;
 import com.atlassian.plugin.webresource.WebResourceManager;
 import com.atlassian.plugins.rest.common.json.JaxbJsonMarshaller;
@@ -38,10 +41,13 @@ public class UserProfileRenderer
     private final PluginManager pluginManager;
     private final ProductAccessor productAccessor;
     private final SpeakeasyData data;
+    private final Plugin plugin;
 
-    public UserProfileRenderer(TemplateRenderer templateRenderer, SpeakeasyManager speakeasyManager, UserManager userManager, WebResourceManager webResourceManager, JaxbJsonMarshaller jaxbJsonMarshaller, PluginManager pluginManager, ProductAccessor productAccessor, SpeakeasyData data)
+
+    public UserProfileRenderer(PluginAccessor pluginAccessor, TemplateRenderer templateRenderer, SpeakeasyManager speakeasyManager, UserManager userManager, WebResourceManager webResourceManager, JaxbJsonMarshaller jaxbJsonMarshaller, PluginManager pluginManager, ProductAccessor productAccessor, SpeakeasyData data)
     {
         this.templateRenderer = templateRenderer;
+        this.plugin = pluginAccessor.getPlugin("com.atlassian.labs.speakeasy-plugin");
         this.speakeasyManager = speakeasyManager;
         this.userManager = userManager;
         this.webResourceManager = webResourceManager;
@@ -69,13 +75,12 @@ public class UserProfileRenderer
         }
 
         final UserPlugins plugins = speakeasyManager.getUserAccessList(user);
-        final String pluginJson = jaxbJsonMarshaller.marshal(plugins);
         render("templates/user" + (useUserProfileDecorator ? "-with-decorator" : "") + ".vm", ImmutableMap.<String,Object>builder().
                 put("accessList", speakeasyManager.getUserAccessList(user)).
                 put("user", user).
                 put("contextPath", req.getContextPath()).
                 put("plugins", plugins.getPlugins()).
-                put("rowRenderer", new RowRenderer()).
+                put("rowRenderer", new RowRenderer(plugin)).
                 put("installAllowed", pluginManager.canUserInstallPlugins(user)).
                 put("staticResourcesPrefix", webResourceManager.getStaticResourcePrefix(UrlMode.RELATIVE)).
                 put("product", productAccessor.getSdkName()).
@@ -95,12 +100,12 @@ public class UserProfileRenderer
     {
         private final Template rowTemplate;
 
-        public RowRenderer()
+        public RowRenderer(Plugin plugin)
         {
             InputStream in = null;
             try
             {
-                in = getClass().getClassLoader().getResourceAsStream("modules/speakeasy/user/row.mu");
+                in = plugin.getResourceAsStream("modules/speakeasy/user/row.mu");
                 this.rowTemplate = Mustache.compiler().compile(new InputStreamReader(in));
             }
             finally

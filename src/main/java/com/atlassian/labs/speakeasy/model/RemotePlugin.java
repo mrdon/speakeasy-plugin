@@ -5,7 +5,6 @@ import com.atlassian.plugin.Plugin;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlRootElement;
-import java.util.Comparator;
 import java.util.HashMap;
 
 /**
@@ -29,14 +28,15 @@ public class RemotePlugin implements Comparable
 
     private boolean enabled;
 
-    private boolean uninstall;
-    private boolean edit;
-    private boolean fork;
-    private boolean enable;
-    private boolean disable;
-    private boolean download;
+    private boolean canUninstall;
+    private boolean canEdit;
+    private boolean canFork;
+    private boolean canEnable;
+    private boolean canDisable;
+    private boolean canDownload;
 
     private HashMap<String,String> params;
+    private boolean fork;
 
     public RemotePlugin()
     {}
@@ -129,14 +129,14 @@ public class RemotePlugin implements Comparable
         this.numUsers = numUsers;
     }
 
-    public boolean isUninstall()
+    public boolean isCanUninstall()
     {
-        return uninstall;
+        return canUninstall;
     }
 
-    public void setUninstall(boolean uninstall)
+    public void setCanUninstall(boolean canUninstall)
     {
-        this.uninstall = uninstall;
+        this.canUninstall = canUninstall;
     }
 
     public void setForkedPluginKey(String ntohing)
@@ -152,16 +152,6 @@ public class RemotePlugin implements Comparable
         return null;
     }
 
-    public boolean isEdit()
-    {
-        return edit;
-    }
-
-    public void setEdit(boolean edit)
-    {
-        this.edit = edit;
-    }
-
     public boolean isFork()
     {
         return fork;
@@ -172,34 +162,54 @@ public class RemotePlugin implements Comparable
         this.fork = fork;
     }
 
-    public boolean isEnable()
+    public boolean isCanEdit()
     {
-        return enable;
+        return canEdit;
     }
 
-    public void setEnable(boolean enable)
+    public void setCanEdit(boolean canEdit)
     {
-        this.enable = enable;
+        this.canEdit = canEdit;
     }
 
-    public boolean isDisable()
+    public boolean isCanFork()
     {
-        return disable;
+        return canFork;
     }
 
-    public void setDisable(boolean disable)
+    public void setCanFork(boolean canFork)
     {
-        this.disable = disable;
+        this.canFork = canFork;
     }
 
-    public boolean isDownload()
+    public boolean isCanEnable()
     {
-        return download;
+        return canEnable;
     }
 
-    public void setDownload(boolean download)
+    public void setCanEnable(boolean canEnable)
     {
-        this.download = download;
+        this.canEnable = canEnable;
+    }
+
+    public boolean isCanDisable()
+    {
+        return canDisable;
+    }
+
+    public void setCanDisable(boolean canDisable)
+    {
+        this.canDisable = canDisable;
+    }
+
+    public boolean isCanDownload()
+    {
+        return canDownload;
+    }
+
+    public void setCanDownload(boolean canDownload)
+    {
+        this.canDownload = canDownload;
     }
 
     public int compareTo(Object o)

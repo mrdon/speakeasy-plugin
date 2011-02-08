@@ -180,23 +180,23 @@ public class SpeakeasyUserPage implements Page
 
     public SpeakeasyUserPage uninstallPlugin(String pluginKey)
     {
-        WebElement uninstallLink = getUninstallLink(pluginKey);
+        WebElement uninstallLink = getActionLink(pluginKey, Actions.UNINSTALL);
         uninstallLink.click();
         waitForMessages();
         return this;
     }
 
-    private WebElement getUninstallLink(String pluginKey)
+    private WebElement getActionLink(String pluginKey, Actions action)
     {
         WebElement pluginRow = getPluginRow(pluginKey);
-        return pluginRow.findElement(By.className("pk-uninstall"));
+        return pluginRow.findElement(By.className("pk-" + action.toString().toLowerCase()));
     }
 
-    public boolean canUninstall(String pluginKey)
+    public boolean canExecute(String pluginKey, Actions action)
     {
         try
         {
-            getUninstallLink(pluginKey);
+            getActionLink(pluginKey, action);
             return true;
         }
         catch (NoSuchElementException ex)

@@ -115,6 +115,7 @@
             <artifactId>atlassian-plugins-osgi</artifactId>
             <scope>provided</scope>
         </dependency>
+
         <dependency>
             <groupId>com.atlassian.plugins</groupId>
             <artifactId>atlassian-plugins-servlet</artifactId>
