@@ -92,6 +92,7 @@ mvn {product}:run
                 <form id="upload-form" action="$contextPath/rest/speakeasy/1/plugins" enctype="multipart/form-data" method="post">
                     <b>Upload New Extension:</b>
                     <label for="plugin-file">Install a new extension by uploading from your computer:</label> <input id="plugin-file" type="file" name="plugin-file" size="40">
+                    <button id="submit-plugin-file">Upload</button>
                 </form>
             </div>
         #end

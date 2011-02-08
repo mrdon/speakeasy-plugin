@@ -194,7 +194,8 @@ function initSpeakeasy() {
     var pluginFile = $('#plugin-file');
     var uploadForm = $('#upload-form');
 
-    var changeForm = function() {
+    var changeForm = function(e) {
+        e.preventDefault();
         uploadForm.ajaxSubmit({
             dataType: null, //"json",
             iframe: "true",
@@ -223,9 +224,7 @@ function initSpeakeasy() {
         });
     };
 
-    uploadForm.change(function() {
-        setTimeout(changeForm, 100);
-    });
+    $('#submit-plugin-file').click(changeForm);
 
     uploadForm.resetForm();
 

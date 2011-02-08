@@ -44,6 +44,8 @@ public class SpeakeasyUserPage implements Page
 
     @FindBy(name = "plugin-file")
     private WebElement pluginFileUpload;
+    @FindBy(id = "submit-plugin-file")
+    private WebElement pluginFileUploadSubmit;
 
     @FindBy(id = "aui-message-bar")
     private WebElement messageBar;
@@ -140,6 +142,7 @@ public class SpeakeasyUserPage implements Page
     private void upload(File jar)
     {
         pluginFileUpload.sendKeys(jar.getAbsolutePath());
+        pluginFileUploadSubmit.click();
         driver.waitUntil(new Function()
         {
             public Object apply(Object from)
@@ -147,7 +150,7 @@ public class SpeakeasyUserPage implements Page
                 return "".equals(pluginFileUpload.getValue());
             }
         });
-        waitForMessages();
+        //waitForMessages();
     }
 
     public SpeakeasyUserPage waitForMessages()
