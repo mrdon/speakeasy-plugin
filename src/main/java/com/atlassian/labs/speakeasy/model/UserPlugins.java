@@ -49,7 +49,7 @@ public class UserPlugins
         HashMap<String, RemotePlugin> rootsByKey = new HashMap<String,RemotePlugin>();
         for (RemotePlugin plugin : plugins)
         {
-            if (plugin.getForkedPluginKey() == null)
+            if (!plugin.isFork())
             {
                 roots.add(plugin);
                 rootsByKey.put(plugin.getKey(), plugin);

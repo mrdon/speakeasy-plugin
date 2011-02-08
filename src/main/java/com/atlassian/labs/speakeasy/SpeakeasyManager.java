@@ -20,11 +20,14 @@ import com.atlassian.plugin.osgi.external.SingleModuleDescriptorFactory;
 import com.atlassian.plugin.osgi.factory.OsgiPlugin;
 import com.atlassian.plugin.util.WaitUntil;
 import com.atlassian.plugin.webresource.transformer.WebResourceTransformerModuleDescriptor;
+import com.google.common.base.Function;
+import com.google.common.collect.Lists;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceRegistration;
 import org.springframework.beans.factory.DisposableBean;
 
+import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -85,23 +88,34 @@ public class SpeakeasyManager implements DisposableBean
     }
     public UserPlugins getUserAccessList(String userName, List<String> modifiedKeys)
     {
-        List<RemotePlugin> plugins = getAllSpeakeasyPlugins(userName);
+        List<RemotePlugin> plugins = getAllRemoteSpeakeasyPlugins(userName);
         UserPlugins userPlugins = new UserPlugins(plugins);
         userPlugins.setUpdated(modifiedKeys);
         return userPlugins;
     }
 
-    private List<RemotePlugin> getAllSpeakeasyPlugins(String userName)
+    private List<RemotePlugin> getAllRemoteSpeakeasyPlugins(final String userName)
     {
-        List<RemotePlugin> plugins = new ArrayList<RemotePlugin>();
+        final List<Plugin> rawPlugins = getAllSpeakeasyPlugins();
+        return Lists.transform(rawPlugins, new Function<Plugin,RemotePlugin>()
+        {
+            public RemotePlugin apply(Plugin from)
+            {
+                return getRemotePlugin(from.getKey(), userName, rawPlugins);
+            }
+        });
+    }
+
+    private List<Plugin> getAllSpeakeasyPlugins()
+    {
+        List<Plugin> plugins = new ArrayList<Plugin>();
         for (Plugin plugin : pluginAccessor.getPlugins())
         {
             for (ModuleDescriptor moduleDescriptor : plugin.getModuleDescriptors())
             {
                 if (moduleDescriptor instanceof DescriptorGenerator)
                 {
-                    RemotePlugin remotePlugin = getRemotePlugin(plugin.getKey(), userName);
-                    plugins.add(remotePlugin);
+                    plugins.add(plugin);
                     break;
                 }
             }
@@ -110,6 +124,10 @@ public class SpeakeasyManager implements DisposableBean
     }
 
     public RemotePlugin getRemotePlugin(String pluginKey, String userName)
+    {
+        return getRemotePlugin(pluginKey, userName, getAllSpeakeasyPlugins());
+    }
+    private RemotePlugin getRemotePlugin(String pluginKey, String userName, Iterable<Plugin> speakeasyPlugins)
     {
         final Plugin plugin = pluginAccessor.getPlugin(pluginKey);
 
@@ -128,6 +146,18 @@ public class SpeakeasyManager implements DisposableBean
         remotePlugin.setCanEnable(!remotePlugin.isEnabled());
         remotePlugin.setCanDisable(remotePlugin.isEnabled());
         remotePlugin.setCanDownload(pureSpeakeasy);
+
+        // if the user has already forked this, don't let them fork again
+        if (!remotePlugin.isFork())
+        {
+            for (Plugin plug : speakeasyPlugins)
+            {
+                if (remotePlugin.getKey().equals(RemotePlugin.getForkedPluginKey(plug.getKey())) && userName.equals(getPluginAuthor(plug)))
+                {
+                    remotePlugin.setCanFork(false);
+                }
+            }
+        }
         return remotePlugin;
     }
 
@@ -170,9 +200,10 @@ public class SpeakeasyManager implements DisposableBean
         RemotePlugin targetPlugin = getRemotePlugin(pluginKey, user);
         String parentKey = targetPlugin.getForkedPluginKey() != null ? targetPlugin.getForkedPluginKey() : targetPlugin.getKey();
 
-        for (RemotePlugin plugin : getAllSpeakeasyPlugins(user))
+        for (Plugin plugin : getAllSpeakeasyPlugins())
         {
-            if (!plugin.getKey().equals(targetPlugin.getKey()) && (plugin.getKey().equals(parentKey) || parentKey.equals(plugin.getForkedPluginKey())))
+            if (!plugin.getKey().equals(targetPlugin.getKey()) && (plugin.getKey().equals(parentKey)
+                    || parentKey.equals(RemotePlugin.getForkedPluginKey(plugin.getKey()))))
             {
                 if (removeFromAccessList(plugin.getKey(), user) != null)
                 {
@@ -193,7 +224,7 @@ public class SpeakeasyManager implements DisposableBean
         {
             final Set<RemotePlugin> commonExtensions = new HashSet<RemotePlugin>();
             final Set<RemotePlugin> suggestedExtensions = new HashSet<RemotePlugin>();
-            for (RemotePlugin plugin : getAllSpeakeasyPlugins(user))
+            for (RemotePlugin plugin : getAllRemoteSpeakeasyPlugins(user))
             {
                 if (plugin.isEnabled())
                 {
@@ -227,7 +258,7 @@ public class SpeakeasyManager implements DisposableBean
         if (pluginAuthor != null && !user.equals(pluginAuthor))
         {
             final Set<RemotePlugin> otherForkedExtensions = new HashSet<RemotePlugin>();
-            for (RemotePlugin plugin : getAllSpeakeasyPlugins(user))
+            for (RemotePlugin plugin : getAllRemoteSpeakeasyPlugins(user))
             {
                 if (user.equals(plugin.getAuthor()) && plugin.getForkedPluginKey() != null && !forkedPluginKey.equals(plugin.getKey()))
                 {

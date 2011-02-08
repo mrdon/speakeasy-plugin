@@ -286,6 +286,9 @@ public class TestUserProfile
                 "First Plugin by A. D. Ministrator (Sysadmin)"
         ));
 
+        assertFalse(page.canExecute("test", Actions.FORK));
+        assertFalse(page.canExecute("test-2", Actions.FORK));
+
         SpeakeasyUserPage.PluginRow row = page.getPlugins().get("test-2-fork-barney");
         assertEquals("test-2-fork-barney", row.getKey());
         assertEquals("Fork Description", row.getDescription());

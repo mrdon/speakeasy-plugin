@@ -145,6 +145,11 @@ public class RemotePlugin implements Comparable
 
     public String getForkedPluginKey()
     {
+        return getForkedPluginKey(key);
+    }
+
+    public static String getForkedPluginKey(String key)
+    {
         if (key != null && key.contains("-fork-"))
         {
             return key.substring(0, key.indexOf("-fork-"));
@@ -215,5 +220,33 @@ public class RemotePlugin implements Comparable
     public int compareTo(Object o)
     {
         return getName().compareTo(((RemotePlugin)o).getName());
+    }
+
+    @Override
+    public boolean equals(Object o)
+    {
+        if (this == o)
+        {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass())
+        {
+            return false;
+        }
+
+        RemotePlugin that = (RemotePlugin) o;
+
+        if (key != null ? !key.equals(that.key) : that.key != null)
+        {
+            return false;
+        }
+
+        return true;
+    }
+
+    @Override
+    public int hashCode()
+    {
+        return key != null ? key.hashCode() : 0;
     }
 }
