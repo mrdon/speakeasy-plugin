@@ -231,6 +231,7 @@ function initSpeakeasy() {
     $('#available-extensions-tab').bind('click.loadextensions', function(e) {
         loadAvailableExtensions();
     });
+    $('#speakeasy-loaded').html("");
 
 }
 

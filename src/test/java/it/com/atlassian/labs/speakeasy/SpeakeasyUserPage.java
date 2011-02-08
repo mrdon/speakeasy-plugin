@@ -56,7 +56,15 @@ public class SpeakeasyUserPage implements Page
     @WaitUntil
     public void waitForSpeakeasyInit()
     {
-        driver.waitUntilElementIsLocated(By.id("speakeasyLoaded"));
+        driver.waitUntilElementIsLocated(By.id("speakeasy-loaded"));
+        final WebElement loaded = driver.findElement(By.id("speakeasy-loaded"));
+        driver.waitUntil(new Function()
+        {
+            public Object apply(@Nullable Object from)
+            {
+                return "".equals(loaded.getText());
+            }
+        });
     }
 
     public List<String> getPluginKeys()
