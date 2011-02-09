@@ -43,44 +43,23 @@ import static java.util.Arrays.asList;
 /**
  *
  */
-public class SpeakeasyManager implements DisposableBean
+public class SpeakeasyManager
 {
     private final PluginAccessor pluginAccessor;
-    private final HostContainer hostContainer;
-    private final BundleContext bundleContext;
     private final SpeakeasyData data;
     private final PluginManager pluginManager;
     private final ProductAccessor productAccessor;
+    private final DescriptorGeneratorManager descriptorGeneratorManager;
 
-    private final Map<String, ServiceRegistration> serviceRegistrations;
-    private final PluginEventManager pluginEventManager;
-    private ServiceRegistration userTransformerService;
-    public SpeakeasyManager(BundleContext bundleContext, PluginAccessor pluginAccessor, PluginEventManager pluginEventManager, HostContainer hostContainer, SpeakeasyData data, PluginManager pluginManager, ProductAccessor productAccessor)
+
+    public SpeakeasyManager(PluginAccessor pluginAccessor,
+                            SpeakeasyData data, PluginManager pluginManager, ProductAccessor productAccessor, DescriptorGeneratorManager descriptorGeneratorManager)
     {
-        this.bundleContext = bundleContext;
+        this.descriptorGeneratorManager = descriptorGeneratorManager;
         this.pluginAccessor = pluginAccessor;
-        this.hostContainer = hostContainer;
         this.data = data;
         this.pluginManager = pluginManager;
         this.productAccessor = productAccessor;
-        this.serviceRegistrations = new ConcurrentHashMap<String, ServiceRegistration>();
-        this.pluginEventManager = pluginEventManager;
-        pluginEventManager.register(this);
-        loadUserTransformerServiceIfNeeded();
-    }
-
-    @PluginEventListener
-    public void onPluginEnabled(PluginEnabledEvent event)
-    {
-        String pluginKey = event.getPlugin().getKey();
-        List<String> accessList = data.getUsersList(pluginKey);
-        updateModuleDescriptorsForPlugin(pluginKey, accessList);
-    }
-
-    @PluginEventListener
-    public void onPluginDisabled(PluginDisabledEvent event)
-    {
-        unregisterGeneratedDescriptorsForPlugin(event.getPlugin().getKey());
     }
 
     public UserPlugins getUserAccessList(String userName, String... modifiedKeys)
@@ -197,7 +176,7 @@ public class SpeakeasyManager implements DisposableBean
         {
             accessList.add(user);
             data.saveUsersList(pluginKey, accessList);
-            updateModuleDescriptorsForPlugin(pluginKey, accessList);
+            descriptorGeneratorManager.updateModuleDescriptorsForPlugin(pluginKey, accessList);
             affectedPluginKeys.add(pluginKey);
         }
 
@@ -296,7 +275,7 @@ public class SpeakeasyManager implements DisposableBean
             accessList.remove(user);
             data.saveUsersList(pluginKey, accessList);
 
-            updateModuleDescriptorsForPlugin(pluginKey, accessList);
+            descriptorGeneratorManager.updateModuleDescriptorsForPlugin(pluginKey, accessList);
             return pluginKey;
         }
         return null;
@@ -307,151 +286,7 @@ public class SpeakeasyManager implements DisposableBean
         List<String> accessList = data.getUsersList(pluginKey);
         accessList.clear();
         data.saveUsersList(pluginKey, accessList);
-        updateModuleDescriptorsForPlugin(pluginKey, accessList);
-    }
-
-    private void waitUntilModulesAreDisabled(final List<ModuleDescriptor> descriptors)
-    {
-        WaitUntil.invoke(new WaitUntil.WaitCondition()
-        {
-            public boolean isFinished()
-            {
-                for (ModuleDescriptor descriptor : descriptors)
-                {
-                    ModuleDescriptor<?> module = pluginAccessor.getEnabledPluginModule(descriptor.getCompleteKey());
-                    if (module != null)
-                    {
-                        return false;
-                    }
-                }
-                return true;
-            }
-
-            public String getWaitMessage()
-            {
-                return "Waiting until the enabled plugins are available";
-            }
-        });
-    }
-
-
-    private void updateModuleDescriptorsForPlugin(String pluginKey, List<String> users)
-    {
-        List<DescriptorGenerator<ModuleDescriptor>> generators = findGeneratorsInPlugin(pluginKey);
-        if (!generators.isEmpty())
-        {
-            // unregister any existing services
-            List<ModuleDescriptor> unregisteredDescriptors = unregisterGeneratedDescriptorsForPlugin(pluginKey);
-            waitUntilModulesAreDisabled(unregisteredDescriptors);
-
-            // generate and register new services
-            Integer pluginStateIdentifier = data.getPluginStateIdentifier(pluginKey);
-            Bundle targetBundle = findBundleForPlugin(bundleContext, pluginKey);
-            List<ModuleDescriptor> generatedDescriptors = new ArrayList<ModuleDescriptor>();
-            for (DescriptorGenerator<ModuleDescriptor> generator : generators)
-            {
-
-                for (ModuleDescriptor generatedDescriptor : generator.getDescriptorsToExposeForUsers(users, pluginStateIdentifier))
-                {
-                    ServiceRegistration reg = targetBundle.getBundleContext().registerService(ModuleDescriptor.class.getName(), generatedDescriptor, null);
-                    serviceRegistrations.put(generatedDescriptor.getCompleteKey(), reg);
-                    generatedDescriptors.add(generatedDescriptor);
-                }
-
-
-            }
-            waitUntilModulesAreEnabled(generatedDescriptors);
-        }
-    }
-
-    private void waitUntilModulesAreEnabled(final List<ModuleDescriptor> generatedDescriptors)
-    {
-        WaitUntil.invoke(new WaitUntil.WaitCondition()
-        {
-            public boolean isFinished()
-            {
-                for (ModuleDescriptor descriptor : generatedDescriptors)
-                {
-                    ModuleDescriptor<?> module = pluginAccessor.getEnabledPluginModule(descriptor.getCompleteKey());
-                    if (module == null)
-                    {
-                        return false;
-                    }
-                }
-                return true;
-            }
-
-            public String getWaitMessage()
-            {
-                return "Waiting until the enabled plugins are available";
-            }
-        });
-    }
-
-    private List<DescriptorGenerator<ModuleDescriptor>> findGeneratorsInPlugin(String pluginKey)
-    {
-        List<DescriptorGenerator<ModuleDescriptor>> generators = new ArrayList<DescriptorGenerator<ModuleDescriptor>>();
-        Plugin plugin = pluginAccessor.getPlugin(pluginKey);
-        if (plugin != null)
-        {
-            for (ModuleDescriptor moduleDescriptor : plugin.getModuleDescriptors())
-            {
-                if (moduleDescriptor instanceof DescriptorGenerator)
-                {
-                    generators.add((DescriptorGenerator) moduleDescriptor);
-                }
-            }
-        }
-        return generators;
-    }
-
-    /**
-     * Works around apps that don't properly register the web resource transformer module type.  Can be removed if all
-     * products are on platform 2.8
-     */
-    private void loadUserTransformerServiceIfNeeded()
-    {
-        String pluginKey = (String) bundleContext.getBundle().getHeaders().get(OsgiPlugin.ATLASSIAN_PLUGIN_KEY);
-        Plugin self = pluginAccessor.getPlugin(pluginKey);
-        if (self.getModuleDescriptor("userTransformer") instanceof UnrecognisedModuleDescriptor)
-        {
-            userTransformerService = bundleContext.registerService(ListableModuleDescriptorFactory.class.getName(), new SingleModuleDescriptorFactory(hostContainer, "web-resource-transformer", WebResourceTransformerModuleDescriptor.class), null);
-        }
-    }
-
-    public void destroy() throws Exception
-    {
-        pluginEventManager.unregister(this);
-        for (Plugin plugin : pluginAccessor.getEnabledPlugins())
-        {
-            unregisterGeneratedDescriptorsForPlugin(plugin.getKey());
-        }
-        if (userTransformerService != null)
-        {
-            userTransformerService.unregister();
-        }
-    }
-
-    private List<ModuleDescriptor> unregisterGeneratedDescriptorsForPlugin(String pluginKey)
-    {
-        List<ModuleDescriptor> removedDescriptors = new ArrayList<ModuleDescriptor>();
-        for (String descriptorCompleteKey : new HashSet<String>(serviceRegistrations.keySet()))
-        {
-            if (descriptorCompleteKey.startsWith(pluginKey))
-            {
-                ServiceRegistration reg = serviceRegistrations.remove(descriptorCompleteKey);
-                try
-                {
-                    removedDescriptors.add((ModuleDescriptor) bundleContext.getService(reg.getReference()));
-                    reg.unregister();
-                }
-                catch (IllegalStateException ex)
-                {
-                    // no worries, this only means the bundle was already shut down so the services aren't valid anymore
-                }
-            }
-        }
-        return removedDescriptors;
+        descriptorGeneratorManager.updateModuleDescriptorsForPlugin(pluginKey, accessList);
     }
 
     public boolean hasAccess(String pluginKey, String remoteUser)
@@ -467,7 +302,7 @@ public class SpeakeasyManager implements DisposableBean
             {
                 disallowUserAccess(plugin.getKey(), user);
             }
-            unregisterGeneratedDescriptorsForPlugin(plugin.getKey());
+            descriptorGeneratorManager.unregisterGeneratedDescriptorsForPlugin(plugin.getKey());
         }
     }
 
