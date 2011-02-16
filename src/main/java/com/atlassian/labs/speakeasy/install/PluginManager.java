@@ -61,8 +61,8 @@ public class PluginManager
             Pattern.compile("META-INF/MANIFEST.MF"),
             Pattern.compile(".*/pom.xml"),
             Pattern.compile(".*/pom.properties"),
-            Pattern.compile("META-INF/MANIFEST.MF"),
-            Pattern.compile("atlassian-plugin.xml"));
+            Pattern.compile("atlassian-plugin.xml"),
+            Pattern.compile(".*\\.DS_Store"));
 
     private static final Collection<String> pluginModulesWhitelist = asList(
             "plugin-info",
