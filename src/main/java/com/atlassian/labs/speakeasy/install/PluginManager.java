@@ -6,6 +6,7 @@ import com.atlassian.plugin.*;
 import com.atlassian.plugin.util.WaitUntil;
 import com.atlassian.sal.api.user.UserManager;
 import com.atlassian.templaterenderer.TemplateRenderer;
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.dom4j.*;
 import org.dom4j.io.OutputFormat;
@@ -89,9 +90,27 @@ public class PluginManager
             throw new PluginOperationFailedException("User '" + user + "' doesn't have access to install plugins");
         }
 
-        if (pluginFile.getName().endsWith(".jar"))
+        File fileToInstall = pluginFile;
+
+        // While this works for Speakeasy, it means an extension with a .zip suffix won't be installable via the UPM
+        // or via PAC
+        if (pluginFile.getName().endsWith(".zip"))
         {
-            PluginArtifact pluginArtifact = pluginArtifactFactory.create(pluginFile.toURI());
+            File zipFile = new File(pluginFile.getPath() + ".jar");
+            try
+            {
+                FileUtils.moveFile(pluginFile, zipFile);
+            }
+            catch (IOException e)
+            {
+                throw new PluginOperationFailedException("Exception moving zip to jar", e);
+            }
+            fileToInstall = zipFile;
+        }
+
+        if (fileToInstall.getName().endsWith(".jar") || fileToInstall.getName().endsWith(".xml"))
+        {
+            PluginArtifact pluginArtifact = pluginArtifactFactory.create(fileToInstall.toURI());
             verifyContents(pluginArtifact);
             verifyDescriptor(pluginArtifact, user);
             Set<String> pluginKeys = pluginController.installPlugins(pluginArtifact);

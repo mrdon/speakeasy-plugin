@@ -201,7 +201,7 @@ function initSpeakeasy() {
             iframe: "true",
             beforeSubmit: function() {
                var extension = pluginFile.val().substring(pluginFile.val().lastIndexOf('.'));
-               if (extension != '.jar') {
+               if (extension != '.jar' && extension != '.zip' && extension != '.xml') {
                   addMessage('error', {body: "The extension '" + extension + "' is not allowed", shadowed: false});
                   return false;
                }

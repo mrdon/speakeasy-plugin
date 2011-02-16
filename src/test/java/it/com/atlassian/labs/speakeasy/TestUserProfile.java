@@ -217,6 +217,20 @@ public class TestUserProfile
     }
 
     @Test
+    public void testInstallPluginAsZip() throws IOException
+    {
+        File jar = buildSimplePluginFile();
+        File zip = new File(jar.getPath() + ".zip");
+        FileUtils.moveFile(jar, zip);
+
+        SpeakeasyUserPage page = product.visit(SpeakeasyUserPage.class)
+                .uploadPlugin(zip);
+
+        assertTrue(page.getPluginKeys().contains("test-2"));
+        page.uninstallPlugin("test-2");
+    }
+
+    @Test
     public void testEmailAuthorOnEnable() throws IOException, MessagingException
     {
         File jar = buildSimplePluginFile();
