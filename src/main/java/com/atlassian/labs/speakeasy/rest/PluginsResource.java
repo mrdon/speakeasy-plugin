@@ -214,7 +214,7 @@ public class PluginsResource
                 {
                     try
                     {
-                        pluginFile = File.createTempFile("plugin-", processFileName(item.getName()));
+                        pluginFile = File.createTempFile("speakeasy-", processFileName(item.getName()));
                         item.write(pluginFile);
                     }
                     catch (Exception e)
