@@ -55,7 +55,16 @@ public class RequireScanner
         URI root = new URI(moduleId);
         for (String requiredModule : findRequiredModules(url))
         {
-            modules.add(root.resolve(requiredModule));
+            if (requiredModule.charAt(0) != '.')
+            {
+                requiredModule = "/" + requiredModule;
+            }
+            URI resolved = root.resolve(requiredModule);
+            if (resolved.getPath().charAt(0) == '/')
+            {
+                resolved = new URI(resolved.getPath().substring(1)); 
+            }
+            modules.add(resolved);
         }
         return modules;
     }
