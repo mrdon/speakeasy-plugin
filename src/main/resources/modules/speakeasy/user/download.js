@@ -1,3 +1,6 @@
+/**
+ * Renders the download dialog for the Speakeasy user page
+ */
 var $ = require('../jquery').jQuery;
 
 exports.openDialog = function(key, product, href) {

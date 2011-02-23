@@ -1,5 +1,6 @@
 package com.atlassian.labs.speakeasy.commonjs.descriptor;
 
+import com.atlassian.labs.speakeasy.commonjs.CommonJsModules;
 import com.atlassian.labs.speakeasy.util.DefaultPluginModuleTracker;
 import com.atlassian.labs.speakeasy.util.PluginModuleTracker;
 import com.atlassian.labs.speakeasy.util.WebResourceUtil;
@@ -10,7 +11,6 @@ import com.atlassian.plugin.event.PluginEventManager;
 import com.atlassian.plugin.hostcontainer.HostContainer;
 import com.atlassian.plugin.impl.StaticPlugin;
 import com.atlassian.plugin.webresource.WebResourceModuleDescriptor;
-import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import org.dom4j.Element;
 import org.dom4j.io.OutputFormat;
@@ -24,7 +24,6 @@ import java.io.IOException;
 import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 import java.util.concurrent.CopyOnWriteArraySet;
 
@@ -93,8 +92,7 @@ class GeneratedDescriptorsManager
             }
             else
             {
-                log.info("Not exposing '{}' as there are unresolved module dependencies: {}", descriptor.getCompleteKey(),
-                        unresolvedExternalDependencies);
+                log.warn("Not exposing '{}' as there are unresolved module dependencies: {}", descriptor.getCompleteKey(), unresolvedExternalDependencies);
             }
         }
     }

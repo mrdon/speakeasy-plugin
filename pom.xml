@@ -13,7 +13,7 @@
     <artifactId>speakeasy-plugin</artifactId>
     <version>0.6-SNAPSHOT</version>
 
-    <name>speakeasy-plugin</name>
+    <name>Speakeasy Plugin</name>
     <description>A plugin that provides per-user plugin module management</description>
     <packaging>atlassian-plugin</packaging>
 
@@ -59,6 +59,12 @@
             <artifactId>atlassian-jira</artifactId>
             <version>${jira.version}</version>
             <scope>provided</scope>
+            <exclusions>
+                <exclusion>
+                    <groupId>com.yahoo</groupId>
+                    <artifactId>yuicompressor</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>com.atlassian.confluence</groupId>
@@ -82,6 +88,11 @@
             <groupId>commons-fileupload</groupId>
             <artifactId>commons-fileupload</artifactId>
             <version>1.2.1</version>
+        </dependency>
+        <dependency>
+            <groupId>org.twdata.rhino</groupId>
+            <artifactId>js</artifactId>
+            <version>1.8pre-20101216</version>
         </dependency>
         <dependency>
             <groupId>javax.servlet</groupId>

@@ -1,3 +1,6 @@
+/**
+ * Handles interactions with AUI messages
+ */
 var $ = require('./jquery').jQuery;
 
 function addMessage(type, params) {
@@ -16,4 +19,7 @@ function addMessage(type, params) {
     window.setTimeout(function() { msg.fadeOut(1500) }, 5000);
 }
 
+/**
+ * Adds a message to #aui-message-bar, clearing the previous and fading it out after 5 seconds
+ */
 exports.add = addMessage;

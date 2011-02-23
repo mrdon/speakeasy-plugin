@@ -1,23 +1,23 @@
-package com.atlassian.labs.speakeasy.commonjs.descriptor;
+package com.atlassian.labs.speakeasy.commonjs;
 
-import com.atlassian.labs.speakeasy.commonjs.util.RequireScanner;
+import com.atlassian.labs.speakeasy.commonjs.descriptor.CommonJsModulesDescriptor;
+import com.atlassian.labs.speakeasy.commonjs.util.IterableTreeMap;
 import com.atlassian.plugin.Plugin;
 import com.atlassian.plugin.PluginParseException;
 import com.atlassian.plugin.util.PluginUtils;
 import com.atlassian.util.concurrent.CopyOnWriteMap;
-import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import org.apache.commons.io.IOUtils;
 import org.osgi.framework.Bundle;
 
-import java.io.File;
+import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlElement;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.*;
 
+import static com.atlassian.labs.speakeasy.commonjs.util.ModuleUtil.determineLastModified;
 import static java.util.Collections.unmodifiableSet;
 
 /**
@@ -25,36 +25,47 @@ import static java.util.Collections.unmodifiableSet;
  */
 public class CommonJsModules
 {
-    private final Map<String, ScannedModule> scannedModules = CopyOnWriteMap.<String,ScannedModule>builder().newHashMap();
+    @XmlElement
+    private final Map<String, Module> modules = CopyOnWriteMap.<String,Module>builder().newHashMap();
+    @XmlElement
     private final Set<String> externalModuleDependencies;
 
     private final Plugin plugin;
     private final Bundle pluginBundle;
     private final String location;
+
     private final Set<String> resources = Sets.newHashSet();
 
-    public CommonJsModules(Plugin plugin, Bundle pluginBundle, String location)
+    @XmlAttribute
+    private final String moduleKey;
+    @XmlAttribute
+    private final String description;
+
+    @XmlAttribute
+    private final String pluginKey;
+    @XmlAttribute
+    private final String pluginName;
+
+    public CommonJsModules(CommonJsModulesDescriptor descriptor, Bundle pluginBundle, String location)
     {
         this.pluginBundle = pluginBundle;
         this.location = location;
-        this.plugin = plugin;
+        this.plugin = descriptor.getPlugin();
+        this.pluginKey = plugin.getKey();
+        this.pluginName = plugin.getName();
+        this.moduleKey = descriptor.getKey();
+        this.description = descriptor.getDescription() != null ? descriptor.getDescription() : "";
         this.externalModuleDependencies = unmodifiableSet(scan());
     }
 
-    public Set<String> getExternalModuleDependencies()
+    public Module getModule(String id)
     {
-        return externalModuleDependencies;
-    }
-
-    public Set<String> getModuleDependencies(String id)
-    {
-        ScannedModule scannedModule = scannedModules.get(id);
-        return scannedModule != null ? scannedModule.getDependencies() : null;
+        return modules.get(id);
     }
 
     public Set<String> getModuleIds()
     {
-        return new HashSet<String>(scannedModules.keySet());
+        return new HashSet<String>(modules.keySet());
     }
 
     public Set<String> getResources()
@@ -64,7 +75,7 @@ public class CommonJsModules
 
     public String getModuleContents(String moduleName)
     {
-        ScannedModule scannedModule = scannedModules.get(moduleName);
+        Module scannedModule = modules.get(moduleName);
         if (scannedModule == null)
         {
             throw new IllegalArgumentException("Module not found: " + moduleName);
@@ -77,14 +88,19 @@ public class CommonJsModules
         }
         if (url == null)
         {
-            url = plugin.getResource(scannedModule.getActualPath());
+            url = plugin.getResource(scannedModule.getPath());
         }
 
         long lastModified = determineLastModified(url);
         if (scannedModule.getLastModified() > 0 && scannedModule.getLastModified() < lastModified)
         {
-            scanModule(moduleName, url);
+            modules.put(moduleName, scanModule(moduleName, url));
         }
+        return readModule(url);
+    }
+
+    private String readModule(URL url)
+    {
         InputStream in = null;
         try
         {
@@ -93,7 +109,7 @@ public class CommonJsModules
         }
         catch (IOException e)
         {
-            throw new RuntimeException("Unable to read module: " + moduleName, e);
+            throw new RuntimeException("Unable to read module: " + url, e);
         }
         finally
         {
@@ -125,52 +141,19 @@ public class CommonJsModules
             String moduleName = modulePath.substring(0, modulePath.lastIndexOf("."));
 
             URL moduleUrl = pluginBundle.getEntry(fullPath);
-            ScannedModule module = scanModule(moduleName, moduleUrl);
+            Module module = scanModule(moduleName, moduleUrl);
             allDeps.addAll(module.getDependencies());
-            scannedModules.put(moduleName, module);
+            modules.put(moduleName, module);
         }
-        allDeps.removeAll(scannedModules.keySet());
+        allDeps.removeAll(modules.keySet());
         return allDeps;
     }
 
-    private ScannedModule scanModule(String moduleName, URL moduleUrl)
+    private Module scanModule(String moduleName, URL moduleUrl)
     {
-        Set<String> deps = new HashSet<String>();
-        try
-        {
-            for (URI dep : RequireScanner.findRequiredModules(moduleName, moduleUrl))
-            {
-                deps.add(dep.toString());
-            }
-        }
-        catch (URISyntaxException e1)
-        {
-            throw new PluginParseException("Invalid dependency: " + moduleName, e1);
-        }
-
-        return new ScannedModule(
-                moduleName,
-                moduleUrl.getPath(), deps,
-                determineLastModified(moduleUrl)
-        );
+        return new Module(moduleName, moduleUrl.getPath(), determineLastModified(moduleUrl), readModule(moduleUrl));
     }
 
-    private long determineLastModified(URL moduleUrl)
-    {
-        long lastModified = 0;
-        if ("file:".equals(moduleUrl.getProtocol()))
-        {
-            try
-            {
-                lastModified = new File(moduleUrl.toURI()).lastModified();
-            }
-            catch (URISyntaxException e)
-            {
-                throw new RuntimeException("Unable to determine last modified for file: " + moduleUrl, e);
-            }
-        }
-        return lastModified;
-    }
 
     private Iterable<String> findModulePaths(Bundle bundle)
     {
@@ -211,42 +194,17 @@ public class CommonJsModules
 
     public String getModulePath(String id)
     {
-        return scannedModules.get(id).getActualPath();
+        return modules.get(id).getPath();
     }
 
-    private static class ScannedModule
+    public Iterable<Module> getIterableModules()
     {
-        private final String id;
-        private final Set<String> dependencies;
-        private final long lastModified;
-        private final String actualPath;
-
-        public ScannedModule(String id, String actualPath, Set<String> dependencies, long lastModified)
-        {
-            this.id = id;
-            this.actualPath = actualPath;
-            this.dependencies = dependencies;
-            this.lastModified = lastModified;
-        }
-
-        public String getId()
-        {
-            return id;
-        }
-
-        public Set<String> getDependencies()
-        {
-            return dependencies;
-        }
-
-        public long getLastModified()
-        {
-            return lastModified;
-        }
-
-        public String getActualPath()
-        {
-            return actualPath;
-        }
+        return new IterableTreeMap<String,Module>(modules);
     }
+
+    public Set<String> getExternalModuleDependencies()
+    {
+        return externalModuleDependencies;
+    }
+
 }

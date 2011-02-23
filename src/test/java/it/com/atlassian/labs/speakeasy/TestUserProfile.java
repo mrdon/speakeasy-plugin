@@ -1,31 +1,20 @@
 package it.com.atlassian.labs.speakeasy;
 
 import com.atlassian.pageobjects.TestedProduct;
-import com.atlassian.pageobjects.TestedProductFactory;
 import com.atlassian.pageobjects.page.HomePage;
 import com.atlassian.pageobjects.page.LoginPage;
 import com.atlassian.plugin.test.PluginJarBuilder;
 import com.atlassian.plugin.util.zip.FileUnzipper;
-import com.atlassian.webdriver.AtlassianWebDriver;
-import com.atlassian.webdriver.jira.JiraTestedProduct;
 import com.atlassian.webdriver.pageobjects.WebDriverTester;
-import com.atlassian.webdriver.refapp.RefappTestedProduct;
 import com.dumbster.smtp.SimpleSmtpServer;
 import com.dumbster.smtp.SmtpMessage;
 import com.google.common.collect.Sets;
-import com.sun.mail.smtp.SMTPMessage;
-import it.com.atlassian.labs.speakeasy.jira.JiraSpeakeasyUserPage;
 import org.apache.commons.io.FileUtils;
 import org.junit.After;
-import org.junit.AfterClass;
 import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Test;
-import org.netbeans.lib.cvsclient.commandLine.command.log;
-import org.openqa.selenium.WebDriver;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.security.event.authorization.LoggerListener;
 
 import javax.mail.MessagingException;
 import java.io.File;
@@ -41,7 +30,7 @@ import static org.junit.Assert.*;
 
 public class TestUserProfile
 {
-    private static TestedProduct<?> product = TestedProductFactory.create(System.getProperty("testedProductClass", RefappTestedProduct.class.getName()));
+    private static TestedProduct<?> product = OwnerOfTestedProduct.INSTANCE;
     private SimpleSmtpServer mailServer;
     private static Logger log = LoggerFactory.getLogger(TestUserProfile.class);
 
@@ -55,15 +44,6 @@ public class TestUserProfile
     public void logout()
     {
         ((WebDriverTester)product.getTester()).getDriver().manage().deleteAllCookies();
-    }
-
-    @BeforeClass
-    public static void initPages()
-    {
-        if (product instanceof JiraTestedProduct)
-        {
-            product.getPageBinder().override(SpeakeasyUserPage.class, JiraSpeakeasyUserPage.class);
-        }
     }
 
     @Before

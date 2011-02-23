@@ -6,6 +6,8 @@
         <param name="foo">bar</param>
     </plugin-info>
 
+    <commonjs key="modules" location="/plugin-modules" />
+    
     <scoped-web-resource key="testScoping">
         <resource type="download" name="test.js" location="test.js" />
         <resource type="download" name="test.css" location="test.css" />

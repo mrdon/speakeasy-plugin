@@ -53,13 +53,19 @@
 
     <web-resource-transformer key="userTransformer" class="com.atlassian.labs.speakeasy.UserScopedTransformer"/>
 
-    <rest key="rest" path="/speakeasy" version="1">
+    <rest key="rest" path="/speakeasy" version="1" package="com.atlassian.labs.speakeasy.rest">
+        <dispatcher>REQUEST</dispatcher>
+        <dispatcher>INCLUDE</dispatcher>
+    </rest>
+
+    <rest key="commonjs-rest" path="/commonjs" version="1" package="com.atlassian.labs.speakeasy.commonjs.rest">
         <dispatcher>REQUEST</dispatcher>
         <dispatcher>INCLUDE</dispatcher>
     </rest>
 
     <component key="speakeasyManager" class="com.atlassian.labs.speakeasy.SpeakeasyManager"/>
     <component key="descriptorGeneratorManager" class="com.atlassian.labs.speakeasy.DescriptorGeneratorManager" />
+    <component key="commonJsModulesAccessor" class="com.atlassian.labs.speakeasy.commonjs.CommonJsModulesAccessor" />
     <component key="pluginManager" class="com.atlassian.labs.speakeasy.install.PluginManager"/>
     <component key="classPrefixModuleFactory" class="com.atlassian.plugin.module.ClassPrefixModuleFactory"/>
     <component key="speakeasyData" class="com.atlassian.labs.speakeasy.data.SpeakeasyData"/>

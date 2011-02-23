@@ -7,7 +7,7 @@ import java.util.Set;
  */
 public class ModuleWrapper
 {
-    public static String wrapModule(String moduleName, String rawJs, Set<String> requiredModules)
+    public static String wrapModule(String moduleName, String rawJs, Iterable<String> requiredModules)
     {
         StringBuffer wrappedJs = new StringBuffer();
         // require.def("alpha", ["require", "exports", "beta"], function (require, exports, beta) {

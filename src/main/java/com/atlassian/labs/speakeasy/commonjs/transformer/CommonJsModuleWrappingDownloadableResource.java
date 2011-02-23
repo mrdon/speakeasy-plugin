@@ -1,9 +1,9 @@
 package com.atlassian.labs.speakeasy.commonjs.transformer;
 
-import com.atlassian.labs.speakeasy.commonjs.descriptor.CommonJsModules;
+import com.atlassian.labs.speakeasy.commonjs.CommonJsModules;
+import com.atlassian.labs.speakeasy.commonjs.Module;
 import com.atlassian.labs.speakeasy.commonjs.descriptor.CommonJsModulesDescriptor;
 import com.atlassian.labs.speakeasy.commonjs.util.ModuleWrapper;
-import com.atlassian.plugin.PluginAccessor;
 import com.atlassian.plugin.servlet.DownloadException;
 import com.atlassian.plugin.servlet.DownloadableResource;
 import com.atlassian.plugin.webresource.transformer.AbstractTransformedDownloadableResource;
@@ -31,10 +31,11 @@ public class CommonJsModuleWrappingDownloadableResource extends AbstractTransfor
 
         PrintWriter out = new PrintWriter(outputStream);
 
+        Module module = commonJsModules.getModule(moduleName);
         out.println(ModuleWrapper.wrapModule(
             moduleName,
             commonJsModules.getModuleContents(moduleName),
-            commonJsModules.getModuleDependencies(moduleName)));
+            module.getDependencies()));
 
         out.flush();
     }

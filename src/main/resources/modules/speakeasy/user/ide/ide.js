@@ -1,3 +1,6 @@
+/**
+ * Manages the in-browser ide for the Speakeasy user page
+ */
 var $ = require('../../jquery').jQuery;
 
 var editor;

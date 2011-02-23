@@ -50,6 +50,9 @@ public class SpeakeasyUserPage implements Page
     @FindBy(id = "aui-message-bar")
     private WebElement messageBar;
 
+    @FindBy(id = "jsdoc-tab")
+    private WebElement jsdocTab;
+
     @Inject
     private TestedProduct testedProduct;
 
@@ -247,6 +250,12 @@ public class SpeakeasyUserPage implements Page
         forkAction.click();
 
         return pageBinder.bind(ForkDialog.class, pluginKey);
+    }
+
+    public CommonJsModulesTab viewCommonJsModulesTab()
+    {
+        jsdocTab.click();
+        return pageBinder.bind(CommonJsModulesTab.class);
     }
 
     public static class PluginRow

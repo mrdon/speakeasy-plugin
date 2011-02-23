@@ -1,3 +1,6 @@
+/**
+ * Methods for the Speakeasy user page
+ */
 var $ = require('../jquery').jQuery;
 var addMessage = require('../messages').add;
 var ide = require('./ide/ide');

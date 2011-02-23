@@ -1,5 +1,6 @@
 package com.atlassian.labs.speakeasy.commonjs.descriptor;
 
+import com.atlassian.labs.speakeasy.commonjs.CommonJsModules;
 import com.atlassian.plugin.Plugin;
 import com.atlassian.plugin.PluginAccessor;
 import com.atlassian.plugin.PluginParseException;
@@ -67,7 +68,7 @@ public class CommonJsModulesDescriptor extends AbstractModuleDescriptor<CommonJs
     {
         super.enabled();
         pluginBundle = findBundleForPlugin(plugin);
-        modules = new CommonJsModules(plugin, pluginBundle, location);
+        modules = new CommonJsModules(this, pluginBundle, location);
         generatedDescriptorsManager = new GeneratedDescriptorsManager(pluginBundle, modules, pluginAccessor, pluginEventManager, this, hostContainer);
     }
 

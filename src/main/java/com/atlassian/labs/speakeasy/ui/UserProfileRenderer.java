@@ -1,6 +1,8 @@
 package com.atlassian.labs.speakeasy.ui;
 
 import com.atlassian.labs.speakeasy.SpeakeasyManager;
+import com.atlassian.labs.speakeasy.commonjs.CommonJsModules;
+import com.atlassian.labs.speakeasy.commonjs.CommonJsModulesAccessor;
 import com.atlassian.labs.speakeasy.data.SpeakeasyData;
 import com.atlassian.labs.speakeasy.install.PluginManager;
 import com.atlassian.labs.speakeasy.model.RemotePlugin;
@@ -8,7 +10,6 @@ import com.atlassian.labs.speakeasy.model.UserPlugins;
 import com.atlassian.labs.speakeasy.product.ProductAccessor;
 import com.atlassian.plugin.Plugin;
 import com.atlassian.plugin.PluginAccessor;
-import com.atlassian.plugin.util.PluginUtils;
 import com.atlassian.plugin.webresource.UrlMode;
 import com.atlassian.plugin.webresource.WebResourceManager;
 import com.atlassian.plugins.rest.common.json.JaxbJsonMarshaller;
@@ -27,6 +28,8 @@ import java.io.InputStreamReader;
 import java.io.Writer;
 import java.util.Map;
 
+import static java.util.Collections.singletonMap;
+
 /**
  *
  */
@@ -38,15 +41,17 @@ public class UserProfileRenderer
     private final UserManager userManager;
     private final WebResourceManager webResourceManager;
     private final JaxbJsonMarshaller jaxbJsonMarshaller;
+    private final CommonJsModulesAccessor commonJsModulesAccessor;
     private final PluginManager pluginManager;
     private final ProductAccessor productAccessor;
     private final SpeakeasyData data;
     private final Plugin plugin;
 
 
-    public UserProfileRenderer(PluginAccessor pluginAccessor, TemplateRenderer templateRenderer, SpeakeasyManager speakeasyManager, UserManager userManager, WebResourceManager webResourceManager, JaxbJsonMarshaller jaxbJsonMarshaller, PluginManager pluginManager, ProductAccessor productAccessor, SpeakeasyData data)
+    public UserProfileRenderer(PluginAccessor pluginAccessor, TemplateRenderer templateRenderer, SpeakeasyManager speakeasyManager, UserManager userManager, WebResourceManager webResourceManager, JaxbJsonMarshaller jaxbJsonMarshaller, PluginManager pluginManager, ProductAccessor productAccessor, SpeakeasyData data, CommonJsModulesAccessor commonJsModulesAccessor)
     {
         this.templateRenderer = templateRenderer;
+        this.commonJsModulesAccessor = commonJsModulesAccessor;
         this.plugin = pluginAccessor.getPlugin("com.atlassian.labs.speakeasy-plugin");
         this.speakeasyManager = speakeasyManager;
         this.userManager = userManager;
@@ -81,6 +86,7 @@ public class UserProfileRenderer
                 put("contextPath", req.getContextPath()).
                 put("plugins", plugins.getPlugins()).
                 put("rowRenderer", new RowRenderer(plugin)).
+                put("jsdocRenderer", new JsDocRenderer(plugin, commonJsModulesAccessor.getAllCommonJsModules())).
                 put("installAllowed", pluginManager.canUserInstallPlugins(user)).
                 put("staticResourcesPrefix", webResourceManager.getStaticResourcePrefix(UrlMode.RELATIVE)).
                 put("product", productAccessor.getSdkName()).
@@ -102,16 +108,7 @@ public class UserProfileRenderer
 
         public RowRenderer(Plugin plugin)
         {
-            InputStream in = null;
-            try
-            {
-                in = plugin.getResourceAsStream("modules/speakeasy/user/row.mu");
-                this.rowTemplate = Mustache.compiler().compile(new InputStreamReader(in));
-            }
-            finally
-            {
-                IOUtils.closeQuietly(in);
-            }
+            this.rowTemplate = compile(plugin, "modules/speakeasy/user/row.mu");
         }
 
         @HtmlSafe
@@ -119,6 +116,40 @@ public class UserProfileRenderer
         public String render(RemotePlugin plugin)
         {
             return rowTemplate.execute(plugin);
+        }
+    }
+
+    public static class JsDocRenderer
+    {
+        private final Template template;
+        private final Iterable<CommonJsModules> modules;
+
+        public JsDocRenderer(Plugin plugin, Iterable<CommonJsModules> modules)
+        {
+            this.modules = modules;
+            this.template = compile(plugin, "modules/speakeasy/user/jsdoc/tree-template.mu");
+        }
+
+        @HtmlSafe
+        @com.atlassian.velocity.htmlsafe.HtmlSafe
+        public String render()
+        {
+            return template.execute(singletonMap("pluginModules", modules));
+        }
+    }
+
+
+    private static Template compile(Plugin plugin, String path)
+    {
+        InputStream in = null;
+        try
+        {
+            in = plugin.getResourceAsStream(path);
+            return Mustache.compiler().compile(new InputStreamReader(in));
+        }
+        finally
+        {
+            IOUtils.closeQuietly(in);
         }
     }
 }
