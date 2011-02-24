@@ -23,7 +23,7 @@ public class TestModule
         assertEquals(1, module.getExports().size());
         Export export = module.getExports().get("foo");
         assertEquals("foo", export.getName());
-        assertEquals("Some method", export.getDescription());
+        assertEquals("Some method", export.getJsDoc().getDescription());
     }
 
     @Test
@@ -50,7 +50,7 @@ public class TestModule
         assertEquals(1, module.getExports().size());
         Export export = module.getExports().get("foo");
         assertEquals("foo", export.getName());
-        assertEquals("Some method", export.getDescription());
+        assertEquals("Some method", export.getJsDoc().getDescription());
     }
 
     @Test
@@ -63,7 +63,7 @@ public class TestModule
         assertEquals(1, module.getExports().size());
         Export export = module.getExports().get("foo");
         assertEquals("foo", export.getName());
-        assertEquals("Some method", export.getDescription());
+        assertEquals("Some method", export.getJsDoc().getDescription());
     }
 
     @Test
@@ -77,7 +77,7 @@ public class TestModule
         assertEquals(1, module.getExports().size());
         Export export = module.getExports().get("foo");
         assertEquals("foo", export.getName());
-        assertEquals("Some method\nAnother point", export.getDescription());
+        assertEquals("Some method\nAnother point", export.getJsDoc().getDescription());
     }
 
     @Test
@@ -86,7 +86,7 @@ public class TestModule
         Module module = new Module("foo", "foo.js", 0, "/**\n" +
                                           " * Some module\n" +
                                           " */\n");
-        assertEquals("Some module", module.getDescription());
+        assertEquals("Some module", module.getJsDoc().getDescription());
     }
 
     @Test
@@ -99,7 +99,7 @@ public class TestModule
                                           " * Some method\n" +
                                           " */\n" +
                                           "exports.foo = bar;");
-        assertEquals("Some module", module.getDescription());
+        assertEquals("Some module", module.getJsDoc().getDescription());
     }
 
     @Test
@@ -111,7 +111,7 @@ public class TestModule
                                           " * Some method\n" +
                                           " */\n" +
                                           "exports.foo = bar;");
-        assertEquals("", module.getDescription());
+        assertEquals("", module.getJsDoc().getDescription());
     }
 
     @Test

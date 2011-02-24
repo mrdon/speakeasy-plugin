@@ -36,13 +36,6 @@ public class ModuleUtil
         }
     }
 
-    public static String stripStars(String jsDoc)
-    {
-        String noStartOrEndStars = jsDoc != null ? jsDoc.replaceAll("^\\/\\*\\*|\\*\\/$", "") : "";
-        String result = Pattern.compile("^\\s*\\* ?", Pattern.MULTILINE).matcher(noStartOrEndStars).replaceAll("");
-        return result.trim();
-    }
-
     public static class ModuleIdComparator implements Comparator<String>
     {
         public int compare(String o1, String o2)

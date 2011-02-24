@@ -1,6 +1,8 @@
 package com.atlassian.labs.speakeasy.commonjs;
 
 import com.atlassian.labs.speakeasy.commonjs.util.IterableTreeMap;
+import com.atlassian.labs.speakeasy.commonjs.util.JsDoc;
+import com.atlassian.labs.speakeasy.commonjs.util.JsDocParser;
 import com.atlassian.labs.speakeasy.commonjs.util.ModuleUtil;
 import com.google.common.collect.ImmutableSet;
 import org.mozilla.javascript.*;
@@ -10,7 +12,6 @@ import org.slf4j.LoggerFactory;
 
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlRootElement;
 import java.io.IOException;
 import java.io.StringReader;
 import java.util.Collection;
@@ -19,6 +20,7 @@ import java.util.Set;
 import java.util.concurrent.atomic.AtomicReference;
 
 import static com.google.common.collect.Sets.newHashSet;
+import static org.apache.commons.lang.Validate.notNull;
 
 /**
  *
@@ -27,8 +29,9 @@ public class Module
 {
     @XmlAttribute
     private final String id;
-    @XmlAttribute
-    private final String description;
+    @XmlElement
+    private final JsDoc jsDoc;
+
     private final String path;
     private final long lastModified;
     @XmlElement
@@ -46,25 +49,26 @@ public class Module
         if (path.endsWith(".js"))
         {
             Set<String> dependencies = newHashSet();
-            description = parseContent(moduleContents, dependencies);
+            jsDoc = parseContent(moduleContents, dependencies);
             this.dependencies = ImmutableSet.copyOf(dependencies);
         }
         else if (path.endsWith(".mu"))
         {
-            description = "Mustache template";
+            jsDoc = new JsDoc("Mustache template");
             this.dependencies = ImmutableSet.of("speakeasy/mustache");
-            final Export export = new Export("render", "Renders the template with the provided context");
+            final Export export = new Export("render", new JsDoc("Renders the template with the provided context"));
             exports.put("render", export);
         }
         else
         {
             throw new IllegalArgumentException("Invalid module:" + id + " of path:" + path);
         }
+        notNull(jsDoc);
     }
 
-    private String parseContent(String moduleContents, final Set<String> dependencies)
+    private JsDoc parseContent(String moduleContents, final Set<String> dependencies)
     {
-        final AtomicReference<String> description = new AtomicReference<String>("");
+        final AtomicReference<JsDoc> jsDoc = new AtomicReference<JsDoc>(new JsDoc(""));
         CompilerEnvirons env = new CompilerEnvirons();
         env.setRecordingComments(true);
         env.setRecordingLocalJsDocComments(true);
@@ -96,7 +100,7 @@ public class Module
             if (root.getComments() != null && !root.getComments().isEmpty())
             {
                 final String rawHeaderDocs = root.getComments().first().getValue();
-                description.set(ModuleUtil.stripStars(rawHeaderDocs));
+                jsDoc.set(JsDocParser.parse(rawHeaderDocs));
             }
 
             root.visitAll(new NodeVisitor()
@@ -113,11 +117,10 @@ public class Module
                             if ("exports".equals(name))
                             {
                                 String exportName = left.getProperty().getIdentifier();
-                                final String exportDescription = ModuleUtil.stripStars(node.getJsDoc());
-                                Export export = new Export(exportName, exportDescription);
-                                if (description.get().length() > 0 && exportDescription.equals(description))
+                                Export export = new Export(exportName, JsDocParser.parse(node.getJsDoc()));
+                                if (jsDoc.get().getDescription().length() > 0 && export.getJsDoc().getDescription().equals(jsDoc.get().getDescription()))
                                 {
-                                    description.set("");
+                                    jsDoc.set(new JsDoc(""));
                                 }
                                 exports.put(exportName, export);
                             }
@@ -147,7 +150,7 @@ public class Module
         {
             log.warn("Unable to determine exports", e);
         }
-        return description.get();
+        return jsDoc.get();
     }
 
 
@@ -166,11 +169,6 @@ public class Module
         return dependencies;
     }
 
-    public String getDescription()
-    {
-        return description;
-    }
-
     public String getPath()
     {
         return path;
@@ -181,4 +179,8 @@ public class Module
         return lastModified;
     }
 
+    public JsDoc getJsDoc()
+    {
+        return jsDoc;
+    }
 }
