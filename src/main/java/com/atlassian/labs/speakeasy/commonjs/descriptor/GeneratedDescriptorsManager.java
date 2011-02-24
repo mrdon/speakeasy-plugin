@@ -1,6 +1,7 @@
 package com.atlassian.labs.speakeasy.commonjs.descriptor;
 
 import com.atlassian.labs.speakeasy.commonjs.CommonJsModules;
+import com.atlassian.labs.speakeasy.commonjs.util.JsDoc;
 import com.atlassian.labs.speakeasy.util.DefaultPluginModuleTracker;
 import com.atlassian.labs.speakeasy.util.PluginModuleTracker;
 import com.atlassian.labs.speakeasy.util.WebResourceUtil;
@@ -140,6 +141,9 @@ class GeneratedDescriptorsManager
             Element dep = root.addElement("dependency");
             dep.setText(descriptor.getCompleteKey() + "-modules");
             //addUserTransformers(descriptor.getUsers(), root);
+            JsDoc jsDoc = modules.getModule(id).getJsDoc();
+            addAnnotatedDependencies(root, descriptor.getPluginKey(), jsDoc);
+            addAnnotatedContext(root, jsDoc);
             Element jsTransform = getJsTransformation(root);
             Element trans = jsTransform.addElement("transformer");
             trans.addAttribute("key", "commonjs-module-entry");
@@ -158,6 +162,42 @@ class GeneratedDescriptorsManager
         }
         return registrations;
     }
+
+    private void addAnnotatedContext(Element root, JsDoc jsDoc)
+    {
+        String jsDocContext = jsDoc.getAttribute("context");
+        if (jsDocContext != null)
+        {
+            for (String ctxRaw : jsDocContext.split(","))
+            {
+                Element ctxElement = root.addElement("context");
+                ctxElement.setText(ctxRaw.trim());
+            }
+        }
+    }
+
+    private void addAnnotatedDependencies(Element root, String pluginKey, JsDoc jsDoc)
+    {
+        String jsDocDependencies = jsDoc.getAttribute("dependency");
+        if (jsDocDependencies != null)
+        {
+            for (String depRaw : jsDocDependencies.split(","))
+            {
+                Element depElement = root.addElement("dependency");
+                String dep = depRaw.trim();
+                if (!dep.contains(":"))
+                {
+                    depElement.setText(pluginKey + ":" + dep);
+                }
+                else
+                {
+                    depElement.setText(dep);
+                }
+            }
+        }
+    }
+
+
 
     private Element getJsTransformation(Element root)
     {
@@ -188,7 +228,7 @@ class GeneratedDescriptorsManager
             {
                 e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
             }
-            log.debug("Generated descriptor:\n" + out.toString());
+            log.error("Generated descriptor:\n" + out.toString());
         }
         return root;
     }

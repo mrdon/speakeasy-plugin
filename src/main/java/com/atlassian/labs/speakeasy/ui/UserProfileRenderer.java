@@ -71,7 +71,6 @@ public class UserProfileRenderer
         }
 
         webResourceManager.requireResource("com.atlassian.auiplugin:ajs");
-        webResourceManager.requireResource("com.atlassian.labs.speakeasy-plugin:user");
         webResourceManager.requireResourcesForContext("speakeasy.user-profile");
         boolean devMode = data.isDeveloperModuleEnabled(user);
         if (devMode)

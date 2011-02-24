@@ -16,11 +16,6 @@
 
     <commonjs key="userModules" />
 
-    <web-resource key="user">
-        <dependency>${project.groupId}.${project.artifactId}:shared</dependency>
-        <dependency>${project.groupId}.${project.artifactId}:speakeasy_user_user</dependency>
-    </web-resource>
-
     <web-resource key="user-jira" application="jira">
         <context>speakeasy.user-profile</context>
         <resource type="download" name="user-jira.css" location="jira/user-jira.css"/>

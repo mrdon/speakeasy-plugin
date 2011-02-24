@@ -1,17 +1,12 @@
 package com.atlassian.labs.speakeasy.commonjs.util;
 
-import com.google.common.base.Function;
 import com.google.common.base.Predicate;
-import com.google.common.collect.ImmutableMap;
 
-import javax.annotation.Nullable;
 import java.util.Map;
 import java.util.regex.Pattern;
 
 import static com.google.common.collect.Iterables.filter;
 import static com.google.common.collect.Maps.newHashMap;
-import static com.google.common.collect.Maps.transformValues;
-import static com.google.common.collect.Maps.uniqueIndex;
 import static java.util.Arrays.asList;
 
 /**
