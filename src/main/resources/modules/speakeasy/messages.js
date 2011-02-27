@@ -1,5 +1,7 @@
 /**
  * Handles interactions with AUI messages
+ *
+ * @public
  */
 var $ = require('./jquery').jQuery;
 

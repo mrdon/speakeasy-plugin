@@ -18,6 +18,7 @@ import com.atlassian.templaterenderer.TemplateRenderer;
 import com.atlassian.templaterenderer.annotations.HtmlSafe;
 import com.google.common.collect.ImmutableMap;
 import com.samskivert.mustache.Mustache;
+import com.samskivert.mustache.Options;
 import com.samskivert.mustache.Template;
 import org.apache.commons.io.IOUtils;
 
@@ -144,7 +145,7 @@ public class UserProfileRenderer
         try
         {
             in = plugin.getResourceAsStream(path);
-            return Mustache.compiler().compile(new InputStreamReader(in));
+            return Mustache.compiler(new Options.Builder().setStandardsMode(true).build()).compile(new InputStreamReader(in));
         }
         finally
         {

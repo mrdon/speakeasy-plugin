@@ -15,7 +15,7 @@ var exportedFunctionOrProperty = require('some/module');
     <h4>External Dependencies</h4>
     <ul>
     {{#externalModuleDependencies}}
-      <li class="modules-external-dependency">{{this}}</li>
+      <li class="modules-external-dependency">{{.}}</li>
     {{/externalModuleDependencies}}
     {{^externalModuleDependencies}}
       <li>No external dependencies</li>
@@ -33,7 +33,14 @@ var exportedFunctionOrProperty = require('some/module');
         </thead>
         <tbody>
             {{#iterableModules}}
-            <tr data-moduleId="{{id}}">
+            <tr data-moduleId="{{id}}"
+                    {{#jsDoc}}
+                        {{#attributes}}
+                            {{^public}}
+                                class="private-module"
+                            {{/public}}
+                        {{/attributes}}
+                    {{/jsDoc}}>
                 <td><code class="module-id">{{id}}</code></td>
                 <td>
                 <ul>
@@ -50,7 +57,7 @@ var exportedFunctionOrProperty = require('some/module');
                 <td>
                     <ul>
                     {{#dependencies}}
-                        <li><code class="module-dependency">{{this}}</code></li>
+                        <li><code class="module-dependency">{{.}}</code></li>
                     {{/dependencies}}
                     </ul>
                 </td>

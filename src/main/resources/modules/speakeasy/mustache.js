@@ -1,5 +1,7 @@
 /**
  * Wraps Mustache
+ *
+ * @public
  */
 
 /**
