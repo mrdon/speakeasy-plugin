@@ -14,7 +14,7 @@ td .plugin-description {
 }
 
 tr.forked-row td .plugin-summary {
-    background: url("@staticResourcePrefix/com.atlassian.labs.speakeasy-plugin:userModules-modules/speakeasy/user/images/arrow_045.png") no-repeat 0px 8px;
+    background: url("@modulePrefix/speakeasy/user/images/arrow_045.png") no-repeat 0px 8px;
     padding-left: 22px;
 }
 

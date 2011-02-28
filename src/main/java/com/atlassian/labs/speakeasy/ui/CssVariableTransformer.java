@@ -23,20 +23,29 @@ public class CssVariableTransformer implements WebResourceTransformer
 
     public DownloadableResource transform(Element configElement, ResourceLocation location, String filePath, DownloadableResource nextResource)
     {
-        return new CssVariableDownloadableResource(nextResource);
+        return new CssVariableDownloadableResource(nextResource, configElement);
     }
 
     private class CssVariableDownloadableResource extends AbstractStringTransformedDownloadableResource
     {
-        public CssVariableDownloadableResource(DownloadableResource originalResource)
+        private final Element configElement;
+
+        public CssVariableDownloadableResource(DownloadableResource originalResource, Element configElement)
         {
             super(originalResource);
+            this.configElement = configElement;
         }
 
         @Override
         protected String transform(String originalContent)
         {
-            return originalContent.replace("@staticResourcePrefix", webResourceManager.getStaticResourcePrefix(UrlMode.RELATIVE) + "/download/resources");
+            String content = originalContent.replace("@staticResourcePrefix", webResourceManager.getStaticResourcePrefix(UrlMode.RELATIVE) + "/download/resources");
+            String fullModuleKey = configElement.attributeValue("fullModuleKey");
+            if (fullModuleKey != null)
+            {
+                content = content.replace("@modulePrefix", webResourceManager.getStaticResourcePrefix(UrlMode.RELATIVE) + "/download/resources/" + fullModuleKey);
+            }
+            return content;
         }
     }
 

@@ -274,13 +274,16 @@ class GeneratedDescriptorsManager
         trans = muTrans.addElement("transformer");
         trans.addAttribute("key", "template");
 
+        String generatedModuleKey = descriptor.getKey() + "-modules";
+
         Element cssTrans = root.addElement("transformation");
         cssTrans.addAttribute("extension", "css");
         trans = cssTrans.addElement("transformer");
         trans.addAttribute("key", "cssVariables");
-
+        trans.addAttribute("fullModuleKey", descriptor.getPluginKey() + ":" + generatedModuleKey);
+        
         webResourceModuleDescriptor.init(dummyPlugin,
-                createDescriptorElement(descriptor.getKey() + "-modules", root));
+                createDescriptorElement(generatedModuleKey, root));
         return pluginBundle.getBundleContext().registerService(ModuleDescriptor.class.getName(), webResourceModuleDescriptor, null);
     }
 }
