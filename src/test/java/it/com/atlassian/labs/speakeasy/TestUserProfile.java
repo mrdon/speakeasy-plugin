@@ -367,9 +367,9 @@ public class TestUserProfile
     @Test
     public void testInstallPluginMissingModules() throws IOException
     {
-        File jar = new PluginJarBuilder()
+        File jar = new PluginJarBuilder("Missing-Module")
                 .addFormattedResource("atlassian-plugin.xml",
-                        "<atlassian-plugin key='unresolved-test' pluginsVersion='2' name='Plugin Tests'>",
+                        "<atlassian-plugin key='unresolved-test' pluginsVersion='2' name='Missing Module Test'>",
                         "    <plugin-info>",
                         "        <version>2</version>",
                         "    </plugin-info>",
@@ -387,8 +387,8 @@ public class TestUserProfile
         assertEquals(1, messages.size());
         assertTrue(messages.get(0).contains("speakeasy/user/user"));
 
-        //SpeakeasyUserPage.PluginRow row = page.getPlugins().get("unresolved-test");
-        //assertTrue(row.getDescription().contains("speakeasy/user/user"));
+        SpeakeasyUserPage.PluginRow row = page.getPlugins().get("unresolved-test");
+        assertTrue(row.getDescription().contains("speakeasy/user/user"));
     }
 
     @Test

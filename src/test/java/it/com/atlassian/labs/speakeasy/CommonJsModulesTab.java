@@ -2,6 +2,7 @@ package it.com.atlassian.labs.speakeasy;
 
 import com.atlassian.webdriver.AtlassianWebDriver;
 import org.openqa.selenium.By;
+import org.openqa.selenium.RenderedWebElement;
 import org.openqa.selenium.WebElement;
 
 import javax.inject.Inject;
@@ -23,9 +24,12 @@ public class CommonJsModulesTab
     {
         List<String> names = newArrayList();
         WebElement row = getModuleRow(moduleId);
-        for (WebElement exportName : row.findElements(By.className("export-name")))
+        if (row != null)
         {
-            names.add(exportName.getText());
+            for (WebElement exportName : row.findElements(By.className("export-name")))
+            {
+                names.add(exportName.getText());
+            }
         }
         return names;
     }
@@ -35,7 +39,7 @@ public class CommonJsModulesTab
 
         for (WebElement row : driver.findElements(By.tagName("tr")))
         {
-            if (moduleId.equals(row.getAttribute("data-moduleId")))
+            if (moduleId.equals(row.getAttribute("data-moduleId")) && ((RenderedWebElement)row).isDisplayed())
             {
                 return row;
             }

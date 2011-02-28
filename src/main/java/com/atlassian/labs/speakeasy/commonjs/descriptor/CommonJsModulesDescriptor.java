@@ -1,6 +1,7 @@
 package com.atlassian.labs.speakeasy.commonjs.descriptor;
 
 import com.atlassian.labs.speakeasy.commonjs.CommonJsModules;
+import com.atlassian.labs.speakeasy.commonjs.PluginFrameworkWatcher;
 import com.atlassian.labs.speakeasy.util.WebResourceUtil;
 import com.atlassian.plugin.ModuleDescriptor;
 import com.atlassian.plugin.Plugin;
@@ -33,19 +34,19 @@ public class CommonJsModulesDescriptor extends AbstractModuleDescriptor<CommonJs
     private final PluginEventManager pluginEventManager;
     private final PluginAccessor pluginAccessor;
     private final HostContainer hostContainer;
-    private final LifecycleManager lifecycleManager;
+    private final PluginFrameworkWatcher pluginFrameworkWatcher;
     private Bundle pluginBundle;
     private volatile CommonJsModules modules;
     private volatile GeneratedDescriptorsManager generatedDescriptorsManager;
 
-    public CommonJsModulesDescriptor(BundleContext bundleContext, PluginEventManager pluginEventManager, PluginAccessor pluginAccessor, HostContainer hostContainer,
-                                     LifecycleManager lifecycleManager)
+
+    public CommonJsModulesDescriptor(BundleContext bundleContext, PluginEventManager pluginEventManager, PluginAccessor pluginAccessor, HostContainer hostContainer, PluginFrameworkWatcher pluginFrameworkWatcher)
     {
         this.bundleContext = bundleContext;
         this.pluginEventManager = pluginEventManager;
         this.pluginAccessor = pluginAccessor;
         this.hostContainer = hostContainer;
-        this.lifecycleManager = lifecycleManager;
+        this.pluginFrameworkWatcher = pluginFrameworkWatcher;
     }
 
 
@@ -82,7 +83,7 @@ public class CommonJsModulesDescriptor extends AbstractModuleDescriptor<CommonJs
             generatedDescriptorsManager = new GeneratedDescriptorsManager(pluginBundle, modules, pluginAccessor, pluginEventManager, this, hostContainer);
         }
         Set<String> unresolvedDependencies = generatedDescriptorsManager.getUnresolvedExternalDependencies();
-        if (lifecycleManager.isApplicationSetUp() && !unresolvedDependencies.isEmpty())
+        if (pluginFrameworkWatcher.isPluginFrameworkStarted() && !unresolvedDependencies.isEmpty())
         {
             throw new PluginException("Unable to enable commonjs modules '" + getCompleteKey() + "' due to unresolved dependencies: " + unresolvedDependencies);
         }

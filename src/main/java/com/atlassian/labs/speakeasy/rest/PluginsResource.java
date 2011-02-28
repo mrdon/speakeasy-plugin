@@ -175,12 +175,18 @@ public class PluginsResource
         }
         catch (PluginOperationFailedException e)
         {
-            return Response.ok().entity(wrapBodyInTextArea("{\"error\":\"" + e.getMessage() + "\"}")).build();
+            return Response.ok().entity(wrapBodyInTextArea(createErrorJson(user, e))).build();
         }
         catch (RuntimeException e)
         {
-            return Response.ok().entity(wrapBodyInTextArea("{\"error\":\"" + e.getMessage() + "\"}")).build();
+            return Response.ok().entity(wrapBodyInTextArea(createErrorJson(user, e))).build();
         }
+    }
+
+    private String createErrorJson(String user, Exception e)
+    {
+        return "{\"error\":\"" + e.getMessage() + "\", \"plugins\" : " +
+               jaxbJsonMarshaller.marshal(speakeasyManager.getUserAccessList(user)) +"}";
     }
 
     private File extractPluginFile(HttpServletRequest request)

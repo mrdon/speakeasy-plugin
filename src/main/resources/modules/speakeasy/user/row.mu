@@ -20,10 +20,10 @@
             <br>
             <span class="plugin-description">
                 {{^available}}
-                {{&description}}
+                    {{&description}}
                 {{/available}}
                 {{#available}}
-                {{description}}
+                    {{description}}
                 {{/available}}
             </span></div>
     </td>

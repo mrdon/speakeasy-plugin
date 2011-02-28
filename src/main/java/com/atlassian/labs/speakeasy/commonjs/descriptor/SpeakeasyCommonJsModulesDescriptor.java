@@ -2,6 +2,7 @@ package com.atlassian.labs.speakeasy.commonjs.descriptor;
 
 import com.atlassian.labs.speakeasy.DescriptorGenerator;
 import com.atlassian.labs.speakeasy.SpeakeasyWebResourceModuleDescriptor;
+import com.atlassian.labs.speakeasy.commonjs.PluginFrameworkWatcher;
 import com.atlassian.plugin.ModuleDescriptor;
 import com.atlassian.plugin.PluginAccessor;
 import com.atlassian.plugin.event.PluginEventManager;
@@ -16,20 +17,25 @@ import static java.util.Collections.emptySet;
 /**
  *
  */
-public class SpeakeasyCommonJsModulesDescriptor extends CommonJsModulesDescriptor implements DescriptorGenerator<CommonJsModulesDescriptor> {
+public class SpeakeasyCommonJsModulesDescriptor extends CommonJsModulesDescriptor implements DescriptorGenerator<CommonJsModulesDescriptor>
+{
     private final HostContainer hostContainer;
+
     public SpeakeasyCommonJsModulesDescriptor(BundleContext bundleContext, PluginEventManager pluginEventManager, PluginAccessor pluginAccessor, HostContainer hostContainer,
-                                              LifecycleManager lifecycleManager) {
-        super(bundleContext, pluginEventManager, pluginAccessor, hostContainer, lifecycleManager);
+                                              PluginFrameworkWatcher pluginFrameworkWatcher)
+    {
+        super(bundleContext, pluginEventManager, pluginAccessor, hostContainer, pluginFrameworkWatcher);
         this.hostContainer = hostContainer;
     }
 
-    public Iterable<CommonJsModulesDescriptor> getDescriptorsToExposeForUsers(List<String> users, int state) {
+    public Iterable<CommonJsModulesDescriptor> getDescriptorsToExposeForUsers(List<String> users, int state)
+    {
         return emptySet();
     }
 
     @Override
-    public ModuleDescriptor createIndividualModuleDescriptor() {
+    public ModuleDescriptor createIndividualModuleDescriptor()
+    {
         return new SpeakeasyWebResourceModuleDescriptor(hostContainer);
     }
 }

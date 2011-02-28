@@ -16,6 +16,7 @@ import com.atlassian.plugin.osgi.external.SingleModuleDescriptorFactory;
 import com.atlassian.plugin.osgi.factory.OsgiPlugin;
 import com.atlassian.plugin.util.WaitUntil;
 import com.atlassian.plugin.webresource.transformer.WebResourceTransformerModuleDescriptor;
+import org.netbeans.lib.cvsclient.commandLine.command.log;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceRegistration;
@@ -158,7 +159,7 @@ public class DescriptorGeneratorManager implements DisposableBean
         }
         else
         {
-            throw new PluginOperationFailedException("Plugin " + pluginKey + " is disabled");
+            // plugin is disabled
         }
         return generators;
     }

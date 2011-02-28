@@ -69,7 +69,6 @@
     <component-import key="userManager" interface="com.atlassian.sal.api.user.UserManager"/>
     <component-import key="pluginSettings" interface="com.atlassian.sal.api.pluginsettings.PluginSettingsFactory"/>
     <component-import key="templateRenderer" interface="com.atlassian.templaterenderer.TemplateRenderer"/>
-    <component-import key="lifecycleManager" interface="com.atlassian.sal.api.lifecycle.LifecycleManager" />
 
     <component-import key="pluginController" interface="com.atlassian.plugin.PluginController"/>
     <component-import key="pluginAccessor" interface="com.atlassian.plugin.PluginAccessor"/>
@@ -161,6 +160,8 @@
         <resource type="download" name="yabble.js" location="shared/yabble.js"/>
     </web-resource>
 
+    <component key="pluginFrameworkWatcher" class="com.atlassian.labs.speakeasy.commonjs.PluginFrameworkWatcher" public="true"
+            interface="com.atlassian.sal.api.lifecycle.LifecycleAware"/>
     <component-import key="appprops" interface="com.atlassian.sal.api.ApplicationProperties" />
 
     <module-type key="commonjs" class="com.atlassian.labs.speakeasy.commonjs.descriptor.CommonJsModulesDescriptor" />

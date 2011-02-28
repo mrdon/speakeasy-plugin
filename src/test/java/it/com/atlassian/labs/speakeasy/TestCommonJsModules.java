@@ -39,9 +39,9 @@ public class TestCommonJsModules
     @Test
     public void testExports()
     {
-        List<String> exportNames = product.visit(SpeakeasyUserPage.class)
-                .viewCommonJsModulesTab()
-                .getExportNames("test/my-module");
-        assertEquals(newArrayList("sayHi"), exportNames);
+        CommonJsModulesTab tab = product.visit(SpeakeasyUserPage.class)
+                .viewCommonJsModulesTab();
+        assertEquals(newArrayList("sayHi"), tab.getExportNames("test/my-module"));
+        assertTrue(tab.getExportNames("test/private").isEmpty());
     }
 }

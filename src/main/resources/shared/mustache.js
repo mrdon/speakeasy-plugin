@@ -149,7 +149,7 @@ var Mustache = function() {
       var that = this;
 
       var new_regex = function() {
-        return new RegExp(that.otag + "(=|!|>|\\{|%)?([^\\/#\\^]+?)\\1?" +
+        return new RegExp(that.otag + "(=|!|>|&|\\{|%)?([^\\/#\\^]+?)\\1?" +
           that.ctag + "+", "g");
       };
 
@@ -165,6 +165,7 @@ var Mustache = function() {
         case ">": // render partial
           return that.render_partial(name, context, partials);
         case "{": // the triple mustache is unescaped
+        case "&": // & operator is an alternative unescape method
           return that.find(name, context);
         default: // escape the value
           return that.escape(that.find(name, context));
@@ -244,11 +245,12 @@ var Mustache = function() {
     */
     escape: function(s) {
       s = String(s === null ? "" : s);
-      return s.replace(/&(?!\w+;)|["<>\\]/g, function(s) {
+      return s.replace(/&(?!\w+;)|["'<>\\]/g, function(s) {
         switch(s) {
         case "&": return "&amp;";
         case "\\": return "\\\\";
-        case '"': return '\"';
+        case '"': return '&quot;';
+        case "'": return '&#39;';
         case "<": return "&lt;";
         case ">": return "&gt;";
         default: return s;
@@ -305,7 +307,7 @@ var Mustache = function() {
 
   return({
     name: "mustache.js",
-    version: "0.3.0",
+    version: "0.3.1-dev",
 
     /*
       Turns a template and view into HTML
