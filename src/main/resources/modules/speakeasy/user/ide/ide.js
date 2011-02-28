@@ -185,6 +185,10 @@ function saveAndReload(pluginKey, fileName, contents) {
             } else {
                 updateStatus(data.name + " was saved successfully and reloaded");
             }
+        },
+        error : function(xhr) {
+            console.log('error');
+            updateStatus("Error - " + xhr.responseText);
         }
     })
 }

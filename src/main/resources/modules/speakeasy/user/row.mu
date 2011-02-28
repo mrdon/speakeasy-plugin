@@ -2,6 +2,10 @@
         {{#fork}}
         class="forked-row"
         {{/fork}}
+
+        {{^available}}
+            class="unavailable-row"
+        {{/available}}
         >
     <td headers="plugin-name">
         <div class="plugin-summary">
@@ -14,7 +18,14 @@
                 {{/fork}}
             </span>
             <br>
-            <span class="plugin-description">{{description}}</span></div>
+            <span class="plugin-description">
+                {{^available}}
+                {{&description}}
+                {{/available}}
+                {{#available}}
+                {{description}}
+                {{/available}}
+            </span></div>
     </td>
     <td headers="plugin-author">
         {{#fork}}

@@ -4,7 +4,9 @@ import com.atlassian.labs.speakeasy.commonjs.descriptor.CommonJsModulesDescripto
 import com.atlassian.labs.speakeasy.commonjs.util.IterableTreeMap;
 import com.atlassian.plugin.Plugin;
 import com.atlassian.plugin.PluginParseException;
+import com.atlassian.plugin.PluginState;
 import com.atlassian.plugin.util.PluginUtils;
+import com.google.common.base.Predicate;
 import com.google.common.collect.MapMaker;
 import com.google.common.collect.Sets;
 import org.apache.commons.io.IOUtils;
@@ -18,6 +20,7 @@ import java.net.URL;
 import java.util.*;
 
 import static com.atlassian.labs.speakeasy.commonjs.util.ModuleUtil.determineLastModified;
+import static com.google.common.collect.Iterables.filter;
 import static java.util.Collections.unmodifiableSet;
 
 /**
@@ -29,6 +32,9 @@ public class CommonJsModules
     private final Map<String, Module> modules = new MapMaker().makeMap();
     @XmlElement
     private final Set<String> externalModuleDependencies;
+
+    @XmlElement
+    private final Set<String> publicModuleIds = Sets.newHashSet();
 
     private final Plugin plugin;
     private final Bundle pluginBundle;
@@ -66,6 +72,11 @@ public class CommonJsModules
     public Set<String> getModuleIds()
     {
         return new HashSet<String>(modules.keySet());
+    }
+
+    public Set<String> getPublicModuleIds()
+    {
+        return publicModuleIds;
     }
 
     public Set<String> getResources()
@@ -144,6 +155,10 @@ public class CommonJsModules
             Module module = scanModule(moduleName, moduleUrl);
             allDeps.addAll(module.getDependencies());
             modules.put(moduleName, module);
+            if (module.getJsDoc().getAttribute("public") != null)
+            {
+                publicModuleIds.add(moduleName);
+            }
         }
         allDeps.removeAll(modules.keySet());
         return allDeps;

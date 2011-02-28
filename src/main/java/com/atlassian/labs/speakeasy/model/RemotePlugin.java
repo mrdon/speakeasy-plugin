@@ -26,6 +26,8 @@ public class RemotePlugin implements Comparable
 
     private int numUsers = 0;
 
+    private boolean available;
+
     private boolean enabled;
 
     private boolean canUninstall;
@@ -215,6 +217,16 @@ public class RemotePlugin implements Comparable
     public void setCanDownload(boolean canDownload)
     {
         this.canDownload = canDownload;
+    }
+
+    public boolean isAvailable()
+    {
+        return available;
+    }
+
+    public void setAvailable(boolean available)
+    {
+        this.available = available;
     }
 
     public int compareTo(Object o)

@@ -1,6 +1,7 @@
 package com.atlassian.labs.speakeasy;
 
 import com.atlassian.labs.speakeasy.data.SpeakeasyData;
+import com.atlassian.labs.speakeasy.install.PluginOperationFailedException;
 import com.atlassian.plugin.ModuleDescriptor;
 import com.atlassian.plugin.Plugin;
 import com.atlassian.plugin.PluginAccessor;
@@ -144,7 +145,7 @@ public class DescriptorGeneratorManager implements DisposableBean
     private List<DescriptorGenerator<ModuleDescriptor>> findGeneratorsInPlugin(String pluginKey)
     {
         List<DescriptorGenerator<ModuleDescriptor>> generators = new ArrayList<DescriptorGenerator<ModuleDescriptor>>();
-        Plugin plugin = pluginAccessor.getPlugin(pluginKey);
+        Plugin plugin = pluginAccessor.getEnabledPlugin(pluginKey);
         if (plugin != null)
         {
             for (ModuleDescriptor moduleDescriptor : plugin.getModuleDescriptors())
@@ -154,6 +155,10 @@ public class DescriptorGeneratorManager implements DisposableBean
                     generators.add((DescriptorGenerator) moduleDescriptor);
                 }
             }
+        }
+        else
+        {
+            throw new PluginOperationFailedException("Plugin " + pluginKey + " is disabled");
         }
         return generators;
     }

@@ -365,6 +365,33 @@ public class TestUserProfile
     }
 
     @Test
+    public void testInstallPluginMissingModules() throws IOException
+    {
+        File jar = new PluginJarBuilder()
+                .addFormattedResource("atlassian-plugin.xml",
+                        "<atlassian-plugin key='unresolved-test' pluginsVersion='2' name='Plugin Tests'>",
+                        "    <plugin-info>",
+                        "        <version>2</version>",
+                        "    </plugin-info>",
+                        "    <scoped-modules key='item' />",
+                        "    <scoped-web-resource key='another-item' />",
+                        "</atlassian-plugin>")
+                .addFormattedResource("modules/foo.js",
+                        "require('speakeasy/user/user');")
+                .build();
+
+        SpeakeasyUserPage page = product.visit(SpeakeasyUserPage.class)
+                .uploadPluginExpectingFailure(jar);
+
+        List<String> messages = page.getErrorMessages();
+        assertEquals(1, messages.size());
+        assertTrue(messages.get(0).contains("speakeasy/user/user"));
+
+        //SpeakeasyUserPage.PluginRow row = page.getPlugins().get("unresolved-test");
+        //assertTrue(row.getDescription().contains("speakeasy/user/user"));
+    }
+
+    @Test
     public void testUninstallPlugin() throws IOException
     {
         File jar = buildSimplePluginFile();

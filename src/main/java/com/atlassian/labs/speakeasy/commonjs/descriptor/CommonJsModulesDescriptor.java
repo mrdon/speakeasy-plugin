@@ -5,12 +5,14 @@ import com.atlassian.labs.speakeasy.util.WebResourceUtil;
 import com.atlassian.plugin.ModuleDescriptor;
 import com.atlassian.plugin.Plugin;
 import com.atlassian.plugin.PluginAccessor;
+import com.atlassian.plugin.PluginException;
 import com.atlassian.plugin.PluginParseException;
 import com.atlassian.plugin.descriptors.AbstractModuleDescriptor;
 import com.atlassian.plugin.event.PluginEventManager;
 import com.atlassian.plugin.hostcontainer.HostContainer;
 import com.atlassian.plugin.osgi.factory.OsgiPlugin;
 import com.atlassian.plugin.webresource.WebResourceModuleDescriptor;
+import com.atlassian.sal.api.lifecycle.LifecycleManager;
 import com.atlassian.util.concurrent.NotNull;
 import org.dom4j.Element;
 import org.osgi.framework.Bundle;
@@ -31,16 +33,19 @@ public class CommonJsModulesDescriptor extends AbstractModuleDescriptor<CommonJs
     private final PluginEventManager pluginEventManager;
     private final PluginAccessor pluginAccessor;
     private final HostContainer hostContainer;
+    private final LifecycleManager lifecycleManager;
     private Bundle pluginBundle;
     private volatile CommonJsModules modules;
     private volatile GeneratedDescriptorsManager generatedDescriptorsManager;
 
-    public CommonJsModulesDescriptor(BundleContext bundleContext, PluginEventManager pluginEventManager, PluginAccessor pluginAccessor, HostContainer hostContainer)
+    public CommonJsModulesDescriptor(BundleContext bundleContext, PluginEventManager pluginEventManager, PluginAccessor pluginAccessor, HostContainer hostContainer,
+                                     LifecycleManager lifecycleManager)
     {
         this.bundleContext = bundleContext;
         this.pluginEventManager = pluginEventManager;
         this.pluginAccessor = pluginAccessor;
         this.hostContainer = hostContainer;
+        this.lifecycleManager = lifecycleManager;
     }
 
 
@@ -75,6 +80,11 @@ public class CommonJsModulesDescriptor extends AbstractModuleDescriptor<CommonJs
             pluginBundle = findBundleForPlugin(plugin);
             modules = new CommonJsModules(this, pluginBundle, location);
             generatedDescriptorsManager = new GeneratedDescriptorsManager(pluginBundle, modules, pluginAccessor, pluginEventManager, this, hostContainer);
+        }
+        Set<String> unresolvedDependencies = generatedDescriptorsManager.getUnresolvedExternalDependencies();
+        if (lifecycleManager.isApplicationSetUp() && !unresolvedDependencies.isEmpty())
+        {
+            throw new PluginException("Unable to enable commonjs modules '" + getCompleteKey() + "' due to unresolved dependencies: " + unresolvedDependencies);
         }
     }
 

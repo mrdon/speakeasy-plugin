@@ -9,12 +9,14 @@ import com.atlassian.labs.speakeasy.product.ProductAccessor;
 import com.atlassian.plugin.ModuleDescriptor;
 import com.atlassian.plugin.Plugin;
 import com.atlassian.plugin.PluginAccessor;
+import com.atlassian.plugin.descriptors.UnloadableModuleDescriptor;
 import com.atlassian.plugin.descriptors.UnrecognisedModuleDescriptor;
 import com.atlassian.plugin.event.PluginEventListener;
 import com.atlassian.plugin.event.PluginEventManager;
 import com.atlassian.plugin.event.events.PluginDisabledEvent;
 import com.atlassian.plugin.event.events.PluginEnabledEvent;
 import com.atlassian.plugin.hostcontainer.HostContainer;
+import com.atlassian.plugin.impl.UnloadablePlugin;
 import com.atlassian.plugin.osgi.external.ListableModuleDescriptorFactory;
 import com.atlassian.plugin.osgi.external.SingleModuleDescriptorFactory;
 import com.atlassian.plugin.osgi.factory.OsgiPlugin;
@@ -118,18 +120,28 @@ public class SpeakeasyManager
         RemotePlugin remotePlugin = new RemotePlugin(plugin);
         remotePlugin.setAuthor(getPluginAuthor(plugin));
         List<String> accessList = data.getUsersList(plugin.getKey());
-        remotePlugin.setEnabled(accessList.contains(userName));
         remotePlugin.setNumUsers(accessList.size());
         boolean isAuthor = userName.equals(remotePlugin.getAuthor());
         boolean pureSpeakeasy = onlyContainsSpeakeasyModules(plugin);
+
+        if (pluginAccessor.isPluginEnabled(pluginKey))
+        {
+            remotePlugin.setAvailable(true);
+            remotePlugin.setEnabled(accessList.contains(userName));
+            remotePlugin.setCanEnable(!remotePlugin.isEnabled());
+            remotePlugin.setCanDisable(remotePlugin.isEnabled());
+        }
+        else if (plugin instanceof UnloadablePlugin)
+        {
+            remotePlugin.setDescription(((UnloadablePlugin)plugin).getErrorText());
+        }
         boolean canUninstall = isAuthor && pureSpeakeasy;
         remotePlugin.setFork(remotePlugin.getForkedPluginKey() != null);
         remotePlugin.setCanUninstall(canUninstall);
         remotePlugin.setCanEdit(isAuthor && pureSpeakeasy);
         remotePlugin.setCanFork(!remotePlugin.isFork() && pureSpeakeasy && !isAuthor);
-        remotePlugin.setCanEnable(!remotePlugin.isEnabled());
-        remotePlugin.setCanDisable(remotePlugin.isEnabled());
         remotePlugin.setCanDownload(pureSpeakeasy);
+
 
         // if the user has already forked this, don't let them fork again
         if (!remotePlugin.isFork())
@@ -160,7 +172,10 @@ public class SpeakeasyManager
         String stateIdentifier = String.valueOf(data.getPluginStateIdentifier(plugin.getKey()));
         for (ModuleDescriptor descriptor : plugin.getModuleDescriptors())
         {
-            if (!(descriptor instanceof DescriptorGenerator) && !descriptor.getKey().endsWith(stateIdentifier))
+            if (!(descriptor instanceof DescriptorGenerator)
+                    // FIXME: these checks are hacks
+                    && !descriptor.getKey().endsWith(stateIdentifier) && !descriptor.getKey().endsWith("-modules")
+                    && !(descriptor instanceof UnloadableModuleDescriptor))
             {
                 return false;
             }

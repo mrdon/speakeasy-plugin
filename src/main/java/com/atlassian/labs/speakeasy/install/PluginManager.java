@@ -3,6 +3,9 @@ package com.atlassian.labs.speakeasy.install;
 import com.atlassian.labs.speakeasy.data.SpeakeasyData;
 import com.atlassian.labs.speakeasy.product.ProductAccessor;
 import com.atlassian.plugin.*;
+import com.atlassian.plugin.descriptors.UnloadableModuleDescriptor;
+import com.atlassian.plugin.descriptors.UnrecognisedModuleDescriptor;
+import com.atlassian.plugin.impl.UnloadablePlugin;
 import com.atlassian.plugin.util.WaitUntil;
 import com.atlassian.sal.api.user.UserManager;
 import com.atlassian.templaterenderer.TemplateRenderer;
@@ -126,7 +129,7 @@ public class PluginManager
                     {
                         for (ModuleDescriptor desc : plugin.getModuleDescriptors())
                         {
-                            if (!pluginAccessor.isPluginModuleEnabled(desc.getCompleteKey()))
+                            if (!pluginAccessor.isPluginModuleEnabled(desc.getCompleteKey()) && desc instanceof UnrecognisedModuleDescriptor)
                             {
                                 return false;
                             }
@@ -139,6 +142,19 @@ public class PluginManager
                         return "Waiting for all module descriptors to be resolved and enabled";
                     }
                 });
+                if (!pluginAccessor.isPluginEnabled(plugin.getKey()))
+                {
+                    String cause = "Plugin didn't install correctly";
+                    for (ModuleDescriptor descriptor : plugin.getModuleDescriptors())
+                    {
+                        if (descriptor instanceof UnloadableModuleDescriptor)
+                        {
+                            cause = ((UnloadableModuleDescriptor)descriptor).getErrorText();
+                            break;
+                        }
+                    }
+                    throw new PluginOperationFailedException(cause);
+                }
 
                 return plugin.getKey();
             }

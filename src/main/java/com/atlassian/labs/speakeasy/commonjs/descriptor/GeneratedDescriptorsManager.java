@@ -41,6 +41,7 @@ class GeneratedDescriptorsManager
     private final HostContainer hostContainer;
 
     private final DefaultPluginModuleTracker<CommonJsModules,CommonJsModulesDescriptor> modulesTracker;
+
     private final Set<String> unresolvedExternalDependencies;
     private final Set<String> resolvedExternalModules;
 
@@ -76,11 +77,16 @@ class GeneratedDescriptorsManager
                 });
     }
 
+    public Set<String> getUnresolvedExternalDependencies()
+    {
+        return unresolvedExternalDependencies;
+    }
+
     private synchronized void maybeRegisterDescriptors(CommonJsModulesDescriptor descriptor)
     {
         if (registrations == null)
         {
-            if (unresolvedExternalDependencies.removeAll(descriptor.getModule().getModuleIds()))
+            if (unresolvedExternalDependencies.removeAll(descriptor.getModule().getPublicModuleIds()))
             {
                 resolvedExternalModules.add(descriptor.getCompleteKey() + "-modules");
             }
@@ -94,14 +100,14 @@ class GeneratedDescriptorsManager
             }
             else
             {
-                log.warn("Not exposing '{}' as there are unresolved module dependencies: {}", descriptor.getCompleteKey(), unresolvedExternalDependencies);
+                log.debug("Not exposing '{}' as there are unresolved module dependencies: {}", descriptor.getCompleteKey(), unresolvedExternalDependencies);
             }
         }
     }
 
     private synchronized void maybeUnregisterDescriptors(CommonJsModulesDescriptor descriptor)
     {
-        unresolvedExternalDependencies.addAll(Sets.intersection(descriptor.getModule().getModuleIds(), resolvedExternalModules));
+        unresolvedExternalDependencies.addAll(Sets.intersection(descriptor.getModule().getPublicModuleIds(), resolvedExternalModules));
 
         if (registrations != null)
         {

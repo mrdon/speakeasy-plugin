@@ -6,6 +6,7 @@ import com.atlassian.plugin.ModuleDescriptor;
 import com.atlassian.plugin.PluginAccessor;
 import com.atlassian.plugin.event.PluginEventManager;
 import com.atlassian.plugin.hostcontainer.HostContainer;
+import com.atlassian.sal.api.lifecycle.LifecycleManager;
 import org.osgi.framework.BundleContext;
 
 import java.util.List;
@@ -15,10 +16,11 @@ import static java.util.Collections.emptySet;
 /**
  *
  */
-public class ScopedCommonJsModulesDescriptor extends CommonJsModulesDescriptor implements DescriptorGenerator<CommonJsModulesDescriptor> {
+public class SpeakeasyCommonJsModulesDescriptor extends CommonJsModulesDescriptor implements DescriptorGenerator<CommonJsModulesDescriptor> {
     private final HostContainer hostContainer;
-    public ScopedCommonJsModulesDescriptor(BundleContext bundleContext, PluginEventManager pluginEventManager, PluginAccessor pluginAccessor, HostContainer hostContainer) {
-        super(bundleContext, pluginEventManager, pluginAccessor, hostContainer);
+    public SpeakeasyCommonJsModulesDescriptor(BundleContext bundleContext, PluginEventManager pluginEventManager, PluginAccessor pluginAccessor, HostContainer hostContainer,
+                                              LifecycleManager lifecycleManager) {
+        super(bundleContext, pluginEventManager, pluginAccessor, hostContainer, lifecycleManager);
         this.hostContainer = hostContainer;
     }
 

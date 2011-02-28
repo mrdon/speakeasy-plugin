@@ -69,6 +69,7 @@
     <component-import key="userManager" interface="com.atlassian.sal.api.user.UserManager"/>
     <component-import key="pluginSettings" interface="com.atlassian.sal.api.pluginsettings.PluginSettingsFactory"/>
     <component-import key="templateRenderer" interface="com.atlassian.templaterenderer.TemplateRenderer"/>
+    <component-import key="lifecycleManager" interface="com.atlassian.sal.api.lifecycle.LifecycleManager" />
 
     <component-import key="pluginController" interface="com.atlassian.plugin.PluginController"/>
     <component-import key="pluginAccessor" interface="com.atlassian.plugin.PluginAccessor"/>
@@ -80,10 +81,7 @@
     <module-type key="scoped-web-item"
                  class="com.atlassian.labs.speakeasy.webfragment.SpeakeasyWebItemModuleDescriptor"/>
 
-    <module-type key="scoped-modules" class="com.atlassian.labs.speakeasy.commonjs.descriptor.ScopedCommonJsModulesDescriptor" />
-
-    <!--module-type key="scoped-modules"
-                 class="com.atlassian.labs.speakeasy.commonjs.SpeakeasyCommonJsModulesDescriptor"/-->
+    <module-type key="scoped-modules" class="com.atlassian.labs.speakeasy.commonjs.descriptor.SpeakeasyCommonJsModulesDescriptor" />
 
     <!-- product accessors -->
 
