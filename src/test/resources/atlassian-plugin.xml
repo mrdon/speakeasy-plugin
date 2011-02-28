@@ -6,14 +6,8 @@
         <param name="foo">bar</param>
     </plugin-info>
 
-    <commonjs key="modules" location="/plugin-modules" />
+    <scoped-modules key="modules" location="/plugin-modules" />
     
-    <scoped-web-resource key="testScoping">
-        <resource type="download" name="test.js" location="test.js" />
-        <resource type="download" name="test.css" location="test.css" />
-        <context>atl.general</context>
-    </scoped-web-resource>
-
     <servlet key="mailFlush" class="com.atlassian.labs.speakeasy.plugin.test.RefappMailQueueFlushServlet" application="refapp">
         <url-pattern>/mail-flush</url-pattern>
     </servlet>

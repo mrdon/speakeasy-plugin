@@ -57,10 +57,9 @@ public class SpeakeasyWebResourceModuleDescriptor extends AbstractModuleDescript
         }
         userElement.addAttribute("key", userElement.attributeValue("key") + "-" + state);
 
-        WebResourceUtil.addUserTransformers(users, userElement);
         WebResourceUtil.addUsersCondition(users, userElement);
 
-        if (log.isDebugEnabled())
+        if (log.isErrorEnabled())
         {
             StringWriter out = new StringWriter();
             OutputFormat format = OutputFormat.createPrettyPrint();
@@ -74,7 +73,7 @@ public class SpeakeasyWebResourceModuleDescriptor extends AbstractModuleDescript
                 e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
             }
 
-            log.debug("Creating dynamic descriptor of key {}: {}", getCompleteKey(), out.toString());
+            log.error("Creating dynamic descriptor of key {}: {}", getCompleteKey(), out.toString());
         }
         descriptor.init(new AbstractDelegatingPlugin(getPlugin())
         {

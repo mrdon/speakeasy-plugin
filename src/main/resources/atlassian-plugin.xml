@@ -46,8 +46,6 @@
     <web-resource-transformer key="template" class="com.atlassian.labs.speakeasy.ui.mustache.TemplateTransformer"/>
     <web-resource-transformer key="cssVariables" class="com.atlassian.labs.speakeasy.ui.CssVariableTransformer"/>
 
-    <web-resource-transformer key="userTransformer" class="com.atlassian.labs.speakeasy.UserScopedTransformer"/>
-
     <rest key="rest" path="/speakeasy" version="1" package="com.atlassian.labs.speakeasy.rest">
         <dispatcher>REQUEST</dispatcher>
         <dispatcher>INCLUDE</dispatcher>
@@ -81,6 +79,8 @@
 
     <module-type key="scoped-web-item"
                  class="com.atlassian.labs.speakeasy.webfragment.SpeakeasyWebItemModuleDescriptor"/>
+
+    <module-type key="scoped-modules" class="com.atlassian.labs.speakeasy.commonjs.descriptor.ScopedCommonJsModulesDescriptor" />
 
     <!--module-type key="scoped-modules"
                  class="com.atlassian.labs.speakeasy.commonjs.SpeakeasyCommonJsModulesDescriptor"/-->
@@ -166,5 +166,4 @@
     <component-import key="appprops" interface="com.atlassian.sal.api.ApplicationProperties" />
 
     <module-type key="commonjs" class="com.atlassian.labs.speakeasy.commonjs.descriptor.CommonJsModulesDescriptor" />
-
 </atlassian-plugin>

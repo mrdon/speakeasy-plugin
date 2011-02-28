@@ -70,7 +70,7 @@ public class PluginManager
             "scoped-web-resource",
             "scoped-web-item",
             "scoped-web-section",
-            "commonjs");
+            "scoped-modules");
 
     public PluginManager(PluginController pluginController, PluginAccessor pluginAccessor, SpeakeasyData data, BundleContext bundleContext, TemplateRenderer templateRenderer, UserManager userManager, ProductAccessor productAccessor)
     {

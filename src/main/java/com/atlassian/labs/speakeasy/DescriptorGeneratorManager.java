@@ -38,8 +38,6 @@ public class DescriptorGeneratorManager implements DisposableBean
     private final PluginAccessor pluginAccessor;
     private final BundleContext bundleContext;
     private final Map<String, ServiceRegistration> serviceRegistrations;
-    private final HostContainer hostContainer;
-    private ServiceRegistration userTransformerService;
 
 
     public DescriptorGeneratorManager(SpeakeasyData data, PluginEventManager pluginEventManager, PluginAccessor pluginAccessor, BundleContext bundleContext, HostContainer hostContainer)
@@ -48,9 +46,7 @@ public class DescriptorGeneratorManager implements DisposableBean
         this.pluginEventManager = pluginEventManager;
         this.pluginAccessor = pluginAccessor;
         this.bundleContext = bundleContext;
-        this.hostContainer = hostContainer;
         this.serviceRegistrations = new ConcurrentHashMap<String, ServiceRegistration>();
-        loadUserTransformerServiceIfNeeded();
         this.pluginEventManager.register(this);
     }
 
@@ -169,10 +165,6 @@ public class DescriptorGeneratorManager implements DisposableBean
         {
             unregisterGeneratedDescriptorsForPlugin(plugin.getKey());
         }
-        if (userTransformerService != null)
-        {
-            userTransformerService.unregister();
-        }
     }
 
     public List<ModuleDescriptor> unregisterGeneratedDescriptorsForPlugin(String pluginKey)
@@ -195,19 +187,5 @@ public class DescriptorGeneratorManager implements DisposableBean
             }
         }
         return removedDescriptors;
-    }
-
-    /**
-     * Works around apps that don't properly register the web resource transformer module type.  Can be removed if all
-     * products are on platform 2.8
-     */
-    private void loadUserTransformerServiceIfNeeded()
-    {
-        String pluginKey = (String) bundleContext.getBundle().getHeaders().get(OsgiPlugin.ATLASSIAN_PLUGIN_KEY);
-        Plugin self = pluginAccessor.getPlugin(pluginKey);
-        if (self.getModuleDescriptor("userTransformer") instanceof UnrecognisedModuleDescriptor)
-        {
-            userTransformerService = bundleContext.registerService(ListableModuleDescriptorFactory.class.getName(), new SingleModuleDescriptorFactory(hostContainer, "web-resource-transformer", WebResourceTransformerModuleDescriptor.class), null);
-        }
     }
 }

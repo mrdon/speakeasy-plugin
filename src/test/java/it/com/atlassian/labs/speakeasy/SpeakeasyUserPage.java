@@ -16,7 +16,6 @@ import org.openqa.selenium.RenderedWebElement;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 
-import javax.annotation.Nullable;
 import javax.inject.Inject;
 import java.io.File;
 import java.io.IOException;
@@ -63,7 +62,7 @@ public class SpeakeasyUserPage implements Page
         final WebElement loaded = driver.findElement(By.id("speakeasy-loaded"));
         driver.waitUntil(new Function()
         {
-            public Object apply(@Nullable Object from)
+            public Object apply(Object from)
             {
                 return "".equals(loaded.getText());
             }

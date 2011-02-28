@@ -8,7 +8,7 @@ var exportedFunctionOrProperty = require('some/module');
         <span class="modules-module-key">{{moduleKey}})</span></h3>
     <p class="modules-description">
         {{#description}}
-        {{&description}}
+        {{&.}}
         {{/description}}
     </p>
     <!--

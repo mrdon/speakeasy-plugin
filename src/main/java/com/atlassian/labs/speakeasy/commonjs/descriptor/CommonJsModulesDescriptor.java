@@ -1,6 +1,8 @@
 package com.atlassian.labs.speakeasy.commonjs.descriptor;
 
 import com.atlassian.labs.speakeasy.commonjs.CommonJsModules;
+import com.atlassian.labs.speakeasy.util.WebResourceUtil;
+import com.atlassian.plugin.ModuleDescriptor;
 import com.atlassian.plugin.Plugin;
 import com.atlassian.plugin.PluginAccessor;
 import com.atlassian.plugin.PluginParseException;
@@ -8,6 +10,7 @@ import com.atlassian.plugin.descriptors.AbstractModuleDescriptor;
 import com.atlassian.plugin.event.PluginEventManager;
 import com.atlassian.plugin.hostcontainer.HostContainer;
 import com.atlassian.plugin.osgi.factory.OsgiPlugin;
+import com.atlassian.plugin.webresource.WebResourceModuleDescriptor;
 import com.atlassian.util.concurrent.NotNull;
 import org.dom4j.Element;
 import org.osgi.framework.Bundle;
@@ -67,9 +70,12 @@ public class CommonJsModulesDescriptor extends AbstractModuleDescriptor<CommonJs
     public void enabled()
     {
         super.enabled();
-        pluginBundle = findBundleForPlugin(plugin);
-        modules = new CommonJsModules(this, pluginBundle, location);
-        generatedDescriptorsManager = new GeneratedDescriptorsManager(pluginBundle, modules, pluginAccessor, pluginEventManager, this, hostContainer);
+        if (generatedDescriptorsManager == null)
+        {
+            pluginBundle = findBundleForPlugin(plugin);
+            modules = new CommonJsModules(this, pluginBundle, location);
+            generatedDescriptorsManager = new GeneratedDescriptorsManager(pluginBundle, modules, pluginAccessor, pluginEventManager, this, hostContainer);
+        }
     }
 
     @Override
@@ -82,6 +88,11 @@ public class CommonJsModulesDescriptor extends AbstractModuleDescriptor<CommonJs
         }
         generatedDescriptorsManager = null;
         pluginBundle = null;
+    }
+
+    public ModuleDescriptor createIndividualModuleDescriptor()
+    {
+        return WebResourceUtil.instantiateDescriptor(hostContainer);
     }
 
     private Bundle findBundleForPlugin(Plugin plugin)

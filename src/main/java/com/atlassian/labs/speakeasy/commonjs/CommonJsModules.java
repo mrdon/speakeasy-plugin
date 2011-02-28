@@ -5,7 +5,7 @@ import com.atlassian.labs.speakeasy.commonjs.util.IterableTreeMap;
 import com.atlassian.plugin.Plugin;
 import com.atlassian.plugin.PluginParseException;
 import com.atlassian.plugin.util.PluginUtils;
-import com.atlassian.util.concurrent.CopyOnWriteMap;
+import com.google.common.collect.MapMaker;
 import com.google.common.collect.Sets;
 import org.apache.commons.io.IOUtils;
 import org.osgi.framework.Bundle;
@@ -26,7 +26,7 @@ import static java.util.Collections.unmodifiableSet;
 public class CommonJsModules
 {
     @XmlElement
-    private final Map<String, Module> modules = CopyOnWriteMap.<String,Module>builder().newHashMap();
+    private final Map<String, Module> modules = new MapMaker().makeMap();
     @XmlElement
     private final Set<String> externalModuleDependencies;
 

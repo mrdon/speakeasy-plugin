@@ -10,7 +10,6 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 
-import javax.annotation.Nullable;
 import javax.inject.Inject;
 import java.util.ArrayList;
 import java.util.List;
@@ -58,7 +57,7 @@ public class IdeDialog
         driver.waitUntil(new Function()
         {
 
-            public Object apply(@Nullable Object from)
+            public Object apply(Object from)
             {
                 System.out.print(".");
                 return driver.executeScript("return require.run('speakeasy/user/ide/ide').text() != null");
@@ -93,7 +92,7 @@ public class IdeDialog
         ideBrowser.findElement(By.id(fileName)).click();
         driver.waitUntil(new Function() {
 
-            public Object apply(@Nullable Object from)
+            public Object apply(Object from)
             {
                 String editorText = getEditorContents();
                 return editorText != null && editorText.length() > 0;
@@ -103,7 +102,7 @@ public class IdeDialog
         dialogElement.findElement(By.className("ide-save")).click();
         driver.waitUntil(new Function()
         {
-            public Object apply(@Nullable Object from)
+            public Object apply(Object from)
             {
                 return ideStatus.getText().contains("saved");
             }

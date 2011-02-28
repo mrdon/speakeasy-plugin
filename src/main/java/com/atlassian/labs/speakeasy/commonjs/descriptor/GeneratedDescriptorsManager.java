@@ -47,7 +47,8 @@ class GeneratedDescriptorsManager
     private Set<ServiceRegistration> registrations;
     private final Logger log = LoggerFactory.getLogger(GeneratedDescriptorsManager.class);
 
-    GeneratedDescriptorsManager(Bundle pluginBundle, CommonJsModules modules, PluginAccessor pluginAccessor, PluginEventManager pluginEventManager, CommonJsModulesDescriptor descriptor, HostContainer hostContainer)
+    GeneratedDescriptorsManager(Bundle pluginBundle, CommonJsModules modules, PluginAccessor pluginAccessor,
+                                PluginEventManager pluginEventManager, CommonJsModulesDescriptor descriptor, HostContainer hostContainer)
     {
         this.pluginBundle = pluginBundle;
         this.modules = modules;
@@ -133,14 +134,13 @@ class GeneratedDescriptorsManager
         Set<ServiceRegistration> registrations = new HashSet<ServiceRegistration>();
         for (String id : modules.getModuleIds())
         {
-            WebResourceModuleDescriptor webResourceModuleDescriptor = WebResourceUtil.instantiateDescriptor(hostContainer);
+            ModuleDescriptor webResourceModuleDescriptor = descriptor.createIndividualModuleDescriptor();
             Plugin dummyPlugin = new StaticPlugin();
             dummyPlugin.setKey(descriptor.getPluginKey());
 
             Element root = createElement("web-resource");
             Element dep = root.addElement("dependency");
             dep.setText(descriptor.getCompleteKey() + "-modules");
-            //addUserTransformers(descriptor.getUsers(), root);
             JsDoc jsDoc = modules.getModule(id).getJsDoc();
             addAnnotatedDependencies(root, descriptor.getPluginKey(), jsDoc);
             addAnnotatedContext(root, jsDoc);
@@ -243,7 +243,6 @@ class GeneratedDescriptorsManager
         Element root = createElement("web-resource");
         Element depElement = root.addElement("dependency");
         depElement.setText("com.atlassian.labs.speakeasy-plugin:yabble");
-        //addUserTransformers(descriptor.getUsers(), root);
         Element jsTransform = getJsTransformation(root);
         Element trans = jsTransform.addElement("transformer");
         trans.addAttribute("key", "commonjs-module");
