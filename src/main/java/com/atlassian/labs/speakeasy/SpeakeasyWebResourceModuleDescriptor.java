@@ -1,6 +1,7 @@
 package com.atlassian.labs.speakeasy;
 
 import com.atlassian.labs.speakeasy.util.WebResourceUtil;
+import com.atlassian.plugin.ModuleDescriptor;
 import com.atlassian.plugin.Plugin;
 import com.atlassian.plugin.PluginParseException;
 import com.atlassian.plugin.descriptors.AbstractModuleDescriptor;
@@ -53,7 +54,7 @@ public class SpeakeasyWebResourceModuleDescriptor extends AbstractModuleDescript
         Element userElement = (Element) originalElement.clone();
         for (Element dep : new ArrayList<Element>(userElement.elements("dependency")))
         {
-            dep.setText(dep.getTextTrim().replace("%state%", String.valueOf(state)));
+            resolveDependency(dep, state);
         }
         userElement.addAttribute("key", userElement.attributeValue("key") + "-" + state);
 
@@ -63,7 +64,7 @@ public class SpeakeasyWebResourceModuleDescriptor extends AbstractModuleDescript
         {
             StringWriter out = new StringWriter();
             OutputFormat format = OutputFormat.createPrettyPrint();
-              XMLWriter writer = new XMLWriter( out, format );
+            XMLWriter writer = new XMLWriter( out, format );
             try
             {
                 writer.write(userElement);
@@ -91,6 +92,24 @@ public class SpeakeasyWebResourceModuleDescriptor extends AbstractModuleDescript
             }
         }, userElement);
         return Collections.singleton(descriptor);
+    }
+
+    private void resolveDependency(Element dep, int state)
+    {
+        String fullKey = dep.getTextTrim();
+        int pos = fullKey.indexOf(':');
+        if (pos == -1)
+        {
+            throw new PluginParseException("Invalid dependency:" + fullKey);
+        }
+        String pluginKey = fullKey.substring(0, pos);
+        String moduleKey = fullKey.substring(pos + 1);
+
+        ModuleDescriptor<?> descriptor = plugin.getModuleDescriptor(moduleKey);
+        if (pluginKey.equals(plugin.getKey()) && descriptor != null && descriptor instanceof SpeakeasyWebResourceModuleDescriptor)
+        {
+            dep.setText(fullKey + "-" + state);
+        }
     }
 
 }

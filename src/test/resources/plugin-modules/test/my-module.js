@@ -2,6 +2,7 @@
  * My Module
  *
  * @context atl.general
+ * @dependency css
  * @public
  */
 function addBanner() {

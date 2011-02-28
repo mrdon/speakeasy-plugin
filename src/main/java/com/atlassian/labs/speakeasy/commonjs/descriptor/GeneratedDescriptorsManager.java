@@ -135,8 +135,6 @@ class GeneratedDescriptorsManager
         for (String id : modules.getModuleIds())
         {
             ModuleDescriptor webResourceModuleDescriptor = descriptor.createIndividualModuleDescriptor();
-            Plugin dummyPlugin = new StaticPlugin();
-            dummyPlugin.setKey(descriptor.getPluginKey());
 
             Element root = createElement("web-resource");
             Element dep = root.addElement("dependency");
@@ -154,7 +152,7 @@ class GeneratedDescriptorsManager
             res.addAttribute("name", id + ".js");
             res.addAttribute("location", modules.getModulePath(id));
 
-            webResourceModuleDescriptor.init(dummyPlugin, createDescriptorElement(id, root));
+            webResourceModuleDescriptor.init(descriptor.getPlugin(), createDescriptorElement(id, root));
 
             ServiceRegistration reg =
                     pluginBundle.getBundleContext().registerService(ModuleDescriptor.class.getName(), webResourceModuleDescriptor, null);
