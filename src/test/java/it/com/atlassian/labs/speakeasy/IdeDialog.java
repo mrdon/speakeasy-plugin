@@ -6,6 +6,7 @@ import com.atlassian.pageobjects.binder.WaitUntil;
 import com.atlassian.webdriver.AtlassianWebDriver;
 import com.atlassian.webdriver.utils.JavaScriptUtils;
 import com.google.common.base.Function;
+import org.apache.http.impl.client.RedirectLocations;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
@@ -86,8 +87,11 @@ public class IdeDialog
         return getEditorContents();
     }
 
-
     public IdeDialog editAndSaveFile(String fileName, String contents)
+    {
+        return editAndSaveFile(fileName, contents, "saved");
+    }
+    public IdeDialog editAndSaveFile(String fileName, String contents, final String statusExpected)
     {
         ideBrowser.findElement(By.id(fileName)).click();
         driver.waitUntil(new Function() {
@@ -104,7 +108,7 @@ public class IdeDialog
         {
             public Object apply(Object from)
             {
-                return ideStatus.getText().contains("saved");
+                return ideStatus.getText().contains(statusExpected);
             }
         });
         return this;
@@ -120,4 +124,8 @@ public class IdeDialog
          return (String) JavaScriptUtils.execute("return require.run('speakeasy/user/ide/ide').text()", driver);
     }
 
+    public String getStatus()
+    {
+        return ideStatus.getText();
+    }
 }

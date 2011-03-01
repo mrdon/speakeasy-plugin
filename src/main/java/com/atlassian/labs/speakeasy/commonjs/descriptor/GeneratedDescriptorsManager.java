@@ -109,7 +109,7 @@ class GeneratedDescriptorsManager
     {
         unresolvedExternalDependencies.addAll(Sets.intersection(descriptor.getModule().getPublicModuleIds(), resolvedExternalModules));
 
-        if (registrations != null)
+        if (!unresolvedExternalDependencies.isEmpty() && registrations != null)
         {
             // todo: try to resolve the dependency from the remaining descriptors instead of assuming it is gone
             unregisterServiceRegistrations();

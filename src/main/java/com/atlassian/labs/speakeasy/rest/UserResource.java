@@ -25,14 +25,12 @@ import static java.util.Arrays.asList;
 public class UserResource
 {
     private final SpeakeasyManager speakeasyManager;
-    private final SpeakeasyData data;
     private final UserManager userManager;
 
-    public UserResource(SpeakeasyManager speakeasyManager, UserManager userManager, SpeakeasyData data)
+    public UserResource(SpeakeasyManager speakeasyManager, UserManager userManager)
     {
         this.speakeasyManager = speakeasyManager;
         this.userManager = userManager;
-        this.data = data;
     }
 
     @GET

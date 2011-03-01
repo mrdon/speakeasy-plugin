@@ -43,15 +43,8 @@ public class PluginsResource
     public Response uninstallPlugin(@PathParam("pluginKey") String pluginKey)
     {
         String user = userManager.getRemoteUsername();
-        try
-        {
-            UserPlugins entity = speakeasyManager.uninstallPlugin(pluginKey, user);
-            return Response.ok().entity(entity).build();
-        }
-        catch (PluginOperationFailedException e)
-        {
-            return Response.status(400).entity(e.getMessage()).build();
-        }
+        UserPlugins entity = speakeasyManager.uninstallPlugin(pluginKey, user);
+        return Response.ok().entity(entity).build();
     }
 
     @GET
@@ -60,15 +53,8 @@ public class PluginsResource
     public Response getAsAmpsProject(@PathParam("pluginKey") String pluginKey)
     {
         String user = userManager.getRemoteUsername();
-        try
-        {
-            File file = speakeasyManager.getPluginFileAsProject(pluginKey, user);
-            return Response.ok().entity(file).build();
-        }
-        catch (PluginOperationFailedException e)
-        {
-            return Response.status(400).entity(e.getMessage()).build();
-        }
+        File file = speakeasyManager.getPluginFileAsProject(pluginKey, user);
+        return Response.ok().entity(file).build();
     }
 
     @POST
@@ -76,15 +62,8 @@ public class PluginsResource
     @Produces("application/json")
     public Response fork(@PathParam("pluginKey") String pluginKey, @FormParam("description") String description)
     {
-        try
-        {
-            UserPlugins entity = speakeasyManager.fork(pluginKey, userManager.getRemoteUsername(), description);
-            return Response.ok().entity(entity).build();
-        }
-        catch (PluginOperationFailedException e)
-        {
-            return Response.status(400).entity(e.getMessage()).build();
-        }
+        UserPlugins entity = speakeasyManager.fork(pluginKey, userManager.getRemoteUsername(), description);
+        return Response.ok().entity(entity).build();
     }
 
     @GET
@@ -94,15 +73,8 @@ public class PluginsResource
     {
         String user = userManager.getRemoteUsername();
         PluginIndex index = new PluginIndex();
-        try
-        {
-            index.setFiles(speakeasyManager.getPluginFileNames(pluginKey, user));
-            return Response.ok().entity(index).build();
-        }
-        catch (PluginOperationFailedException e)
-        {
-            return Response.status(400).entity(e.getMessage()).build();
-        }
+        index.setFiles(speakeasyManager.getPluginFileNames(pluginKey, user));
+        return Response.ok().entity(index).build();
     }
 
     @GET
@@ -111,15 +83,8 @@ public class PluginsResource
     public Response getFileText(@PathParam("pluginKey") String pluginKey, @QueryParam("path") String fileName)
     {
         String user = userManager.getRemoteUsername();
-        try
-        {
-            Object pluginFile = speakeasyManager.getPluginFile(pluginKey, fileName, user);
-            return Response.ok().entity(pluginFile).build();
-        }
-        catch (PluginOperationFailedException e)
-        {
-            return Response.status(400).entity(e.getMessage()).build();
-        }
+        Object pluginFile = speakeasyManager.getPluginFile(pluginKey, fileName, user);
+        return Response.ok().entity(pluginFile).build();
     }
 
     @GET
@@ -128,15 +93,8 @@ public class PluginsResource
     public Response getFileBinary(@PathParam("pluginKey") String pluginKey, @QueryParam("path") String fileName)
     {
         String user = userManager.getRemoteUsername();
-        try
-        {
-            Object pluginFile = speakeasyManager.getPluginFile(pluginKey, fileName, user);
-            return Response.ok().entity(pluginFile).build();
-        }
-        catch (PluginOperationFailedException e)
-        {
-            return Response.status(400).entity(e.getMessage()).build();
-        }
+        Object pluginFile = speakeasyManager.getPluginFile(pluginKey, fileName, user);
+        return Response.ok().entity(pluginFile).build();
     }
 
     @PUT
@@ -146,19 +104,8 @@ public class PluginsResource
     public Response saveAndRebuild(@PathParam("pluginKey") String pluginKey, @QueryParam("path") String fileName, String contents)
     {
         String user = userManager.getRemoteUsername();
-        try
-        {
-            final RemotePlugin remotePlugin = speakeasyManager.saveAndRebuild(pluginKey, fileName, contents, user);
-            return Response.ok().entity(jaxbJsonMarshaller.marshal(remotePlugin)).build();
-        }
-        catch (PluginOperationFailedException e)
-        {
-            return Response.status(400).entity(e.getMessage()).build();
-        }
-        catch (RuntimeException e)
-        {
-            return Response.status(400).entity(e.getMessage()).build();
-        }
+        final RemotePlugin remotePlugin = speakeasyManager.saveAndRebuild(pluginKey, fileName, contents, user);
+        return Response.ok().entity(remotePlugin).build();
     }
 
     @POST

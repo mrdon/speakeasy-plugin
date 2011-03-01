@@ -129,6 +129,7 @@ function updateTable(plugins) {
             addRow(plugin);
         })
     } else {
+        pluginsTable.find('tr[data-pluginkey="' + plugins.key + '"]').remove();
         addRow(plugins);
         updatedPlugins.push(plugins);
     }
@@ -196,6 +197,9 @@ function initSpeakeasy() {
             msg.remove();
         action($row.attr("data-pluginkey"), $link, $row);
     });
+    pluginsTable.bind('pluginsUpdated', function(e, data) {
+       updateTable(data.plugins || data.plugin);
+    });
 
     var pluginFile = $('#plugin-file');
     var uploadForm = $('#upload-form');
@@ -220,7 +224,7 @@ function initSpeakeasy() {
                 var end = response.indexOf("||", start);
                 var data = $.parseJSON(response.substring(start, end));
                 if (data.error) {
-                    updateTable(data.plugins);
+                    pluginsTable.trigger('pluginsUpdated', {'plugins': data.plugins});
                     addMessage('error', {title: "Error installing extension", body: data.error, shadowed: false});
                 } else {
                     var updatedPlugin = updateTable(data)[0];

@@ -12,7 +12,6 @@ import com.atlassian.plugin.Plugin;
 import com.atlassian.plugin.PluginAccessor;
 import com.atlassian.plugin.webresource.UrlMode;
 import com.atlassian.plugin.webresource.WebResourceManager;
-import com.atlassian.plugins.rest.common.json.JaxbJsonMarshaller;
 import com.atlassian.sal.api.user.UserManager;
 import com.atlassian.templaterenderer.TemplateRenderer;
 import com.atlassian.templaterenderer.annotations.HtmlSafe;
@@ -41,7 +40,6 @@ public class UserProfileRenderer
     private final SpeakeasyManager speakeasyManager;
     private final UserManager userManager;
     private final WebResourceManager webResourceManager;
-    private final JaxbJsonMarshaller jaxbJsonMarshaller;
     private final CommonJsModulesAccessor commonJsModulesAccessor;
     private final PluginManager pluginManager;
     private final ProductAccessor productAccessor;
@@ -49,7 +47,9 @@ public class UserProfileRenderer
     private final Plugin plugin;
 
 
-    public UserProfileRenderer(PluginAccessor pluginAccessor, TemplateRenderer templateRenderer, SpeakeasyManager speakeasyManager, UserManager userManager, WebResourceManager webResourceManager, JaxbJsonMarshaller jaxbJsonMarshaller, PluginManager pluginManager, ProductAccessor productAccessor, SpeakeasyData data, CommonJsModulesAccessor commonJsModulesAccessor)
+    public UserProfileRenderer(PluginAccessor pluginAccessor, TemplateRenderer templateRenderer, SpeakeasyManager speakeasyManager,
+                               UserManager userManager, WebResourceManager webResourceManager, PluginManager pluginManager,
+                               ProductAccessor productAccessor, SpeakeasyData data, CommonJsModulesAccessor commonJsModulesAccessor)
     {
         this.templateRenderer = templateRenderer;
         this.commonJsModulesAccessor = commonJsModulesAccessor;
@@ -57,7 +57,6 @@ public class UserProfileRenderer
         this.speakeasyManager = speakeasyManager;
         this.userManager = userManager;
         this.webResourceManager = webResourceManager;
-        this.jaxbJsonMarshaller = jaxbJsonMarshaller;
         this.pluginManager = pluginManager;
         this.productAccessor = productAccessor;
         this.data = data;

@@ -10,36 +10,17 @@ import com.atlassian.plugin.ModuleDescriptor;
 import com.atlassian.plugin.Plugin;
 import com.atlassian.plugin.PluginAccessor;
 import com.atlassian.plugin.descriptors.UnloadableModuleDescriptor;
-import com.atlassian.plugin.descriptors.UnrecognisedModuleDescriptor;
-import com.atlassian.plugin.event.PluginEventListener;
-import com.atlassian.plugin.event.PluginEventManager;
-import com.atlassian.plugin.event.events.PluginDisabledEvent;
-import com.atlassian.plugin.event.events.PluginEnabledEvent;
-import com.atlassian.plugin.hostcontainer.HostContainer;
 import com.atlassian.plugin.impl.UnloadablePlugin;
-import com.atlassian.plugin.osgi.external.ListableModuleDescriptorFactory;
-import com.atlassian.plugin.osgi.external.SingleModuleDescriptorFactory;
-import com.atlassian.plugin.osgi.factory.OsgiPlugin;
-import com.atlassian.plugin.util.WaitUntil;
-import com.atlassian.plugin.webresource.transformer.WebResourceTransformerModuleDescriptor;
 import com.google.common.base.Function;
 import com.google.common.collect.Lists;
-import org.osgi.framework.Bundle;
-import org.osgi.framework.BundleContext;
-import org.osgi.framework.ServiceRegistration;
-import org.springframework.beans.factory.DisposableBean;
 
-import javax.ws.rs.core.Response;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
 
-import static com.atlassian.labs.speakeasy.util.BundleUtil.findBundleForPlugin;
 import static java.util.Arrays.asList;
 
 /**
@@ -114,7 +95,7 @@ public class SpeakeasyManager
         final Plugin plugin = pluginAccessor.getPlugin(pluginKey);
         if (plugin == null)
         {
-            throw new PluginOperationFailedException("Plugin not found: " + pluginKey);
+            throw new PluginOperationFailedException("Plugin not found: " + pluginKey, pluginKey);
         }
 
         RemotePlugin remotePlugin = new RemotePlugin(plugin);
@@ -324,96 +305,163 @@ public class SpeakeasyManager
     public UserPlugins uninstallPlugin(String pluginKey, String user)
             throws PluginOperationFailedException
     {
-        List<String> keysModified = new ArrayList<String>();
-        RemotePlugin plugin = getRemotePlugin(pluginKey, user);
-        if (plugin == null || !plugin.isCanUninstall())
+        try
         {
-            throw new PluginOperationFailedException("Not authorized to install " + pluginKey);
-        }
-        String originalKey = plugin.getForkedPluginKey();
-        if (originalKey != null && pluginAccessor.getPlugin(originalKey) != null)
-        {
-            if (hasAccess(pluginKey, user))
+            List<String> keysModified = new ArrayList<String>();
+            RemotePlugin plugin = getRemotePlugin(pluginKey, user);
+            if (plugin == null || !plugin.isCanUninstall())
             {
-                keysModified.add(originalKey);
-                allowUserAccess(originalKey, user);
-
+                throw new PluginOperationFailedException("Not authorized to install " + pluginKey, pluginKey);
             }
+            String originalKey = plugin.getForkedPluginKey();
+            if (originalKey != null && pluginAccessor.getPlugin(originalKey) != null)
+            {
+                if (hasAccess(pluginKey, user))
+                {
+                    keysModified.add(originalKey);
+                    allowUserAccess(originalKey, user);
+
+                }
+            }
+            disallowAllPluginAccess(pluginKey);
+            pluginManager.uninstall(pluginKey, user);
+            return getUserAccessList(user, keysModified);
         }
-        disallowAllPluginAccess(pluginKey);
-        pluginManager.uninstall(pluginKey, user);
-        return getUserAccessList(user, keysModified);
+        catch (PluginOperationFailedException ex)
+        {
+            throw ex;
+        }
+        catch (RuntimeException ex)
+        {
+            throw new PluginOperationFailedException(ex.getMessage(), ex, pluginKey);
+        }
     }
 
     public UserPlugins fork(String pluginKey, String remoteUser, String description)
             throws PluginOperationFailedException
     {
-        RemotePlugin plugin = getRemotePlugin(pluginKey, remoteUser);
-        if (!plugin.isCanFork())
+        try
         {
-            throw new PluginOperationFailedException("Not authorized to fork " + pluginKey);
+            RemotePlugin plugin = getRemotePlugin(pluginKey, remoteUser);
+            if (!plugin.isCanFork())
+            {
+                throw new PluginOperationFailedException("Not authorized to fork " + pluginKey, pluginKey);
+            }
+            String forkedPluginKey = pluginManager.forkAndInstall(pluginKey, remoteUser, description);
+            List<String> modifiedKeys = new ArrayList<String>();
+            modifiedKeys.add(forkedPluginKey);
+            if (hasAccess(pluginKey, remoteUser))
+            {
+                modifiedKeys.add(pluginKey);
+                allowUserAccess(forkedPluginKey, remoteUser);
+            }
+            if (forkedPluginKey != null)
+            {
+                sendForkedEmail(pluginKey, forkedPluginKey, remoteUser);
+            }
+            return getUserAccessList(remoteUser, modifiedKeys);
         }
-        String forkedPluginKey = pluginManager.forkAndInstall(pluginKey, remoteUser, description);
-        List<String> modifiedKeys = new ArrayList<String>();
-        modifiedKeys.add(forkedPluginKey);
-        if (hasAccess(pluginKey, remoteUser))
+        catch (PluginOperationFailedException ex)
         {
-            modifiedKeys.add(pluginKey);
-            allowUserAccess(forkedPluginKey, remoteUser);
+            throw ex;
         }
-        if (forkedPluginKey != null)
+        catch (RuntimeException ex)
         {
-            sendForkedEmail(pluginKey, forkedPluginKey, remoteUser);
+            throw new PluginOperationFailedException(ex.getMessage(), ex, pluginKey);
         }
-        return getUserAccessList(remoteUser, modifiedKeys);
     }
 
     public File getPluginFileAsProject(String pluginKey, String user)
     {
-        RemotePlugin plugin = getRemotePlugin(pluginKey, user);
-        if (!plugin.isCanDownload())
+        try
         {
-            throw new PluginOperationFailedException("Not authorized to download " + pluginKey);
+            RemotePlugin plugin = getRemotePlugin(pluginKey, user);
+            if (!plugin.isCanDownload())
+            {
+                throw new PluginOperationFailedException("Not authorized to download " + pluginKey, pluginKey);
+            }
+            return pluginManager.getPluginFileAsProject(pluginKey);
         }
-        return pluginManager.getPluginFileAsProject(pluginKey);
+        catch (PluginOperationFailedException ex)
+        {
+            throw ex;
+        }
+        catch (RuntimeException ex)
+        {
+            throw new PluginOperationFailedException(ex.getMessage(), ex, pluginKey);
+        }
     }
 
     public List<String> getPluginFileNames(String pluginKey, String user)
     {
-        RemotePlugin plugin = getRemotePlugin(pluginKey, user);
-        if (!plugin.isCanEdit())
+        try
         {
-            throw new PluginOperationFailedException("Not authorized to view " + pluginKey);
+            RemotePlugin plugin = getRemotePlugin(pluginKey, user);
+            if (!plugin.isCanEdit())
+            {
+                throw new PluginOperationFailedException("Not authorized to view " + pluginKey, pluginKey);
+            }
+            return pluginManager.getPluginFileNames(pluginKey);
         }
-        return pluginManager.getPluginFileNames(pluginKey);
+        catch (PluginOperationFailedException ex)
+        {
+            throw ex;
+        }
+        catch (RuntimeException ex)
+        {
+            throw new PluginOperationFailedException(ex.getMessage(), ex, pluginKey);
+        }
     }
 
     public Object getPluginFile(String pluginKey, String fileName, String user)
     {
-        RemotePlugin plugin = getRemotePlugin(pluginKey, user);
-        if (!plugin.isCanEdit())
+        try
         {
-            throw new PluginOperationFailedException("Not authorized to view " + pluginKey);
+            RemotePlugin plugin = getRemotePlugin(pluginKey, user);
+            if (!plugin.isCanEdit())
+            {
+                throw new PluginOperationFailedException("Not authorized to view " + pluginKey, pluginKey);
+            }
+            return pluginManager.getPluginFile(pluginKey, fileName);
         }
-        return pluginManager.getPluginFile(pluginKey, fileName);
+        catch (PluginOperationFailedException ex)
+        {
+            throw ex;
+        }
+        catch (RuntimeException ex)
+        {
+            throw new PluginOperationFailedException(ex.getMessage(), ex, pluginKey);
+        }
     }
 
     public RemotePlugin saveAndRebuild(String pluginKey, String fileName, String contents, String user)
     {
-        RemotePlugin plugin = getRemotePlugin(pluginKey, user);
-        if (!plugin.isCanEdit())
+        try
         {
-            throw new PluginOperationFailedException("Not authorized to edit " + pluginKey);
+            RemotePlugin plugin = getRemotePlugin(pluginKey, user);
+
+            if (!plugin.isCanEdit())
+            {
+                throw new PluginOperationFailedException("Not authorized to edit " + pluginKey, pluginKey);
+            }
+            String installedPluginKey = pluginManager.saveAndRebuild(pluginKey, fileName, contents, user);
+            return getRemotePlugin(installedPluginKey, user);
         }
-        String installedPluginKey = pluginManager.saveAndRebuild(pluginKey, fileName, contents, user);
-        return getRemotePlugin(installedPluginKey, user);
+        catch (PluginOperationFailedException ex)
+        {
+            throw ex;
+        }
+        catch (RuntimeException ex)
+        {
+            throw new PluginOperationFailedException(ex.getMessage(), ex, pluginKey);
+        }
     }
 
     public UserPlugins installPlugin(File uploadedFile, String user)
     {
         if (!pluginManager.canUserInstallPlugins(user))
         {
-            throw new PluginOperationFailedException("Not authorized to install plugins");
+            throw new PluginOperationFailedException("Not authorized to install plugins", null);
         }
 
         String pluginKey = pluginManager.install(uploadedFile, user);

@@ -75,7 +75,7 @@ public class TestUserProfile
                 .uploadPlugin(buildSimplePluginFile())
                 .openEditDialog("test-2");
 
-        assertEquals(asList("bar/baz.js", "atlassian-plugin.xml", "foo.js"), ide.getFileNames());
+        assertEquals(asList("bar/baz.js", "modules/test.js", "atlassian-plugin.xml", "foo.js"), ide.getFileNames());
 
         ide = ide.editAndSaveFile("foo.js", "var foo;")
            .done()
@@ -85,6 +85,30 @@ public class TestUserProfile
 
         assertEquals("var foo;", contents);
 
+    }
+
+    @Test
+    public void testEditAndBreakThenFixPlugin() throws IOException
+    {
+        product.visit(SpeakeasyUserPage.class)
+                .uploadPlugin(buildSimplePluginFile());
+        IdeDialog ide =  product.visit(SpeakeasyUserPage.class)
+                .uploadPlugin(buildSimplePluginFile())
+                .openEditDialog("test-2")
+                .editAndSaveFile("modules/test.js", "require('nonexistent/module');", "problem loading");
+
+        assertTrue(ide.getStatus().contains("nonexistent/module"));
+
+        SpeakeasyUserPage page = ide.done();
+        assertTrue(page.getPlugins().get("test-2").getDescription().contains("nonexistent/module"));
+
+        page = page
+                .openEditDialog("test-2")
+                .editAndSaveFile("modules/test.js", "require('speakeasy/jquery');")
+                .done();
+
+        assertEquals("Desc", page.getPlugins().get("test-2").getDescription());
+        page.uninstallPlugin("test-2");
     }
 
     @Test
@@ -123,7 +147,9 @@ public class TestUserProfile
                 "src/main/resources/atlassian-plugin.xml",
                 "src/main/resources/foo.js",
                 "src/main/resources/bar/",
-                "src/main/resources/bar/baz.js"
+                "src/main/resources/bar/baz.js",
+                "src/main/resources/modules/",
+                "src/main/resources/modules/test.js"
         ), entries);
 
         File fooFile = new File(unzippedPlugin, "src/main/resources/foo.js");
@@ -467,10 +493,13 @@ public class TestUserProfile
                         "    <scoped-web-resource key='res'>",
                         "      <resource type='download' name='foo.js' location='foo.js' />",
                         "    </scoped-web-resource>",
+                        "    <scoped-modules key='modules' />",
                         "</atlassian-plugin>")
                 .addFormattedResource("foo.js", "alert('hi');")
                 .addFormattedResource("bar/baz.js", "alert('hoho');")
+                .addFormattedResource("modules/test.js", "alert('hi');")
                 .addResource("bar/", "")
+                .addResource("modules/", "")
                 .build();
     }
 }

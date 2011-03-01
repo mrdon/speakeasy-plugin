@@ -5,7 +5,6 @@ import com.atlassian.labs.speakeasy.product.ProductAccessor;
 import com.atlassian.plugin.*;
 import com.atlassian.plugin.descriptors.UnloadableModuleDescriptor;
 import com.atlassian.plugin.descriptors.UnrecognisedModuleDescriptor;
-import com.atlassian.plugin.impl.UnloadablePlugin;
 import com.atlassian.plugin.util.WaitUntil;
 import com.atlassian.sal.api.user.UserManager;
 import com.atlassian.templaterenderer.TemplateRenderer;
@@ -90,7 +89,7 @@ public class PluginManager
     public String install(File pluginFile, String user) throws PluginOperationFailedException
     {
         if (!canUserInstallPlugins(user)) {
-            throw new PluginOperationFailedException("User '" + user + "' doesn't have access to install plugins");
+            throw new PluginOperationFailedException("User '" + user + "' doesn't have access to install plugins", null);
         }
 
         File fileToInstall = pluginFile;
@@ -106,7 +105,7 @@ public class PluginManager
             }
             catch (IOException e)
             {
-                throw new PluginOperationFailedException("Exception moving zip to jar", e);
+                throw new PluginOperationFailedException("Exception moving zip to jar", e, null);
             }
             fileToInstall = zipFile;
         }
@@ -153,19 +152,19 @@ public class PluginManager
                             break;
                         }
                     }
-                    throw new PluginOperationFailedException(cause);
+                    throw new PluginOperationFailedException(cause, plugin.getKey());
                 }
 
                 return plugin.getKey();
             }
             else
             {
-                throw new PluginOperationFailedException("Plugin didn't install correctly");
+                throw new PluginOperationFailedException("Plugin didn't install correctly", null);
             }
         }
         else
         {
-            throw new PluginOperationFailedException("The plugin must be a valid zip file");
+            throw new PluginOperationFailedException("The plugin must be a valid zip file", null);
         }
     }
 
@@ -176,7 +175,7 @@ public class PluginManager
         {
             if (!pluginModulesWhitelist.contains(module.getName()))
             {
-                throw new PluginOperationFailedException("Invalid plugin module: " + module.getName());
+                throw new PluginOperationFailedException("Invalid plugin module: " + module.getName(), doc.getRootElement().attributeValue("key"));
             }
         }
 
@@ -184,7 +183,7 @@ public class PluginManager
         String recordedAuthor = data.getPluginAuthor(pluginKey);
         if (pluginAccessor.getPlugin(pluginKey) != null && !user.equals(recordedAuthor))
         {
-            throw new PluginOperationFailedException("Unable to upgrade the '" + pluginKey + "' as you didn't install it");
+            throw new PluginOperationFailedException("Unable to upgrade the '" + pluginKey + "' as you didn't install it", pluginKey);
         }
 
     }
@@ -199,7 +198,7 @@ public class PluginManager
         }
         catch (final DocumentException e)
         {
-            throw new PluginOperationFailedException("Cannot parse XML plugin descriptor", e);
+            throw new PluginOperationFailedException("Cannot parse XML plugin descriptor", e, null);
         }
         finally
         {
@@ -227,13 +226,13 @@ public class PluginManager
                 }
                 if (!allowed)
                 {
-                    throw new PluginOperationFailedException("Invalid plugin entry: " + entry.getName());
+                    throw new PluginOperationFailedException("Invalid plugin entry: " + entry.getName(), null);
                 }
             }
         }
         catch (IOException e)
         {
-            throw new PluginOperationFailedException("Unable to open plugin zip", e);
+            throw new PluginOperationFailedException("Unable to open plugin zip", e, null);
         }
         finally
         {
@@ -255,7 +254,7 @@ public class PluginManager
     public void uninstall(String pluginKey, String user) throws PluginOperationFailedException
     {
         if (!canUserInstallPlugins(user)) {
-            throw new PluginOperationFailedException("User '" + user + "' doesn't have access to uninstall the '" + pluginKey + "' plugin");
+            throw new PluginOperationFailedException("User '" + user + "' doesn't have access to uninstall the '" + pluginKey + "' plugin", pluginKey);
         }
         Plugin plugin = pluginAccessor.getPlugin(pluginKey);
 
@@ -263,7 +262,7 @@ public class PluginManager
             pluginController.uninstall(plugin);
             data.clearPluginAuthor(pluginKey);
         } else {
-            throw new PluginOperationFailedException("User '" + user + "' is not the author of plugin '" + pluginKey + "' and cannot uninstall it");
+            throw new PluginOperationFailedException("User '" + user + "' is not the author of plugin '" + pluginKey + "' and cannot uninstall it", pluginKey);
         }
     }
 
@@ -418,7 +417,7 @@ public class PluginManager
         {
             e.printStackTrace();
 
-            throw new PluginOperationFailedException("Unable to create zip file", e);
+            throw new PluginOperationFailedException("Unable to create zip file", e, pluginKey);
         }
         finally
         {
@@ -430,7 +429,7 @@ public class PluginManager
     {
         if (pluginKey.contains("-fork-"))
         {
-            throw new PluginOperationFailedException("Cannot fork an existing fork");
+            throw new PluginOperationFailedException("Cannot fork an existing fork", pluginKey);
         }
         Bundle bundle = findBundleForPlugin(bundleContext, pluginKey);
         notNull(bundle);
@@ -472,13 +471,13 @@ public class PluginManager
         {
             e.printStackTrace();
 
-            throw new PluginOperationFailedException("Unable to create forked plugin jar", e);
+            throw new PluginOperationFailedException("Unable to create forked plugin jar", e, pluginKey);
         }
         catch (DocumentException e)
         {
             e.printStackTrace();
 
-            throw new PluginOperationFailedException("Unable transform plugin descriptor xml", e);
+            throw new PluginOperationFailedException("Unable transform plugin descriptor xml", e, pluginKey);
         }
         finally
         {

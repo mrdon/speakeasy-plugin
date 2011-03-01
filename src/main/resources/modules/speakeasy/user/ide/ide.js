@@ -180,15 +180,14 @@ function saveAndReload(pluginKey, fileName, contents) {
         processData: false,
         success : function(data) {
             console.log('success');
-            if (data.error) {
-                updateStatus("Error - " + data.error);
-            } else {
-                updateStatus(data.name + " was saved successfully and reloaded");
-            }
+            updateStatus(data.name + " was saved successfully and reloaded");
+            $('#plugins-table-body').trigger('pluginsUpdated', {'plugin': data})
         },
         error : function(xhr) {
             console.log('error');
-            updateStatus("Error - " + xhr.responseText);
+            var data = JSON.parse(xhr.responseText);
+            updateStatus("Error - " + data.error);
+            $('#plugins-table-body').trigger('pluginsUpdated', {'plugin': data.plugin})
         }
     })
 }

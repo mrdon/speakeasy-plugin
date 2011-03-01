@@ -85,6 +85,7 @@ public class CommonJsModulesDescriptor extends AbstractModuleDescriptor<CommonJs
         Set<String> unresolvedDependencies = generatedDescriptorsManager.getUnresolvedExternalDependencies();
         if (pluginFrameworkWatcher.isPluginFrameworkStarted() && !unresolvedDependencies.isEmpty())
         {
+            generatedDescriptorsManager.close();
             throw new PluginException("Unable to enable commonjs modules '" + getCompleteKey() + "' due to unresolved dependencies: " + unresolvedDependencies);
         }
     }
