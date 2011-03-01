@@ -1,6 +1,9 @@
 package com.atlassian.labs.speakeasy.util;
 
+import com.atlassian.plugin.PluginParseException;
 import com.atlassian.plugin.osgi.factory.OsgiPlugin;
+import com.google.common.base.Predicate;
+import com.google.common.base.Predicates;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 
@@ -74,4 +77,43 @@ public class BundleUtil
         return contents;
     }
 
+    public static Iterable<String> scanForPaths(Bundle bundle, String startPath)
+    {
+        return scanForPaths(bundle, startPath, Predicates.<String>alwaysTrue());
+    }
+
+
+    public static Iterable<String> scanForPaths(Bundle bundle, String startPath, Predicate<String> predicate)
+    {
+        Set<String> paths = new HashSet<String>();
+
+        scanPath(bundle, startPath, startPath, paths, predicate);
+        if (paths.isEmpty())
+        {
+            throw new PluginParseException("No resources found at " + startPath);
+        }
+        return paths;
+    }
+
+    public static void scanPath(Bundle bundle, String root, String prefix, Set<String> paths, Predicate<String> predicate)
+    {
+        final Enumeration<String> entryPaths = bundle.getEntryPaths(prefix);
+
+        while(entryPaths != null && entryPaths.hasMoreElements())
+        {
+            String fullPath = entryPaths.nextElement();
+            if (fullPath.endsWith("/"))
+            {
+                scanPath(bundle, root, fullPath, paths, predicate);
+            }
+            else
+            {
+                String path = fullPath.substring(root.length() - 1);
+                if (predicate.apply(path))
+                {
+                    paths.add(path);
+                }
+            }
+        }
+    }
 }

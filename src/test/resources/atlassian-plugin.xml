@@ -8,9 +8,7 @@
 
     <scoped-modules key="modules" location="/plugin-modules" />
 
-    <scoped-web-resource key="css">
-        <resource type="download" name="test.css" location="css/test.css" />
-    </scoped-web-resource>
+    <scoped-web-resource key="css" scan="css/" />
     
     <servlet key="mailFlush" class="com.atlassian.labs.speakeasy.plugin.test.RefappMailQueueFlushServlet" application="refapp">
         <url-pattern>/mail-flush</url-pattern>

@@ -3,8 +3,6 @@ package com.atlassian.labs.speakeasy.commonjs;
 import com.atlassian.labs.speakeasy.commonjs.descriptor.CommonJsModulesDescriptor;
 import com.atlassian.labs.speakeasy.commonjs.util.IterableTreeMap;
 import com.atlassian.plugin.Plugin;
-import com.atlassian.plugin.PluginParseException;
-import com.atlassian.plugin.PluginState;
 import com.atlassian.plugin.util.PluginUtils;
 import com.google.common.base.Predicate;
 import com.google.common.collect.MapMaker;
@@ -21,6 +19,7 @@ import java.util.*;
 
 import static com.atlassian.labs.speakeasy.commonjs.util.ModuleUtil.determineLastModified;
 import static com.google.common.collect.Iterables.filter;
+import static com.google.common.collect.Sets.newHashSet;
 import static java.util.Collections.unmodifiableSet;
 
 /**
@@ -55,7 +54,7 @@ public class CommonJsModules
     public CommonJsModules(CommonJsModulesDescriptor descriptor, Bundle pluginBundle, String location)
     {
         this.pluginBundle = pluginBundle;
-        this.location = location;
+        this.location = location.endsWith("/") ? location : location + "/";
         this.plugin = descriptor.getPlugin();
         this.pluginKey = plugin.getKey();
         this.pluginName = plugin.getName();
@@ -172,39 +171,25 @@ public class CommonJsModules
 
     private Iterable<String> findModulePaths(Bundle bundle)
     {
-        Set<String> paths = new HashSet<String>();
-
-        scanPath(bundle, location, paths);
-        if (paths.isEmpty())
+        Set<String> modulePaths = newHashSet();
+        for (String path : com.atlassian.labs.speakeasy.util.BundleUtil.scanForPaths(bundle, location, new Predicate<String>()
         {
-            throw new PluginParseException("No modules found at " + location);
-        }
-        return paths;
-    }
-
-    private void scanPath(Bundle bundle, String prefix, Set<String> paths)
-    {
-        final Enumeration<String> entryPaths = bundle.getEntryPaths(prefix);
-
-        while(entryPaths != null && entryPaths.hasMoreElements())
-        {
-            String fullPath = entryPaths.nextElement();
-            if (fullPath.endsWith("/"))
+            public boolean apply(String path)
             {
-                scanPath(bundle, fullPath, paths);
+                return !path.contains("-min.");
             }
-            else if (!fullPath.contains("-min."))
+        }))
+        {
+            if (path.endsWith(".js") || path.endsWith(".mu"))
             {
-                if (fullPath.endsWith(".js") || fullPath.endsWith(".mu"))
-                {
-                    paths.add(fullPath);
-                }
-                else
-                {
-                    resources.add(fullPath.substring(location.length()));
-                }
+                modulePaths.add(location + path);
+            }
+            else
+            {
+                resources.add(path);
             }
         }
+        return modulePaths;
     }
 
     public String getModulePath(String id)

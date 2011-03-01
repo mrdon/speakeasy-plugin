@@ -1,5 +1,6 @@
 package com.atlassian.labs.speakeasy;
 
+import com.atlassian.labs.speakeasy.util.BundleUtil;
 import com.atlassian.labs.speakeasy.util.WebResourceUtil;
 import com.atlassian.plugin.ModuleDescriptor;
 import com.atlassian.plugin.Plugin;
@@ -8,9 +9,12 @@ import com.atlassian.plugin.descriptors.AbstractModuleDescriptor;
 import com.atlassian.plugin.hostcontainer.HostContainer;
 import com.atlassian.plugin.impl.AbstractDelegatingPlugin;
 import com.atlassian.plugin.webresource.WebResourceModuleDescriptor;
+import com.google.common.base.Predicate;
 import org.dom4j.Element;
 import org.dom4j.io.OutputFormat;
 import org.dom4j.io.XMLWriter;
+import org.osgi.framework.Bundle;
+import org.osgi.framework.BundleContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -28,10 +32,12 @@ public class SpeakeasyWebResourceModuleDescriptor extends AbstractModuleDescript
     private Element originalElement;
     private static final Logger log = LoggerFactory.getLogger(SpeakeasyWebResourceModuleDescriptor.class);
     private final HostContainer hostContainer;
+    private final BundleContext bundleContext;
 
-    public SpeakeasyWebResourceModuleDescriptor(HostContainer hostContainer)
+    public SpeakeasyWebResourceModuleDescriptor(HostContainer hostContainer, BundleContext bundleContext)
     {
         this.hostContainer = hostContainer;
+        this.bundleContext = bundleContext;
     }
 
     @Override
@@ -39,6 +45,21 @@ public class SpeakeasyWebResourceModuleDescriptor extends AbstractModuleDescript
     {
         super.init(plugin, element);
         this.originalElement = element;
+        String scan = element.attributeValue("scan");
+        if (scan != null)
+        {
+            scan = scan.endsWith("/") ? scan : scan + "/";
+            scan = scan.startsWith("/") ? scan : "/" + scan;
+            final Bundle pluginBundle = BundleUtil.findBundleForPlugin(bundleContext, plugin.getKey());
+            for (String path : BundleUtil.scanForPaths(pluginBundle, scan))
+            {
+                Element e = originalElement.addElement("resource");
+                e.addAttribute("type", "download");
+                e.addAttribute("name", path);
+                e.addAttribute("location", scan + path);
+            }
+
+        }
     }
 
     @Override
