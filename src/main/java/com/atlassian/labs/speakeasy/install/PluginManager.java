@@ -1,6 +1,7 @@
 package com.atlassian.labs.speakeasy.install;
 
 import com.atlassian.labs.speakeasy.data.SpeakeasyData;
+import com.atlassian.labs.speakeasy.install.convention.ZipTransformer;
 import com.atlassian.labs.speakeasy.product.ProductAccessor;
 import com.atlassian.plugin.*;
 import com.atlassian.plugin.descriptors.UnloadableModuleDescriptor;
@@ -34,6 +35,7 @@ import java.util.zip.ZipOutputStream;
 
 import static com.atlassian.labs.speakeasy.util.BundleUtil.findBundleForPlugin;
 import static com.atlassian.labs.speakeasy.util.BundleUtil.getBundlePathsRecursive;
+import static com.google.common.collect.Iterables.concat;
 import static java.util.Arrays.asList;
 import static org.apache.commons.lang.Validate.notNull;
 
@@ -50,10 +52,12 @@ public class PluginManager
     private final TemplateRenderer templateRenderer;
     private final UserManager userManager;
     private final ProductAccessor productAccessor;
+    private final ZipTransformer zipTransformer;
 
-    private static final Iterable<Pattern> pluginContentsWhitelist = asList(
+    private static final Iterable<Pattern> coreWhitelist = asList(
             Pattern.compile(".*\\.js", Pattern.CASE_INSENSITIVE),
             Pattern.compile(".*\\.mu", Pattern.CASE_INSENSITIVE),
+            Pattern.compile(".*\\.json", Pattern.CASE_INSENSITIVE),
             Pattern.compile(".*\\.gif", Pattern.CASE_INSENSITIVE),
             Pattern.compile(".*\\.png", Pattern.CASE_INSENSITIVE),
             Pattern.compile(".*\\.jpg", Pattern.CASE_INSENSITIVE),
@@ -64,8 +68,16 @@ public class PluginManager
             Pattern.compile("META-INF/MANIFEST.MF"),
             Pattern.compile(".*/pom.xml"),
             Pattern.compile(".*/pom.properties"),
-            Pattern.compile("atlassian-plugin.xml"),
             Pattern.compile(".*\\.DS_Store"));
+
+    private static final Iterable<Pattern> jarWhitelist = concat(coreWhitelist, asList(
+            Pattern.compile("atlassian-plugin.xml")));
+
+    private static final Iterable<Pattern> zipWhitelist = concat(coreWhitelist, asList(
+            Pattern.compile("atlassian-extension.json")));
+
+
+
 
     private static final Collection<String> pluginModulesWhitelist = asList(
             "plugin-info",
@@ -74,7 +86,7 @@ public class PluginManager
             "scoped-web-section",
             "scoped-modules");
 
-    public PluginManager(PluginController pluginController, PluginAccessor pluginAccessor, SpeakeasyData data, BundleContext bundleContext, TemplateRenderer templateRenderer, UserManager userManager, ProductAccessor productAccessor)
+    public PluginManager(PluginController pluginController, PluginAccessor pluginAccessor, SpeakeasyData data, BundleContext bundleContext, TemplateRenderer templateRenderer, UserManager userManager, ProductAccessor productAccessor, ZipTransformer zipTransformer)
     {
         this.pluginController = pluginController;
         this.pluginAccessor = pluginAccessor;
@@ -83,6 +95,7 @@ public class PluginManager
         this.templateRenderer = templateRenderer;
         this.userManager = userManager;
         this.productAccessor = productAccessor;
+        this.zipTransformer = zipTransformer;
         pluginArtifactFactory = new DefaultPluginArtifactFactory();
     }
 
@@ -92,29 +105,28 @@ public class PluginManager
             throw new PluginOperationFailedException("User '" + user + "' doesn't have access to install plugins", null);
         }
 
-        File fileToInstall = pluginFile;
+        File fileToInstall = null;
 
-        // While this works for Speakeasy, it means an extension with a .zip suffix won't be installable via the UPM
-        // or via PAC
-        if (pluginFile.getName().endsWith(".zip"))
+        if (pluginFile.getName().endsWith(".jar") || pluginFile.getName().endsWith(".xml") || pluginFile.getName().endsWith(".zip"))
         {
-            File zipFile = new File(pluginFile.getPath() + ".jar");
-            try
-            {
-                FileUtils.moveFile(pluginFile, zipFile);
-            }
-            catch (IOException e)
-            {
-                throw new PluginOperationFailedException("Exception moving zip to jar", e, null);
-            }
-            fileToInstall = zipFile;
-        }
 
-        if (fileToInstall.getName().endsWith(".jar") || fileToInstall.getName().endsWith(".xml"))
-        {
-            PluginArtifact pluginArtifact = pluginArtifactFactory.create(fileToInstall.toURI());
-            verifyContents(pluginArtifact);
-            verifyDescriptor(pluginArtifact, user);
+            PluginArtifact pluginArtifact = null;
+            // While this works for Speakeasy, it means an extension with a .zip suffix won't be installable via the UPM
+            // or via PAC
+            if (pluginFile.getName().endsWith(".zip"))
+            {
+                verifyContents(new JarPluginArtifact(pluginFile), zipWhitelist);
+                fileToInstall = zipTransformer.convertConventionZipToPluginJar(pluginFile);
+                pluginArtifact = pluginArtifactFactory.create(fileToInstall.toURI());
+            }
+            else
+            {
+                fileToInstall = pluginFile;
+                pluginArtifact = pluginArtifactFactory.create(fileToInstall.toURI());
+                verifyContents(pluginArtifact, jarWhitelist);
+                verifyDescriptor(pluginArtifact, user);
+            }
+
             Set<String> pluginKeys = pluginController.installPlugins(pluginArtifact);
             if (pluginKeys.size() == 1)
             {
@@ -206,7 +218,7 @@ public class PluginManager
         }
     }
 
-    private void verifyContents(PluginArtifact plugin) throws PluginOperationFailedException
+    private void verifyContents(PluginArtifact plugin, Iterable<Pattern> whitelistPatterns) throws PluginOperationFailedException
     {
         ZipFile zip = null;
         try
@@ -216,7 +228,7 @@ public class PluginManager
             {
                 ZipEntry entry = e.nextElement();
                 boolean allowed = false;
-                for (Pattern whitelist : pluginContentsWhitelist)
+                for (Pattern whitelist : whitelistPatterns)
                 {
                     if (whitelist.matcher(entry.getName()).matches())
                     {

@@ -106,6 +106,11 @@
             <version>1.8pre-20101216</version>
         </dependency>
         <dependency>
+            <groupId>org.json</groupId>
+            <artifactId>json</artifactId>
+            <version>20080701</version>
+        </dependency>
+        <dependency>
             <groupId>javax.servlet</groupId>
             <artifactId>servlet-api</artifactId>
             <version>2.4</version>
@@ -135,6 +140,12 @@
         <dependency>
             <groupId>com.atlassian.plugins</groupId>
             <artifactId>atlassian-plugins-osgi</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.atlassian.plugins</groupId>
+            <artifactId>atlassian-plugins-osgi-spring-extender</artifactId>
+            <version>2.7.0</version>
             <scope>provided</scope>
         </dependency>
 
@@ -207,6 +218,13 @@
             <version>2.6.3</version>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>xmlunit</groupId>
+            <artifactId>xmlunit</artifactId>
+            <version>1.3</version>
+            <scope>test</scope>
+        </dependency>
+
     </dependencies>
 
     <build>
@@ -250,6 +268,9 @@
                             com.atlassian.confluence.plugin.webresource;resolution:=optional,
                             *;resolution:=optional
                         </Import-Package>
+                        <Export-Package>
+                            com.atlassian.labs.speakeasy.install.convention.external
+                        </Export-Package>
                     </instructions>
                     <products>
                         <product>

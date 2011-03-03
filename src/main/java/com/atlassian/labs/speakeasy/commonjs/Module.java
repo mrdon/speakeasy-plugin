@@ -46,7 +46,7 @@ public class Module
         this.path = path;
         this.lastModified = lastModified;
         this.exports = new IterableTreeMap<String,Export>();
-        if (path.endsWith(".js"))
+        if (path.endsWith(".js") || path.endsWith(".host"))
         {
             Set<String> dependencies = newHashSet();
             jsDoc = parseContent(moduleContents, dependencies);
@@ -83,10 +83,11 @@ public class Module
             public void error(String message, String sourceName, int line, String lineSource, int lineOffset)
             {
                 log.warn("Error parsing module " + id + ":\n" +
-                         "\tMessage: " + message + "\n" +
-                         "\tLine:    " + line + "\n" +
-                         "\tLine Src:" + lineSource + "\n" +
-                         "\tColumn:  " + lineOffset);
+                         "  Message: " + message + "\n" +
+                         "  Line:    " + line + "\n" +
+                         "  Line Src:" + lineSource + "\n" +
+                         "  Column:  " + lineOffset);
+                throw new RuntimeException("Error parsing module '" + id + "' on line " + line + ": " + message);
             }
 
             public EvaluatorException runtimeError(String message, String sourceName, int line, String lineSource, int lineOffset)
@@ -96,7 +97,7 @@ public class Module
         });
         try
         {
-            AstRoot root = parser.parse(new StringReader(moduleContents), path, 0);
+            AstRoot root = parser.parse(new StringReader(moduleContents), path, 1);
             if (root.getComments() != null && !root.getComments().isEmpty())
             {
                 final String rawHeaderDocs = root.getComments().first().getValue();

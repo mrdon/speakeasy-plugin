@@ -1,0 +1,16 @@
+{
+    "key":          "myextension",
+    "name":         "My Extension",
+    "description":  "My simple extension that does wonderful things",
+    "version":      "1",
+
+    "vendor": { "name": "Joe Citizen",
+                 "url": "http://example.com/extension-homepage.html",
+               "email": "joe@example.com" },
+
+    "icons": {    "16": "icon16.png",
+                  "48": "icon48.png",
+                 "128": "icon128.png" },
+
+    "screenshots": [ "screenshot1.png", "screenshot2.png" ]
+}

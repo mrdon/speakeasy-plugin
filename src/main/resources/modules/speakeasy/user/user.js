@@ -224,7 +224,7 @@ function initSpeakeasy() {
                 var end = response.indexOf("||", start);
                 var data = $.parseJSON(response.substring(start, end));
                 if (data.error) {
-                    pluginsTable.trigger('pluginsUpdated', {'plugins': data.plugins});
+                    if (data.plugins) pluginsTable.trigger('pluginsUpdated', {'plugins': data.plugins});
                     addMessage('error', {title: "Error installing extension", body: data.error, shadowed: false});
                 } else {
                     var updatedPlugin = updateTable(data)[0];

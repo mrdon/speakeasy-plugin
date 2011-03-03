@@ -14,7 +14,13 @@
         <url-pattern>/speakeasy/unsubscribe</url-pattern>
     </servlet>
 
-    <commonjs key="userModules" />
+    <commonjs key="userModules">
+        <transformation extension="host">
+            <transformer key="commonjs-module" fullModuleKey="${project.groupId}.${project.artifactId}:userModules"/>
+            <transformer key="cssVariables" fullModuleKey="${project.groupId}.${project.artifactId}:userModules"/>
+        </transformation>
+    </commonjs>
+
 
     <web-resource key="user-jira" application="jira">
         <context>speakeasy.user-profile</context>
@@ -59,11 +65,16 @@
     <component key="speakeasyManager" class="com.atlassian.labs.speakeasy.SpeakeasyManager"/>
     <component key="descriptorGeneratorManager" class="com.atlassian.labs.speakeasy.DescriptorGeneratorManager" />
     <component key="commonJsModulesAccessor" class="com.atlassian.labs.speakeasy.commonjs.CommonJsModulesAccessor" />
+    <component key="zipTransformer" class="com.atlassian.labs.speakeasy.install.convention.ZipTransformer"/>
     <component key="pluginManager" class="com.atlassian.labs.speakeasy.install.PluginManager"/>
     <component key="classPrefixModuleFactory" class="com.atlassian.plugin.module.ClassPrefixModuleFactory"/>
     <component key="speakeasyData" class="com.atlassian.labs.speakeasy.data.SpeakeasyData"/>
     <component key="pomProperties" class="com.atlassian.labs.speakeasy.util.PomProperties"/>
     <component key="userProfileRenderer" class="com.atlassian.labs.speakeasy.ui.UserProfileRenderer"/>
+
+    <component key="conventionDescriptorGenerator" class="com.atlassian.labs.speakeasy.install.convention.ConventionDescriptorGeneratorServiceFactory" public="true">
+        <interface>com.atlassian.labs.speakeasy.install.convention.external.ConventionDescriptorGenerator</interface>
+    </component>
 
     <component-import key="jsonMarshaller" interface="com.atlassian.plugins.rest.common.json.JaxbJsonMarshaller"/>
     <component-import key="userManager" interface="com.atlassian.sal.api.user.UserManager"/>

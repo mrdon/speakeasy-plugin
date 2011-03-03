@@ -28,7 +28,6 @@ import java.util.*;
 public class CommonJsModulesDescriptor extends AbstractModuleDescriptor<CommonJsModules>
 {
     private String location = "/modules";
-    private Set<String> dependencies = new HashSet<String>();
 
     private final BundleContext bundleContext;
     private final PluginEventManager pluginEventManager;
@@ -38,6 +37,7 @@ public class CommonJsModulesDescriptor extends AbstractModuleDescriptor<CommonJs
     private Bundle pluginBundle;
     private volatile CommonJsModules modules;
     private volatile GeneratedDescriptorsManager generatedDescriptorsManager;
+    private volatile Element originalElement;
 
 
     public CommonJsModulesDescriptor(BundleContext bundleContext, PluginEventManager pluginEventManager, PluginAccessor pluginAccessor, HostContainer hostContainer, PluginFrameworkWatcher pluginFrameworkWatcher)
@@ -60,16 +60,18 @@ public class CommonJsModulesDescriptor extends AbstractModuleDescriptor<CommonJs
             location = element.attributeValue("location");
         }
 
-        for (Element dep : new HashSet<Element>(element.elements("dependency")))
-        {
-            dependencies.add(dep.getTextTrim());
-        }
+        this.originalElement = element;
     }
 
     @Override
     public CommonJsModules getModule()
     {
         return modules;
+    }
+
+    public Element getOriginalElement()
+    {
+        return originalElement;
     }
 
     @Override
@@ -122,10 +124,5 @@ public class CommonJsModulesDescriptor extends AbstractModuleDescriptor<CommonJs
     String getLocation()
     {
         return location;
-    }
-
-    Set<String> getDependencies()
-    {
-        return dependencies;
     }
 }

@@ -21,13 +21,15 @@ public class CommonJsModuleWrappingTransformer implements WebResourceTransformer
 
     public DownloadableResource transform(Element element, ResourceLocation resourceLocation, String extraPath, DownloadableResource downloadableResource)
     {
-        String descriptorKey = element.attributeValue("descriptorKey");
+        String descriptorKey = element.attributeValue("fullModuleKey");
         CommonJsModulesDescriptor commonJsModulesDescriptor = (CommonJsModulesDescriptor) pluginAccessor.getEnabledPluginModule(descriptorKey);
 
         String name = resourceLocation.getName();
         String moduleName = name.substring(0, name.length() - ".js".length());
 
-        return new CommonJsModuleWrappingDownloadableResource(downloadableResource, moduleName, commonJsModulesDescriptor);
+        String modulesKey = element.getParent().getParent().attributeValue("key");
+
+        return new CommonJsModuleWrappingDownloadableResource(downloadableResource, moduleName, modulesKey, commonJsModulesDescriptor);
     }
 
 }

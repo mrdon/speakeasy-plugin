@@ -2,7 +2,6 @@ package com.atlassian.labs.speakeasy.rest;
 
 import com.atlassian.labs.speakeasy.SpeakeasyManager;
 import com.atlassian.labs.speakeasy.install.PluginOperationFailedException;
-import com.atlassian.labs.speakeasy.install.PluginManager;
 import com.atlassian.labs.speakeasy.model.PluginIndex;
 import com.atlassian.labs.speakeasy.model.RemotePlugin;
 import com.atlassian.labs.speakeasy.model.UserPlugins;
@@ -12,9 +11,22 @@ import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.fileupload.FileUploadException;
 import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
+import org.json.JSONException;
+import org.json.JSONObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.ws.rs.*;
+import javax.ws.rs.Consumes;
+import javax.ws.rs.DELETE;
+import javax.ws.rs.FormParam;
+import javax.ws.rs.GET;
+import javax.ws.rs.POST;
+import javax.ws.rs.PUT;
+import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
+import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
 import java.io.File;
@@ -29,6 +41,7 @@ public class PluginsResource
     private final SpeakeasyManager speakeasyManager;
     private final UserManager userManager;
     private final JaxbJsonMarshaller jaxbJsonMarshaller;
+    private static final Logger log = LoggerFactory.getLogger(PluginsResource.class);
 
     public PluginsResource(UserManager userManager, JaxbJsonMarshaller jaxbJsonMarshaller, SpeakeasyManager speakeasyManager)
     {
@@ -122,18 +135,30 @@ public class PluginsResource
         }
         catch (PluginOperationFailedException e)
         {
+            log.error(e.getError(), e.getCause());
             return Response.ok().entity(wrapBodyInTextArea(createErrorJson(user, e))).build();
         }
         catch (RuntimeException e)
         {
+            log.error(e.getMessage(), e);
             return Response.ok().entity(wrapBodyInTextArea(createErrorJson(user, e))).build();
         }
     }
 
     private String createErrorJson(String user, Exception e)
     {
-        return "{\"error\":\"" + e.getMessage() + "\", \"plugins\" : " +
-               jaxbJsonMarshaller.marshal(speakeasyManager.getUserAccessList(user)) +"}";
+        JSONObject obj = new JSONObject();
+
+        try
+        {
+            obj.put("error", e.getMessage());
+            obj.put("plugins", new JSONObject(jaxbJsonMarshaller.marshal(speakeasyManager.getUserAccessList(user))));
+        }
+        catch (JSONException e1)
+        {
+            throw new PluginOperationFailedException("Unable to serialize error", e1, null);
+        }
+        return obj.toString();
     }
 
     private File extractPluginFile(HttpServletRequest request)

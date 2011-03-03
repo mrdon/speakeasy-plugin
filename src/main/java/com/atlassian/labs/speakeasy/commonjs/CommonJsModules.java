@@ -63,6 +63,8 @@ public class CommonJsModules
         this.externalModuleDependencies = unmodifiableSet(scan());
     }
 
+
+
     public Module getModule(String id)
     {
         return modules.get(id);
@@ -180,7 +182,7 @@ public class CommonJsModules
             }
         }))
         {
-            if (path.endsWith(".js") || path.endsWith(".mu"))
+            if (path.endsWith(".js") || path.endsWith(".mu") || path.endsWith(".host"))
             {
                 modulePaths.add(location + path);
             }
@@ -207,4 +209,8 @@ public class CommonJsModules
         return externalModuleDependencies;
     }
 
+    public String getPluginKey()
+    {
+        return pluginKey;
+    }
 }

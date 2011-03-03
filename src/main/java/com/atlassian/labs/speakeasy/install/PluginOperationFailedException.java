@@ -28,6 +28,10 @@ public class PluginOperationFailedException extends RuntimeException
     public PluginOperationFailedException(String message, Throwable cause, String pluginKey)
     {
         super(message, cause);
+        if (message != null)
+        {
+            message.replaceAll("<br>", "\n");
+        }
         this.error = message;
         this.pluginKey = pluginKey;
     }

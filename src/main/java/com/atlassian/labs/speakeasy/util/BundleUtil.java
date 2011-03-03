@@ -95,7 +95,7 @@ public class BundleUtil
         return paths;
     }
 
-    public static void scanPath(Bundle bundle, String root, String prefix, Set<String> paths, Predicate<String> predicate)
+    private static void scanPath(Bundle bundle, String root, String prefix, Set<String> paths, Predicate<String> predicate)
     {
         final Enumeration<String> entryPaths = bundle.getEntryPaths(prefix);
 
@@ -109,6 +109,10 @@ public class BundleUtil
             else
             {
                 String path = fullPath.substring(root.length() - 1);
+                if (path.startsWith("/"))
+                {
+                    path = path.substring(1);
+                }
                 if (predicate.apply(path))
                 {
                     paths.add(path);

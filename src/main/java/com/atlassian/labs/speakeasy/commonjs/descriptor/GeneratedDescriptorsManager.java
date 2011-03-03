@@ -1,5 +1,6 @@
 package com.atlassian.labs.speakeasy.commonjs.descriptor;
 
+import com.atlassian.labs.speakeasy.SpeakeasyWebResourceModuleDescriptor;
 import com.atlassian.labs.speakeasy.commonjs.CommonJsModules;
 import com.atlassian.labs.speakeasy.commonjs.util.JsDoc;
 import com.atlassian.labs.speakeasy.util.DefaultPluginModuleTracker;
@@ -28,6 +29,7 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.CopyOnWriteArraySet;
 
+import static com.google.common.collect.Sets.newHashSet;
 import static org.dom4j.DocumentHelper.createElement;
 
 /**
@@ -239,18 +241,19 @@ class GeneratedDescriptorsManager
 
     private ServiceRegistration registerBatchedModulesDescriptor()
     {
-        WebResourceModuleDescriptor webResourceModuleDescriptor = WebResourceUtil.instantiateDescriptor(hostContainer);
-        Plugin dummyPlugin = new StaticPlugin();
-        dummyPlugin.setKey(descriptor.getPluginKey());
-
+        ModuleDescriptor webResourceModuleDescriptor = descriptor.createIndividualModuleDescriptor();
 
         Element root = createElement("web-resource");
+        for (Element child : new HashSet<Element>(descriptor.getOriginalElement().elements()))
+        {
+            root.add(child.createCopy());
+        }
         Element depElement = root.addElement("dependency");
         depElement.setText("com.atlassian.labs.speakeasy-plugin:yabble");
         Element jsTransform = getJsTransformation(root);
         Element trans = jsTransform.addElement("transformer");
         trans.addAttribute("key", "commonjs-module");
-        trans.addAttribute("descriptorKey", descriptor.getCompleteKey());
+        trans.addAttribute("fullModuleKey", descriptor.getCompleteKey());
 
         for (String id : modules.getModuleIds())
         {
@@ -261,7 +264,7 @@ class GeneratedDescriptorsManager
         }
 
 
-        for (String dep : Sets.union(descriptor.getDependencies(), resolvedExternalModules))
+        for (String dep : resolvedExternalModules)
         {
             Element extDep = root.addElement("dependency");
             extDep.setText(dep);
@@ -288,7 +291,7 @@ class GeneratedDescriptorsManager
         trans.addAttribute("key", "cssVariables");
         trans.addAttribute("fullModuleKey", descriptor.getPluginKey() + ":" + generatedModuleKey);
         
-        webResourceModuleDescriptor.init(dummyPlugin,
+        webResourceModuleDescriptor.init(descriptor.getPlugin(),
                 createDescriptorElement(generatedModuleKey, root));
         return pluginBundle.getBundleContext().registerService(ModuleDescriptor.class.getName(), webResourceModuleDescriptor, null);
     }

@@ -7,6 +7,7 @@ import com.atlassian.labs.speakeasy.commonjs.util.ModuleWrapper;
 import com.atlassian.plugin.servlet.DownloadException;
 import com.atlassian.plugin.servlet.DownloadableResource;
 import com.atlassian.plugin.webresource.transformer.AbstractTransformedDownloadableResource;
+import com.google.common.collect.ImmutableMap;
 
 import java.io.*;
 
@@ -16,12 +17,14 @@ import java.io.*;
 public class CommonJsModuleWrappingDownloadableResource extends AbstractTransformedDownloadableResource
 {
     private final String moduleName;
+    private final String modulesKey;
     private final CommonJsModules commonJsModules;
 
-    public CommonJsModuleWrappingDownloadableResource(DownloadableResource delegate, String moduleName, CommonJsModulesDescriptor commonJsModulesDescriptor)
+    public CommonJsModuleWrappingDownloadableResource(DownloadableResource delegate, String moduleName, String modulesKey, CommonJsModulesDescriptor commonJsModulesDescriptor)
     {
         super(delegate);
         this.moduleName = moduleName;
+        this.modulesKey = modulesKey;
         this.commonJsModules = commonJsModulesDescriptor.getModule();
     }
 
@@ -35,7 +38,10 @@ public class CommonJsModuleWrappingDownloadableResource extends AbstractTransfor
         out.println(ModuleWrapper.wrapModule(
             moduleName,
             commonJsModules.getModuleContents(moduleName),
-            module.getDependencies()));
+            module.getDependencies(), ImmutableMap.of(
+                "pluginKey", commonJsModules.getPluginKey(),
+                "modulesKey", modulesKey
+        )));
 
         out.flush();
     }

@@ -1,0 +1,10 @@
+/**
+ * Provides variables from the host application
+ *
+ * @public
+ */
+
+/**
+ * The relative static resources prefix, including context path
+ */
+exports.staticResourcesPrefix = "@staticResourcePrefix";

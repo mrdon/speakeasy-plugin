@@ -19,12 +19,7 @@
             </span>
             <br>
             <span class="plugin-description">
-                {{^available}}
-                    {{&description}}
-                {{/available}}
-                {{#available}}
-                    {{description}}
-                {{/available}}
+                {{description}}
             </span></div>
     </td>
     <td headers="plugin-author">

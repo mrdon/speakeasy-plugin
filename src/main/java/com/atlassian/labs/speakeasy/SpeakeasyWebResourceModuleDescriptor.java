@@ -2,14 +2,12 @@ package com.atlassian.labs.speakeasy;
 
 import com.atlassian.labs.speakeasy.util.BundleUtil;
 import com.atlassian.labs.speakeasy.util.WebResourceUtil;
-import com.atlassian.plugin.ModuleDescriptor;
 import com.atlassian.plugin.Plugin;
 import com.atlassian.plugin.PluginParseException;
 import com.atlassian.plugin.descriptors.AbstractModuleDescriptor;
 import com.atlassian.plugin.hostcontainer.HostContainer;
 import com.atlassian.plugin.impl.AbstractDelegatingPlugin;
 import com.atlassian.plugin.webresource.WebResourceModuleDescriptor;
-import com.google.common.base.Predicate;
 import org.dom4j.Element;
 import org.dom4j.io.OutputFormat;
 import org.dom4j.io.XMLWriter;
@@ -33,6 +31,7 @@ public class SpeakeasyWebResourceModuleDescriptor extends AbstractModuleDescript
     private static final Logger log = LoggerFactory.getLogger(SpeakeasyWebResourceModuleDescriptor.class);
     private final HostContainer hostContainer;
     private final BundleContext bundleContext;
+    private volatile String directoryToScan;
 
     public SpeakeasyWebResourceModuleDescriptor(HostContainer hostContainer, BundleContext bundleContext)
     {
@@ -45,27 +44,33 @@ public class SpeakeasyWebResourceModuleDescriptor extends AbstractModuleDescript
     {
         super.init(plugin, element);
         this.originalElement = element;
-        String scan = element.attributeValue("scan");
-        if (scan != null)
-        {
-            scan = scan.endsWith("/") ? scan : scan + "/";
-            scan = scan.startsWith("/") ? scan : "/" + scan;
-            final Bundle pluginBundle = BundleUtil.findBundleForPlugin(bundleContext, plugin.getKey());
-            for (String path : BundleUtil.scanForPaths(pluginBundle, scan))
-            {
-                Element e = originalElement.addElement("resource");
-                e.addAttribute("type", "download");
-                e.addAttribute("name", path);
-                e.addAttribute("location", scan + path);
-            }
-
-        }
+        this.directoryToScan = element.attributeValue("scan");
     }
 
     @Override
     public Void getModule()
     {
         return null;
+    }
+
+    @Override
+    public void enabled()
+    {
+        if (directoryToScan != null)
+        {
+            directoryToScan = directoryToScan.endsWith("/") ? directoryToScan : directoryToScan + "/";
+            directoryToScan = directoryToScan.startsWith("/") ? directoryToScan : "/" + directoryToScan;
+            final Bundle pluginBundle = BundleUtil.findBundleForPlugin(bundleContext, plugin.getKey());
+            for (String path : BundleUtil.scanForPaths(pluginBundle, directoryToScan))
+            {
+                Element e = originalElement.addElement("resource");
+                e.addAttribute("type", "download");
+                e.addAttribute("name", path);
+                e.addAttribute("location", directoryToScan + path);
+            }
+            directoryToScan = null;
+        }
+        super.enabled();
     }
 
     public Iterable<WebResourceModuleDescriptor> getDescriptorsToExposeForUsers(List<String> users, int state)
@@ -75,7 +80,7 @@ public class SpeakeasyWebResourceModuleDescriptor extends AbstractModuleDescript
         Element userElement = (Element) originalElement.clone();
         for (Element dep : new ArrayList<Element>(userElement.elements("dependency")))
         {
-            resolveDependency(dep, state);
+            WebResourceUtil.resolveDependency(plugin, dep, state);
         }
         userElement.addAttribute("key", userElement.attributeValue("key") + "-" + state);
 
@@ -114,23 +119,4 @@ public class SpeakeasyWebResourceModuleDescriptor extends AbstractModuleDescript
         }, userElement);
         return Collections.singleton(descriptor);
     }
-
-    private void resolveDependency(Element dep, int state)
-    {
-        String fullKey = dep.getTextTrim();
-        int pos = fullKey.indexOf(':');
-        if (pos == -1)
-        {
-            throw new PluginParseException("Invalid dependency:" + fullKey);
-        }
-        String pluginKey = fullKey.substring(0, pos);
-        String moduleKey = fullKey.substring(pos + 1);
-
-        ModuleDescriptor<?> descriptor = plugin.getModuleDescriptor(moduleKey);
-        if (pluginKey.equals(plugin.getKey()) && descriptor != null && descriptor instanceof SpeakeasyWebResourceModuleDescriptor)
-        {
-            dep.setText(fullKey + "-" + state);
-        }
-    }
-
 }
