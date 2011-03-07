@@ -5,19 +5,10 @@ import com.atlassian.labs.speakeasy.install.convention.external.ConventionDescri
 import com.atlassian.plugin.JarPluginArtifact;
 import com.atlassian.plugin.PluginArtifact;
 import com.atlassian.plugin.osgi.factory.OsgiPlugin;
-import com.atlassian.plugin.osgi.factory.transform.PluginTransformationException;
-import com.atlassian.plugin.osgi.util.OsgiHeaderUtil;
 import com.atlassian.plugin.util.PluginUtils;
 import com.atlassian.plugins.rest.common.json.JacksonJsonProviderFactory;
-import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
-import org.dom4j.Document;
-import org.dom4j.DocumentHelper;
-import org.dom4j.Element;
-import org.dom4j.io.OutputFormat;
-import org.dom4j.io.XMLWriter;
 import org.osgi.framework.Constants;
-import sun.tools.jar.resources.jar;
 
 import javax.ws.rs.core.MediaType;
 import java.io.ByteArrayInputStream;
@@ -27,7 +18,6 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.StringWriter;
 import java.util.Map;
 import java.util.jar.Attributes;
 import java.util.jar.Manifest;

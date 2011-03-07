@@ -43,7 +43,7 @@ public class SpeakeasyWebResourceModuleDescriptor extends AbstractModuleDescript
     public void init(Plugin plugin, Element element) throws PluginParseException
     {
         super.init(plugin, element);
-        this.originalElement = element;
+        this.originalElement = element.createCopy();
         this.directoryToScan = element.attributeValue("scan");
     }
 

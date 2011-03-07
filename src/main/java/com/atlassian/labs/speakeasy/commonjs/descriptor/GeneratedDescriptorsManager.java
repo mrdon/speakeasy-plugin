@@ -40,7 +40,6 @@ class GeneratedDescriptorsManager
     private final CommonJsModulesDescriptor descriptor;
     private final Bundle pluginBundle;
     private final CommonJsModules modules;
-    private final HostContainer hostContainer;
 
     private final DefaultPluginModuleTracker<CommonJsModules,CommonJsModulesDescriptor> modulesTracker;
 
@@ -51,12 +50,11 @@ class GeneratedDescriptorsManager
     private final Logger log = LoggerFactory.getLogger(GeneratedDescriptorsManager.class);
 
     GeneratedDescriptorsManager(Bundle pluginBundle, CommonJsModules modules, PluginAccessor pluginAccessor,
-                                PluginEventManager pluginEventManager, CommonJsModulesDescriptor descriptor, HostContainer hostContainer)
+                                PluginEventManager pluginEventManager, CommonJsModulesDescriptor descriptor)
     {
         this.pluginBundle = pluginBundle;
         this.modules = modules;
         this.descriptor = descriptor;
-        this.hostContainer = hostContainer;
         this.unresolvedExternalDependencies = new HashSet<String>(modules.getExternalModuleDependencies());
         this.resolvedExternalModules = new CopyOnWriteArraySet<String>();
         modulesTracker = new DefaultPluginModuleTracker<CommonJsModules, CommonJsModulesDescriptor>(pluginAccessor, pluginEventManager,

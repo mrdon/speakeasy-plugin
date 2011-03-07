@@ -1,5 +1,6 @@
 package com.atlassian.labs.speakeasy.install;
 
+import com.atlassian.labs.speakeasy.commonjs.descriptor.CommonJsModulesDescriptor;
 import com.atlassian.labs.speakeasy.data.SpeakeasyData;
 import com.atlassian.labs.speakeasy.install.convention.ZipTransformer;
 import com.atlassian.labs.speakeasy.product.ProductAccessor;
@@ -165,6 +166,20 @@ public class PluginManager
                         }
                     }
                     throw new PluginOperationFailedException(cause, plugin.getKey());
+                }
+                else
+                {
+                    for (ModuleDescriptor descriptor : plugin.getModuleDescriptors())
+                    {
+                        if (descriptor instanceof CommonJsModulesDescriptor)
+                        {
+                            Set<String> unresolved = ((CommonJsModulesDescriptor)descriptor).getUnresolvedExternalModuleDependencies();
+                            if (!unresolved.isEmpty())
+                            {
+                                throw new PluginOperationFailedException("Plugin didn't install due to missing modules: " + unresolved, plugin.getKey());
+                            }
+                        }
+                    }
                 }
 
                 return plugin.getKey();

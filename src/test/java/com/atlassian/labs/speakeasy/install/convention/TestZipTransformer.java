@@ -2,15 +2,13 @@ package com.atlassian.labs.speakeasy.install.convention;
 
 import com.atlassian.plugin.JarPluginArtifact;
 import com.atlassian.plugin.PluginArtifact;
+import com.atlassian.plugin.osgi.factory.OsgiPlugin;
 import com.atlassian.plugin.test.PluginJarBuilder;
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang.StringUtils;
-import org.custommonkey.xmlunit.Diff;
-import org.custommonkey.xmlunit.XMLUnit;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.xml.sax.SAXException;
 
@@ -19,10 +17,15 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringWriter;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
+import java.util.jar.JarFile;
+import java.util.jar.Manifest;
 
 import static com.google.common.collect.Sets.newHashSet;
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
+import static org.osgi.framework.Constants.*;
 
 /**
  *
@@ -38,7 +41,6 @@ public class TestZipTransformer
     }
 
     @Test
-    @Ignore
     public void testFullTransform() throws IOException, SAXException
     {
         assertTransform("full", ImmutableList.of(
@@ -46,21 +48,29 @@ public class TestZipTransformer
             "images/image.png",
             "js/myextension/main.js",
             "atlassian-extension.json"
+        ), ImmutableMap.of(
+                BUNDLE_DESCRIPTION, "My simple extension that does wonderful things",
+                BUNDLE_NAME, "My Extension",
+                BUNDLE_VERSION, "1",
+                BUNDLE_VENDOR, "Joe Citizen",
+                OsgiPlugin.ATLASSIAN_PLUGIN_KEY, "myextension"
         ));
 
     }
 
     @Test
-    @Ignore
     public void testMinimalTransform() throws IOException, SAXException
     {
         assertTransform("minimal", ImmutableList.of(
             "atlassian-extension.json"
+        ), ImmutableMap.of(
+                BUNDLE_VERSION, "1",
+                OsgiPlugin.ATLASSIAN_PLUGIN_KEY, "myextension"
         ));
 
     }
 
-    private void assertTransform(String id, List<String> source) throws IOException, SAXException
+    private void assertTransform(String id, List<String> source, Map<String,String> expectedHeaders) throws IOException, SAXException
     {
         String prefix = "/" + getClass().getPackage().getName().replace('.', '/') + "/" + id + "/";
 
@@ -77,7 +87,7 @@ public class TestZipTransformer
                 if (allDirs.add(pwd.toString()))
                 {
                     builder.addResource(pwd.toString(), "");
-                };
+                }
             }
         }
         File jar = builder.buildWithNoManifest();
@@ -86,15 +96,12 @@ public class TestZipTransformer
 
         File converted = zipTransformer.convertConventionZipToPluginJar(zip);
         PluginArtifact artifact = new JarPluginArtifact(converted);
-
-        String expected = getResource(prefix + "atlassian-plugin.xml");
-        String actual = StringUtils.join(IOUtils.readLines(artifact.getResourceAsStream("atlassian-plugin.xml")), "\n");
-
-        XMLUnit.setNormalizeWhitespace(true);
-        XMLUnit.setIgnoreAttributeOrder(true);
-        XMLUnit.setIgnoreDiffBetweenTextAndCDATA(true);
-        Diff diff = new Diff(expected, actual);
-        assertTrue("Unexpected differences:" + diff.toString() + ", Expected: \n" + expected + "' but found: \n" + actual, diff.similar());
+        JarFile jarFile = new JarFile(converted);
+        Manifest mf = jarFile.getManifest();
+        for (Map.Entry<String,String> entry : expectedHeaders.entrySet())
+        {
+            assertEquals(entry.getValue(), mf.getMainAttributes().getValue(entry.getKey()));
+        }
 
         for (String path : source)
         {

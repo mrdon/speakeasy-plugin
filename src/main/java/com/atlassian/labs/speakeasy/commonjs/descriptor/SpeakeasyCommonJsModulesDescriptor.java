@@ -2,7 +2,6 @@ package com.atlassian.labs.speakeasy.commonjs.descriptor;
 
 import com.atlassian.labs.speakeasy.DescriptorGenerator;
 import com.atlassian.labs.speakeasy.SpeakeasyWebResourceModuleDescriptor;
-import com.atlassian.labs.speakeasy.commonjs.PluginFrameworkWatcher;
 import com.atlassian.plugin.ModuleDescriptor;
 import com.atlassian.plugin.PluginAccessor;
 import com.atlassian.plugin.event.PluginEventManager;
@@ -21,10 +20,9 @@ public class SpeakeasyCommonJsModulesDescriptor extends CommonJsModulesDescripto
     private final HostContainer hostContainer;
     private final BundleContext bundleContext;
 
-    public SpeakeasyCommonJsModulesDescriptor(BundleContext bundleContext, PluginEventManager pluginEventManager, PluginAccessor pluginAccessor, HostContainer hostContainer,
-                                              PluginFrameworkWatcher pluginFrameworkWatcher)
+    public SpeakeasyCommonJsModulesDescriptor(BundleContext bundleContext, PluginEventManager pluginEventManager, PluginAccessor pluginAccessor, HostContainer hostContainer)
     {
-        super(bundleContext, pluginEventManager, pluginAccessor, hostContainer, pluginFrameworkWatcher);
+        super(bundleContext, pluginEventManager, pluginAccessor, hostContainer);
         this.bundleContext = bundleContext;
         this.hostContainer = hostContainer;
     }

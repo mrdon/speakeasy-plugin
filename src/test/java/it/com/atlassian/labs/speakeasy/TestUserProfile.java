@@ -95,7 +95,7 @@ public class TestUserProfile
         IdeDialog ide =  product.visit(SpeakeasyUserPage.class)
                 .uploadPlugin(buildSimplePluginFile())
                 .openEditDialog("test-2")
-                .editAndSaveFile("modules/test.js", "require('nonexistent/module');", "problem loading");
+                .editAndSaveFile("modules/test.js", "require('nonexistent/module');", "nonexistent/module");
 
         assertTrue(ide.getStatus().contains("nonexistent/module"));
 

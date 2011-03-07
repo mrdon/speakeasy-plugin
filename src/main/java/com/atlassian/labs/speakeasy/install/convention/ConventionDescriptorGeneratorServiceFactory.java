@@ -1,7 +1,6 @@
 package com.atlassian.labs.speakeasy.install.convention;
 
 import com.atlassian.labs.speakeasy.SpeakeasyWebResourceModuleDescriptor;
-import com.atlassian.labs.speakeasy.commonjs.PluginFrameworkWatcher;
 import com.atlassian.labs.speakeasy.commonjs.descriptor.SpeakeasyCommonJsModulesDescriptor;
 import com.atlassian.labs.speakeasy.install.convention.external.ConventionDescriptorGenerator;
 import com.atlassian.plugin.ModuleDescriptor;
@@ -26,15 +25,13 @@ public class ConventionDescriptorGeneratorServiceFactory implements ServiceFacto
     private final BundleContext bundleContext;
     private final PluginAccessor pluginAccessor;
     private final HostContainer hostContainer;
-    private final PluginFrameworkWatcher pluginFrameworkWatcher;
 
-    public ConventionDescriptorGeneratorServiceFactory(PluginEventManager pluginEventManager, BundleContext bundleContext, PluginAccessor pluginAccessor, HostContainer hostContainer, PluginFrameworkWatcher pluginFrameworkWatcher)
+    public ConventionDescriptorGeneratorServiceFactory(PluginEventManager pluginEventManager, BundleContext bundleContext, PluginAccessor pluginAccessor, HostContainer hostContainer)
     {
         this.pluginEventManager = pluginEventManager;
         this.bundleContext = bundleContext;
         this.pluginAccessor = pluginAccessor;
         this.hostContainer = hostContainer;
-        this.pluginFrameworkWatcher = pluginFrameworkWatcher;
     }
 
     public Object getService(Bundle bundle, ServiceRegistration registration)
@@ -46,7 +43,7 @@ public class ConventionDescriptorGeneratorServiceFactory implements ServiceFacto
         if (bundle.getEntry("js/") != null)
         {
             SpeakeasyCommonJsModulesDescriptor descriptor = new SpeakeasyCommonJsModulesDescriptor(
-                    bundleContext, pluginEventManager, pluginAccessor, hostContainer, pluginFrameworkWatcher);
+                    bundleContext, pluginEventManager, pluginAccessor, hostContainer);
 
             Element modules = factory.createElement("scoped-modules")
                 .addAttribute("key", "modules")

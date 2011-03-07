@@ -1,5 +1,6 @@
 package com.atlassian.labs.speakeasy;
 
+import com.atlassian.labs.speakeasy.commonjs.descriptor.CommonJsModulesDescriptor;
 import com.atlassian.labs.speakeasy.data.SpeakeasyData;
 import com.atlassian.labs.speakeasy.install.PluginManager;
 import com.atlassian.labs.speakeasy.install.PluginOperationFailedException;
@@ -21,6 +22,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import static com.google.common.collect.Sets.newHashSet;
 import static java.util.Arrays.asList;
 
 /**
@@ -107,10 +109,18 @@ public class SpeakeasyManager
 
         if (pluginAccessor.isPluginEnabled(pluginKey))
         {
-            remotePlugin.setAvailable(true);
-            remotePlugin.setEnabled(accessList.contains(userName));
-            remotePlugin.setCanEnable(!remotePlugin.isEnabled());
-            remotePlugin.setCanDisable(remotePlugin.isEnabled());
+            Set<String> unresolvedExternalModuleDependencies = findUnresolvedCommonJsDependencies(plugin);
+            if (unresolvedExternalModuleDependencies.isEmpty())
+            {
+                remotePlugin.setAvailable(true);
+                remotePlugin.setEnabled(accessList.contains(userName));
+                remotePlugin.setCanEnable(!remotePlugin.isEnabled());
+                remotePlugin.setCanDisable(remotePlugin.isEnabled());
+            }
+            else
+            {
+                remotePlugin.setDescription("Unable to find modules: " + unresolvedExternalModuleDependencies);
+            }
         }
         else if (plugin instanceof UnloadablePlugin)
         {
@@ -136,6 +146,19 @@ public class SpeakeasyManager
             }
         }
         return remotePlugin;
+    }
+
+    private Set<String> findUnresolvedCommonJsDependencies(Plugin plugin)
+    {
+        Set<String> unresolved = newHashSet();
+        for (ModuleDescriptor descriptor : plugin.getModuleDescriptors())
+        {
+            if (descriptor instanceof CommonJsModulesDescriptor)
+            {
+                unresolved.addAll(((CommonJsModulesDescriptor)descriptor).getUnresolvedExternalModuleDependencies());
+            }
+        }
+        return unresolved;
     }
 
     private String getPluginAuthor(Plugin plugin)
