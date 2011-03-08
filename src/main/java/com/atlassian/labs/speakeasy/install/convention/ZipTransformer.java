@@ -2,6 +2,7 @@ package com.atlassian.labs.speakeasy.install.convention;
 
 import com.atlassian.labs.speakeasy.install.PluginOperationFailedException;
 import com.atlassian.labs.speakeasy.install.convention.external.ConventionDescriptorGenerator;
+import com.atlassian.labs.speakeasy.util.InputStreamToJsonObject;
 import com.atlassian.plugin.JarPluginArtifact;
 import com.atlassian.plugin.PluginArtifact;
 import com.atlassian.plugin.osgi.factory.OsgiPlugin;
@@ -35,6 +36,13 @@ public class ZipTransformer
 {
     private static final String ATLASSIAN_EXTENSION_PATH = "atlassian-extension.json";
 
+    private final InputStreamToJsonObject jsonReader;
+
+    public ZipTransformer(InputStreamToJsonObject jsonReader)
+    {
+        this.jsonReader = jsonReader;
+    }
+
     public File convertConventionZipToPluginJar(File pluginFile)
     {
         Map<String,byte[]> additions = newHashMap();
@@ -45,6 +53,9 @@ public class ZipTransformer
 
             additions.put("META-INF/MANIFEST.MF", generateManifest(descriptor));
             additions.put("META-INF/spring/speakeasy-context.xml", getResourceContents("speakeasy-context.xml"));
+
+            // this exists to force parse errors to happen earlier
+            JsonToElementParser.createWebItems(artifact.getResourceAsStream("ui/web-items.json"));
 
             try
             {
@@ -113,24 +124,13 @@ public class ZipTransformer
 
     private JsonManifest readJsonManifest(PluginArtifact artifact)
     {
-        InputStream in = null;
         try
         {
-            in = artifact.getResourceAsStream(ATLASSIAN_EXTENSION_PATH);
-            Class<Object> foo = (Class<Object>) getClass().getClassLoader().loadClass(JsonManifest.class.getName());
-            return (JsonManifest) new JacksonJsonProviderFactory().create().readFrom(foo, JsonManifest.class, null, MediaType.APPLICATION_JSON_TYPE, null, in);
-        }
-        catch (ClassNotFoundException e)
-        {
-            throw new RuntimeException("Not possible", e);
+            return jsonReader.readToObject(JsonManifest.class, artifact.getResourceAsStream(ATLASSIAN_EXTENSION_PATH));
         }
         catch (IOException e)
         {
             throw new PluginOperationFailedException("Unable to parse " + ATLASSIAN_EXTENSION_PATH, e, null);
-        }
-        finally
-        {
-            IOUtils.closeQuietly(in);
         }
     }
 

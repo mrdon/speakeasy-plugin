@@ -73,6 +73,22 @@ mvn {product}:run
             To develop your own extensions, <a href="mailto:don@atlassian.com">learn more</a>.
         </p>
 
+        #set ($topWebItems = $webInterfaceManager.getDisplayableItems("speakeasy.user-profile/top", $webInterfaceContext))
+        #if (!$topWebItems.empty)
+                <div class="top-links">
+                #foreach ($item in $topWebItems)
+                    <div class="top-link">
+                        <a href="$item.link.getDisplayableUrl($req, $webInterfaceContext)"
+                            #if ($item.link.id) id="$item.link.id"#end
+                            #if ($item.styleClass) class="$item.styleClass"#end
+                            #if ($item.link.hasAccessKey()) accessKey="$item.link.getAccessKey($helper)"#end>
+                           $item.webLabel.getDisplayableLabel($req, $webInterfaceContext)
+                        </a>
+                    </div>
+                #end
+                </div>
+            #end
+
         <table class="aui" id="plugins-table">
             <thead>
                 <tr>

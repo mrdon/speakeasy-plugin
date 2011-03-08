@@ -1,0 +1,13 @@
+/*
+	Web Items allow you to insert navigation items (menu items, tabs etc) into
+	various places within the product interface.
+ */
+[
+{
+	"section": "confluence.user.profile.menu",
+	"label": "Hello World Menu Item",
+	"url": "#",
+	"cssName": "hello-world-menu-item",
+	"weight": 40
+}
+]

@@ -2,6 +2,7 @@ package it.com.atlassian.labs.speakeasy;
 
 import com.atlassian.pageobjects.binder.WaitUntil;
 import com.atlassian.webdriver.AtlassianWebDriver;
+import com.atlassian.webdriver.utils.Check;
 import com.gargoylesoftware.htmlunit.javascript.background.JavaScriptExecutor;
 import com.google.common.base.Function;
 import org.openqa.selenium.By;
@@ -44,5 +45,9 @@ public class HiBanner
         WebElement img = driver.findElement(By.id("foo")).findElement(By.tagName("img"));
         return (Boolean) driver.executeScript(
               "return arguments[0].complete", img);
+    }
+    public boolean isYahooLinkAvailable()
+    {
+        return Check.elementIsVisible(By.className("yahoo-web-item"), driver);
     }
 }

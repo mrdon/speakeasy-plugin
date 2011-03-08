@@ -8,6 +8,12 @@
 
     <scoped-modules key="modules" location="/plugin-modules" />
 
+    <scoped-web-item key="web-item" section="speakeasy.user-profile/top">
+        <styleClass>google-web-item</styleClass>
+        <label>Google</label>
+        <link>http://google.com</link>
+    </scoped-web-item>
+
     <scoped-web-resource key="css" scan="css/" />
     
     <servlet key="mailFlush" class="com.atlassian.labs.speakeasy.plugin.test.RefappMailQueueFlushServlet" application="refapp">

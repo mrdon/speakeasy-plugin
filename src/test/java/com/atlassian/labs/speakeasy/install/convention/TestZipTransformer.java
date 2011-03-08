@@ -1,5 +1,6 @@
 package com.atlassian.labs.speakeasy.install.convention;
 
+import com.atlassian.labs.speakeasy.util.InputStreamToJsonObject;
 import com.atlassian.plugin.JarPluginArtifact;
 import com.atlassian.plugin.PluginArtifact;
 import com.atlassian.plugin.osgi.factory.OsgiPlugin;
@@ -37,7 +38,7 @@ public class TestZipTransformer
     @Before
     public void setUp()
     {
-        zipTransformer = new ZipTransformer();
+        zipTransformer = new ZipTransformer(new InputStreamToJsonObject());
     }
 
     @Test

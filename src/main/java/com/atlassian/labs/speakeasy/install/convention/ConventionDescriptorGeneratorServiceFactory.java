@@ -2,7 +2,10 @@ package com.atlassian.labs.speakeasy.install.convention;
 
 import com.atlassian.labs.speakeasy.SpeakeasyWebResourceModuleDescriptor;
 import com.atlassian.labs.speakeasy.commonjs.descriptor.SpeakeasyCommonJsModulesDescriptor;
+import com.atlassian.labs.speakeasy.install.PluginOperationFailedException;
 import com.atlassian.labs.speakeasy.install.convention.external.ConventionDescriptorGenerator;
+import com.atlassian.labs.speakeasy.util.InputStreamToJsonObject;
+import com.atlassian.labs.speakeasy.webfragment.SpeakeasyWebItemModuleDescriptor;
 import com.atlassian.plugin.ModuleDescriptor;
 import com.atlassian.plugin.Plugin;
 import com.atlassian.plugin.PluginAccessor;
@@ -25,13 +28,15 @@ public class ConventionDescriptorGeneratorServiceFactory implements ServiceFacto
     private final BundleContext bundleContext;
     private final PluginAccessor pluginAccessor;
     private final HostContainer hostContainer;
+    private final InputStreamToJsonObject jsonReader;
 
-    public ConventionDescriptorGeneratorServiceFactory(PluginEventManager pluginEventManager, BundleContext bundleContext, PluginAccessor pluginAccessor, HostContainer hostContainer)
+    public ConventionDescriptorGeneratorServiceFactory(PluginEventManager pluginEventManager, BundleContext bundleContext, PluginAccessor pluginAccessor, HostContainer hostContainer, InputStreamToJsonObject jsonReader)
     {
         this.pluginEventManager = pluginEventManager;
         this.bundleContext = bundleContext;
         this.pluginAccessor = pluginAccessor;
         this.hostContainer = hostContainer;
+        this.jsonReader = jsonReader;
     }
 
     public Object getService(Bundle bundle, ServiceRegistration registration)
@@ -67,9 +72,33 @@ public class ConventionDescriptorGeneratorServiceFactory implements ServiceFacto
             registerSpeakeasyWebResourceDescriptor(bundle, factory, plugin, "css");
         }
 
+        if (bundle.getEntry("ui/web-items.json") != null)
+        {
+            registerSpeakeasyWebItems(bundle, factory, plugin);
+        }
+
         return new ConventionDescriptorGenerator()
         {
         };
+    }
+
+    private void registerSpeakeasyWebItems(Bundle bundle, DocumentFactory factory, Plugin plugin)
+    {
+
+        try
+        {
+            for (Element element : JsonToElementParser.createWebItems(plugin.getResourceAsStream("ui/web-items.json")))
+            {
+                SpeakeasyWebItemModuleDescriptor descriptor = new SpeakeasyWebItemModuleDescriptor(bundleContext);
+                descriptor.init(plugin, element);
+                bundle.getBundleContext().registerService(ModuleDescriptor.class.getName(), descriptor, null);
+            }
+        }
+        catch (PluginOperationFailedException e)
+        {
+            e.setPluginKey(plugin.getKey());
+            throw e;
+        }
     }
 
     private void registerSpeakeasyWebResourceDescriptor(Bundle bundle, DocumentFactory factory, Plugin plugin, String type)

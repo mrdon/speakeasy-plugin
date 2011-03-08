@@ -12,7 +12,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 @XmlRootElement
 public class PluginOperationFailedException extends RuntimeException
 {
-    private final String pluginKey;
+    private String pluginKey;
 
     @XmlAttribute
     private final String error;
@@ -49,6 +49,11 @@ public class PluginOperationFailedException extends RuntimeException
     public void setPlugin(RemotePlugin plugin)
     {
         this.plugin = plugin;
+    }
+
+    public void setPluginKey(String pluginKey)
+    {
+        this.pluginKey = pluginKey;
     }
 
     public String getPluginKey()

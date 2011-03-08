@@ -1,6 +1,5 @@
 package it.com.atlassian.labs.speakeasy;
 
-import com.atlassian.pageobjects.binder.WaitUntil;
 import com.atlassian.webdriver.AtlassianWebDriver;
 import com.atlassian.webdriver.utils.Check;
 import org.openqa.selenium.By;
@@ -10,7 +9,7 @@ import javax.inject.Inject;
 /**
  *
  */
-public class PluginTestBanner
+public class PluginTestActivated
 {
     @Inject
     private AtlassianWebDriver driver;
@@ -25,7 +24,12 @@ public class PluginTestBanner
         return Check.elementIsVisible(By.id("upload-form"), driver);
     }
 
-    public PluginTestBanner waitForBanner()
+    public boolean isGoogleLinkVisible()
+    {
+        return Check.elementIsVisible(By.className("google-web-item"), driver);
+    }
+
+    public PluginTestActivated waitForBanner()
     {
         driver.waitUntilElementIsVisible(By.id("plugin-tests-enabled"));
         return this;

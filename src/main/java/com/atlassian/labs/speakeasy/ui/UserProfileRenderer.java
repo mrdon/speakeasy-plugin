@@ -10,6 +10,7 @@ import com.atlassian.labs.speakeasy.model.UserPlugins;
 import com.atlassian.labs.speakeasy.product.ProductAccessor;
 import com.atlassian.plugin.Plugin;
 import com.atlassian.plugin.PluginAccessor;
+import com.atlassian.plugin.web.WebInterfaceManager;
 import com.atlassian.plugin.webresource.UrlMode;
 import com.atlassian.plugin.webresource.WebResourceManager;
 import com.atlassian.sal.api.user.UserManager;
@@ -26,6 +27,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Writer;
+import java.util.Collections;
 import java.util.Map;
 
 import static java.util.Collections.singletonMap;
@@ -45,14 +47,14 @@ public class UserProfileRenderer
     private final ProductAccessor productAccessor;
     private final SpeakeasyData data;
     private final Plugin plugin;
+    private final WebInterfaceManager webInterfaceManager;
 
 
-    public UserProfileRenderer(PluginAccessor pluginAccessor, TemplateRenderer templateRenderer, SpeakeasyManager speakeasyManager,
-                               UserManager userManager, WebResourceManager webResourceManager, PluginManager pluginManager,
-                               ProductAccessor productAccessor, SpeakeasyData data, CommonJsModulesAccessor commonJsModulesAccessor)
+    public UserProfileRenderer(PluginAccessor pluginAccessor, TemplateRenderer templateRenderer, SpeakeasyManager speakeasyManager, UserManager userManager, WebResourceManager webResourceManager, PluginManager pluginManager, ProductAccessor productAccessor, SpeakeasyData data, CommonJsModulesAccessor commonJsModulesAccessor, WebInterfaceManager webInterfaceManager)
     {
         this.templateRenderer = templateRenderer;
         this.commonJsModulesAccessor = commonJsModulesAccessor;
+        this.webInterfaceManager = webInterfaceManager;
         this.plugin = pluginAccessor.getPlugin("com.atlassian.labs.speakeasy-plugin");
         this.speakeasyManager = speakeasyManager;
         this.userManager = userManager;
@@ -90,6 +92,9 @@ public class UserProfileRenderer
                 put("staticResourcesPrefix", webResourceManager.getStaticResourcePrefix(UrlMode.RELATIVE)).
                 put("product", productAccessor.getSdkName()).
                 put("devmode", devMode).
+
+                put("webInterfaceManager", webInterfaceManager).
+                put("webInterfaceContext", Collections.<String, Object>emptyMap()).
                 build(),
                 output);
     }
