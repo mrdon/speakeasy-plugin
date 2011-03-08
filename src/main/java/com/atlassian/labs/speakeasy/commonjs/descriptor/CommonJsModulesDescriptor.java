@@ -15,7 +15,10 @@ import org.dom4j.Element;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 
+import java.util.Collections;
 import java.util.Set;
+
+import static java.util.Collections.emptySet;
 
 
 /**
@@ -94,7 +97,9 @@ public class CommonJsModulesDescriptor extends AbstractModuleDescriptor<CommonJs
 
     public Set<String> getUnresolvedExternalModuleDependencies()
     {
-        return generatedDescriptorsManager.getUnresolvedExternalDependencies();
+        return generatedDescriptorsManager != null ?
+                generatedDescriptorsManager.getUnresolvedExternalDependencies()
+                : Collections.<String>emptySet();
     }
 
     public ModuleDescriptor createIndividualModuleDescriptor()

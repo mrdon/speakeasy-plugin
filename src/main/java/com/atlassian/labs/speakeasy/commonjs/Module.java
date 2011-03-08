@@ -83,10 +83,10 @@ public class Module
             public void error(String message, String sourceName, int line, String lineSource, int lineOffset)
             {
                 log.warn("Error parsing module " + id + ":\n" +
-                         "  Message: " + message + "\n" +
-                         "  Line:    " + line + "\n" +
-                         "  Line Src:" + lineSource + "\n" +
-                         "  Column:  " + lineOffset);
+                        "  Message: " + message + "\n" +
+                        "  Line:    " + line + "\n" +
+                        "  Line Src:" + lineSource + "\n" +
+                        "  Column:  " + lineOffset);
                 throw new RuntimeException("Error parsing module '" + id + "' on line " + line + ": " + message);
             }
 
@@ -97,7 +97,7 @@ public class Module
         });
         try
         {
-            AstRoot root = parser.parse(new StringReader(moduleContents), path, 1);
+            final AstRoot root = parser.parse(new StringReader(moduleContents), path, 1);
             if (root.getComments() != null && !root.getComments().isEmpty())
             {
                 final String rawHeaderDocs = root.getComments().first().getValue();
@@ -108,42 +108,48 @@ public class Module
             {
                 public boolean visit(AstNode node)
                 {
-                    if (node.getType() == Token.ASSIGN)
+                    try
                     {
-                        Assignment assignment = (Assignment) node;
-                        if (assignment.getLeft().getType() == Token.GETPROP)
+                        if (node.getType() == Token.ASSIGN)
                         {
-                            PropertyGet left = (PropertyGet)assignment.getLeft();
-                            String name = ((Name)left.getLeft()).getIdentifier();
-                            if ("exports".equals(name))
+                            Assignment assignment = (Assignment) node;
+                            if (assignment.getLeft().getType() == Token.GETPROP)
                             {
-                                String exportName = left.getProperty().getIdentifier();
-                                Export export = new Export(exportName, JsDocParser.parse(node.getJsDoc()));
-                                if (jsDoc.get().getDescription().length() > 0 && export.getJsDoc().getDescription().equals(jsDoc.get().getDescription()))
+                                PropertyGet left = (PropertyGet)assignment.getLeft();
+                                if (left.getLeft() instanceof Name && ((Name)left.getLeft()).getIdentifier().equals("exports"))
                                 {
-                                    jsDoc.set(new JsDoc(""));
-                                }
-                                exports.put(exportName, export);
-                            }
-                        }
-                    }
-                    else if (node.getType() == Token.CALL)
-                    {
-                        FunctionCall call = (FunctionCall)node;
-                        if (call.getTarget().getType() == Token.NAME)
-                        {
-                            Name name = (Name)call.getTarget();
-                            if ("require".equals(name.getIdentifier()))
-                            {
-                                if (call.getArguments().size() == 1 && call.getArguments().get(0).getType() == Token.STRING)
-                                {
-                                    dependencies.add(ModuleUtil.resolveModuleId(id, ((StringLiteral) call.getArguments().get(0)).getValue()));
+                                    String exportName = left.getProperty().getIdentifier();
+                                    Export export = new Export(exportName, JsDocParser.parse(node.getJsDoc()));
+                                    if (jsDoc.get().getDescription().length() > 0 && export.getJsDoc().getDescription().equals(jsDoc.get().getDescription()))
+                                    {
+                                        jsDoc.set(new JsDoc(""));
+                                    }
+                                    exports.put(exportName, export);
                                 }
                             }
                         }
-                    }
+                        else if (node.getType() == Token.CALL)
+                        {
+                            FunctionCall call = (FunctionCall)node;
+                            if (call.getTarget().getType() == Token.NAME)
+                            {
+                                Name name = (Name)call.getTarget();
+                                if ("require".equals(name.getIdentifier()))
+                                {
+                                    if (call.getArguments().size() == 1 && call.getArguments().get(0).getType() == Token.STRING)
+                                    {
+                                        dependencies.add(ModuleUtil.resolveModuleId(id, ((StringLiteral) call.getArguments().get(0)).getValue()));
+                                    }
+                                }
+                            }
+                        }
 
-                    return true;
+                        return true;
+                    }
+                    catch (RuntimeException ex)
+                    {
+                        throw new IllegalArgumentException("Exception while parsing for exports in file " + root.getSourceName() + " on line " + node.getLineno(), ex);
+                    }
                 }
             });
         }
