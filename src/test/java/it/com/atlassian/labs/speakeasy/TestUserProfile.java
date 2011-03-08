@@ -9,6 +9,7 @@ import com.atlassian.webdriver.pageobjects.WebDriverTester;
 import com.dumbster.smtp.SimpleSmtpServer;
 import com.dumbster.smtp.SmtpMessage;
 import com.google.common.collect.Sets;
+import it.com.atlassian.labs.speakeasy.util.TempHelp;
 import org.apache.commons.io.FileUtils;
 import org.junit.After;
 import org.junit.Before;
@@ -112,24 +113,15 @@ public class TestUserProfile
     }
 
     @Test
-    public void testDownloadPlugin() throws IOException
+    public void testDownloadPluginJarAsAmpsProject() throws IOException
     {
         File file = product.visit(SpeakeasyUserPage.class)
                 .uploadPlugin(buildSimplePluginFile())
                 .openDownloadDialog("test-2")
-                .download();
+                .downloadAsAmpsProject();
         assertNotNull(file);
-        File unzippedPlugin = new File(file.getParent(), "unzipped");
-        if (unzippedPlugin.exists())
-        {
-            FileUtils.cleanDirectory(unzippedPlugin);
-        }
-        else
-        {
-            unzippedPlugin.mkdirs();
-        }
-
-        FileUnzipper unzipper = new FileUnzipper(file, unzippedPlugin);
+        File unzippedPluginDir = TempHelp.getTempDir("test-2-amps-unzip");
+        FileUnzipper unzipper = new FileUnzipper(file, unzippedPluginDir);
         Set<String> entries = new HashSet<String>();
         for (ZipEntry entry : unzipper.entries())
         {
@@ -152,12 +144,47 @@ public class TestUserProfile
                 "src/main/resources/modules/test.js"
         ), entries);
 
-        File fooFile = new File(unzippedPlugin, "src/main/resources/foo.js");
+        File fooFile = new File(unzippedPluginDir, "src/main/resources/foo.js");
         assertEquals("alert(\"hi\");", FileUtils.readFileToString(fooFile).trim());
-        String pomContents = FileUtils.readFileToString(new File(unzippedPlugin, "pom.xml"));
+        String pomContents = FileUtils.readFileToString(new File(unzippedPluginDir, "pom.xml"));
         assertFalse(pomContents.contains("${"));
         assertTrue(pomContents.contains("plugin.key>test-2</plugin.key"));
     }
+
+    @Test
+    public void testDownloadPluginJarAsExtension() throws IOException
+    {
+        File file = product.visit(SpeakeasyUserPage.class)
+                .uploadPlugin(buildSimplePluginFile())
+                .openDownloadDialog("test-2")
+                .downloadAsExtension();
+        assertNotNull(file);
+        assertTrue(file.getName().endsWith(".jar"));
+        File unzippedPluginDir = TempHelp.getTempDir("test-2-extension-unzip");
+
+        FileUnzipper unzipper = new FileUnzipper(file, unzippedPluginDir);
+        Set<String> entries = new HashSet<String>();
+        for (ZipEntry entry : unzipper.entries())
+        {
+            entries.add(entry.getName());
+        }
+
+        unzipper.unzip();
+
+
+        assertEquals(Sets.newHashSet(
+                "atlassian-plugin.xml",
+                "foo.js",
+                "bar/",
+                "bar/baz.js",
+                "modules/",
+                "modules/test.js"
+        ), entries);
+
+        File fooFile = new File(unzippedPluginDir, "foo.js");
+        assertEquals("alert(\"hi\");", FileUtils.readFileToString(fooFile).trim());
+    }
+
 
     @Test
     public void testEnableTestPlugin() throws IOException

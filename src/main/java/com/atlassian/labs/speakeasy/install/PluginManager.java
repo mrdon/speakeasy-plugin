@@ -298,7 +298,7 @@ public class PluginManager
         return true;
     }
 
-    public File getPluginFileAsProject(String pluginKey)
+    public File getPluginAsProject(String pluginKey)
     {
         Bundle bundle = findBundleForPlugin(bundleContext, pluginKey);
         notNull(bundle, "Bundle for plugin '" + pluginKey + "' not found");
@@ -331,6 +331,44 @@ public class PluginManager
             zout.putNextEntry(new ZipEntry("pom.xml"));
             String pomContents = renderPom(pluginAccessor.getPlugin(pluginKey));
             IOUtils.copy(new StringReader(pomContents), zout);
+        }
+        catch (IOException e)
+        {
+            throw new RuntimeException("Unable to create plugin project", e);
+        }
+        finally
+        {
+            IOUtils.closeQuietly(zout);
+            IOUtils.closeQuietly(fout);
+        }
+        return file;
+    }
+
+    public File getPluginArtifact(String pluginKey)
+    {
+        Bundle bundle = findBundleForPlugin(bundleContext, pluginKey);
+        notNull(bundle, "Bundle for plugin '" + pluginKey + "' not found");
+        FileOutputStream fout = null;
+        ZipOutputStream zout = null;
+        File file = null;
+        try
+        {
+            file = File.createTempFile("speakeasy-plugin-artifact", ".zip");
+            fout = new FileOutputStream(file);
+            zout = new ZipOutputStream(fout);
+
+            List<String> paths = getPluginFileNames(bundle);
+            for (String path : paths)
+            {
+
+                ZipEntry entry = new ZipEntry(path);
+                zout.putNextEntry(entry);
+                if (!path.endsWith("/"))
+                {
+                    byte[] data = readEntry(bundle, path);
+                    zout.write(data, 0, data.length);
+                }
+            }
         }
         catch (IOException e)
         {

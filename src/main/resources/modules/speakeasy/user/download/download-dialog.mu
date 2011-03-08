@@ -11,4 +11,5 @@ mvn {{product}}:run
     <li>Edit the extension files, usually in <code>src/main/resources</code>, and refresh your browser
     to see the changes.</li>
 </ol>
-<a id="download-link" href="{{href}}">Download</a>
+<a id="download-as-extension-link" href="{{href}}/extension/{{pluginKey}}.{{extension}}">Download</a> |
+<a id="download-as-amps-link" href="{{href}}/project/{{pluginKey}}-project.zip">Download as SDK Project</a>

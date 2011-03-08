@@ -24,6 +24,8 @@ public class RemotePlugin implements Comparable
 
     private String description;
 
+    private String extension;
+
     private int numUsers = 0;
 
     private boolean available;
@@ -227,6 +229,16 @@ public class RemotePlugin implements Comparable
     public void setAvailable(boolean available)
     {
         this.available = available;
+    }
+
+    public String getExtension()
+    {
+        return extension;
+    }
+
+    public void setExtension(String extension)
+    {
+        this.extension = extension;
     }
 
     public int compareTo(Object o)

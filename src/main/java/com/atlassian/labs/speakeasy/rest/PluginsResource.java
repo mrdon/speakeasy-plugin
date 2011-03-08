@@ -61,12 +61,22 @@ public class PluginsResource
     }
 
     @GET
-    @Path("download/{pluginKey}.zip")
+    @Path("download/project/{pluginKey}-project.zip")
     @Produces("application/octet-stream")
     public Response getAsAmpsProject(@PathParam("pluginKey") String pluginKey)
     {
         String user = userManager.getRemoteUsername();
-        File file = speakeasyManager.getPluginFileAsProject(pluginKey, user);
+        File file = speakeasyManager.getPluginAsProject(pluginKey, user);
+        return Response.ok().entity(file).build();
+    }
+
+    @GET
+    @Path("download/extension/{pluginKey}.{extension}")
+    @Produces("application/octet-stream")
+    public Response getAsExtension(@PathParam("pluginKey") String pluginKey)
+    {
+        String user = userManager.getRemoteUsername();
+        File file = speakeasyManager.getPluginArtifact(pluginKey, user);
         return Response.ok().entity(file).build();
     }
 

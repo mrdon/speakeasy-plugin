@@ -6,23 +6,6 @@
         var product = "$product";
     </script>
 
-    <script type="text/x-template" title="download-dialog">
-        <p>
-            This will create an AMPS project for the extension '{pluginKey}'.
-            To use it:
-        </p>
-        <ol>
-            <li>Unzip the file into an empty directory</li>
-            <li>Start the target product with the extension installed by running:
-<pre>
-mvn {product}:run
-</pre></li>
-            <li>Edit the extension files, usually in <code>src/main/resources</code>, and refresh your browser
-            to see the changes.</li>
-        </ol>
-        <a id="download-link" href="{href}">Download</a>
-    </script>
-
     <script type="text/x-template" title="fork-dialog">
         <p>
             This will create a fork of the extension '{pluginKey}'
@@ -44,7 +27,7 @@ mvn {product}:run
             <td headers="plugin-author"><a href="{authorUrl}">{author}</a></td>
             <td headers="plugin-version">{version}</td>
             <td headers="plugin-actions" nowrap="true">
-                <a href="{binaryUrl}"'>Download</a>
+                <a href="{binaryUrl}">Download</a>
                 <a href="http://plugins.atlassian.com/{id}">Learn More</a>
             </td>
         </tr>

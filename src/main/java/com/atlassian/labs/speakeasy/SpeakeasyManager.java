@@ -104,6 +104,9 @@ public class SpeakeasyManager
         remotePlugin.setAuthor(getPluginAuthor(plugin));
         List<String> accessList = data.getUsersList(plugin.getKey());
         remotePlugin.setNumUsers(accessList.size());
+        remotePlugin.setExtension(plugin.getResource("atlassian-plugin.xml") != null ? "jar" :
+                                  plugin.getResource("atlassian-extension.json") != null ? "zip" :
+                                  "xml");
         boolean isAuthor = userName.equals(remotePlugin.getAuthor());
         boolean pureSpeakeasy = onlyContainsSpeakeasyModules(plugin);
 
@@ -394,7 +397,7 @@ public class SpeakeasyManager
         }
     }
 
-    public File getPluginFileAsProject(String pluginKey, String user)
+    public File getPluginAsProject(String pluginKey, String user)
     {
         try
         {
@@ -403,7 +406,28 @@ public class SpeakeasyManager
             {
                 throw new PluginOperationFailedException("Not authorized to download " + pluginKey, pluginKey);
             }
-            return pluginManager.getPluginFileAsProject(pluginKey);
+            return pluginManager.getPluginAsProject(pluginKey);
+        }
+        catch (PluginOperationFailedException ex)
+        {
+            throw ex;
+        }
+        catch (RuntimeException ex)
+        {
+            throw new PluginOperationFailedException(ex.getMessage(), ex, pluginKey);
+        }
+    }
+
+    public File getPluginArtifact(String pluginKey, String user)
+    {
+        try
+        {
+            RemotePlugin plugin = getRemotePlugin(pluginKey, user);
+            if (!plugin.isCanDownload())
+            {
+                throw new PluginOperationFailedException("Not authorized to download " + pluginKey, pluginKey);
+            }
+            return pluginManager.getPluginArtifact(pluginKey);
         }
         catch (PluginOperationFailedException ex)
         {

@@ -32,8 +32,11 @@ public class DownloadDialog
     @FindBy(id="download-dialog")
     private WebElement dialogElement;
 
-    @FindBy(id="download-link")
-    private WebElement downloadLink;
+    @FindBy(id="download-as-amps-link")
+    private WebElement downloadAsAmpsLink;
+
+    @FindBy(id="download-as-extension-link")
+    private WebElement downloadAsExtension;
 
     private final String pluginKey;
 
@@ -45,23 +48,33 @@ public class DownloadDialog
     @WaitUntil
     public void waitUntilOpen()
     {
-        driver.waitUntilElementIsVisible(By.id("download-link"));
+        driver.waitUntilElementIsVisible(By.id("download-as-amps-link"));
     }
 
-    public File download() throws IOException
+    public File downloadAsAmpsProject() throws IOException
     {
-        String href = downloadLink.getAttribute("href");
+        String href = downloadAsAmpsLink.getAttribute("href");
+        return download(href);
+    }
 
+    public File downloadAsExtension() throws IOException
+    {
+        String href = downloadAsExtension.getAttribute("href");
+        return download(href);
+    }
+
+    private File download(String href) throws IOException
+    {
         DefaultHttpClient httpclient = new DefaultHttpClient();
         httpclient.getCredentialsProvider().setCredentials(AuthScope.ANY, new UsernamePasswordCredentials("admin", "admin"));
         HttpGet get = new HttpGet("http://localhost:" + productInstance.getHttpPort() + href + "?os_username=admin&os_password=admin");
         HttpResponse res = httpclient.execute(get);
-        File tmpFile = File.createTempFile("speakeasy-download-", ".zip");
+        File tmpFile = File.createTempFile("speakeasy-download-", href.substring(href.lastIndexOf(".")));
         FileOutputStream fout = new FileOutputStream(tmpFile);
         res.getEntity().writeTo(fout);
         fout.close();
         dialogElement.sendKeys(Keys.ESCAPE);
-        driver.waitUntilElementIsNotVisible(By.id("download-link"));
+        driver.waitUntilElementIsNotVisible(By.id("download-as-amps-link"));
         return tmpFile;
     }
 

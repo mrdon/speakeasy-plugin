@@ -18,7 +18,7 @@ var pluginActions = {
     'enable' : enablePlugin,
     'disable' : disablePlugin,
     'download' : function(key, link, attachedRow) {
-        require('./download').openDialog(key, product, getAbsoluteHref(link));
+        require('./download/download').openDialog(key, product, getAbsoluteHref(link), link.attr("data-extension"));
     }
 };
 

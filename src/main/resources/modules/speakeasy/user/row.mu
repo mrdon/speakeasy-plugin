@@ -49,7 +49,7 @@
         <a class="pk-uninstall" href="/rest/speakeasy/1/plugins/{{key}}">Uninstall</a>
         {{/canUninstall}}
         {{#canDownload}}
-            <a class="pk-download" href="/rest/speakeasy/1/plugins/download/{{key}}.zip">Download</a>
+            <a class="pk-download" data-extension="{{extension}}" href="/rest/speakeasy/1/plugins/download">Download</a>
         {{/canDownload}}
     </td>
 </tr>
