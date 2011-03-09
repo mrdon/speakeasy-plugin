@@ -2,16 +2,14 @@ package com.atlassian.labs.speakeasy.install.convention;
 
 import com.atlassian.labs.speakeasy.install.PluginOperationFailedException;
 import com.atlassian.labs.speakeasy.install.convention.external.ConventionDescriptorGenerator;
-import com.atlassian.labs.speakeasy.util.InputStreamToJsonObject;
+import com.atlassian.labs.speakeasy.model.JsonManifest;
 import com.atlassian.plugin.JarPluginArtifact;
 import com.atlassian.plugin.PluginArtifact;
 import com.atlassian.plugin.osgi.factory.OsgiPlugin;
 import com.atlassian.plugin.util.PluginUtils;
-import com.atlassian.plugins.rest.common.json.JacksonJsonProviderFactory;
 import org.apache.commons.io.IOUtils;
 import org.osgi.framework.Constants;
 
-import javax.ws.rs.core.MediaType;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -34,11 +32,10 @@ import static com.google.common.collect.Maps.newHashMap;
  */
 public class ZipTransformer
 {
-    private static final String ATLASSIAN_EXTENSION_PATH = "atlassian-extension.json";
 
-    private final InputStreamToJsonObject jsonReader;
+    private final JsonManifestReader jsonReader;
 
-    public ZipTransformer(InputStreamToJsonObject jsonReader)
+    public ZipTransformer(JsonManifestReader jsonReader)
     {
         this.jsonReader = jsonReader;
     }
@@ -47,9 +44,9 @@ public class ZipTransformer
     {
         Map<String,byte[]> additions = newHashMap();
         PluginArtifact artifact = new JarPluginArtifact(pluginFile);
-        if (artifact.doesResourceExist(ATLASSIAN_EXTENSION_PATH))
+        if (artifact.doesResourceExist(JsonManifest.ATLASSIAN_EXTENSION_PATH))
         {
-            JsonManifest descriptor = readJsonManifest(artifact);
+            JsonManifest descriptor = jsonReader.read(artifact);
 
             additions.put("META-INF/MANIFEST.MF", generateManifest(descriptor));
             additions.put("META-INF/spring/speakeasy-context.xml", getResourceContents("speakeasy-context.xml"));
@@ -68,7 +65,7 @@ public class ZipTransformer
         }
         else
         {
-            throw new PluginOperationFailedException("File '" + ATLASSIAN_EXTENSION_PATH + "' expected", null);
+            throw new PluginOperationFailedException("File '" + JsonManifest.ATLASSIAN_EXTENSION_PATH + "' expected", null);
         }
     }
 
@@ -120,18 +117,6 @@ public class ZipTransformer
             throw new RuntimeException("Should never happen", e);
         }
         return bout.toByteArray();
-    }
-
-    private JsonManifest readJsonManifest(PluginArtifact artifact)
-    {
-        try
-        {
-            return jsonReader.readToObject(JsonManifest.class, artifact.getResourceAsStream(ATLASSIAN_EXTENSION_PATH));
-        }
-        catch (IOException e)
-        {
-            throw new PluginOperationFailedException("Unable to parse " + ATLASSIAN_EXTENSION_PATH, e, null);
-        }
     }
 
     /**

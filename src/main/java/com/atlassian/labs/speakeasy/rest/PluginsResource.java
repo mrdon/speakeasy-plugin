@@ -51,7 +51,7 @@ public class PluginsResource
     }
 
     @DELETE
-    @Path("{pluginKey}")
+    @Path("plugin/{pluginKey}")
     @Produces("application/json")
     public Response uninstallPlugin(@PathParam("pluginKey") String pluginKey)
     {
@@ -89,8 +89,17 @@ public class PluginsResource
         return Response.ok().entity(entity).build();
     }
 
+    @POST
+    @Path("create/{pluginKey}")
+    @Produces("application/json")
+    public Response create(@PathParam("pluginKey") String pluginKey, @FormParam("description") String description, @FormParam("name") String name)
+    {
+        UserPlugins entity = speakeasyManager.createZipExtension(pluginKey, userManager.getRemoteUsername(), description, name);
+        return Response.ok().entity(entity).build();
+    }
+
     @GET
-    @Path("{pluginKey}/index")
+    @Path("plugin/{pluginKey}/index")
     @Produces("application/json")
     public Response getIndex(@PathParam("pluginKey") String pluginKey)
     {
@@ -101,7 +110,7 @@ public class PluginsResource
     }
 
     @GET
-    @Path("{pluginKey}/file")
+    @Path("plugin/{pluginKey}/file")
     @Produces("text/plain")
     public Response getFileText(@PathParam("pluginKey") String pluginKey, @QueryParam("path") String fileName)
     {
@@ -111,7 +120,7 @@ public class PluginsResource
     }
 
     @GET
-    @Path("{pluginKey}/binary")
+    @Path("plugin/{pluginKey}/binary")
     @Produces("application/octet-stream")
     public Response getFileBinary(@PathParam("pluginKey") String pluginKey, @QueryParam("path") String fileName)
     {
@@ -121,7 +130,7 @@ public class PluginsResource
     }
 
     @PUT
-    @Path("{pluginKey}/file")
+    @Path("plugin/{pluginKey}/file")
     @Consumes("text/plain")
     @Produces("application/json")
     public Response saveAndRebuild(@PathParam("pluginKey") String pluginKey, @QueryParam("path") String fileName, String contents)

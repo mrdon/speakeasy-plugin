@@ -1,0 +1,11 @@
+/*
+	Web Items allow you to insert navigation items (menu items, tabs etc) into 
+	various places within the product interface.
+ */
+[
+    {   "section" : "speakeasy.user-profile/top",
+        "label"   : "Yahoo",
+        "url"     : "http://yahoo.com",
+        "cssName" : "yahoo-web-item",
+        "weight"  : 40}
+]

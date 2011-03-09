@@ -53,23 +53,24 @@
             These are the extensions installed on your server.<br />
             To use an extension, click <b>Enable</b>. <br />
             To upload a new extension, use the <b>Upload</b> form.<br />
+            To create a new extension, <a id="extension-wizard-link" href="javascript:void(0)">use the wizard</a>.<br />
             To develop your own extensions, <a href="mailto:don@atlassian.com">learn more</a>.
         </p>
 
         #set ($topWebItems = $webInterfaceManager.getDisplayableItems("speakeasy.user-profile/top", $webInterfaceContext))
         #if (!$topWebItems.empty)
-                <div class="top-links">
+                <ul class="top-links">
                 #foreach ($item in $topWebItems)
-                    <div class="top-link">
+                    <li class="top-link">
                         <a href="$item.link.getDisplayableUrl($req, $webInterfaceContext)"
                             #if ($item.link.id) id="$item.link.id"#end
                             #if ($item.styleClass) class="$item.styleClass"#end
                             #if ($item.link.hasAccessKey()) accessKey="$item.link.getAccessKey($helper)"#end>
                            $item.webLabel.getDisplayableLabel($req, $webInterfaceContext)
                         </a>
-                    </div>
+                    </li>
                 #end
-                </div>
+                </ul>
             #end
 
         <table class="aui" id="plugins-table">

@@ -71,7 +71,7 @@
     <component key="speakeasyData" class="com.atlassian.labs.speakeasy.data.SpeakeasyData"/>
     <component key="pomProperties" class="com.atlassian.labs.speakeasy.util.PomProperties"/>
     <component key="userProfileRenderer" class="com.atlassian.labs.speakeasy.ui.UserProfileRenderer"/>
-    <component key="jsonReader" class="com.atlassian.labs.speakeasy.util.InputStreamToJsonObject" />
+    <component key="jsonReader" class="com.atlassian.labs.speakeasy.install.convention.JsonManifestReader" />
 
     <component key="conventionDescriptorGenerator" class="com.atlassian.labs.speakeasy.install.convention.ConventionDescriptorGeneratorServiceFactory" public="true">
         <interface>com.atlassian.labs.speakeasy.install.convention.external.ConventionDescriptorGenerator</interface>

@@ -38,7 +38,7 @@ public class TestZipTransformer
     @Before
     public void setUp()
     {
-        zipTransformer = new ZipTransformer(new InputStreamToJsonObject());
+        zipTransformer = new ZipTransformer(new JsonManifestReader());
     }
 
     @Test

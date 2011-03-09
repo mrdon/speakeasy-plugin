@@ -48,7 +48,7 @@ public class RemotePlugin implements Comparable
     public RemotePlugin(Plugin plugin)
     {
         key = plugin.getKey();
-        name = plugin.getName() != null ? plugin.getName() : plugin.getKey();
+        name = plugin.getName();
         description = plugin.getPluginInformation().getDescription();
         version = plugin.getPluginInformation().getVersion();
         params = new HashMap<String,String>(plugin.getPluginInformation().getParameters());

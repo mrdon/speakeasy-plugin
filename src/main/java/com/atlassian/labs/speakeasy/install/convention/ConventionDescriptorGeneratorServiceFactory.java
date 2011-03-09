@@ -28,15 +28,13 @@ public class ConventionDescriptorGeneratorServiceFactory implements ServiceFacto
     private final BundleContext bundleContext;
     private final PluginAccessor pluginAccessor;
     private final HostContainer hostContainer;
-    private final InputStreamToJsonObject jsonReader;
 
-    public ConventionDescriptorGeneratorServiceFactory(PluginEventManager pluginEventManager, BundleContext bundleContext, PluginAccessor pluginAccessor, HostContainer hostContainer, InputStreamToJsonObject jsonReader)
+    public ConventionDescriptorGeneratorServiceFactory(PluginEventManager pluginEventManager, BundleContext bundleContext, PluginAccessor pluginAccessor, HostContainer hostContainer)
     {
         this.pluginEventManager = pluginEventManager;
         this.bundleContext = bundleContext;
         this.pluginAccessor = pluginAccessor;
         this.hostContainer = hostContainer;
-        this.jsonReader = jsonReader;
     }
 
     public Object getService(Bundle bundle, ServiceRegistration registration)

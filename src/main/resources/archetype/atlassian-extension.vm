@@ -1,0 +1,10 @@
+{
+	"key": 			"$key",
+	"name":			"$name",
+	"description":	"$description",
+	"version":		"1",
+	
+	"vendor": {	"name": "Joe",
+			     "url": "http://example.com/extension-homepage.html",
+		       "email": "jane@example.com" }
+}

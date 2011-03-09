@@ -1,4 +1,6 @@
-package com.atlassian.labs.speakeasy.install.convention;
+package com.atlassian.labs.speakeasy.model;
+
+import com.atlassian.labs.speakeasy.install.convention.JsonVendor;
 
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
@@ -12,6 +14,7 @@ import java.util.Map;
 @XmlRootElement
 public class JsonManifest
 {
+    public static final String ATLASSIAN_EXTENSION_PATH = "atlassian-extension.json";
     @XmlAttribute
     private String key;
 

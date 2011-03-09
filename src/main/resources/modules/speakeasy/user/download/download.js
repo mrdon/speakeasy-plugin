@@ -1,7 +1,7 @@
 /**
  * Renders the download dialog for the Speakeasy user page
  */
-var $ = require('../../jquery').jQuery;
+var $ = require('speakeasy/jquery').jQuery;
 
 exports.openDialog = function(key, product, href, extension) {
     var dialog = new AJS.Dialog({width:470, height:400, id:'download-dialog'});

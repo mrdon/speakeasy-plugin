@@ -4,6 +4,8 @@ import com.atlassian.labs.speakeasy.commonjs.descriptor.CommonJsModulesDescripto
 import com.atlassian.labs.speakeasy.data.SpeakeasyData;
 import com.atlassian.labs.speakeasy.install.PluginManager;
 import com.atlassian.labs.speakeasy.install.PluginOperationFailedException;
+import com.atlassian.labs.speakeasy.install.convention.JsonManifestReader;
+import com.atlassian.labs.speakeasy.model.JsonManifest;
 import com.atlassian.labs.speakeasy.model.RemotePlugin;
 import com.atlassian.labs.speakeasy.model.UserPlugins;
 import com.atlassian.labs.speakeasy.product.ProductAccessor;
@@ -35,16 +37,18 @@ public class SpeakeasyManager
     private final PluginManager pluginManager;
     private final ProductAccessor productAccessor;
     private final DescriptorGeneratorManager descriptorGeneratorManager;
+    private final JsonManifestReader jsonManifestReader;
 
 
     public SpeakeasyManager(PluginAccessor pluginAccessor,
-                            SpeakeasyData data, PluginManager pluginManager, ProductAccessor productAccessor, DescriptorGeneratorManager descriptorGeneratorManager)
+                            SpeakeasyData data, PluginManager pluginManager, ProductAccessor productAccessor, DescriptorGeneratorManager descriptorGeneratorManager, JsonManifestReader jsonManifestReader)
     {
         this.descriptorGeneratorManager = descriptorGeneratorManager;
         this.pluginAccessor = pluginAccessor;
         this.data = data;
         this.pluginManager = pluginManager;
         this.productAccessor = productAccessor;
+        this.jsonManifestReader = jsonManifestReader;
     }
 
     public UserPlugins getUserAccessList(String userName, String... modifiedKeys)
@@ -104,9 +108,30 @@ public class SpeakeasyManager
         remotePlugin.setAuthor(getPluginAuthor(plugin));
         List<String> accessList = data.getUsersList(plugin.getKey());
         remotePlugin.setNumUsers(accessList.size());
-        remotePlugin.setExtension(plugin.getResource("atlassian-plugin.xml") != null ? "jar" :
-                                  plugin.getResource("atlassian-extension.json") != null ? "zip" :
-                                  "xml");
+
+        if (plugin.getResource("/" + JsonManifest.ATLASSIAN_EXTENSION_PATH) != null)
+        {
+            JsonManifest mf = jsonManifestReader.read(plugin);
+            remotePlugin.setDescription(mf.getDescription());
+            remotePlugin.setName(mf.getName());
+            remotePlugin.setExtension("zip");
+        }
+        else if (plugin.getResource("/atlassian-plugin.xml") != null)
+        {
+            remotePlugin.setExtension("jar");
+        }
+        else
+        {
+            remotePlugin.setExtension("xml");
+        }
+        if (remotePlugin.getName() == null)
+        {
+            remotePlugin.setName(remotePlugin.getKey());
+        }
+        if (remotePlugin.getDescription() == null)
+        {
+            remotePlugin.setDescription("");
+        }
         boolean isAuthor = userName.equals(remotePlugin.getAuthor());
         boolean pureSpeakeasy = onlyContainsSpeakeasyModules(plugin);
 
@@ -246,14 +271,15 @@ public class SpeakeasyManager
                 }
 
             }
-            productAccessor.sendEmail(pluginAuthor, "email/enabled-subject.vm", "email/enabled-body.vm", new HashMap<String,Object>() {{
-                put("plugin", getRemotePlugin(pluginKey, user));
-                put("enablerFullName", userFullName);
-                put("enabler", user);
-                put("commonExtensions", commonExtensions);
-                put("suggestedExtensions", suggestedExtensions);
-                put("enabledTotal", data.getUsersList(pluginKey).size());
-            }});
+            productAccessor.sendEmail(pluginAuthor, "email/enabled-subject.vm", "email/enabled-body.vm", new HashMap<String, Object>()
+            {{
+                    put("plugin", getRemotePlugin(pluginKey, user));
+                    put("enablerFullName", userFullName);
+                    put("enabler", user);
+                    put("commonExtensions", commonExtensions);
+                    put("suggestedExtensions", suggestedExtensions);
+                    put("enabledTotal", data.getUsersList(pluginKey).size());
+                }});
         }
     }
 
@@ -513,5 +539,28 @@ public class SpeakeasyManager
 
         String pluginKey = pluginManager.install(uploadedFile, user);
         return getUserAccessList(user, pluginKey);
+    }
+
+    public UserPlugins createZipExtension(String pluginKey, String remoteUser, String description, String name)
+    {
+        if (pluginAccessor.getPlugin(pluginKey) != null)
+        {
+            throw new PluginOperationFailedException("Extension '" + pluginKey + "' already exists", null);
+        }
+        try
+        {
+            pluginManager.createZipExtension(pluginKey, remoteUser, description, name);
+            List<String> modifiedKeys = new ArrayList<String>();
+            modifiedKeys.add(pluginKey);
+            return getUserAccessList(remoteUser, modifiedKeys);
+        }
+        catch (PluginOperationFailedException ex)
+        {
+            throw ex;
+        }
+        catch (RuntimeException ex)
+        {
+            throw new PluginOperationFailedException(ex.getMessage(), ex, pluginKey);
+        }
     }
 }

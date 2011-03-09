@@ -6,9 +6,7 @@
 var $ = require('./jquery').jQuery;
 
 function addMessage(type, params) {
-    var msg = $("#aui-message-bar").children(".aui-message");
-    if (msg)
-        msg.remove();
+    var msg = $("#aui-message-bar").children(".aui-message").remove();
 
     if (type == "success") {
         AJS.messages.success(params);

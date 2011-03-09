@@ -51,25 +51,13 @@ public class TestConventionExtensions
                         "}")
                 .addResource("js/", "")
                 .addResource("js/test/", "")
-                .addResource("js/test/foo.js",
-                        "/**\n" +
-                        " * @context speakeasy.user-profile\n" +
-                        " */\n" +
-                        "var $ = require('speakeasy/jquery').jQuery;" +
-                        "var img = require('speakeasy/resources').getImageUrl(module, 'projectavatar.png');" +
-                        "$(document).ready(function() {$('body').prepend(\"<h1 id='foo'><img src='\" + img + \"'>Hi</h1><h1 id='bar'>Bye</h1>\");});")
+                .addFile("js/test/foo.js", new File(getClass().getResource("/archetype/main.js").toURI()))
                 .addResource("css/", "")
-                .addFormattedResource("css/test-convention.css", "#bar { display: none; }")
+                .addFile("css/test-convention.css", new File(getClass().getResource("/archetype/main.css").toURI()))
                 .addResource("images/", "")
-                .addFile("images/projectavatar.png", new File(getClass().getResource("/projectavatar.png").toURI()))
+                .addFile("images/projectavatar.png", new File(getClass().getResource("/archetype/projectavatar.png").toURI()))
                 .addResource("ui/", "")
-                .addFormattedResource("ui/web-items.json",
-                        "/* Some docs */",
-                        "[{'section' : 'speakeasy.user-profile/top',",
-                        "  'label'   : 'Yahoo',",
-                        "  'url'     : 'http://yahoo.com',",
-                        "  'cssName' : 'yahoo-web-item',",
-                        "  'weight'  : 40}]")
+                .addFile("ui/web-items.json", new File(getClass().getResource("/archetype/web-items.json").toURI()))
                 .buildWithNoManifest();
         File zip = new File(jar.getPath() + ".zip");
         FileUtils.moveFile(jar, zip);

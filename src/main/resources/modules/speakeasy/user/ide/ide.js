@@ -147,7 +147,7 @@ function openDialog(pluginKey, href){
 
 function loadFile(pluginKey, filePath) {
     updateStatus("Loading " + filePath + " . . .");
-    $.get(contextPath + "/rest/speakeasy/1/plugins/" + pluginKey + "/file", {path:filePath}, function(data) {
+    $.get(contextPath + "/rest/speakeasy/1/plugins/plugin/" + pluginKey + "/file", {path:filePath}, function(data) {
         editor.setCode(data);
         var editorEl = retrieveEditor();
         editorEl.text(data);
@@ -174,7 +174,7 @@ function loadFile(pluginKey, filePath) {
 function saveAndReload(pluginKey, fileName, contents) {
     updateStatus("Saving " + fileName + " and reloading plugin '" + pluginKey + "' . . . ");
     $.ajax({
-        url: contextPath + "/rest/speakeasy/1/plugins/" + pluginKey + "/file?path=" + fileName,
+        url: contextPath + "/rest/speakeasy/1/plugins/plugin/" + pluginKey + "/file?path=" + fileName,
         data: contents,
         type: 'PUT',
         contentType: "text/plain",

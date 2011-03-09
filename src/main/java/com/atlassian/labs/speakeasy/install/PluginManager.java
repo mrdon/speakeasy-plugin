@@ -10,6 +10,8 @@ import com.atlassian.plugin.descriptors.UnrecognisedModuleDescriptor;
 import com.atlassian.plugin.util.WaitUntil;
 import com.atlassian.sal.api.user.UserManager;
 import com.atlassian.templaterenderer.TemplateRenderer;
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.dom4j.*;
@@ -553,5 +555,39 @@ public class PluginManager
     public boolean doesPluginExist(String pluginKey)
     {
         return pluginAccessor.getPlugin(pluginKey) != null;
+    }
+
+    public String createZipExtension(String pluginKey, String remoteUser, String description, String name)
+    {
+        ZipOutputStream zout = null;
+        File tmpFile = null;
+        try
+        {
+            tmpFile = File.createTempFile("speakeasy-create", ".zip");
+            zout = new ZipOutputStream(new FileOutputStream(tmpFile));
+            ZipWriter.addDirectoryToZip(zout, "js/");
+            ZipWriter.addFileToZip(zout, "js/" + pluginKey + "/main.js", "main.js");
+            ZipWriter.addDirectoryToZip(zout, "css/");
+            ZipWriter.addFileToZip(zout, "css/main.css", "main.css");
+            ZipWriter.addDirectoryToZip(zout, "images/");
+            ZipWriter.addFileToZip(zout, "images/projectavatar.png", "projectavatar.png");
+            ZipWriter.addVelocityFileToZip(zout, "atlassian-extension.json", "atlassian-extension.vm", templateRenderer, ImmutableMap.<String,Object>of(
+                    "key", pluginKey,
+                    "description", description,
+                    "name", name
+            ));
+
+            zout.close();
+
+            return install(tmpFile, remoteUser);
+        }
+        catch (IOException e)
+        {
+            throw new PluginOperationFailedException("Unable to create extension", e, pluginKey);
+        }
+        finally
+        {
+            IOUtils.closeQuietly(zout);
+        }
     }
 }

@@ -1,6 +1,6 @@
 <p>
-    This will create an AMPS project for the extension '{{pluginKey}}'.
-    To use it:
+    This will download the extension '{{pluginKey}}' as an artifact or as an SDK project.
+    To use it the SDK project:
 </p>
 <ol>
     <li>Unzip the file into an empty directory</li>

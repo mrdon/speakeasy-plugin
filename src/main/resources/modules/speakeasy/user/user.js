@@ -7,6 +7,7 @@
 var $ = require('../jquery').jQuery;
 var addMessage = require('../messages').add;
 var ide = require('./ide/ide');
+var wizard = require('./wizard/create');
 
 var pluginsTable;
 var pluginActions = {
@@ -198,7 +199,7 @@ function initSpeakeasy() {
         action($row.attr("data-pluginkey"), $link, $row);
     });
     pluginsTable.bind('pluginsUpdated', function(e, data) {
-       updateTable(data.plugins || data.plugin);
+       updateTable(data.plugin || data);
     });
 
     var pluginFile = $('#plugin-file');
@@ -224,7 +225,7 @@ function initSpeakeasy() {
                 var end = response.indexOf("||", start);
                 var data = $.parseJSON(response.substring(start, end));
                 if (data.error) {
-                    if (data.plugins) pluginsTable.trigger('pluginsUpdated', {'plugins': data.plugins});
+                    if (data.plugins) pluginsTable.trigger('pluginsUpdated', data.plugins);
                     addMessage('error', {title: "Error installing extension", body: data.error, shadowed: false});
                 } else {
                     var updatedPlugin = updateTable(data)[0];
@@ -243,6 +244,11 @@ function initSpeakeasy() {
         loadAvailableExtensions();
     });
     $('#speakeasy-loaded').html("");
+
+    $('#extension-wizard-link').click(function(e) {
+        e.preventDefault();
+        wizard.openDialog();
+    });
 
 }
 

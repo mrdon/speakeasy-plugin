@@ -257,6 +257,12 @@ public class SpeakeasyUserPage implements Page
         return pageBinder.bind(CommonJsModulesTab.class);
     }
 
+    public ExtensionWizard openCreateExtensionDialog()
+    {
+        driver.findElement(By.id("extension-wizard-link")).click();
+        return pageBinder.bind(ExtensionWizard.class);
+    }
+
     public static class PluginRow
     {
         private String key;
