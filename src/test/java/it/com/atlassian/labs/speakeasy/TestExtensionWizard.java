@@ -10,8 +10,12 @@ import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.IOException;
+
 import static com.google.common.collect.Lists.newArrayList;
+import static java.util.Arrays.asList;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
@@ -50,5 +54,27 @@ public class TestExtensionWizard
         assertEquals("Foo", row.getDescription());
         assertEquals("myextension", row.getKey());
         page.uninstallPlugin("myextension");
+    }
+
+    @Test
+    public void testEditPlugin() throws IOException
+    {
+        product.visit(SpeakeasyUserPage.class)
+                .openCreateExtensionDialog()
+                    .key("myextension")
+                    .name("My Extension")
+                    .description("Foo")
+                    .create()
+                .openEditDialog("myextension")
+                    .editAndSaveFile("css/main.css", "#bar { display: block; }")
+                    .done()
+                .enablePlugin("myextension");
+
+        SpeakeasyUserPage page = product.visit(SpeakeasyUserPage.class);
+        HiBanner banner = product.getPageBinder().bind(HiBanner.class);
+        assertTrue(banner.isFooVisible());
+        assertTrue(banner.isBarVisible());
+        page.uninstallPlugin("myextension");        
+
     }
 }

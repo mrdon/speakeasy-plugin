@@ -448,7 +448,7 @@ public class PluginManager
         }
     }
 
-    public String saveAndRebuild(String pluginKey, String fileName, String contents, String user) throws PluginOperationFailedException
+    public String saveAndRebuild(String pluginKey, String extension, String fileName, String contents, String user) throws PluginOperationFailedException
     {
         Bundle bundle = findBundleForPlugin(bundleContext, pluginKey);
         notNull(bundle);
@@ -456,7 +456,7 @@ public class PluginManager
         File tmpFile = null;
         try
         {
-            tmpFile = File.createTempFile("speakeasy-edit", ".jar");
+            tmpFile = File.createTempFile("speakeasy-edit", "." + extension);
             zout = new ZipOutputStream(new FileOutputStream(tmpFile));
             for (String path : getBundlePathsRecursive(bundle, ""))
             {

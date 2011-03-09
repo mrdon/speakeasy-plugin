@@ -517,7 +517,7 @@ public class SpeakeasyManager
             {
                 throw new PluginOperationFailedException("Not authorized to edit " + pluginKey, pluginKey);
             }
-            String installedPluginKey = pluginManager.saveAndRebuild(pluginKey, fileName, contents, user);
+            String installedPluginKey = pluginManager.saveAndRebuild(pluginKey, plugin.getExtension(), fileName, contents, user);
             return getRemotePlugin(installedPluginKey, user);
         }
         catch (PluginOperationFailedException ex)
