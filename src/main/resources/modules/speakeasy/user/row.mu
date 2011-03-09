@@ -43,7 +43,7 @@
         <a class="pk-fork" href="/rest/speakeasy/1/plugins/fork/{{key}}">Fork</a>
         {{/canFork}}
         {{#canEdit}}
-        <a class="pk-edit" href="/rest/speakeasy/1/plugins/plugin/{{key}}/index">Edit</a>
+        <a class="pk-edit" data-extension="{{extension}}" href="/rest/speakeasy/1/plugins/plugin/{{key}}/index">Edit</a>
         {{/canEdit}}
         {{#canUninstall}}
         <a class="pk-uninstall" href="/rest/speakeasy/1/plugins/plugin/{{key}}">Uninstall</a>

@@ -12,7 +12,7 @@ var wizard = require('./wizard/create');
 var pluginsTable;
 var pluginActions = {
     'edit' : function (key, link, attachedRow) {
-            ide.openDialog(key, getAbsoluteHref(link));
+            ide.openDialog(key, getAbsoluteHref(link), link.attr("data-extension"));
         },
     'uninstall' : uninstallPlugin,
     'fork' : openForkDialog,

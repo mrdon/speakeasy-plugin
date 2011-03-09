@@ -4,17 +4,21 @@
 var $ = require('speakeasy/jquery').jQuery;
 
 exports.openDialog = function(key, product, href, extension) {
-    var dialog = new AJS.Dialog({width:470, height:400, id:'download-dialog'});
+    var dialog = new AJS.Dialog({width:500, height:430, id:'download-dialog'});
     dialog.addHeader("Download '" + key + "'");
     var downloadDialogContents = require('./download-dialog').render({
                                     pluginKey : key,
                                     href : href,
                                     product : product,
-                                    extension : extension
+                                    extension : extension,
+                                    allowAmps : extension == "jar"
                                    });
     dialog.addPanel("Download", downloadDialogContents, "panel-body");
     dialog.show();
-    $('#download-link').click(function(e) {
+    $('#download-as-extension-link').click(function(e) {
+        dialog.remove();
+    });
+    $('#download-as-amps-link').click(function(e) {
         dialog.remove();
     });
 }

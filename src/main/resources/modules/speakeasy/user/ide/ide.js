@@ -97,7 +97,7 @@ function handleBrowserFileClick(pluginKey, event) {
         loadFile(pluginKey, event.target.id);
     }
 }
-function openDialog(pluginKey, href){
+function openDialog(pluginKey, href, extension){
     var dialog = new AJS.Dialog({width: $(window).width() * .95, height: 620, id:'ide-dialog'});
 
     dialog.addHeader("Edit Extension : " + pluginKey);
@@ -128,6 +128,7 @@ function openDialog(pluginKey, href){
 
     dialog.show();
 
+    var firstFile = extension == "jar" ? "atlassian-plugin.xml" : "atlassian-extension.json";
     // loadFile("atlassian-plugin.xml");
     $("#ide-loading").hide();
     $("#ide-editor").show();
@@ -139,7 +140,7 @@ function openDialog(pluginKey, href){
         parserfile: ["parsexml.js", "parsecss.js", "tokenizejavascript.js", "parsejavascript.js", "parsehtmlmixed.js"],
         stylesheet: [ staticResourcesPrefix + '/download/resources/com.atlassian.labs.speakeasy-plugin:codemirror/css/xmlcolors.css', staticResourcesPrefix + '/download/resources/com.atlassian.labs.speakeasy-plugin:codemirror/css/jscolors.css', staticResourcesPrefix + '/download/resources/com.atlassian.labs.speakeasy-plugin:codemirror/css/csscolors.css'],
         path: staticResourcesPrefix + '/download/resources/com.atlassian.labs.speakeasy-plugin:codemirror/js/',
-        onLoad: function() { loadFile(pluginKey, "atlassian-plugin.xml"); }
+        onLoad: function() { loadFile(pluginKey, firstFile); }
 
         //, lineNumbers: true
     });
