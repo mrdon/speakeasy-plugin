@@ -376,7 +376,7 @@
         <xvfb.enable>true</xvfb.enable>
         <platform.version>2.9.0</platform.version>
         <refapp.version>2.9.0</refapp.version>
-        <confluence.version>3.5-beta1</confluence.version>
+        <confluence.version>3.5-rc1</confluence.version>
         <confluence.4.0.version>4.0-m14</confluence.4.0.version>
         <confluence.data.version>3.0</confluence.data.version>
         <jira.version>4.3-rc1</jira.version>
