@@ -220,7 +220,7 @@ class GeneratedDescriptorsManager
     private Element createDescriptorElement(String id, Element root)
     {
         root.addAttribute("key", id.replace('/', '_'));
-        if (log.isErrorEnabled())
+        if (log.isDebugEnabled())
         {
             StringWriter out = new StringWriter();
             OutputFormat format = OutputFormat.createPrettyPrint();
@@ -232,7 +232,7 @@ class GeneratedDescriptorsManager
             {
                 e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
             }
-            log.error("Generated descriptor:\n" + out.toString());
+            log.debug("Generated descriptor:\n" + out.toString());
         }
         return root;
     }
