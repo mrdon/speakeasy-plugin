@@ -10,12 +10,13 @@
     margin-left: 245px;
     max-width: 100%;
 }
-
 #ide-file-contents-panel {
+    height: 514px;
     width: 245px;
     float: left;
     padding: 0;
     font-size: 75%;
+    overflow: auto;
 }
 
 #ide-file-contents-panel b {
