@@ -71,21 +71,21 @@ function populateBrowser(href) {
     var $browser = $("#ide-browser");
     $browser.treeview();
     $.get(href, function(data) {
-        var tree = [], path;
-        $.each(data.files, function(){
-            path = this;
-            if (path.indexOf('/') != path.length - 1) {
-                var node = fill(tree, path);
+        var tree = [], path, node;
+        for(var i=0, ii=data.files.length; i < ii; i++) {
+            path = data.files[i];
+            if (path[path.length-1] != '/') {
+                node = fill(tree, path);
                 if (node.text.match(/([^\/\\]+)\.(gif|jpg|jpeg)$/i)) {
                     // todo - fix the binary download REST service so we can show images in the editor - talk to Don! Seems to half work.
                     // node.text = "<a href='" + contextPath + "/rest/speakeasy/1/plugins/" + pluginKey + "/binary?path=" + path + "'>" + node.text + "</a>";
                     node.text = node.text + "";
                 }
                 else if (!node.text.match(/([^\/\\]+)\.(class)$/i)) {
-                    node.text = "<a href='javascript:void(0)' id='" + path + "' class='editable-bespin'>" + node.text + "</a>";
+                    node.text = ['<a href="javascript:void(0)" id="', path, '" class="editable-bespin">', node.text, '</a>'].join('');
                 }
             }
-        });
+        }
         createTreeview($browser, tree);
     });
 }
