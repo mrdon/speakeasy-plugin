@@ -270,6 +270,7 @@
                         <product>
                             <id>refapp</id>
                             <version>${platform.version}</version>
+                            <log4jProperties>src/test/resources/log4j.properties</log4jProperties>
                             <libArtifacts>
                                 <libArtifact>
                                     <groupId>org.apache.commons</groupId>

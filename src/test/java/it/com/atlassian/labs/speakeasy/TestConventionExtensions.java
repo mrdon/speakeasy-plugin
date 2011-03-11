@@ -73,7 +73,7 @@ public class TestConventionExtensions
         assertTrue(banner.isYahooLinkAvailable());
         assertFalse(banner.isBarVisible());
 
-        assertEquals(asList("css/test-convention.css", "images/projectavatar.png", "js/test/", "js/test/foo.js", "ui/web-items.json", "atlassian-extension.json"),
+        assertEquals(asList("css/test-convention.css", "images/projectavatar.png", "js/test/foo.js", "ui/web-items.json", "atlassian-extension.json"),
                 page.openEditDialog("test-convention").getFileNames());
 
         page.uninstallPlugin("test-convention");
