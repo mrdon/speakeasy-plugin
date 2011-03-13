@@ -22,6 +22,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import static com.atlassian.labs.speakeasy.DescriptorGeneratorManager.getStatefulKey;
+
 /**
  *
  */
@@ -31,12 +33,14 @@ public class SpeakeasyWebResourceModuleDescriptor extends AbstractModuleDescript
     private static final Logger log = LoggerFactory.getLogger(SpeakeasyWebResourceModuleDescriptor.class);
     private final HostContainer hostContainer;
     private final BundleContext bundleContext;
+    private final DescriptorGeneratorManager descriptorGeneratorManager;
     private volatile String directoryToScan;
 
-    public SpeakeasyWebResourceModuleDescriptor(HostContainer hostContainer, BundleContext bundleContext)
+    public SpeakeasyWebResourceModuleDescriptor(HostContainer hostContainer, BundleContext bundleContext, DescriptorGeneratorManager descriptorGeneratorManager)
     {
         this.hostContainer = hostContainer;
         this.bundleContext = bundleContext;
+        this.descriptorGeneratorManager = descriptorGeneratorManager;
     }
 
     @Override
@@ -71,9 +75,17 @@ public class SpeakeasyWebResourceModuleDescriptor extends AbstractModuleDescript
             directoryToScan = null;
         }
         super.enabled();
+        descriptorGeneratorManager.registerGenerator(getPluginKey(), getKey(), this);
     }
 
-    public Iterable<WebResourceModuleDescriptor> getDescriptorsToExposeForUsers(List<String> users, int state)
+    @Override
+    public void disabled()
+    {
+        super.disabled();
+        descriptorGeneratorManager.unregisterGenerator(getPluginKey(), getKey());
+    }
+
+    public Iterable<WebResourceModuleDescriptor> getDescriptorsToExposeForUsers(List<String> users, long state)
     {
         WebResourceModuleDescriptor descriptor = WebResourceUtil.instantiateDescriptor(hostContainer);
 
@@ -82,7 +94,7 @@ public class SpeakeasyWebResourceModuleDescriptor extends AbstractModuleDescript
         {
             WebResourceUtil.resolveDependency(plugin, dep, state);
         }
-        userElement.addAttribute("key", userElement.attributeValue("key") + "-" + state);
+        userElement.addAttribute("key", getStatefulKey(userElement.attributeValue("key"), state));
 
         WebResourceUtil.addUsersCondition(users, userElement);
 

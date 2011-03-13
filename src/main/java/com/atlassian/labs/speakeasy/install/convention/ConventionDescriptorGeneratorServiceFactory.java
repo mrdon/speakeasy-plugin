@@ -1,10 +1,10 @@
 package com.atlassian.labs.speakeasy.install.convention;
 
+import com.atlassian.labs.speakeasy.DescriptorGeneratorManager;
 import com.atlassian.labs.speakeasy.SpeakeasyWebResourceModuleDescriptor;
 import com.atlassian.labs.speakeasy.commonjs.descriptor.SpeakeasyCommonJsModulesDescriptor;
 import com.atlassian.labs.speakeasy.install.PluginOperationFailedException;
 import com.atlassian.labs.speakeasy.install.convention.external.ConventionDescriptorGenerator;
-import com.atlassian.labs.speakeasy.util.InputStreamToJsonObject;
 import com.atlassian.labs.speakeasy.webfragment.SpeakeasyWebItemModuleDescriptor;
 import com.atlassian.plugin.ModuleDescriptor;
 import com.atlassian.plugin.Plugin;
@@ -28,13 +28,15 @@ public class ConventionDescriptorGeneratorServiceFactory implements ServiceFacto
     private final BundleContext bundleContext;
     private final PluginAccessor pluginAccessor;
     private final HostContainer hostContainer;
+    private final DescriptorGeneratorManager descriptorGeneratorManager;
 
-    public ConventionDescriptorGeneratorServiceFactory(PluginEventManager pluginEventManager, BundleContext bundleContext, PluginAccessor pluginAccessor, HostContainer hostContainer)
+    public ConventionDescriptorGeneratorServiceFactory(PluginEventManager pluginEventManager, BundleContext bundleContext, PluginAccessor pluginAccessor, HostContainer hostContainer, DescriptorGeneratorManager descriptorGeneratorManager)
     {
         this.pluginEventManager = pluginEventManager;
         this.bundleContext = bundleContext;
         this.pluginAccessor = pluginAccessor;
         this.hostContainer = hostContainer;
+        this.descriptorGeneratorManager = descriptorGeneratorManager;
     }
 
     public Object getService(Bundle bundle, ServiceRegistration registration)
@@ -46,7 +48,7 @@ public class ConventionDescriptorGeneratorServiceFactory implements ServiceFacto
         if (bundle.getEntry("js/") != null)
         {
             SpeakeasyCommonJsModulesDescriptor descriptor = new SpeakeasyCommonJsModulesDescriptor(
-                    bundleContext, pluginEventManager, pluginAccessor, hostContainer);
+                    bundleContext, pluginEventManager, pluginAccessor, hostContainer, descriptorGeneratorManager);
 
             Element modules = factory.createElement("scoped-modules")
                 .addAttribute("key", "modules")
@@ -87,7 +89,7 @@ public class ConventionDescriptorGeneratorServiceFactory implements ServiceFacto
         {
             for (Element element : JsonToElementParser.createWebItems(plugin.getResourceAsStream("ui/web-items.json")))
             {
-                SpeakeasyWebItemModuleDescriptor descriptor = new SpeakeasyWebItemModuleDescriptor(bundleContext);
+                SpeakeasyWebItemModuleDescriptor descriptor = new SpeakeasyWebItemModuleDescriptor(bundleContext, descriptorGeneratorManager);
                 descriptor.init(plugin, element);
                 bundle.getBundleContext().registerService(ModuleDescriptor.class.getName(), descriptor, null);
             }
@@ -101,7 +103,7 @@ public class ConventionDescriptorGeneratorServiceFactory implements ServiceFacto
 
     private void registerSpeakeasyWebResourceDescriptor(Bundle bundle, DocumentFactory factory, Plugin plugin, String type)
     {
-        SpeakeasyWebResourceModuleDescriptor descriptor = new SpeakeasyWebResourceModuleDescriptor(hostContainer, bundleContext);
+        SpeakeasyWebResourceModuleDescriptor descriptor = new SpeakeasyWebResourceModuleDescriptor(hostContainer, bundleContext, descriptorGeneratorManager);
 
         Element element = factory.createElement("scoped-web-resource")
                 .addAttribute("key", type)

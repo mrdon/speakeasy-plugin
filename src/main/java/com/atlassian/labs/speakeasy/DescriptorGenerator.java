@@ -10,5 +10,5 @@ import java.util.List;
  */
 public interface DescriptorGenerator<D extends ModuleDescriptor>
 {
-    Iterable<D> getDescriptorsToExposeForUsers(List<String> users, int state);
+    Iterable<D> getDescriptorsToExposeForUsers(List<String> users, long state);
 }

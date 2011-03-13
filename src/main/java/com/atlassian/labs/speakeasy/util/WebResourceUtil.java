@@ -76,7 +76,7 @@ public class WebResourceUtil
         paramElement.setText(users != null ? StringUtils.join(users, "|") : "");
     }
 
-    public static void resolveDependency(Plugin plugin, Element dep, int state)
+    public static void resolveDependency(Plugin plugin, Element dep, long state)
     {
         String fullKey = dep.getTextTrim();
         int pos = fullKey.indexOf(':');

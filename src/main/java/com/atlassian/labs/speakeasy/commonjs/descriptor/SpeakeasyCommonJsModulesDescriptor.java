@@ -1,6 +1,7 @@
 package com.atlassian.labs.speakeasy.commonjs.descriptor;
 
 import com.atlassian.labs.speakeasy.DescriptorGenerator;
+import com.atlassian.labs.speakeasy.DescriptorGeneratorManager;
 import com.atlassian.labs.speakeasy.SpeakeasyWebResourceModuleDescriptor;
 import com.atlassian.plugin.ModuleDescriptor;
 import com.atlassian.plugin.PluginAccessor;
@@ -19,15 +20,17 @@ public class SpeakeasyCommonJsModulesDescriptor extends CommonJsModulesDescripto
 {
     private final HostContainer hostContainer;
     private final BundleContext bundleContext;
+    private final DescriptorGeneratorManager descriptorGeneratorManager;
 
-    public SpeakeasyCommonJsModulesDescriptor(BundleContext bundleContext, PluginEventManager pluginEventManager, PluginAccessor pluginAccessor, HostContainer hostContainer)
+    public SpeakeasyCommonJsModulesDescriptor(BundleContext bundleContext, PluginEventManager pluginEventManager, PluginAccessor pluginAccessor, HostContainer hostContainer, DescriptorGeneratorManager descriptorGeneratorManager)
     {
         super(bundleContext, pluginEventManager, pluginAccessor, hostContainer);
         this.bundleContext = bundleContext;
         this.hostContainer = hostContainer;
+        this.descriptorGeneratorManager = descriptorGeneratorManager;
     }
 
-    public Iterable<CommonJsModulesDescriptor> getDescriptorsToExposeForUsers(List<String> users, int state)
+    public Iterable<CommonJsModulesDescriptor> getDescriptorsToExposeForUsers(List<String> users, long state)
     {
         return emptySet();
     }
@@ -35,6 +38,6 @@ public class SpeakeasyCommonJsModulesDescriptor extends CommonJsModulesDescripto
     @Override
     public ModuleDescriptor createIndividualModuleDescriptor()
     {
-        return new SpeakeasyWebResourceModuleDescriptor(hostContainer, bundleContext);
+        return new SpeakeasyWebResourceModuleDescriptor(hostContainer, bundleContext, descriptorGeneratorManager);
     }
 }

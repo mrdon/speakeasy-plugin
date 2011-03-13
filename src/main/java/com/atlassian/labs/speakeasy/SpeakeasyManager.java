@@ -16,6 +16,8 @@ import com.atlassian.plugin.descriptors.UnloadableModuleDescriptor;
 import com.atlassian.plugin.impl.UnloadablePlugin;
 import com.google.common.base.Function;
 import com.google.common.collect.Lists;
+import org.osgi.framework.Bundle;
+import org.osgi.framework.BundleContext;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -24,6 +26,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import static com.atlassian.labs.speakeasy.util.BundleUtil.findBundleForPlugin;
 import static com.google.common.collect.Sets.newHashSet;
 import static java.util.Arrays.asList;
 
@@ -38,10 +41,10 @@ public class SpeakeasyManager
     private final ProductAccessor productAccessor;
     private final DescriptorGeneratorManager descriptorGeneratorManager;
     private final JsonManifestReader jsonManifestReader;
+    private final BundleContext bundleContext;
 
 
-    public SpeakeasyManager(PluginAccessor pluginAccessor,
-                            SpeakeasyData data, PluginManager pluginManager, ProductAccessor productAccessor, DescriptorGeneratorManager descriptorGeneratorManager, JsonManifestReader jsonManifestReader)
+    public SpeakeasyManager(PluginAccessor pluginAccessor, SpeakeasyData data, PluginManager pluginManager, ProductAccessor productAccessor, DescriptorGeneratorManager descriptorGeneratorManager, JsonManifestReader jsonManifestReader, BundleContext bundleContext)
     {
         this.descriptorGeneratorManager = descriptorGeneratorManager;
         this.pluginAccessor = pluginAccessor;
@@ -49,6 +52,7 @@ public class SpeakeasyManager
         this.pluginManager = pluginManager;
         this.productAccessor = productAccessor;
         this.jsonManifestReader = jsonManifestReader;
+        this.bundleContext = bundleContext;
     }
 
     public UserPlugins getUserAccessList(String userName, String... modifiedKeys)
@@ -201,7 +205,8 @@ public class SpeakeasyManager
 
     private boolean onlyContainsSpeakeasyModules(Plugin plugin)
     {
-        String stateIdentifier = String.valueOf(data.getPluginStateIdentifier(plugin.getKey()));
+        Bundle bundle = findBundleForPlugin(bundleContext, plugin.getKey());
+        String stateIdentifier = String.valueOf(bundle.getLastModified());
         for (ModuleDescriptor descriptor : plugin.getModuleDescriptors())
         {
             if (!(descriptor instanceof DescriptorGenerator)
@@ -223,7 +228,7 @@ public class SpeakeasyManager
         {
             accessList.add(user);
             data.saveUsersList(pluginKey, accessList);
-            descriptorGeneratorManager.updateModuleDescriptorsForPlugin(pluginKey, accessList);
+            descriptorGeneratorManager.refreshGeneratedDescriptorsForPlugin(pluginKey);
             affectedPluginKeys.add(pluginKey);
         }
 
@@ -323,7 +328,7 @@ public class SpeakeasyManager
             accessList.remove(user);
             data.saveUsersList(pluginKey, accessList);
 
-            descriptorGeneratorManager.updateModuleDescriptorsForPlugin(pluginKey, accessList);
+            descriptorGeneratorManager.refreshGeneratedDescriptorsForPlugin(pluginKey);
             return pluginKey;
         }
         return null;
@@ -334,7 +339,7 @@ public class SpeakeasyManager
         List<String> accessList = data.getUsersList(pluginKey);
         accessList.clear();
         data.saveUsersList(pluginKey, accessList);
-        descriptorGeneratorManager.updateModuleDescriptorsForPlugin(pluginKey, accessList);
+        descriptorGeneratorManager.refreshGeneratedDescriptorsForPlugin(pluginKey);
     }
 
     public boolean hasAccess(String pluginKey, String remoteUser)

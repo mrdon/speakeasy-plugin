@@ -1,6 +1,7 @@
 package com.atlassian.labs.speakeasy.webfragment;
 
 import com.atlassian.labs.speakeasy.DescriptorGenerator;
+import com.atlassian.labs.speakeasy.DescriptorGeneratorManager;
 import com.atlassian.labs.speakeasy.util.WebResourceUtil;
 import com.atlassian.plugin.Plugin;
 import com.atlassian.plugin.PluginParseException;
@@ -15,6 +16,8 @@ import org.osgi.framework.BundleContext;
 import java.util.Collections;
 import java.util.List;
 
+import static com.atlassian.labs.speakeasy.DescriptorGeneratorManager.getStatefulKey;
+
 /**
  *
  */
@@ -23,10 +26,12 @@ public class SpeakeasyWebItemModuleDescriptor extends AbstractModuleDescriptor<V
     private Element originalElement;
     private final BundleContext bundleContext;
     private WebInterfaceManager webInterfaceManager;
+    private final DescriptorGeneratorManager descriptorGeneratorManager;
 
-    public SpeakeasyWebItemModuleDescriptor(BundleContext bundleContext)
+    public SpeakeasyWebItemModuleDescriptor(BundleContext bundleContext, DescriptorGeneratorManager descriptorGeneratorManager)
     {
         this.bundleContext = bundleContext;
+        this.descriptorGeneratorManager = descriptorGeneratorManager;
     }
 
     @Override
@@ -43,7 +48,21 @@ public class SpeakeasyWebItemModuleDescriptor extends AbstractModuleDescriptor<V
         return null;
     }
 
-    public Iterable<WebItemModuleDescriptor> getDescriptorsToExposeForUsers(List<String> users, int state)
+    @Override
+    public void enabled()
+    {
+        super.enabled();
+        descriptorGeneratorManager.registerGenerator(getPluginKey(), getKey(), this);
+    }
+
+    @Override
+    public void disabled()
+    {
+        super.disabled();
+        descriptorGeneratorManager.unregisterGenerator(getPluginKey(), getKey());
+    }
+
+    public Iterable<WebItemModuleDescriptor> getDescriptorsToExposeForUsers(List<String> users, long state)
     {
         WebItemModuleDescriptor descriptor;
         try
@@ -59,7 +78,7 @@ public class SpeakeasyWebItemModuleDescriptor extends AbstractModuleDescriptor<V
         }
 
         Element userElement = (Element) originalElement.clone();
-        userElement.addAttribute("key", userElement.attributeValue("key") + "-" + state);
+        userElement.addAttribute("key", getStatefulKey(userElement.attributeValue("key"), state));
 
         WebResourceUtil.addUsersCondition(users, userElement);
 

@@ -71,28 +71,6 @@ public class SpeakeasyData
     {
         String key = createAccessKey(pluginKey, "users");
         pluginSettings.put(key, users);
-        incrementPluginStateIdentifier(pluginKey);
-    }
-
-    public int getPluginStateIdentifier(String pluginKey)
-    {
-        String key = createAccessKey(pluginKey, "state");
-        String stateValue = (String) pluginSettings.get(key);
-        if (stateValue != null)
-        {
-            return Integer.parseInt(stateValue);
-        }
-        else
-        {
-            return 0;
-        }
-    }
-
-    private void incrementPluginStateIdentifier(String pluginKey)
-    {
-        String key = createAccessKey(pluginKey, "state");
-        final int updatedState = getPluginStateIdentifier(pluginKey) + 1;
-        pluginSettings.put(key, String.valueOf(updatedState));
     }
 
     private String createAccessKey(String pluginKey, String propertyName)

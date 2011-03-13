@@ -1,22 +1,17 @@
 package com.atlassian.labs.speakeasy;
 
 import com.atlassian.labs.speakeasy.data.SpeakeasyData;
-import com.atlassian.labs.speakeasy.install.PluginOperationFailedException;
 import com.atlassian.plugin.ModuleDescriptor;
 import com.atlassian.plugin.Plugin;
 import com.atlassian.plugin.PluginAccessor;
-import com.atlassian.plugin.descriptors.UnrecognisedModuleDescriptor;
 import com.atlassian.plugin.event.PluginEventListener;
 import com.atlassian.plugin.event.PluginEventManager;
 import com.atlassian.plugin.event.events.PluginDisabledEvent;
 import com.atlassian.plugin.event.events.PluginEnabledEvent;
 import com.atlassian.plugin.hostcontainer.HostContainer;
-import com.atlassian.plugin.osgi.external.ListableModuleDescriptorFactory;
-import com.atlassian.plugin.osgi.external.SingleModuleDescriptorFactory;
-import com.atlassian.plugin.osgi.factory.OsgiPlugin;
 import com.atlassian.plugin.util.WaitUntil;
-import com.atlassian.plugin.webresource.transformer.WebResourceTransformerModuleDescriptor;
-import org.netbeans.lib.cvsclient.commandLine.command.log;
+import com.atlassian.plugin.webresource.WebResourceModuleDescriptor;
+import com.sun.syndication.io.ModuleGenerator;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceRegistration;
@@ -29,70 +24,115 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 import static com.atlassian.labs.speakeasy.util.BundleUtil.findBundleForPlugin;
+import static com.google.common.collect.Lists.newArrayList;
 
 /**
  *
  */
-public class DescriptorGeneratorManager implements DisposableBean
+public class DescriptorGeneratorManager
 {
     private final SpeakeasyData data;
-    private final PluginEventManager pluginEventManager;
     private final PluginAccessor pluginAccessor;
     private final BundleContext bundleContext;
-    private final Map<String, ServiceRegistration> serviceRegistrations;
+    private final Map<String, Registration> registrations;
 
 
-    public DescriptorGeneratorManager(SpeakeasyData data, PluginEventManager pluginEventManager, PluginAccessor pluginAccessor, BundleContext bundleContext, HostContainer hostContainer)
+    public DescriptorGeneratorManager(SpeakeasyData data, PluginAccessor pluginAccessor, BundleContext bundleContext)
     {
         this.data = data;
-        this.pluginEventManager = pluginEventManager;
         this.pluginAccessor = pluginAccessor;
         this.bundleContext = bundleContext;
-        this.serviceRegistrations = new ConcurrentHashMap<String, ServiceRegistration>();
-        this.pluginEventManager.register(this);
+        this.registrations = new ConcurrentHashMap<String, Registration>();
     }
 
-    @PluginEventListener
-    public void onPluginEnabled(PluginEnabledEvent event)
+    public void registerGenerator(String pluginKey, String descriptorKey, DescriptorGenerator<? extends ModuleDescriptor> descriptorGenerator)
     {
-        String pluginKey = event.getPlugin().getKey();
+        // unregister any existing services
+        List<ModuleDescriptor> unregisteredDescriptors = unregisterGenerator(pluginKey, descriptorKey);
+        waitUntilModulesAreDisabled(unregisteredDescriptors);
+
+        // generate and register new services
         List<String> accessList = data.getUsersList(pluginKey);
-        updateModuleDescriptorsForPlugin(pluginKey, accessList);
-    }
-
-    @PluginEventListener
-    public void onPluginDisabled(PluginDisabledEvent event)
-    {
-        unregisterGeneratedDescriptorsForPlugin(event.getPlugin().getKey());
-    }
-
-    public void updateModuleDescriptorsForPlugin(String pluginKey, List<String> users)
-    {
-        List<DescriptorGenerator<ModuleDescriptor>> generators = findGeneratorsInPlugin(pluginKey);
-        if (!generators.isEmpty())
+        Bundle targetBundle = findBundleForPlugin(bundleContext, pluginKey);
+        List<ModuleDescriptor> generatedDescriptors = new ArrayList<ModuleDescriptor>();
+        List<ServiceRegistration> serviceRegistrations = newArrayList();
+        for (ModuleDescriptor generatedDescriptor : descriptorGenerator.getDescriptorsToExposeForUsers(accessList, targetBundle.getLastModified()))
         {
-            // unregister any existing services
-            List<ModuleDescriptor> unregisteredDescriptors = unregisterGeneratedDescriptorsForPlugin(pluginKey);
-            waitUntilModulesAreDisabled(unregisteredDescriptors);
-
-            // generate and register new services
-            Integer pluginStateIdentifier = data.getPluginStateIdentifier(pluginKey);
-            Bundle targetBundle = findBundleForPlugin(bundleContext, pluginKey);
-            List<ModuleDescriptor> generatedDescriptors = new ArrayList<ModuleDescriptor>();
-            for (DescriptorGenerator<ModuleDescriptor> generator : generators)
-            {
-
-                for (ModuleDescriptor generatedDescriptor : generator.getDescriptorsToExposeForUsers(users, pluginStateIdentifier))
-                {
-                    ServiceRegistration reg = targetBundle.getBundleContext().registerService(ModuleDescriptor.class.getName(), generatedDescriptor, null);
-                    serviceRegistrations.put(generatedDescriptor.getCompleteKey(), reg);
-                    generatedDescriptors.add(generatedDescriptor);
-                }
-
-
-            }
-            waitUntilModulesAreEnabled(generatedDescriptors);
+            ServiceRegistration reg = targetBundle.getBundleContext().registerService(ModuleDescriptor.class.getName(), generatedDescriptor, null);
+            serviceRegistrations.add(reg);
+            generatedDescriptors.add(generatedDescriptor);
         }
+        registrations.put(getKey(pluginKey, descriptorKey), new Registration(
+                pluginKey,
+                descriptorKey,
+                descriptorGenerator,
+                serviceRegistrations
+        ));
+
+        waitUntilModulesAreEnabled(generatedDescriptors);
+    }
+
+    public List<ModuleDescriptor> unregisterGenerator(String pluginKey, String descriptorKey)
+    {
+        String keyToRemove = getKey(pluginKey, descriptorKey);
+        List<ModuleDescriptor> removedDescriptors = new ArrayList<ModuleDescriptor>();
+        Registration registration = registrations.remove(keyToRemove);
+        if (registration != null)
+        {
+            for (ServiceRegistration reg : registration.getServiceRegistrations())
+            {
+                try
+                {
+                    removedDescriptors.add((ModuleDescriptor) bundleContext.getService(reg.getReference()));
+                    reg.unregister();
+                }
+                catch (IllegalStateException ex)
+                {
+                    // no worries, this only means the bundle was already shut down so the services aren't valid anymore
+                }
+            }
+        }
+        return removedDescriptors;
+    }
+
+    public void refreshGeneratedDescriptorsForPlugin(String pluginKey)
+    {
+        for (Registration reg : findRegistrationsForPlugin(pluginKey))
+        {
+            registerGenerator(reg.getPluginKey(), reg.getDescriptorKey(), reg.getDescriptorGenerator());
+        }
+    }
+
+    public void unregisterGeneratedDescriptorsForPlugin(String key)
+    {
+        for (Registration reg : findRegistrationsForPlugin(key))
+        {
+            unregisterGenerator(reg.getPluginKey(), reg.getDescriptorKey());
+        }
+    }
+
+    private Iterable<Registration> findRegistrationsForPlugin(String key)
+    {
+        List<Registration> result = newArrayList();
+        String keyPrefix = key + ":";
+        for (String completeKey : newArrayList(registrations.keySet()))
+        {
+            if (completeKey.startsWith(keyPrefix))
+            {
+                result.add(registrations.get(completeKey));
+            }
+        }
+        return result;
+    }
+
+    public static String getStatefulKey(String descriptorKey, long state)
+    {
+        return descriptorKey + "-" + state;
+    }
+
+    private String getKey(String pluginKey, String descriptorKey)
+    {
+        return pluginKey + ":" + descriptorKey;
     }
 
     private void waitUntilModulesAreDisabled(final List<ModuleDescriptor> descriptors)
@@ -143,55 +183,39 @@ public class DescriptorGeneratorManager implements DisposableBean
         });
     }
 
-    private List<DescriptorGenerator<ModuleDescriptor>> findGeneratorsInPlugin(String pluginKey)
+    private static class Registration
     {
-        List<DescriptorGenerator<ModuleDescriptor>> generators = new ArrayList<DescriptorGenerator<ModuleDescriptor>>();
-        Plugin plugin = pluginAccessor.getEnabledPlugin(pluginKey);
-        if (plugin != null)
-        {
-            for (ModuleDescriptor moduleDescriptor : plugin.getModuleDescriptors())
-            {
-                if (moduleDescriptor instanceof DescriptorGenerator)
-                {
-                    generators.add((DescriptorGenerator) moduleDescriptor);
-                }
-            }
-        }
-        else
-        {
-            // plugin is disabled
-        }
-        return generators;
-    }
+        private final String pluginKey;
+        private final String descriptorKey;
+        private final DescriptorGenerator descriptorGenerator;
+        private final List<ServiceRegistration> serviceRegistrations;
 
-    public void destroy() throws Exception
-    {
-        pluginEventManager.unregister(this);
-        for (Plugin plugin : pluginAccessor.getEnabledPlugins())
+        public Registration(String pluginKey, String descriptorKey, DescriptorGenerator descriptorGenerator, List<ServiceRegistration> serviceRegistrations)
         {
-            unregisterGeneratedDescriptorsForPlugin(plugin.getKey());
+            this.pluginKey = pluginKey;
+            this.descriptorKey = descriptorKey;
+            this.descriptorGenerator = descriptorGenerator;
+            this.serviceRegistrations = serviceRegistrations;
         }
-    }
 
-    public List<ModuleDescriptor> unregisterGeneratedDescriptorsForPlugin(String pluginKey)
-    {
-        List<ModuleDescriptor> removedDescriptors = new ArrayList<ModuleDescriptor>();
-        for (String descriptorCompleteKey : new HashSet<String>(serviceRegistrations.keySet()))
+        public String getPluginKey()
         {
-            if (descriptorCompleteKey.startsWith(pluginKey))
-            {
-                ServiceRegistration reg = serviceRegistrations.remove(descriptorCompleteKey);
-                try
-                {
-                    removedDescriptors.add((ModuleDescriptor) bundleContext.getService(reg.getReference()));
-                    reg.unregister();
-                }
-                catch (IllegalStateException ex)
-                {
-                    // no worries, this only means the bundle was already shut down so the services aren't valid anymore
-                }
-            }
+            return pluginKey;
         }
-        return removedDescriptors;
+
+        public String getDescriptorKey()
+        {
+            return descriptorKey;
+        }
+
+        public DescriptorGenerator getDescriptorGenerator()
+        {
+            return descriptorGenerator;
+        }
+
+        public List<ServiceRegistration> getServiceRegistrations()
+        {
+            return serviceRegistrations;
+        }
     }
 }
