@@ -1,5 +1,6 @@
 package com.atlassian.labs.speakeasy.model;
 
+import com.atlassian.labs.speakeasy.PluginType;
 import com.atlassian.plugin.Plugin;
 
 import javax.xml.bind.annotation.XmlAccessType;
@@ -239,6 +240,11 @@ public class RemotePlugin implements Comparable
     public void setExtension(String extension)
     {
         this.extension = extension;
+    }
+
+    public PluginType getPluginType()
+    {
+        return PluginType.valueOf(getExtension().toUpperCase());
     }
 
     public int compareTo(Object o)

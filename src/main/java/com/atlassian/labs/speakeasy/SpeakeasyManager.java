@@ -4,7 +4,7 @@ import com.atlassian.labs.speakeasy.commonjs.descriptor.CommonJsModulesDescripto
 import com.atlassian.labs.speakeasy.data.SpeakeasyData;
 import com.atlassian.labs.speakeasy.install.PluginManager;
 import com.atlassian.labs.speakeasy.install.PluginOperationFailedException;
-import com.atlassian.labs.speakeasy.install.convention.JsonManifestReader;
+import com.atlassian.labs.speakeasy.install.convention.JsonManifestHandler;
 import com.atlassian.labs.speakeasy.model.JsonManifest;
 import com.atlassian.labs.speakeasy.model.RemotePlugin;
 import com.atlassian.labs.speakeasy.model.UserPlugins;
@@ -43,18 +43,18 @@ public class SpeakeasyManager
     private final PluginManager pluginManager;
     private final ProductAccessor productAccessor;
     private final DescriptorGeneratorManager descriptorGeneratorManager;
-    private final JsonManifestReader jsonManifestReader;
+    private final JsonManifestHandler jsonManifestHandler;
     private final BundleContext bundleContext;
 
 
-    public SpeakeasyManager(PluginAccessor pluginAccessor, SpeakeasyData data, PluginManager pluginManager, ProductAccessor productAccessor, DescriptorGeneratorManager descriptorGeneratorManager, JsonManifestReader jsonManifestReader, BundleContext bundleContext)
+    public SpeakeasyManager(PluginAccessor pluginAccessor, SpeakeasyData data, PluginManager pluginManager, ProductAccessor productAccessor, DescriptorGeneratorManager descriptorGeneratorManager, JsonManifestHandler jsonManifestHandler, BundleContext bundleContext)
     {
         this.descriptorGeneratorManager = descriptorGeneratorManager;
         this.pluginAccessor = pluginAccessor;
         this.data = data;
         this.pluginManager = pluginManager;
         this.productAccessor = productAccessor;
-        this.jsonManifestReader = jsonManifestReader;
+        this.jsonManifestHandler = jsonManifestHandler;
         this.bundleContext = bundleContext;
     }
 
@@ -118,7 +118,7 @@ public class SpeakeasyManager
 
         if (plugin.getResource("/" + JsonManifest.ATLASSIAN_EXTENSION_PATH) != null)
         {
-            JsonManifest mf = jsonManifestReader.read(plugin);
+            JsonManifest mf = jsonManifestHandler.read(plugin);
             remotePlugin.setDescription(mf.getDescription());
             remotePlugin.setName(mf.getName());
             remotePlugin.setExtension("zip");
@@ -358,7 +358,7 @@ public class SpeakeasyManager
             {
                 disallowUserAccess(plugin.getKey(), user);
             }
-            descriptorGeneratorManager.unregisterGeneratedDescriptorsForPlugin(plugin.getKey());
+            descriptorGeneratorManager.refreshGeneratedDescriptorsForPlugin(plugin.getKey());
         }
     }
 
@@ -407,7 +407,7 @@ public class SpeakeasyManager
             {
                 throw new PluginOperationFailedException("Not authorized to fork " + pluginKey, pluginKey);
             }
-            String forkedPluginKey = pluginManager.forkAndInstall(pluginKey, remoteUser, description);
+            String forkedPluginKey = pluginManager.forkAndInstall(pluginKey, plugin.getPluginType(), remoteUser, description);
             List<String> modifiedKeys = new ArrayList<String>();
             modifiedKeys.add(forkedPluginKey);
             if (hasAccess(pluginKey, remoteUser))
@@ -440,7 +440,7 @@ public class SpeakeasyManager
             {
                 throw new PluginOperationFailedException("Not authorized to download " + pluginKey, pluginKey);
             }
-            return pluginManager.getPluginAsProject(pluginKey);
+            return pluginManager.getPluginAsProject(pluginKey, plugin.getPluginType(), user);
         }
         catch (PluginOperationFailedException ex)
         {
@@ -461,7 +461,7 @@ public class SpeakeasyManager
             {
                 throw new PluginOperationFailedException("Not authorized to download " + pluginKey, pluginKey);
             }
-            return pluginManager.getPluginArtifact(pluginKey);
+            return pluginManager.getPluginArtifact(pluginKey, plugin.getPluginType());
         }
         catch (PluginOperationFailedException ex)
         {
@@ -482,7 +482,7 @@ public class SpeakeasyManager
             {
                 throw new PluginOperationFailedException("Not authorized to view " + pluginKey, pluginKey);
             }
-            return newArrayList(filter(pluginManager.getPluginFileNames(pluginKey), new Predicate<String>()
+            return newArrayList(filter(pluginManager.getPluginFileNames(pluginKey, plugin.getPluginType()), new Predicate<String>()
             {
                 public boolean apply(String input)
                 {
@@ -509,7 +509,7 @@ public class SpeakeasyManager
             {
                 throw new PluginOperationFailedException("Not authorized to view " + pluginKey, pluginKey);
             }
-            return pluginManager.getPluginFile(pluginKey, fileName);
+            return pluginManager.getPluginFile(pluginKey, plugin.getPluginType(), fileName);
         }
         catch (PluginOperationFailedException ex)
         {
@@ -531,7 +531,7 @@ public class SpeakeasyManager
             {
                 throw new PluginOperationFailedException("Not authorized to edit " + pluginKey, pluginKey);
             }
-            String installedPluginKey = pluginManager.saveAndRebuild(pluginKey, plugin.getExtension(), fileName, contents, user);
+            String installedPluginKey = pluginManager.saveAndRebuild(pluginKey, plugin.getPluginType(), fileName, contents, user);
             return getRemotePlugin(installedPluginKey, user);
         }
         catch (PluginOperationFailedException ex)
@@ -555,7 +555,7 @@ public class SpeakeasyManager
         return getUserAccessList(user, pluginKey);
     }
 
-    public UserPlugins createZipExtension(String pluginKey, String remoteUser, String description, String name)
+    public UserPlugins createExtension(String pluginKey, PluginType pluginType, String remoteUser, String description, String name)
     {
         if (pluginAccessor.getPlugin(pluginKey) != null)
         {
@@ -563,7 +563,7 @@ public class SpeakeasyManager
         }
         try
         {
-            pluginManager.createZipExtension(pluginKey, remoteUser, description, name);
+            pluginManager.createExtension(pluginType, pluginKey, remoteUser, description, name);
             List<String> modifiedKeys = new ArrayList<String>();
             modifiedKeys.add(pluginKey);
             return getUserAccessList(remoteUser, modifiedKeys);

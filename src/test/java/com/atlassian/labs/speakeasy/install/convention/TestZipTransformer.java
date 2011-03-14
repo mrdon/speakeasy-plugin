@@ -38,7 +38,7 @@ public class TestZipTransformer
     @Before
     public void setUp()
     {
-        zipTransformer = new ZipTransformer(new JsonManifestReader());
+        zipTransformer = new ZipTransformer(new JsonManifestHandler());
     }
 
     @Test
@@ -95,9 +95,8 @@ public class TestZipTransformer
         File zip = new File(jar.getPath() + ".zip");
         FileUtils.moveFile(jar, zip);
 
-        File converted = zipTransformer.convertConventionZipToPluginJar(zip);
-        PluginArtifact artifact = new JarPluginArtifact(converted);
-        JarFile jarFile = new JarFile(converted);
+        PluginArtifact artifact = zipTransformer.convertConventionZipToPluginJar(new JarPluginArtifact(zip));
+        JarFile jarFile = new JarFile(artifact.toFile());
         Manifest mf = jarFile.getManifest();
         for (Map.Entry<String,String> entry : expectedHeaders.entrySet())
         {

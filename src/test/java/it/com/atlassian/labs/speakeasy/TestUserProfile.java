@@ -368,6 +368,36 @@ public class TestUserProfile
     }
 
     @Test
+    public void testForkZipPlugin() throws IOException, MessagingException
+    {
+        product.visit(SpeakeasyUserPage.class)
+                .openCreateExtensionDialog()
+                    .key("tofork-zip")
+                    .description("Description")
+                    .name("Fork Zip")
+                    .create();
+        logout();
+
+        SpeakeasyUserPage page = product.visit(LoginPage.class)
+                .login("barney", "barney", SpeakeasyUserPage.class)
+                .openForkDialog("tofork-zip")
+                    .setDescription("Fork Description")
+                    .fork();
+
+        List<String> messages = page.getSuccessMessages();
+        assertEquals(1, messages.size());
+        assertTrue(messages.get(0).contains("was forked successfully"));
+        assertTrue(page.getPluginKeys().contains("tofork-zip-fork-barney"));
+
+        page.uninstallPlugin("tofork-zip-fork-barney");
+
+        logout();
+        product.visit(LoginPage.class)
+               .loginAsSysAdmin(SpeakeasyUserPage.class)
+               .uninstallPlugin("tofork-zip");
+    }
+
+    @Test
     public void testUnsubscribeFromAllPlugins() throws IOException
     {
         File jar = buildSimplePluginFile();

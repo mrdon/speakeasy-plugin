@@ -1,5 +1,6 @@
 package com.atlassian.labs.speakeasy.rest;
 
+import com.atlassian.labs.speakeasy.PluginType;
 import com.atlassian.labs.speakeasy.SpeakeasyManager;
 import com.atlassian.labs.speakeasy.install.PluginOperationFailedException;
 import com.atlassian.labs.speakeasy.model.PluginIndex;
@@ -102,7 +103,7 @@ public class PluginsResource
     @Produces("application/json")
     public Response create(@PathParam("pluginKey") String pluginKey, @FormParam("description") String description, @FormParam("name") String name)
     {
-        UserPlugins entity = speakeasyManager.createZipExtension(pluginKey, userManager.getRemoteUsername(), description, name);
+        UserPlugins entity = speakeasyManager.createExtension(pluginKey, PluginType.ZIP, userManager.getRemoteUsername(), description, name);
         return Response.ok().entity(entity).build();
     }
 

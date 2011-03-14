@@ -10,13 +10,7 @@ import com.atlassian.plugin.util.PluginUtils;
 import org.apache.commons.io.IOUtils;
 import org.osgi.framework.Constants;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 import java.util.Map;
 import java.util.jar.Attributes;
 import java.util.jar.Manifest;
@@ -33,20 +27,19 @@ import static com.google.common.collect.Maps.newHashMap;
 public class ZipTransformer
 {
 
-    private final JsonManifestReader jsonReader;
+    private final JsonManifestHandler jsonHandler;
 
-    public ZipTransformer(JsonManifestReader jsonReader)
+    public ZipTransformer(JsonManifestHandler jsonHandler)
     {
-        this.jsonReader = jsonReader;
+        this.jsonHandler = jsonHandler;
     }
 
-    public File convertConventionZipToPluginJar(File pluginFile)
+    public JarPluginArtifact convertConventionZipToPluginJar(PluginArtifact artifact)
     {
         Map<String,byte[]> additions = newHashMap();
-        PluginArtifact artifact = new JarPluginArtifact(pluginFile);
         if (artifact.doesResourceExist(JsonManifest.ATLASSIAN_EXTENSION_PATH))
         {
-            JsonManifest descriptor = jsonReader.read(artifact);
+            JsonManifest descriptor = jsonHandler.read(artifact);
 
             additions.put("META-INF/MANIFEST.MF", generateManifest(descriptor));
             additions.put("META-INF/spring/speakeasy-context.xml", getResourceContents("speakeasy-context.xml"));
@@ -56,7 +49,7 @@ public class ZipTransformer
 
             try
             {
-                return addFilesToExistingZip(pluginFile, additions);
+                return new JarPluginArtifact(addFilesToExistingZip(artifact.toFile(), additions));
             }
             catch (IOException e)
             {
@@ -67,6 +60,25 @@ public class ZipTransformer
         {
             throw new PluginOperationFailedException("File '" + JsonManifest.ATLASSIAN_EXTENSION_PATH + "' expected", null);
         }
+    }
+
+    public String extractPluginKey(PluginArtifact pluginArtifact)
+    {
+        if (pluginArtifact.doesResourceExist(JsonManifest.ATLASSIAN_EXTENSION_PATH))
+        {
+            JsonManifest descriptor = jsonHandler.read(pluginArtifact);
+            return descriptor.getKey();
+        }
+        return null;
+    }
+    public JsonManifest readManifest(InputStream in)
+    {
+        return jsonHandler.read(in);
+    }
+
+    public void writeManifest(JsonManifest manifest, OutputStream out) throws IOException
+    {
+        jsonHandler.write(manifest, out);
     }
 
     private byte[] getResourceContents(String path)

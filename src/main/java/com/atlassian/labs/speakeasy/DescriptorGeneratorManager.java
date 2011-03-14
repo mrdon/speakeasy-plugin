@@ -106,14 +106,6 @@ public class DescriptorGeneratorManager
         }
     }
 
-    public void unregisterGeneratedDescriptorsForPlugin(String key)
-    {
-        for (Registration reg : findRegistrationsForPlugin(key))
-        {
-            unregisterGenerator(reg.getPluginKey(), reg.getDescriptorKey());
-        }
-    }
-
     private Iterable<Registration> findRegistrationsForPlugin(String key)
     {
         List<Registration> result = newArrayList();

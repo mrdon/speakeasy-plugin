@@ -10,11 +10,12 @@ import org.apache.commons.io.IOUtils;
 import javax.ws.rs.core.MediaType;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 
 /**
  *
  */
-public class JsonManifestReader
+public class JsonManifestHandler
 {
     /**
      * Reads from a stream to create an object.  Closes the input stream
@@ -37,11 +38,28 @@ public class JsonManifestReader
         }
     }
 
+    public void write(JsonManifest manifest, OutputStream out) throws IOException
+    {
+        new JacksonJsonProviderFactory().create().writeTo(manifest, manifest.getClass(), manifest.getClass(), null, MediaType.APPLICATION_JSON_TYPE, null, out);
+    }
+
     public JsonManifest read(PluginArtifact artifact)
     {
         try
         {
             return readToObject(JsonManifest.class, artifact.getResourceAsStream(JsonManifest.ATLASSIAN_EXTENSION_PATH));
+        }
+        catch (IOException e)
+        {
+            throw new PluginOperationFailedException("Unable to parse " + JsonManifest.ATLASSIAN_EXTENSION_PATH, e, null);
+        }
+    }
+
+    public JsonManifest read(InputStream in)
+    {
+        try
+        {
+            return readToObject(JsonManifest.class, in);
         }
         catch (IOException e)
         {
