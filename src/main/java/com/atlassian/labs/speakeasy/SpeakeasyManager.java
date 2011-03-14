@@ -15,6 +15,7 @@ import com.atlassian.plugin.PluginAccessor;
 import com.atlassian.plugin.descriptors.UnloadableModuleDescriptor;
 import com.atlassian.plugin.impl.UnloadablePlugin;
 import com.google.common.base.Function;
+import com.google.common.base.Predicate;
 import com.google.common.collect.Lists;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
@@ -27,6 +28,8 @@ import java.util.List;
 import java.util.Set;
 
 import static com.atlassian.labs.speakeasy.util.BundleUtil.findBundleForPlugin;
+import static com.google.common.collect.Iterables.filter;
+import static com.google.common.collect.Lists.newArrayList;
 import static com.google.common.collect.Sets.newHashSet;
 import static java.util.Arrays.asList;
 
@@ -479,7 +482,13 @@ public class SpeakeasyManager
             {
                 throw new PluginOperationFailedException("Not authorized to view " + pluginKey, pluginKey);
             }
-            return pluginManager.getPluginFileNames(pluginKey);
+            return newArrayList(filter(pluginManager.getPluginFileNames(pluginKey), new Predicate<String>()
+            {
+                public boolean apply(String input)
+                {
+                    return !input.contains("-min.");
+                }
+            }));
         }
         catch (PluginOperationFailedException ex)
         {

@@ -464,7 +464,7 @@ public class PluginManager
             zout = new ZipOutputStream(new FileOutputStream(tmpFile));
             for (String path : getBundlePathsRecursive(bundle, ""))
             {
-                if (!path.equals(fileName))
+                if (!path.equals(fileName) && !path.contains("-min."))
                 {
                     ZipEntry entry = new ZipEntry(path);
                     zout.putNextEntry(entry);

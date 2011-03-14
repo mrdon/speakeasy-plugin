@@ -20,12 +20,12 @@ import org.slf4j.LoggerFactory;
 import javax.mail.MessagingException;
 import java.io.File;
 import java.io.IOException;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.zip.ZipEntry;
+import java.util.zip.ZipFile;
 
+import static com.google.common.collect.Lists.newArrayList;
+import static com.google.common.collect.Sets.newHashSet;
 import static java.util.Arrays.asList;
 import static org.junit.Assert.*;
 
@@ -70,21 +70,23 @@ public class TestUserProfile
     @Test
     public void testEditPlugin() throws IOException
     {
-        product.visit(SpeakeasyUserPage.class)
-                .uploadPlugin(buildSimplePluginFile());
-        IdeDialog ide =  product.visit(SpeakeasyUserPage.class)
-                .uploadPlugin(buildSimplePluginFile())
-                .openEditDialog("test-2");
+        SpeakeasyUserPage page = product.visit(SpeakeasyUserPage.class)
+                .uploadPlugin(startSimpleBuilder("edit", "Edit").addFormattedResource("foo-min.js", "var bar;").build());
+        IdeDialog ide =  page.openEditDialog("edit");
 
         assertEquals(asList("bar/baz.js", "modules/test.js", "atlassian-plugin.xml", "foo.js"), ide.getFileNames());
 
         ide = ide.editAndSaveFile("foo.js", "var foo;")
            .done()
-           .openEditDialog("test-2");
+           .openEditDialog("edit");
 
         String contents = ide.getFileContents("foo.js");
 
         assertEquals("var foo;", contents);
+
+        page = ide.done();
+        assertFalse(getZipEntries(page.openDownloadDialog("edit").downloadAsExtension()).contains("foo-min.js"));
+        page.uninstallPlugin("edit");
 
     }
 
@@ -115,7 +117,7 @@ public class TestUserProfile
     @Test
     public void testDownloadPluginJarAsAmpsProject() throws IOException
     {
-        final SpeakeasyUserPage page = product.visit(SpeakeasyUserPage.class).uploadPlugin(buildSimplePluginFile("download.jar-file", "Download Jar"));
+        final SpeakeasyUserPage page = product.visit(SpeakeasyUserPage.class).uploadPlugin(buildSimplePluginFile("download.jar-project", "Download Jar"));
         File file = page
                 .openDownloadDialog("download.jar-project")
                 .downloadAsAmpsProject();
@@ -127,7 +129,7 @@ public class TestUserProfile
         {
             entries.add(entry.getName());
         }
-        
+
         unzipper.unzip();
 
 
@@ -148,14 +150,16 @@ public class TestUserProfile
         assertEquals("alert(\"hi\");", FileUtils.readFileToString(fooFile).trim());
         String pomContents = FileUtils.readFileToString(new File(unzippedPluginDir, "pom.xml"));
         assertFalse(pomContents.contains("${"));
-        assertTrue(pomContents.contains("plugin.key>download.jar-projects</plugin.key"));
+        assertTrue(pomContents.contains("plugin.key>download.jar-project</plugin.key"));
         page.uninstallPlugin("download.jar-project");
     }
 
     @Test
     public void testDownloadPluginJarAsExtension() throws IOException
     {
-        final SpeakeasyUserPage page = product.visit(SpeakeasyUserPage.class).uploadPlugin(buildSimplePluginFile());
+        final SpeakeasyUserPage page = product.
+                visit(SpeakeasyUserPage.class).
+                uploadPlugin(buildSimplePluginFile("download.jar-file", "Jar File"));
         File file = page
                 .openDownloadDialog("download.jar-file")
                 .downloadAsExtension();
@@ -187,7 +191,6 @@ public class TestUserProfile
         page.uninstallPlugin("download.jar-file");
     }
 
-
     @Test
     public void testEnableTestPlugin() throws IOException
     {
@@ -215,6 +218,7 @@ public class TestUserProfile
         assertTrue(activated.isUploadFormVisible());
         assertFalse(activated.isGoogleLinkVisible());
     }
+
 
     @Test
     public void testInstallPlugin() throws IOException
@@ -420,8 +424,7 @@ public class TestUserProfile
                         "    <scoped-modules key='item' />",
                         "    <scoped-web-resource key='another-item' />",
                         "</atlassian-plugin>")
-                .addFormattedResource("modules/foo.js",
-                        "require('speakeasy/user/user');")
+                .addFormattedResource("modules/foo.js", "require('speakeasy/user/user');")
                 .build();
 
         SpeakeasyUserPage page = product.visit(SpeakeasyUserPage.class)
@@ -501,24 +504,41 @@ public class TestUserProfile
     private File buildSimplePluginFile(String key, String name)
             throws IOException
     {
+        return startSimpleBuilder(key, name)
+                .build();
+    }
+
+    private PluginJarBuilder startSimpleBuilder(String key, String name)
+    {
         return new PluginJarBuilder()
                 .addFormattedResource("atlassian-plugin.xml",
-                        "<atlassian-plugin key='" + key + "' pluginsVersion='2' name='" + name + "'>",
-                        "    <plugin-info>",
-                        "        <version>1</version>",
-                        "        <description>Desc</description>",
-                        "    </plugin-info>",
-                        "    <scoped-web-item key='item' section='foo' />",
-                        "    <scoped-web-resource key='res'>",
-                        "      <resource type='download' name='foo.js' location='foo.js' />",
-                        "    </scoped-web-resource>",
-                        "    <scoped-modules key='modules' />",
-                        "</atlassian-plugin>")
+                         "<atlassian-plugin key='" + key + "' pluginsVersion='2' name='" + name + "'>",
+                         "    <plugin-info>",
+                         "        <version>1</version>",
+                         "        <description>Desc</description>",
+                         "    </plugin-info>",
+                         "    <scoped-web-item key='item' section='foo' />",
+                         "    <scoped-web-resource key='res'>",
+                         "      <resource type='download' name='foo.js' location='foo.js' />",
+                         "    </scoped-web-resource>",
+                         "    <scoped-modules key='modules' />",
+                         "</atlassian-plugin>")
                 .addFormattedResource("foo.js", "alert('hi');")
                 .addFormattedResource("bar/baz.js", "alert('hoho');")
                 .addFormattedResource("modules/test.js", "alert('hi');")
                 .addResource("bar/", "")
-                .addResource("modules/", "")
-                .build();
+                .addResource("modules/", "");
+    }
+
+    private Set<String> getZipEntries(File artifact) throws IOException
+    {
+        Set<String> entries = newHashSet();
+        ZipFile file = new ZipFile(artifact);
+        for (Enumeration<? extends ZipEntry> e = file.entries(); e.hasMoreElements(); )
+        {
+            entries.add(e.nextElement().getName());
+        }
+        file.close();
+        return entries;
     }
 }
