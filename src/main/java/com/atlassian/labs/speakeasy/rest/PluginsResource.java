@@ -71,13 +71,21 @@ public class PluginsResource
     }
 
     @GET
-    @Path("download/extension/{pluginKey}.{extension}")
+    @Path("download/extension/{pluginKeyAndExtension}")
     @Produces("application/octet-stream")
-    public Response getAsExtension(@PathParam("pluginKey") String pluginKey)
+    public Response getAsExtension(@PathParam("pluginKeyAndExtension") String pluginKeyAndExtension)
     {
         String user = userManager.getRemoteUsername();
-        File file = speakeasyManager.getPluginArtifact(pluginKey, user);
-        return Response.ok().entity(file).build();
+        int pos = pluginKeyAndExtension.lastIndexOf('.');
+        if (pos > 0)
+        {
+            File file = speakeasyManager.getPluginArtifact(pluginKeyAndExtension.substring(0, pos), user);
+            return Response.ok().entity(file).build();
+        }
+        else
+        {
+            throw new PluginOperationFailedException("Missing extension on '" + pluginKeyAndExtension, null);
+        }
     }
 
     @POST

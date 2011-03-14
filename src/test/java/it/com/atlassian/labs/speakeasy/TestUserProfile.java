@@ -115,12 +115,12 @@ public class TestUserProfile
     @Test
     public void testDownloadPluginJarAsAmpsProject() throws IOException
     {
-        File file = product.visit(SpeakeasyUserPage.class)
-                .uploadPlugin(buildSimplePluginFile())
-                .openDownloadDialog("test-2")
+        final SpeakeasyUserPage page = product.visit(SpeakeasyUserPage.class).uploadPlugin(buildSimplePluginFile("download.jar-file", "Download Jar"));
+        File file = page
+                .openDownloadDialog("download.jar-project")
                 .downloadAsAmpsProject();
         assertNotNull(file);
-        File unzippedPluginDir = TempHelp.getTempDir("test-2-amps-unzip");
+        File unzippedPluginDir = TempHelp.getTempDir("download.jar-project-amps-unzip");
         FileUnzipper unzipper = new FileUnzipper(file, unzippedPluginDir);
         Set<String> entries = new HashSet<String>();
         for (ZipEntry entry : unzipper.entries())
@@ -148,19 +148,20 @@ public class TestUserProfile
         assertEquals("alert(\"hi\");", FileUtils.readFileToString(fooFile).trim());
         String pomContents = FileUtils.readFileToString(new File(unzippedPluginDir, "pom.xml"));
         assertFalse(pomContents.contains("${"));
-        assertTrue(pomContents.contains("plugin.key>test-2</plugin.key"));
+        assertTrue(pomContents.contains("plugin.key>download.jar-projects</plugin.key"));
+        page.uninstallPlugin("download.jar-project");
     }
 
     @Test
     public void testDownloadPluginJarAsExtension() throws IOException
     {
-        File file = product.visit(SpeakeasyUserPage.class)
-                .uploadPlugin(buildSimplePluginFile())
-                .openDownloadDialog("test-2")
+        final SpeakeasyUserPage page = product.visit(SpeakeasyUserPage.class).uploadPlugin(buildSimplePluginFile());
+        File file = page
+                .openDownloadDialog("download.jar-file")
                 .downloadAsExtension();
         assertNotNull(file);
         assertTrue(file.getName().endsWith(".jar"));
-        File unzippedPluginDir = TempHelp.getTempDir("test-2-extension-unzip");
+        File unzippedPluginDir = TempHelp.getTempDir("download.jar-file-extension-unzip");
 
         FileUnzipper unzipper = new FileUnzipper(file, unzippedPluginDir);
         Set<String> entries = new HashSet<String>();
@@ -183,6 +184,7 @@ public class TestUserProfile
 
         File fooFile = new File(unzippedPluginDir, "foo.js");
         assertEquals("alert(\"hi\");", FileUtils.readFileToString(fooFile).trim());
+        page.uninstallPlugin("download.jar-file");
     }
 
 
