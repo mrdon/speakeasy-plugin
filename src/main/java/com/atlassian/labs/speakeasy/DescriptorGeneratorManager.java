@@ -4,6 +4,7 @@ import com.atlassian.labs.speakeasy.data.SpeakeasyData;
 import com.atlassian.plugin.ModuleDescriptor;
 import com.atlassian.plugin.Plugin;
 import com.atlassian.plugin.PluginAccessor;
+import com.atlassian.plugin.PluginController;
 import com.atlassian.plugin.event.PluginEventListener;
 import com.atlassian.plugin.event.PluginEventManager;
 import com.atlassian.plugin.event.events.PluginDisabledEvent;
@@ -35,13 +36,15 @@ public class DescriptorGeneratorManager
     private final PluginAccessor pluginAccessor;
     private final BundleContext bundleContext;
     private final Map<String, Registration> registrations;
+    private final PluginController pluginController;
 
 
-    public DescriptorGeneratorManager(SpeakeasyData data, PluginAccessor pluginAccessor, BundleContext bundleContext)
+    public DescriptorGeneratorManager(SpeakeasyData data, PluginAccessor pluginAccessor, BundleContext bundleContext, PluginController pluginController)
     {
         this.data = data;
         this.pluginAccessor = pluginAccessor;
         this.bundleContext = bundleContext;
+        this.pluginController = pluginController;
         this.registrations = new ConcurrentHashMap<String, Registration>();
     }
 
@@ -167,10 +170,20 @@ public class DescriptorGeneratorManager
             {
                 for (ModuleDescriptor descriptor : generatedDescriptors)
                 {
-                    ModuleDescriptor<?> module = pluginAccessor.getEnabledPluginModule(descriptor.getCompleteKey());
+                    ModuleDescriptor<?> module = pluginAccessor.getPluginModule(descriptor.getCompleteKey());
                     if (module == null)
                     {
                         return false;
+                    }
+                    else
+                    {
+                        if (!pluginAccessor.isPluginModuleEnabled(descriptor.getCompleteKey()))
+                        {
+                            // This is necessary as Confluence will handle unregistered descriptors as an explicit
+                            // disabling persisted in local state
+                            pluginController.enablePluginModule(descriptor.getCompleteKey());
+                            return true;
+                        }
                     }
                 }
                 return true;
