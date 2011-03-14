@@ -58,25 +58,25 @@ public class PluginManager
     private final ZipTransformer zipTransformer;
 
     private static final Iterable<Pattern> coreWhitelist = asList(
-            Pattern.compile(".*\\.js", Pattern.CASE_INSENSITIVE),
-            Pattern.compile(".*\\.mu", Pattern.CASE_INSENSITIVE),
-            Pattern.compile(".*\\.json", Pattern.CASE_INSENSITIVE),
-            Pattern.compile(".*\\.gif", Pattern.CASE_INSENSITIVE),
-            Pattern.compile(".*\\.png", Pattern.CASE_INSENSITIVE),
-            Pattern.compile(".*\\.jpg", Pattern.CASE_INSENSITIVE),
-            Pattern.compile(".*\\.jpeg", Pattern.CASE_INSENSITIVE),
+            Pattern.compile(".*[._]js", Pattern.CASE_INSENSITIVE),
+            Pattern.compile(".*[._]mu", Pattern.CASE_INSENSITIVE),
+            Pattern.compile(".*[._]json", Pattern.CASE_INSENSITIVE),
+            Pattern.compile(".*[._]gif", Pattern.CASE_INSENSITIVE),
+            Pattern.compile(".*[._]png", Pattern.CASE_INSENSITIVE),
+            Pattern.compile(".*[._]jpg", Pattern.CASE_INSENSITIVE),
+            Pattern.compile(".*[._]jpeg", Pattern.CASE_INSENSITIVE),
             // Pattern.compile(".*\\.xml", Pattern.CASE_INSENSITIVE), // excluded for now as you could add a spring XML file and load other classes
-            Pattern.compile(".*\\.css", Pattern.CASE_INSENSITIVE),
+            Pattern.compile(".*[._]css", Pattern.CASE_INSENSITIVE),
             Pattern.compile(".*/$"),
             Pattern.compile("META-INF/MANIFEST.MF"),
             Pattern.compile(".*/pom.xml"),
             Pattern.compile(".*/pom.properties"),
             Pattern.compile(".*\\.DS_Store"));
 
-    private static final Iterable<Pattern> jarWhitelist = concat(coreWhitelist, asList(
+    static final Iterable<Pattern> jarWhitelist = concat(coreWhitelist, asList(
             Pattern.compile("atlassian-plugin.xml")));
 
-    private static final Iterable<Pattern> zipWhitelist = concat(coreWhitelist, asList(
+    static final Iterable<Pattern> zipWhitelist = concat(coreWhitelist, asList(
             Pattern.compile("atlassian-extension.json")));
 
 
@@ -244,15 +244,7 @@ public class PluginManager
             for (Enumeration<? extends ZipEntry> e = zip.entries(); e.hasMoreElements();)
             {
                 ZipEntry entry = e.nextElement();
-                boolean allowed = false;
-                for (Pattern whitelist : whitelistPatterns)
-                {
-                    if (whitelist.matcher(entry.getName()).matches())
-                    {
-                        allowed = true;
-                        break;
-                    }
-                }
+                boolean allowed = tryPluginEntryAgainstWhitelist(whitelistPatterns, entry.getName());
                 if (!allowed)
                 {
                     throw new PluginOperationFailedException("Invalid plugin entry: " + entry.getName(), null);
@@ -278,6 +270,18 @@ public class PluginManager
             }
         }
 
+    }
+
+    static boolean tryPluginEntryAgainstWhitelist(Iterable<Pattern> whitelistPatterns, String entry)
+    {
+        for (Pattern whitelist : whitelistPatterns)
+        {
+            if (whitelist.matcher(entry).matches())
+            {
+                return true;
+            }
+        }
+        return false;
     }
 
     public void uninstall(String pluginKey, String user) throws PluginOperationFailedException
