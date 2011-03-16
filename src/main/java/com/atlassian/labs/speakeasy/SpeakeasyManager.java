@@ -123,6 +123,17 @@ public class SpeakeasyManager
             remotePlugin.setName(mf.getName());
             remotePlugin.setExtension("zip");
         }
+        // try to detect a failed install of a zip plugin
+        else if (plugin instanceof UnloadablePlugin &&
+                        plugin.getModuleDescriptors().size() == 3 &&
+                        plugin.getModuleDescriptor("modules") != null &&
+                        plugin.getModuleDescriptor("images") != null &&
+                        plugin.getModuleDescriptor("css") != null)
+        {
+            remotePlugin.setExtension("zip");
+            remotePlugin.setName(plugin.getName());
+            remotePlugin.setDescription(((UnloadablePlugin) plugin).getErrorText());
+        }
         else if (plugin.getResource("/atlassian-plugin.xml") != null)
         {
             remotePlugin.setExtension("jar");

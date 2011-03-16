@@ -79,4 +79,21 @@ public class TestConventionExtensions
         page.uninstallPlugin("test-convention");
     }
 
+    @Test
+    public void testEditAndBreakWithJavascriptSyntaxErrorThenFixPlugin() throws IOException
+    {
+        SpeakeasyUserPage page = product.visit(SpeakeasyUserPage.class)
+                .openCreateExtensionDialog()
+                    .key("breakjs")
+                    .name("Breaking JS")
+                    .description("All Good")
+                    .create()
+                .openEditDialog("breakjs")
+                .editAndSaveFile("js/breakjs/main.js", "require(';", "Error parsing module 'breakjs/main' on line")
+                .editAndSaveFile("js/breakjs/main.js", "var foo;")
+                .done();
+        assertTrue(page.getPlugins().get("breakjs").getDescription().contains("All Good"));
+        page.uninstallPlugin("breakjs");
+    }
+
 }

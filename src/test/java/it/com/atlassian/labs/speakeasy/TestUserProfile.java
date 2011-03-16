@@ -91,7 +91,7 @@ public class TestUserProfile
     }
 
     @Test
-    public void testEditAndBreakThenFixPlugin() throws IOException
+    public void testEditAndBreakWithMissingModuleThenFixPlugin() throws IOException
     {
         product.visit(SpeakeasyUserPage.class)
                 .uploadPlugin(buildSimplePluginFile());
