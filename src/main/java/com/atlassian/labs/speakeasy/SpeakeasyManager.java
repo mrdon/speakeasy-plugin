@@ -125,7 +125,6 @@ public class SpeakeasyManager
         }
         // try to detect a failed install of a zip plugin
         else if (plugin instanceof UnloadablePlugin &&
-                        plugin.getModuleDescriptors().size() == 3 &&
                         plugin.getModuleDescriptor("modules") != null &&
                         plugin.getModuleDescriptor("images") != null &&
                         plugin.getModuleDescriptor("css") != null)
