@@ -12,6 +12,7 @@ import com.atlassian.plugin.PluginAccessor;
 import com.atlassian.plugin.event.PluginEventManager;
 import com.atlassian.plugin.hostcontainer.HostContainer;
 import com.atlassian.plugin.osgi.util.OsgiHeaderUtil;
+import com.atlassian.plugin.webresource.WebResourceManager;
 import org.dom4j.DocumentFactory;
 import org.dom4j.Element;
 import org.osgi.framework.Bundle;
@@ -29,14 +30,18 @@ public class ConventionDescriptorGeneratorServiceFactory implements ServiceFacto
     private final PluginAccessor pluginAccessor;
     private final HostContainer hostContainer;
     private final DescriptorGeneratorManager descriptorGeneratorManager;
+    private final JsonToElementParser jsonToElementParser;
+    private final WebResourceManager webResourceManager;
 
-    public ConventionDescriptorGeneratorServiceFactory(PluginEventManager pluginEventManager, BundleContext bundleContext, PluginAccessor pluginAccessor, HostContainer hostContainer, DescriptorGeneratorManager descriptorGeneratorManager)
+    public ConventionDescriptorGeneratorServiceFactory(PluginEventManager pluginEventManager, BundleContext bundleContext, PluginAccessor pluginAccessor, HostContainer hostContainer, DescriptorGeneratorManager descriptorGeneratorManager, JsonToElementParser jsonToElementParser, WebResourceManager webResourceManager)
     {
         this.pluginEventManager = pluginEventManager;
         this.bundleContext = bundleContext;
         this.pluginAccessor = pluginAccessor;
         this.hostContainer = hostContainer;
         this.descriptorGeneratorManager = descriptorGeneratorManager;
+        this.jsonToElementParser = jsonToElementParser;
+        this.webResourceManager = webResourceManager;
     }
 
     public Object getService(Bundle bundle, ServiceRegistration registration)
@@ -74,7 +79,7 @@ public class ConventionDescriptorGeneratorServiceFactory implements ServiceFacto
 
         if (bundle.getEntry("ui/web-items.json") != null)
         {
-            registerSpeakeasyWebItems(bundle, factory, plugin);
+            registerSpeakeasyWebItems(bundle, plugin);
         }
 
         return new ConventionDescriptorGenerator()
@@ -82,14 +87,14 @@ public class ConventionDescriptorGeneratorServiceFactory implements ServiceFacto
         };
     }
 
-    private void registerSpeakeasyWebItems(Bundle bundle, DocumentFactory factory, Plugin plugin)
+    private void registerSpeakeasyWebItems(Bundle bundle, Plugin plugin)
     {
 
         try
         {
-            for (Element element : JsonToElementParser.createWebItems(plugin.getResourceAsStream("ui/web-items.json")))
+            for (Element element : jsonToElementParser.createWebItems(plugin.getResourceAsStream("ui/web-items.json")))
             {
-                SpeakeasyWebItemModuleDescriptor descriptor = new SpeakeasyWebItemModuleDescriptor(bundleContext, descriptorGeneratorManager, hostContainer);
+                SpeakeasyWebItemModuleDescriptor descriptor = new SpeakeasyWebItemModuleDescriptor(bundleContext, descriptorGeneratorManager, webResourceManager);
                 descriptor.init(plugin, element);
                 bundle.getBundleContext().registerService(ModuleDescriptor.class.getName(), descriptor, null);
             }

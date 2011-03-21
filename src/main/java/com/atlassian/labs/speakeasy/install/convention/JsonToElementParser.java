@@ -1,6 +1,8 @@
 package com.atlassian.labs.speakeasy.install.convention;
 
 import com.atlassian.labs.speakeasy.install.PluginOperationFailedException;
+import com.atlassian.plugin.webresource.UrlMode;
+import com.atlassian.plugin.webresource.WebResourceManager;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 import org.dom4j.DocumentFactory;
@@ -22,7 +24,11 @@ import static java.util.Collections.emptyList;
 public class JsonToElementParser
 {
 
-    public static List<Element> createWebItems(InputStream in)
+    public JsonToElementParser()
+    {
+    }
+
+    public List<Element> createWebItems(InputStream in)
     {
         List<Element> items = newArrayList();
         DocumentFactory factory = DocumentFactory.getInstance();
@@ -47,9 +53,9 @@ public class JsonToElementParser
                 {
                     element.addElement("label").setText(item.getString("label"));
                 }
-                if (!item.isNull("url"))
+                if (hasLink(item))
                 {
-                    element.addElement("link").setText(item.getString("url"));
+                    element.addElement("link").setText(getLink(item));
                 }
                 if (!item.isNull("cssName"))
                 {
@@ -58,6 +64,27 @@ public class JsonToElementParser
                 if (!item.isNull("weight"))
                 {
                     element.addAttribute("weight", item.getString("weight"));
+                }
+                if (!item.isNull("tooltip"))
+                {
+                    element.addElement("tooltip").setText(item.getString("tooltip"));
+                }
+                if (!item.isNull("icon"))
+                {
+                    JSONObject iconJson = item.getJSONObject("icon");
+                    Element iconE = element.addElement("icon");
+                    if (!iconJson.isNull("width"))
+                    {
+                        iconE.addAttribute("width", iconJson.getString("width"));
+                    }
+                    if (!iconJson.isNull("height"))
+                    {
+                        iconE.addAttribute("height", iconJson.getString("height"));
+                    }
+                    if (hasLink(iconJson))
+                    {
+                        iconE.addElement("link").setText(getLink(iconJson));
+                    }
                 }
                 items.add(element);
             }
@@ -77,7 +104,23 @@ public class JsonToElementParser
         return items;
     }
 
-    private static String stripComments(String content)
+    private String getLink(JSONObject item) throws JSONException
+    {
+        String url = !item.isNull("url") ? item.getString("url") : !item.isNull("link") ? item.getString("link") : null;
+        if (url == null)
+        {
+            throw new IllegalArgumentException("Link url must be specified");
+        }
+
+        return url;
+    }
+
+    private boolean hasLink(JSONObject item)
+    {
+        return !item.isNull("url") || !item.isNull("link");
+    }
+
+    private String stripComments(String content)
     {
         return content.replaceAll("\\s*/\\*.*\\*/", "");
     }

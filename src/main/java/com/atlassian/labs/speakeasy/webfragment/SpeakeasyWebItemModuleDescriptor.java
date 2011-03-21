@@ -1,18 +1,17 @@
 package com.atlassian.labs.speakeasy.webfragment;
 
-import com.atlassian.jira.ComponentManager;
-import com.atlassian.jira.security.JiraAuthenticationContext;
 import com.atlassian.labs.speakeasy.DescriptorGenerator;
 import com.atlassian.labs.speakeasy.DescriptorGeneratorManager;
 import com.atlassian.labs.speakeasy.util.WebResourceUtil;
 import com.atlassian.plugin.Plugin;
 import com.atlassian.plugin.PluginParseException;
 import com.atlassian.plugin.descriptors.AbstractModuleDescriptor;
-import com.atlassian.plugin.hostcontainer.HostContainer;
 import com.atlassian.plugin.impl.AbstractDelegatingPlugin;
 import com.atlassian.plugin.web.WebInterfaceManager;
 import com.atlassian.plugin.web.descriptors.DefaultWebItemModuleDescriptor;
 import com.atlassian.plugin.web.descriptors.WebItemModuleDescriptor;
+import com.atlassian.plugin.webresource.UrlMode;
+import com.atlassian.plugin.webresource.WebResourceManager;
 import org.dom4j.Element;
 import org.osgi.framework.BundleContext;
 
@@ -30,13 +29,13 @@ public class SpeakeasyWebItemModuleDescriptor extends AbstractModuleDescriptor<V
     private final BundleContext bundleContext;
     private WebInterfaceManager webInterfaceManager;
     private final DescriptorGeneratorManager descriptorGeneratorManager;
-    private final HostContainer hostContainer;
+    private final WebResourceManager webResourceManager;
 
-    public SpeakeasyWebItemModuleDescriptor(BundleContext bundleContext, DescriptorGeneratorManager descriptorGeneratorManager, HostContainer hostContainer)
+    public SpeakeasyWebItemModuleDescriptor(BundleContext bundleContext, DescriptorGeneratorManager descriptorGeneratorManager, WebResourceManager webResourceManager)
     {
         this.bundleContext = bundleContext;
         this.descriptorGeneratorManager = descriptorGeneratorManager;
-        this.hostContainer = hostContainer;
+        this.webResourceManager = webResourceManager;
     }
 
     @Override
@@ -73,7 +72,7 @@ public class SpeakeasyWebItemModuleDescriptor extends AbstractModuleDescriptor<V
         try
         {
             Class cls = getClass().getClassLoader().loadClass("com.atlassian.confluence.plugin.descriptor.web.descriptors.ConfluenceWebItemModuleDescriptor");
-            descriptor = (WebItemModuleDescriptor) hostContainer.create(cls); 
+            descriptor = (WebItemModuleDescriptor) cls.newInstance();
         }
         catch (Exception e)
         {
@@ -103,6 +102,7 @@ public class SpeakeasyWebItemModuleDescriptor extends AbstractModuleDescriptor<V
         userElement.addAttribute("key", getStatefulKey(userElement.attributeValue("key"), state));
 
         WebResourceUtil.addUsersCondition(users, userElement);
+        resolveLinkPaths(state, userElement);
 
         descriptor.init(new AbstractDelegatingPlugin(getPlugin())
         {
@@ -120,6 +120,32 @@ public class SpeakeasyWebItemModuleDescriptor extends AbstractModuleDescriptor<V
             }
         }, userElement);
         return Collections.singleton(descriptor);
+    }
+
+    private void resolveLinkPaths(long stateKey, Element element)
+    {
+        if ("link".equals(element.getName()))
+        {
+            String url = element.getTextTrim();
+            if (!url.startsWith("/") && !url.startsWith("http"))
+            {
+                element.setText(getImageUrl(getPluginKey(), stateKey, url));
+            }
+        }
+        for (Element e : (List<Element>)element.elements())
+        {
+            resolveLinkPaths(stateKey, e);
+        }
+    }
+
+    private String getImageUrl(String pluginKey, long stateKey, String fileName)
+    {
+        String fullUrl = webResourceManager.getStaticResourcePrefix(UrlMode.AUTO) + "/download/resources/" + pluginKey + ":images-" + stateKey + "/" + fileName;
+        if (!fullUrl.startsWith("/s"))
+        {
+            fullUrl = fullUrl.substring(fullUrl.indexOf("/s"));
+        }
+        return fullUrl;
     }
 
 }

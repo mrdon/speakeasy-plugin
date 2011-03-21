@@ -1,6 +1,5 @@
 package com.atlassian.labs.speakeasy.install.convention;
 
-import com.atlassian.labs.speakeasy.util.InputStreamToJsonObject;
 import com.atlassian.plugin.JarPluginArtifact;
 import com.atlassian.plugin.PluginArtifact;
 import com.atlassian.plugin.osgi.factory.OsgiPlugin;
@@ -26,6 +25,7 @@ import java.util.jar.Manifest;
 import static com.google.common.collect.Sets.newHashSet;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.Mockito.mock;
 import static org.osgi.framework.Constants.*;
 
 /**
@@ -38,7 +38,7 @@ public class TestZipTransformer
     @Before
     public void setUp()
     {
-        zipTransformer = new ZipTransformer(new JsonManifestHandler());
+        zipTransformer = new ZipTransformer(new JsonManifestHandler(), mock(JsonToElementParser.class));
     }
 
     @Test

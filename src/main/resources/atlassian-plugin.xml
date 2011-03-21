@@ -72,6 +72,7 @@
     <component key="pomProperties" class="com.atlassian.labs.speakeasy.util.PomProperties"/>
     <component key="userProfileRenderer" class="com.atlassian.labs.speakeasy.ui.UserProfileRenderer"/>
     <component key="jsonHandler" class="com.atlassian.labs.speakeasy.install.convention.JsonManifestHandler" />
+    <component key="jsonParser" class="com.atlassian.labs.speakeasy.install.convention.JsonToElementParser" />
 
     <component key="conventionDescriptorGenerator" class="com.atlassian.labs.speakeasy.install.convention.ConventionDescriptorGeneratorServiceFactory" public="true">
         <interface>com.atlassian.labs.speakeasy.install.convention.external.ConventionDescriptorGenerator</interface>

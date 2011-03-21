@@ -28,10 +28,12 @@ public class ZipTransformer
 {
 
     private final JsonManifestHandler jsonHandler;
+    private final JsonToElementParser jsonToElementParser;
 
-    public ZipTransformer(JsonManifestHandler jsonHandler)
+    public ZipTransformer(JsonManifestHandler jsonHandler, JsonToElementParser jsonToElementParser)
     {
         this.jsonHandler = jsonHandler;
+        this.jsonToElementParser = jsonToElementParser;
     }
 
     public JarPluginArtifact convertConventionZipToPluginJar(PluginArtifact artifact)
@@ -45,7 +47,7 @@ public class ZipTransformer
             additions.put("META-INF/spring/speakeasy-context.xml", getResourceContents("speakeasy-context.xml"));
 
             // this exists to force parse errors to happen earlier
-            JsonToElementParser.createWebItems(artifact.getResourceAsStream("ui/web-items.json"));
+            jsonToElementParser.createWebItems(artifact.getResourceAsStream("ui/web-items.json"));
 
             try
             {
