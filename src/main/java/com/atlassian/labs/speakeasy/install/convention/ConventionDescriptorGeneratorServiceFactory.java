@@ -89,7 +89,7 @@ public class ConventionDescriptorGeneratorServiceFactory implements ServiceFacto
         {
             for (Element element : JsonToElementParser.createWebItems(plugin.getResourceAsStream("ui/web-items.json")))
             {
-                SpeakeasyWebItemModuleDescriptor descriptor = new SpeakeasyWebItemModuleDescriptor(bundleContext, descriptorGeneratorManager);
+                SpeakeasyWebItemModuleDescriptor descriptor = new SpeakeasyWebItemModuleDescriptor(bundleContext, descriptorGeneratorManager, hostContainer);
                 descriptor.init(plugin, element);
                 bundle.getBundleContext().registerService(ModuleDescriptor.class.getName(), descriptor, null);
             }

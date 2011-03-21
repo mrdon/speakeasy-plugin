@@ -7,13 +7,10 @@ import com.atlassian.webdriver.pageobjects.WebDriverTester;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 
 import static com.google.common.collect.Lists.newArrayList;
-import static java.util.Arrays.asList;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
@@ -39,7 +36,7 @@ public class TestExtensionWizard
     }
 
     @Test
-    public void testCreate()
+    public void testCreate() throws IOException
     {
         SpeakeasyUserPage page = product.visit(SpeakeasyUserPage.class)
                 .openCreateExtensionDialog()
@@ -71,7 +68,7 @@ public class TestExtensionWizard
                 .enablePlugin("myextension");
 
         SpeakeasyUserPage page = product.visit(SpeakeasyUserPage.class);
-        HiBanner banner = product.getPageBinder().bind(HiBanner.class);
+        ExampleBanner banner = product.getPageBinder().bind(ExampleBanner.class);
         assertTrue(banner.isFooVisible());
         assertTrue(banner.isBarVisible());
         page.uninstallPlugin("myextension");        

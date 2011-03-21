@@ -266,6 +266,9 @@
                         <Import-Package>
                             com.atlassian.confluence.plugin.descriptor.web.descriptors;resolution:=optional,
                             com.atlassian.confluence.plugin.webresource;resolution:=optional,
+                            com.atlassian.jira.plugin.webfragment.descriptors;resolution:=optional,
+                            com.atlassian.jira.security;resolution:=optional,
+                            com.atlassian.jira;resolution:=optional,
                             *;resolution:=optional
                         </Import-Package>
                         <Export-Package>

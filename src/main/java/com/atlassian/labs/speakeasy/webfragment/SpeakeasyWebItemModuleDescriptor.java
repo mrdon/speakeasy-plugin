@@ -1,11 +1,14 @@
 package com.atlassian.labs.speakeasy.webfragment;
 
+import com.atlassian.jira.ComponentManager;
+import com.atlassian.jira.security.JiraAuthenticationContext;
 import com.atlassian.labs.speakeasy.DescriptorGenerator;
 import com.atlassian.labs.speakeasy.DescriptorGeneratorManager;
 import com.atlassian.labs.speakeasy.util.WebResourceUtil;
 import com.atlassian.plugin.Plugin;
 import com.atlassian.plugin.PluginParseException;
 import com.atlassian.plugin.descriptors.AbstractModuleDescriptor;
+import com.atlassian.plugin.hostcontainer.HostContainer;
 import com.atlassian.plugin.impl.AbstractDelegatingPlugin;
 import com.atlassian.plugin.web.WebInterfaceManager;
 import com.atlassian.plugin.web.descriptors.DefaultWebItemModuleDescriptor;
@@ -27,11 +30,13 @@ public class SpeakeasyWebItemModuleDescriptor extends AbstractModuleDescriptor<V
     private final BundleContext bundleContext;
     private WebInterfaceManager webInterfaceManager;
     private final DescriptorGeneratorManager descriptorGeneratorManager;
+    private final HostContainer hostContainer;
 
-    public SpeakeasyWebItemModuleDescriptor(BundleContext bundleContext, DescriptorGeneratorManager descriptorGeneratorManager)
+    public SpeakeasyWebItemModuleDescriptor(BundleContext bundleContext, DescriptorGeneratorManager descriptorGeneratorManager, HostContainer hostContainer)
     {
         this.bundleContext = bundleContext;
         this.descriptorGeneratorManager = descriptorGeneratorManager;
+        this.hostContainer = hostContainer;
     }
 
     @Override
@@ -68,13 +73,30 @@ public class SpeakeasyWebItemModuleDescriptor extends AbstractModuleDescriptor<V
         try
         {
             Class cls = getClass().getClassLoader().loadClass("com.atlassian.confluence.plugin.descriptor.web.descriptors.ConfluenceWebItemModuleDescriptor");
-            descriptor = (WebItemModuleDescriptor) cls.getConstructor().newInstance();
+            descriptor = (WebItemModuleDescriptor) hostContainer.create(cls); 
         }
         catch (Exception e)
         {
-            // not confluence so ignore
+            // not confluence so try JIRA
+            try
+            {
+                // Yes, this all sucks
+                Class cls = getClass().getClassLoader().loadClass("com.atlassian.jira.plugin.webfragment.descriptors.JiraWebItemModuleDescriptor");
+                Class ctx = getClass().getClassLoader().loadClass("com.atlassian.jira.security.JiraAuthenticationContext");
+                Class mgrClass = getClass().getClassLoader().loadClass("com.atlassian.jira.ComponentManager");
+                Object mgr = mgrClass.getMethod("getInstance").invoke(mgrClass);
 
-            descriptor = new DefaultWebItemModuleDescriptor(webInterfaceManager);
+                descriptor = (WebItemModuleDescriptor) cls.getConstructor(ctx, WebInterfaceManager.class).newInstance(
+                        mgrClass.getMethod("getJiraAuthenticationContext").invoke(mgr),
+                        webInterfaceManager
+                );
+            }
+            catch (Exception ex)
+            {
+                // not JIRA or confluence so ignore
+
+                descriptor = new DefaultWebItemModuleDescriptor(webInterfaceManager);
+            }
         }
 
         Element userElement = (Element) originalElement.clone();

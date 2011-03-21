@@ -76,7 +76,7 @@ function uninstallPlugin(pluginKey, link, attachedRow) {
 
 function openForkDialog(pluginKey, link, attachedRow) {
     var href = getAbsoluteHref(link);
-    var desc = $('.plugin-description', attachedRow).text();
+    var desc = $.trim($('.plugin-description', attachedRow).text());
     var dialog = new AJS.Dialog({width:500, height:450, id:'fork-dialog'});
     var pluginName = $('td[headers=plugin-name] .plugin-name', attachedRow).text();
     dialog.addHeader("Fork '" + pluginName + "'");

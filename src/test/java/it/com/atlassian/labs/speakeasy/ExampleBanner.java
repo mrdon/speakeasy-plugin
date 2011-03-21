@@ -13,7 +13,7 @@ import javax.inject.Inject;
 /**
  *
  */
-public class HiBanner
+public class ExampleBanner
 {
     @Inject
     private AtlassianWebDriver driver;
@@ -46,8 +46,9 @@ public class HiBanner
         return (Boolean) driver.executeScript(
               "return arguments[0].complete", img);
     }
-    public boolean isYahooLinkAvailable()
+    public String getYahooLinkText()
     {
-        return Check.elementIsVisible(By.className("yahoo-web-item"), driver);
+        WebElement link = driver.findElement(By.className("yahoo-web-item"));
+        return link.getText();
     }
 }

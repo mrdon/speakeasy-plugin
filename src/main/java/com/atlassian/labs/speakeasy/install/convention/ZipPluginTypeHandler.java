@@ -74,6 +74,8 @@ public class ZipPluginTypeHandler extends AbstractOsgiPluginTypeHandler implemen
             ZipWriter.addFileToZip(zout, "css/main.css", "main.css");
             ZipWriter.addDirectoryToZip(zout, "images/");
             ZipWriter.addFileToZip(zout, "images/projectavatar.png", "projectavatar.png");
+            ZipWriter.addDirectoryToZip(zout, "ui/");
+            ZipWriter.addFileToZip(zout, "ui/web-items.json", "web-items.json");
             ZipWriter.addVelocityFileToZip(zout, "atlassian-extension.json", "atlassian-extension.vm", templateRenderer,
                     ImmutableMap.<String,Object>of(
                             "key", pluginKey,

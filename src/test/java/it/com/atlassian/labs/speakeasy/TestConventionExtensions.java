@@ -9,8 +9,6 @@ import org.apache.commons.io.FileUtils;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.IOException;
@@ -67,10 +65,10 @@ public class TestConventionExtensions
                 .enablePlugin("test-convention");
 
         SpeakeasyUserPage page = product.visit(SpeakeasyUserPage.class);
-        HiBanner banner = product.getPageBinder().bind(HiBanner.class);
+        ExampleBanner banner = product.getPageBinder().bind(ExampleBanner.class);
         assertTrue(banner.isFooVisible());
         assertTrue(banner.isFooImageLoaded());
-        assertTrue(banner.isYahooLinkAvailable());
+        assertEquals("Yahoo", banner.getYahooLinkText());
         assertFalse(banner.isBarVisible());
 
         assertEquals(asList("css/test-convention.css", "images/projectavatar.png", "js/test/foo.js", "ui/web-items.json", "atlassian-extension.json"),

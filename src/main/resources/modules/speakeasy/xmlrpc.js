@@ -1038,7 +1038,8 @@ rpc.zeroPad = function(value, width){
 /**
  * Creates a service proxy for accessing the remote service.  For XML-RPC to access Confluence, it would look something like:
  * <pre>
- *      var service = new require('speakeasy/xmlrpc').ServiceProxy(contextPath + "/rpc/xmlrpc", {
+ *      var ServiceProxy = require('speakeasy/xmlrpc').ServiceProxy;
+ *      var service = new ServiceProxy(contextPath + "/rpc/xmlrpc", {
  *                              protocol: "XML-RPC",
  *                              methods: ['confluence1.getBlogEntries']});
  *      service.confluence1.getBlogEntries({
