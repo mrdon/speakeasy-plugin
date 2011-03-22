@@ -6,9 +6,7 @@ import com.atlassian.labs.speakeasy.commonjs.descriptor.SpeakeasyCommonJsModules
 import com.atlassian.labs.speakeasy.install.PluginOperationFailedException;
 import com.atlassian.labs.speakeasy.install.convention.external.ConventionDescriptorGenerator;
 import com.atlassian.labs.speakeasy.webfragment.SpeakeasyWebItemModuleDescriptor;
-import com.atlassian.plugin.ModuleDescriptor;
-import com.atlassian.plugin.Plugin;
-import com.atlassian.plugin.PluginAccessor;
+import com.atlassian.plugin.*;
 import com.atlassian.plugin.event.PluginEventManager;
 import com.atlassian.plugin.hostcontainer.HostContainer;
 import com.atlassian.plugin.osgi.util.OsgiHeaderUtil;
@@ -20,28 +18,37 @@ import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceFactory;
 import org.osgi.framework.ServiceRegistration;
 
+import java.util.Set;
+import java.util.concurrent.CopyOnWriteArraySet;
+
+import static com.google.common.collect.Sets.newHashSet;
+
 /**
  *
  */
 public class ConventionDescriptorGeneratorServiceFactory implements ServiceFactory
 {
-    private final PluginEventManager pluginEventManager;
     private final BundleContext bundleContext;
     private final PluginAccessor pluginAccessor;
     private final HostContainer hostContainer;
     private final DescriptorGeneratorManager descriptorGeneratorManager;
+    private final PluginEventManager pluginEventManager;
     private final JsonToElementParser jsonToElementParser;
     private final WebResourceManager webResourceManager;
+    private final PluginController pluginController;
 
-    public ConventionDescriptorGeneratorServiceFactory(PluginEventManager pluginEventManager, BundleContext bundleContext, PluginAccessor pluginAccessor, HostContainer hostContainer, DescriptorGeneratorManager descriptorGeneratorManager, JsonToElementParser jsonToElementParser, WebResourceManager webResourceManager)
+    //private final Set<String> trackedPlugins = new CopyOnWriteArraySet<String>();
+
+    public ConventionDescriptorGeneratorServiceFactory(final BundleContext bundleContext, final PluginAccessor pluginAccessor, HostContainer hostContainer, DescriptorGeneratorManager descriptorGeneratorManager, JsonToElementParser jsonToElementParser, WebResourceManager webResourceManager, PluginEventManager pluginEventManager, final PluginController pluginController)
     {
-        this.pluginEventManager = pluginEventManager;
         this.bundleContext = bundleContext;
         this.pluginAccessor = pluginAccessor;
         this.hostContainer = hostContainer;
         this.descriptorGeneratorManager = descriptorGeneratorManager;
         this.jsonToElementParser = jsonToElementParser;
+        this.pluginEventManager = pluginEventManager;
         this.webResourceManager = webResourceManager;
+        this.pluginController = pluginController;
     }
 
     public Object getService(Bundle bundle, ServiceRegistration registration)
@@ -53,7 +60,7 @@ public class ConventionDescriptorGeneratorServiceFactory implements ServiceFacto
         if (bundle.getEntry("js/") != null)
         {
             SpeakeasyCommonJsModulesDescriptor descriptor = new SpeakeasyCommonJsModulesDescriptor(
-                    bundleContext, pluginEventManager, pluginAccessor, hostContainer, descriptorGeneratorManager);
+                    bundleContext, hostContainer, descriptorGeneratorManager, pluginAccessor);
 
             Element modules = factory.createElement("scoped-modules")
                 .addAttribute("key", "modules")
@@ -81,6 +88,8 @@ public class ConventionDescriptorGeneratorServiceFactory implements ServiceFacto
         {
             registerSpeakeasyWebItems(bundle, plugin);
         }
+
+        //trackedPlugins.add(pluginKey);
 
         return new ConventionDescriptorGenerator()
         {
@@ -120,6 +129,18 @@ public class ConventionDescriptorGeneratorServiceFactory implements ServiceFacto
 
     public void ungetService(Bundle bundle, ServiceRegistration registration, Object service)
     {
-
+        final String pluginKey = OsgiHeaderUtil.getPluginKey(bundle);
+//        Plugin plugin = pluginAccessor.getPlugin(pluginKey);
+//        if (trackedPlugins.contains(plugin.getKey()))
+//        {
+//            for (ModuleDescriptor descriptor : plugin.getModuleDescriptors())
+//            {
+//                if (descriptor instanceof StateAware)
+//                {
+//                    ((StateAware)descriptor).disabled();
+//                }
+//            }
+//        }
+        //trackedPlugins.remove(pluginKey);
     }
 }

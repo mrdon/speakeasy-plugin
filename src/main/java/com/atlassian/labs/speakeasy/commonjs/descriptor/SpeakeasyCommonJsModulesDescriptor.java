@@ -22,9 +22,10 @@ public class SpeakeasyCommonJsModulesDescriptor extends CommonJsModulesDescripto
     private final BundleContext bundleContext;
     private final DescriptorGeneratorManager descriptorGeneratorManager;
 
-    public SpeakeasyCommonJsModulesDescriptor(BundleContext bundleContext, PluginEventManager pluginEventManager, PluginAccessor pluginAccessor, HostContainer hostContainer, DescriptorGeneratorManager descriptorGeneratorManager)
+    public SpeakeasyCommonJsModulesDescriptor(BundleContext bundleContext, HostContainer hostContainer, DescriptorGeneratorManager descriptorGeneratorManager,
+                                              PluginAccessor pluginAccessor)
     {
-        super(bundleContext, pluginEventManager, pluginAccessor, hostContainer);
+        super(bundleContext, hostContainer, pluginAccessor);
         this.bundleContext = bundleContext;
         this.hostContainer = hostContainer;
         this.descriptorGeneratorManager = descriptorGeneratorManager;

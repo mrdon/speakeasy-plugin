@@ -14,6 +14,7 @@ import com.atlassian.util.concurrent.NotNull;
 import org.dom4j.Element;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
+import org.springframework.beans.factory.DisposableBean;
 
 import java.util.Collections;
 import java.util.Set;
@@ -38,12 +39,12 @@ public class CommonJsModulesDescriptor extends AbstractModuleDescriptor<CommonJs
     private volatile Element originalElement;
 
 
-    public CommonJsModulesDescriptor(BundleContext bundleContext, PluginEventManager pluginEventManager, PluginAccessor pluginAccessor, HostContainer hostContainer)
+    public CommonJsModulesDescriptor(BundleContext bundleContext, HostContainer hostContainer, PluginAccessor pluginAccessor)
     {
         this.bundleContext = bundleContext;
-        this.pluginEventManager = pluginEventManager;
-        this.pluginAccessor = pluginAccessor;
         this.hostContainer = hostContainer;
+        this.pluginEventManager = (PluginEventManager) bundleContext.getService(bundleContext.getServiceReference(PluginEventManager.class.getName()));
+        this.pluginAccessor = pluginAccessor;
     }
 
 

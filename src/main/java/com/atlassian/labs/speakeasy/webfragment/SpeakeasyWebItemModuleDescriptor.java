@@ -27,8 +27,8 @@ public class SpeakeasyWebItemModuleDescriptor extends AbstractModuleDescriptor<V
 {
     private Element originalElement;
     private final BundleContext bundleContext;
-    private WebInterfaceManager webInterfaceManager;
     private final DescriptorGeneratorManager descriptorGeneratorManager;
+    private WebInterfaceManager webInterfaceManager;
     private final WebResourceManager webResourceManager;
 
     public SpeakeasyWebItemModuleDescriptor(BundleContext bundleContext, DescriptorGeneratorManager descriptorGeneratorManager, WebResourceManager webResourceManager)
