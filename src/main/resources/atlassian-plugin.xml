@@ -19,6 +19,7 @@
             <transformer key="commonjs-module" fullModuleKey="${project.groupId}.${project.artifactId}:userModules"/>
             <transformer key="cssVariables" fullModuleKey="${project.groupId}.${project.artifactId}:userModules"/>
         </transformation>
+        <dependency>${project.groupId}.${project.artifactId}:mustache</dependency>
     </commonjs>
 
 
@@ -28,9 +29,13 @@
     </web-resource>
 
     <web-resource key="shared">
+        <dependency>${project.groupId}.${project.artifactId}:mustache</dependency>
         <resource type="download" name="jquery.form.js" location="shared/jquery.form.js"/>
-        <resource type="download" name="mustache.js" location="shared/mustache.js"/>
         <resource type="download" name="images/" location="shared/images/"/>
+    </web-resource>
+
+    <web-resource key="mustache">
+        <resource type="download" name="mustache.js" location="shared/mustache.js"/>
     </web-resource>
 
     <web-resource key="codemirror">
