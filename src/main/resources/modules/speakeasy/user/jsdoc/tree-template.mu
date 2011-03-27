@@ -28,7 +28,6 @@ var exportedFunctionOrProperty = require('some/module');
                 <th>Module</th>
                 <th>Exports</th>
                 <th>Description</th>
-                <th>Dependencies</th>
             </tr>
         </thead>
         <tbody>
@@ -54,13 +53,13 @@ var exportedFunctionOrProperty = require('some/module');
                         {{&description}}
                     {{/jsDoc}}
                 </td>
-                <td>
+                <!--td>
                     <ul>
                     {{#dependencies}}
                         <li><code class="module-dependency">{{.}}</code></li>
                     {{/dependencies}}
                     </ul>
-                </td>
+                </td-->
             </tr>
             {{/iterableModules}}
         </tbody>
