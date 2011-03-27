@@ -154,13 +154,15 @@ function loadFile(pluginKey, filePath) {
         editorEl.text(data);
         editorEl.data('filename', filePath);
 
-        if (filePath.match(/([^\/\\]+)\.(xml|html|js|css)$/i))
+        if (filePath.match(/([^\/\\]+)\.(xml|html|js|json|css)$/i))
         {
             if (RegExp.$2 == 'xml')
                 editor.setParser('XMLParser');
             else if (RegExp.$2 == 'html')
                 editor.setParser('HTMLMixedParser');
             else if (RegExp.$2 == 'js')
+                editor.setParser('JSParser');
+            else if (RegExp.$2 == 'json')
                 editor.setParser('JSParser');
             else if (RegExp.$2 == 'css')
                 editor.setParser('CSSParser');
