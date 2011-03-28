@@ -1,5 +1,6 @@
 package com.atlassian.labs.speakeasy.data;
 
+import com.atlassian.labs.speakeasy.model.Settings;
 import com.atlassian.labs.speakeasy.util.PomProperties;
 import com.atlassian.sal.api.pluginsettings.PluginSettings;
 import com.atlassian.sal.api.pluginsettings.PluginSettingsFactory;
@@ -81,5 +82,21 @@ public class SpeakeasyData
     private String createAccessKey(String propertyName)
     {
         return "speakeasy-" + propertyName;
+    }
+
+    public String getSettings()
+    {
+        String result = (String) pluginSettings.get(createAccessKey("settings"));
+        if (result == null)
+        {
+            result = saveSettings("{}");
+        }
+        return result;
+    }
+
+    public String saveSettings(String value)
+    {
+        pluginSettings.put(createAccessKey("settings"), value);
+        return value;
     }
 }

@@ -1,6 +1,7 @@
 package com.atlassian.labs.speakeasy.ui;
 
 import com.atlassian.labs.speakeasy.SpeakeasyManager;
+import com.atlassian.labs.speakeasy.UnauthorizedAccessException;
 import com.atlassian.sal.api.user.UserManager;
 
 import javax.servlet.ServletException;
@@ -29,7 +30,15 @@ public class UserOptOutServlet extends HttpServlet
         String user = userManager.getRemoteUsername();
         if (user != null)
         {
-            speakeasyManager.disallowAllUserAccess(user);
+            try
+            {
+                speakeasyManager.disallowAllUserAccess(user);
+            }
+            catch (UnauthorizedAccessException e)
+            {
+                resp.sendError(403, e.getMessage());
+                return;
+            }
         }
         resp.setContentType("text/html");
         resp.getWriter().append("<html><body class=\"success\">Unsubscribed</body></html>");

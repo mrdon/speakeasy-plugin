@@ -2,6 +2,7 @@ package com.atlassian.labs.speakeasy.install.convention;
 
 import com.atlassian.labs.speakeasy.install.PluginOperationFailedException;
 import com.atlassian.labs.speakeasy.model.JsonManifest;
+import com.atlassian.labs.speakeasy.util.JsonObjectMapper;
 import com.atlassian.plugin.Plugin;
 import com.atlassian.plugin.PluginArtifact;
 import com.atlassian.plugins.rest.common.json.JacksonJsonProviderFactory;
@@ -17,37 +18,11 @@ import java.io.OutputStream;
  */
 public class JsonManifestHandler
 {
-    /**
-     * Reads from a stream to create an object.  Closes the input stream
-     */
-    private <T>T readToObject(Class<T> objectType, InputStream in) throws IOException
-    {
-        try
-        {
-            // this is lame but needed to get it to compile
-            Class<Object> foo = (Class<Object>) getClass().getClassLoader().loadClass(objectType.getName());
-            return (T) new JacksonJsonProviderFactory().create().readFrom(foo, objectType, null, MediaType.APPLICATION_JSON_TYPE, null, in);
-        }
-        catch (ClassNotFoundException e)
-        {
-            throw new RuntimeException(e);
-        }
-        finally
-        {
-            IOUtils.closeQuietly(in);
-        }
-    }
-
-    public void write(JsonManifest manifest, OutputStream out) throws IOException
-    {
-        new JacksonJsonProviderFactory().create().writeTo(manifest, manifest.getClass(), manifest.getClass(), null, MediaType.APPLICATION_JSON_TYPE, null, out);
-    }
-
     public JsonManifest read(PluginArtifact artifact)
     {
         try
         {
-            return readToObject(JsonManifest.class, artifact.getResourceAsStream(JsonManifest.ATLASSIAN_EXTENSION_PATH));
+            return JsonObjectMapper.read(JsonManifest.class, artifact.getResourceAsStream(JsonManifest.ATLASSIAN_EXTENSION_PATH));
         }
         catch (IOException e)
         {
@@ -59,7 +34,7 @@ public class JsonManifestHandler
     {
         try
         {
-            return readToObject(JsonManifest.class, in);
+            return JsonObjectMapper.read(JsonManifest.class, in);
         }
         catch (IOException e)
         {
@@ -71,11 +46,16 @@ public class JsonManifestHandler
     {
         try
         {
-            return readToObject(JsonManifest.class, plugin.getResourceAsStream(JsonManifest.ATLASSIAN_EXTENSION_PATH));
+            return JsonObjectMapper.read(JsonManifest.class, plugin.getResourceAsStream(JsonManifest.ATLASSIAN_EXTENSION_PATH));
         }
         catch (IOException e)
         {
             throw new PluginOperationFailedException("Unable to parse " + JsonManifest.ATLASSIAN_EXTENSION_PATH, e, null);
         }
+    }
+
+    public void write(JsonManifest manifest, OutputStream out) throws IOException
+    {
+        JsonObjectMapper.write(manifest, out);
     }
 }

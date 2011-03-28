@@ -53,10 +53,6 @@ public class PluginManager
 
     public String install(File pluginFile, String user) throws PluginOperationFailedException
     {
-        if (!canUserInstallPlugins(user)) {
-            throw new PluginOperationFailedException("User '" + user + "' doesn't have access to install plugins", null);
-        }
-
         PluginArtifact pluginArtifact = null;
         String pluginKey;
         for (PluginTypeHandler handler : typeHandlers.values())
@@ -144,9 +140,6 @@ public class PluginManager
 
     public void uninstall(String pluginKey, String user) throws PluginOperationFailedException
     {
-        if (!canUserInstallPlugins(user)) {
-            throw new PluginOperationFailedException("User '" + user + "' doesn't have access to uninstall the '" + pluginKey + "' plugin", pluginKey);
-        }
         Plugin plugin = pluginAccessor.getPlugin(pluginKey);
 
         if (user.equals(data.getPluginAuthor(pluginKey))) {
@@ -155,11 +148,6 @@ public class PluginManager
         } else {
             throw new PluginOperationFailedException("User '" + user + "' is not the author of plugin '" + pluginKey + "' and cannot uninstall it", pluginKey);
         }
-    }
-
-    public boolean canUserInstallPlugins(String user)
-    {
-        return true;
     }
 
     public File getPluginAsProject(final String pluginKey, final PluginType pluginType, final String user)

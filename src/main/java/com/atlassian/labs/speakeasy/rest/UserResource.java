@@ -1,6 +1,7 @@
 package com.atlassian.labs.speakeasy.rest;
 
 import com.atlassian.labs.speakeasy.SpeakeasyManager;
+import com.atlassian.labs.speakeasy.UnauthorizedAccessException;
 import com.atlassian.labs.speakeasy.data.SpeakeasyData;
 import com.atlassian.labs.speakeasy.install.PluginManager;
 import com.atlassian.labs.speakeasy.model.RemotePlugin;
@@ -36,7 +37,7 @@ public class UserResource
     @GET
     @Path("")
     @Produces("application/json")
-    public Response getPlugins()
+    public Response getPlugins() throws UnauthorizedAccessException
     {
         return Response.ok(speakeasyManager.getUserAccessList(userManager.getRemoteUsername())).build();
     }
@@ -44,7 +45,7 @@ public class UserResource
     @PUT
     @Path("{pluginKey}")
     @Produces("application/json")
-    public Response enableAccess(@PathParam("pluginKey") String pluginKey)
+    public Response enableAccess(@PathParam("pluginKey") String pluginKey) throws UnauthorizedAccessException
     {
         String user = userManager.getRemoteUsername();
         List<String> affectedKeys = speakeasyManager.allowUserAccess(pluginKey, user);
@@ -56,7 +57,7 @@ public class UserResource
     @DELETE
     @Path("{pluginKey}")
     @Produces("application/json")
-    public Response disableAccess(@PathParam("pluginKey") String pluginKey)
+    public Response disableAccess(@PathParam("pluginKey") String pluginKey) throws UnauthorizedAccessException
     {
         String user = userManager.getRemoteUsername();
         String affectedKey = speakeasyManager.disallowUserAccess(pluginKey, user);

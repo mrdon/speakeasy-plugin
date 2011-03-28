@@ -38,7 +38,7 @@ public class TestJsDocParser
     @Test
     public void testExtractAttributes()
     {
-        JsDoc doc = JsDocParser.parse("/**\n* Desc\n* @foo bar\n* @baz jim bob*/");
+        JsDoc doc = JsDocParser.parse("foo", "/**\n* Desc\n* @foo bar\n* @baz jim bob*/");
         assertEquals("Desc", doc.getDescription());
         assertEquals("bar", doc.getAttribute("foo"));
         assertEquals("jim bob", doc.getAttribute("baz"));
@@ -47,7 +47,7 @@ public class TestJsDocParser
     @Test
     public void testExtractAttributesMultiline()
     {
-        JsDoc doc = JsDocParser.parse("/**\n* Desc\n* @foo bar\n* jim*/");
+        JsDoc doc = JsDocParser.parse("foo", "/**\n* Desc\n* @foo bar\n* jim*/");
         assertEquals("bar jim", doc.getAttribute("foo"));
     }
 }

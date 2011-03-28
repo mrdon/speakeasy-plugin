@@ -1,4 +1,4 @@
-package com.atlassian.labs.speakeasy;
+package com.atlassian.labs.speakeasy.ui;
 
 import com.atlassian.plugin.PluginParseException;
 import com.atlassian.plugin.web.Condition;
@@ -9,11 +9,11 @@ import java.util.Map;
 /**
  *
  */
-public class UserLoggedInCondition implements Condition
+public class UserAdminCondition implements Condition
 {
     private final UserManager userManager;
 
-    public UserLoggedInCondition(UserManager userManager)
+    public UserAdminCondition(UserManager userManager)
     {
         this.userManager = userManager;
     }
@@ -24,6 +24,7 @@ public class UserLoggedInCondition implements Condition
 
     public boolean shouldDisplay(Map<String, Object> stringObjectMap)
     {
-        return userManager.getRemoteUsername() != null;
+        final String remoteUsername = userManager.getRemoteUsername();
+        return remoteUsername != null && userManager.isAdmin(remoteUsername);
     }
 }

@@ -1,6 +1,9 @@
 package com.atlassian.labs.speakeasy.commonjs.util;
 
 import com.google.common.base.Predicate;
+import org.netbeans.lib.cvsclient.commandLine.command.log;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.Map;
 import java.util.regex.Pattern;
@@ -15,12 +18,14 @@ import static java.util.Arrays.asList;
 public class JsDocParser
 {
     private static final String DESCRIPTION = "desc";
+    private static final Logger log = LoggerFactory.getLogger(JsDocParser.class);
+    public static final JsDoc EMPTY_JSDOC = new JsDoc("");
 
-    public static JsDoc parse(String content)
+    public static JsDoc parse(String moduleId, String content)
     {
         if (content == null)
         {
-            return new JsDoc("");
+            return EMPTY_JSDOC;
         }
         if (content.startsWith("/**"))
         {
@@ -66,7 +71,8 @@ public class JsDocParser
         }
         else
         {
-            throw new IllegalArgumentException("Not a jsdoc comment as it doesn't start with /**");
+            log.debug("Module '{}' doesn't start with /** so not parsed as a jsdoc comment", moduleId);
+            return EMPTY_JSDOC;
         }
     }
 

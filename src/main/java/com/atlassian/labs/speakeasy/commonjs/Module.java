@@ -101,7 +101,7 @@ public class Module
             if (root.getComments() != null && !root.getComments().isEmpty())
             {
                 final String rawHeaderDocs = root.getComments().first().getValue();
-                jsDoc.set(JsDocParser.parse(rawHeaderDocs));
+                jsDoc.set(JsDocParser.parse(getId(), rawHeaderDocs));
             }
 
             root.visitAll(new NodeVisitor()
@@ -119,7 +119,7 @@ public class Module
                                 if (left.getLeft() instanceof Name && ((Name)left.getLeft()).getIdentifier().equals("exports"))
                                 {
                                     String exportName = left.getProperty().getIdentifier();
-                                    Export export = new Export(exportName, JsDocParser.parse(node.getJsDoc()));
+                                    Export export = new Export(exportName, JsDocParser.parse(getId(), node.getJsDoc()));
                                     if (jsDoc.get().getDescription().length() > 0 && export.getJsDoc().getDescription().equals(jsDoc.get().getDescription()))
                                     {
                                         jsDoc.set(new JsDoc(""));

@@ -1,5 +1,6 @@
 package com.atlassian.labs.speakeasy.ui.mustache;
 
+import com.atlassian.labs.speakeasy.util.JavascriptEscaper;
 import com.atlassian.plugin.servlet.DownloadException;
 import com.atlassian.plugin.servlet.DownloadableResource;
 import org.apache.commons.lang.StringUtils;
@@ -56,28 +57,7 @@ public class TemplateDownloadableResource implements DownloadableResource
 
             InputStreamReader reader = new InputStreamReader(new ByteArrayInputStream(buffer.toByteArray()));
 
-            int r;
-            while ((r = reader.read()) > -1)
-            {
-                char c = (char) r;
-                if (c == '\n')
-                {
-                    out.write('\\');
-                    out.write('n');
-                }
-                else if (
-                    c == '\'' ||
-                    c == '\"' ||
-                    c == '\\')
-                {
-                    out.write('\\');
-                    out.write(c);
-                }
-                else
-                {
-                    out.write(c);
-                }
-            }
+            JavascriptEscaper.escape(reader, out);
             out.write("\", data);};});");
             out.flush();
         } catch (IOException e) {

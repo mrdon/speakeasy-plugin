@@ -1,6 +1,7 @@
 package com.atlassian.labs.speakeasy.ui;
 
 import com.atlassian.labs.speakeasy.SpeakeasyManager;
+import com.atlassian.labs.speakeasy.UnauthorizedAccessException;
 import com.atlassian.labs.speakeasy.commonjs.CommonJsModules;
 import com.atlassian.labs.speakeasy.commonjs.CommonJsModulesAccessor;
 import com.atlassian.labs.speakeasy.data.SpeakeasyData;
@@ -43,14 +44,13 @@ public class UserProfileRenderer
     private final UserManager userManager;
     private final WebResourceManager webResourceManager;
     private final CommonJsModulesAccessor commonJsModulesAccessor;
-    private final PluginManager pluginManager;
     private final ProductAccessor productAccessor;
     private final SpeakeasyData data;
     private final Plugin plugin;
     private final WebInterfaceManager webInterfaceManager;
 
 
-    public UserProfileRenderer(PluginAccessor pluginAccessor, TemplateRenderer templateRenderer, SpeakeasyManager speakeasyManager, UserManager userManager, WebResourceManager webResourceManager, PluginManager pluginManager, ProductAccessor productAccessor, SpeakeasyData data, CommonJsModulesAccessor commonJsModulesAccessor, WebInterfaceManager webInterfaceManager)
+    public UserProfileRenderer(PluginAccessor pluginAccessor, TemplateRenderer templateRenderer, SpeakeasyManager speakeasyManager, UserManager userManager, WebResourceManager webResourceManager, ProductAccessor productAccessor, SpeakeasyData data, CommonJsModulesAccessor commonJsModulesAccessor, WebInterfaceManager webInterfaceManager)
     {
         this.templateRenderer = templateRenderer;
         this.commonJsModulesAccessor = commonJsModulesAccessor;
@@ -59,17 +59,16 @@ public class UserProfileRenderer
         this.speakeasyManager = speakeasyManager;
         this.userManager = userManager;
         this.webResourceManager = webResourceManager;
-        this.pluginManager = pluginManager;
         this.productAccessor = productAccessor;
         this.data = data;
     }
 
-    public void render(HttpServletRequest req, Writer output, boolean useUserProfileDecorator) throws UnauthorizedAccessException, IOException
+    public void render(HttpServletRequest req, Writer output, boolean useUserProfileDecorator) throws IOException, UnauthorizedAccessException
     {
         String user = userManager.getRemoteUsername(req);
         if (user == null)
         {
-            throw new UnauthorizedAccessException("Unauthorized - must be a valid user");
+            throw new UnauthorizedAccessException(null, "Unauthorized - must be a valid user");
         }
 
         webResourceManager.requireResource("com.atlassian.auiplugin:ajs");
@@ -88,11 +87,10 @@ public class UserProfileRenderer
                 put("plugins", plugins.getPlugins()).
                 put("rowRenderer", new RowRenderer(plugin)).
                 put("jsdocRenderer", new JsDocRenderer(plugin, commonJsModulesAccessor.getAllCommonJsModules())).
-                put("installAllowed", pluginManager.canUserInstallPlugins(user)).
                 put("staticResourcesPrefix", webResourceManager.getStaticResourcePrefix(UrlMode.RELATIVE)).
                 put("product", productAccessor.getSdkName()).
                 put("devmode", devMode).
-
+                put("canAuthor", speakeasyManager.canAuthorExtensions(user)).
                 put("webInterfaceManager", webInterfaceManager).
                 put("webInterfaceContext", Collections.<String, Object>emptyMap()).
                 build(),
@@ -112,7 +110,7 @@ public class UserProfileRenderer
 
         public RowRenderer(Plugin plugin)
         {
-            this.rowTemplate = compile(plugin, "modules/speakeasy/user/row.mu");
+            this.rowTemplate = compile(plugin, "packages/user/speakeasy/user/row.mu");
         }
 
         @HtmlSafe
@@ -131,7 +129,7 @@ public class UserProfileRenderer
         public JsDocRenderer(Plugin plugin, Iterable<CommonJsModules> modules)
         {
             this.modules = modules;
-            this.template = compile(plugin, "modules/speakeasy/user/jsdoc/tree-template.mu");
+            this.template = compile(plugin, "packages/user/speakeasy/user/jsdoc/tree-template.mu");
         }
 
         @HtmlSafe

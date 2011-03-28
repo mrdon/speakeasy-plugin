@@ -14,12 +14,12 @@ import com.atlassian.util.concurrent.NotNull;
 import org.dom4j.Element;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
-import org.springframework.beans.factory.DisposableBean;
 
 import java.util.Collections;
+import java.util.List;
 import java.util.Set;
 
-import static java.util.Collections.emptySet;
+import static com.google.common.collect.Sets.newHashSet;
 
 
 /**
@@ -37,6 +37,7 @@ public class CommonJsModulesDescriptor extends AbstractModuleDescriptor<CommonJs
     private volatile CommonJsModules modules;
     private volatile GeneratedDescriptorsManager generatedDescriptorsManager;
     private volatile Element originalElement;
+    private volatile Set<String> explicitPublicModules;
 
 
     public CommonJsModulesDescriptor(BundleContext bundleContext, HostContainer hostContainer, PluginAccessor pluginAccessor)
@@ -59,6 +60,12 @@ public class CommonJsModulesDescriptor extends AbstractModuleDescriptor<CommonJs
         }
 
         this.originalElement = element;
+
+        this.explicitPublicModules = newHashSet();
+        for (Element e : (List<Element>)element.elements("public-module"))
+        {
+            explicitPublicModules.add(e.getTextTrim());
+        }
     }
 
     @Override
@@ -70,6 +77,11 @@ public class CommonJsModulesDescriptor extends AbstractModuleDescriptor<CommonJs
     public Element getOriginalElement()
     {
         return originalElement;
+    }
+
+    public Set<String> getExplicitPublicModules()
+    {
+        return explicitPublicModules;
     }
 
     @Override

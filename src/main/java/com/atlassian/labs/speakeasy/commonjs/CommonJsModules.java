@@ -61,6 +61,7 @@ public class CommonJsModules
         this.moduleKey = descriptor.getKey();
         this.description = descriptor.getDescription() != null ? descriptor.getDescription() : "";
         this.externalModuleDependencies = unmodifiableSet(scan());
+        this.publicModuleIds.addAll(descriptor.getExplicitPublicModules());
     }
 
 

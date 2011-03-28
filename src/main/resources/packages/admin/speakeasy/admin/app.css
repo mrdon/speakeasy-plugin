@@ -1,0 +1,11 @@
+#sp-main .edit {
+    display: none;
+}
+
+#sp-main.editing .edit {
+    display: block;
+}
+
+#sp-main.editing .view {
+    display: none;
+}

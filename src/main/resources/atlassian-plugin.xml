@@ -9,18 +9,28 @@
         <url-pattern>/speakeasy/user</url-pattern>
     </servlet>
 
+    <servlet key="admin-servlet" name="speakeasy-plugin" class="com.atlassian.labs.speakeasy.ui.AdminServlet">
+        <url-pattern>/speakeasy/admin</url-pattern>
+    </servlet>
+
     <servlet key="unsubscribe-servlet" name="Unsubscribe Page"
              class="com.atlassian.labs.speakeasy.ui.UserOptOutServlet">
         <url-pattern>/speakeasy/unsubscribe</url-pattern>
     </servlet>
 
-    <commonjs key="userModules">
+    <commonjs key="sharedModules" location="packages/shared">
         <transformation extension="host">
-            <transformer key="commonjs-module" fullModuleKey="${project.groupId}.${project.artifactId}:userModules"/>
-            <transformer key="cssVariables" fullModuleKey="${project.groupId}.${project.artifactId}:userModules"/>
+            <transformer key="commonjs-module" fullModuleKey="${project.groupId}.${project.artifactId}:sharedModules"/>
+            <transformer key="cssVariables" fullModuleKey="${project.groupId}.${project.artifactId}:sharedModules"/>
         </transformation>
         <dependency>${project.groupId}.${project.artifactId}:mustache</dependency>
+        <public-module>backbone</public-module>
+        <public-module>underscore</public-module>
     </commonjs>
+
+    <commonjs key="userModules" location="packages/user" />
+
+    <commonjs key="adminModules" location="packages/admin" />
 
 
     <web-resource key="user-jira" application="jira">
@@ -68,6 +78,7 @@
     </rest>
 
     <component key="speakeasyManager" class="com.atlassian.labs.speakeasy.SpeakeasyManager"/>
+    <component key="permissionManager" class="com.atlassian.labs.speakeasy.PermissionManager"/>
     <component key="descriptorGeneratorManager" class="com.atlassian.labs.speakeasy.DescriptorGeneratorManager" />
     <component key="commonJsModulesAccessor" class="com.atlassian.labs.speakeasy.commonjs.CommonJsModulesAccessor" />
     <component key="zipTransformer" class="com.atlassian.labs.speakeasy.install.convention.ZipTransformer"/>
@@ -117,28 +128,28 @@
               application="refapp">
         <label>Speakeasy Plugins</label>
         <link linkId="speakeasy-admin-link">/plugins/servlet/speakeasy/user</link>
-        <condition class="com.atlassian.labs.speakeasy.UserLoggedInCondition" />
+        <condition class="com.atlassian.labs.speakeasy.UserCanAccessSpeakeasyCondition" />
     </web-item>
 
     <web-item key="speakeasy-plugins" name="Speakeasy Tab" section="system.profile" weight="100"
               application="com.atlassian.confluence">
         <label>Speakeasy</label>
         <link>/plugins/servlet/speakeasy/user</link>
-        <condition class="com.atlassian.labs.speakeasy.UserLoggedInCondition" />
+        <condition class="com.atlassian.labs.speakeasy.UserCanAccessSpeakeasyCondition" />
     </web-item>
 
     <web-item key="conf-speakeasy-plugins.menu" name="Speakeasy Confluence User Menu Item"
               section="system.user/user-content" weight="100" application="com.atlassian.confluence">
         <label>Speakeasy</label>
         <link>/plugins/servlet/speakeasy/user</link>
-        <condition class="com.atlassian.labs.speakeasy.UserLoggedInCondition" />
+        <condition class="com.atlassian.labs.speakeasy.UserCanAccessSpeakeasyCondition" />
     </web-item>
 
     <web-item key="jira-speakeasy-plugins.menu" name="Speakeasy JIRA User Menu Item"
               section="system.user.options/personal" weight="100" application="jira">
         <label>Speakeasy</label>
         <link>/secure/ViewProfile.jspa#selectedTab=com.atlassian.labs.speakeasy-plugin:speakeasy-plugins</link>
-        <condition class="com.atlassian.labs.speakeasy.UserLoggedInCondition" />
+        <condition class="com.atlassian.labs.speakeasy.UserCanAccessSpeakeasyCondition" />
     </web-item>
 
     <view-profile-panel key="speakeasy-plugins" i18n-name-key="Speakeasy"
@@ -150,30 +161,35 @@
 
 
     <!-- admin links -->
-    <!--web-item key="refimpl-speakeasy-admin-menu" name="Plugin Access" section="system.admin/general"  weight="1" application="refapp">
-        <label>Plugin Access</label>
-        <link linkId="speakeasy-admin-link">/plugins/servlet/speakeasy</link>
+    <web-item key="refimpl-speakeasy-admin-menu" name="Plugin Access" section="system.admin/general"  weight="1" application="refapp">
+        <label>Extension Admin</label>
+        <link linkId="speakeasy-admin-link">/plugins/servlet/speakeasy/admin</link>
+        <condition class="com.atlassian.labs.speakeasy.ui.UserAdminCondition" />
     </web-item>
     
     <web-item key="confluence-speakeasy-admin-menu" name="Plugin Access" section="system.admin/configuration"  weight="40">
-        <label>Plugin Access</label>
-        <link linkId="speakeasy-admin-link">/plugins/servlet/speakeasy</link>
+        <label>Extension Admin</label>
+        <link linkId="speakeasy-admin-link">/plugins/servlet/speakeasy/admin</link>
+        <condition class="com.atlassian.labs.speakeasy.ui.UserAdminCondition" />
     </web-item>
 
     <web-item key="jira-speakeasy-admin-menu" name="Plugin Access" section="system.admin/system"  weight="145" application="jira">
-        <label>Plugin Access</label>
-        <link linkId="speakeasy-admin-link">/plugins/servlet/speakeasy</link>
+        <label>Extension Admin</label>
+        <link linkId="speakeasy-admin-link">/plugins/servlet/speakeasy/admin</link>
+        <condition class="com.atlassian.labs.speakeasy.ui.UserAdminCondition" />
     </web-item>
 
     <web-item key="bamboo-speakeasy-admin-menu" name="Plugin Access" section="system.admin/system"  weight="15" application="bamboo">
-        <label>Plugin Access</label>
-        <link linkId="speakeasy-admin-link">/plugins/servlet/speakeasy</link>
+        <label>Extension Admin</label>
+        <link linkId="speakeasy-admin-link">/plugins/servlet/speakeasy/admin</link>
+        <condition class="com.atlassian.labs.speakeasy.ui.UserAdminCondition" />
     </web-item>
 
     <web-item key="fecru-speakeasy-admin-menu" name="Plugin Access" section="system.admin/system"  weight="15" application="fisheye">
-        <label>Plugin Access</label>
-        <link linkId="speakeasy-admin-link">/plugins/servlet/speakeasy</link>
-    </web-item-->
+        <label>Extension Admin</label>
+        <link linkId="speakeasy-admin-link">/plugins/servlet/speakeasy/admin</link>
+        <condition class="com.atlassian.labs.speakeasy.ui.UserAdminCondition" />
+    </web-item>
 
     <!-- commonjs -->
     <web-resource-transformer key="commonjs-module" class="com.atlassian.labs.speakeasy.commonjs.transformer.CommonJsModuleWrappingTransformer" />

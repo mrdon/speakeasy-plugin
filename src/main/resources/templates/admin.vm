@@ -1,28 +1,85 @@
 <html>
 <head>
     <meta name="decorator" content="atl.admin"/>
-    <title>Scoped Plugins</title>
+    <title>Extension Administration</title>
 </head>
 <body>
-<h1>Scoped Plugins</h1>
-<div>
-    $msg
-</div>
+<div id="sp-main">
+<script type="text/javascript">
+        var contextPath = "$contextPath";
+        var currentUser = "$user";
+        var settings = $settings.render();
+    </script>
+<h1>Extension Administration</h1>
+<p>
+    The following settings configure who can access, enable, and author Speakeasy extensions.
+</p>
+<div id="aui-message-bar"></div>
+<form action="#" method="post" class="aui">
+    <fieldset>
+        <h2>Speakeasy Access</h2>
+        <div class="field-group">
+            <label for="sp-noadmins-edit" class="form-icon icon-required">Restrict to non-Administrators</label>
+            <div class="edit">
+                <input class="checkbox" type="checkbox" id="sp-noadmins-edit" name="sp-noadmins" title="No Admins" />
+                <div class="description">Restrict Speakeasy usage to non-Administrators for security reasons</div>
+            </div>
+            <div class="view">
+                <div id="sp-noadmins-view"></div>
+            </div>
+        </div>
+        <div class="field-group">
+            <label for="sp-access-groups-enable-edit" class="form-icon icon-required">Restrict access to groups</label>
+            <div class="edit">
+                <input type="checkbox" class="checkbox" id="sp-access-groups-enable-edit" name="sp-access-groups-enable" title="Access Groups Enabled" />
+                <div class="description">Whether to restrict access to certain groups</div>
+            </div>
+            <div class="view">
+                <div id="sp-access-groups-enable-view"></div>
+            </div>
+        </div>
+        <div class="field-group" id="sp-access-groups">
+            <label for="sp-access-groups-edit" class="form-icon icon-required">Access Groups</label>
+            <div class="edit">
+                <textarea id="sp-access-groups-edit" name="sp-access-groups" title="Access Groups" cols="50" rows="10"></textarea>
+                <div class="description">Groups allowed to access Speakeasy, one per line</div>
+            </div>
+            <div class="view">
+                <div id="sp-access-groups-view"></div>
+            </div>
+        </div>
+    </fieldset>
+    <fieldset>
+        <h2>Extension Authoring</h2>
+        <div class="field-group">
+            <label for="sp-author-groups-enable-edit" class="form-icon icon-required">Restrict authoring to Groups</label>
+            <div class="edit">
+                <input type="checkbox" class="checkbox" id="sp-author-groups-enable-edit" name="sp-author-groups-enable" title="Author Groups Enabled" />
+                <div class="description">Whether to restrict authoring to certain groups</div>
+            </div>
+            <div class="view">
+                <div id="sp-author-groups-enable-view"></div>
+            </div>
+        </div>
+        <div class="field-group" id="sp-author-groups">
+            <label for="sp-author-groups-edit" class="form-icon icon-required">Author Groups</label>
+            <div class="edit">
+                <textarea id="sp-author-groups-edit" name="sp-author-groups" title="Author Groups" cols="50" rows="10"></textarea>
+                <div class="description">Groups allowed to author extensions, one per line</div>
+            </div>
+            <div class="view">
+                <div id="sp-author-groups-view"></div>
+            </div>
+        </div>
+    </fieldset>
 
-
-#foreach ($pluginEntry in $accessList.entrySet())
-<h3>$pluginEntry.key.name</h3>
-<ul>
-    #foreach ($name in $pluginEntry.value)
-        <li><a href="?action=remove&amp;user=$name&amp;plugin=$pluginEntry.key.key">[x]</a> $name</li>
-    #end
-</ul>
-<form action="">
-    <input type="hidden" name="plugin" value="$pluginEntry.key.key" />
-    <input type="hidden" name="action" value="add" />
-    Add user: <input type="text" name="user" />
-    <input type="submit" value="Add"/>
+    <div class="buttons-container">
+        <div class="buttons">
+            <input id="sp-save" class="button submit edit" type="submit" value="Save" />
+            <a id="sp-edit" class="view" href="#edit">Edit</a>
+        </div>
+    </div>
 </form>
-#end
+</div>
 </body>
 </html>

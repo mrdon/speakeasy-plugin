@@ -2,7 +2,7 @@ package com.atlassian.labs.speakeasy.ui.jira;
 
 import com.atlassian.jira.plugin.profile.ViewProfilePanel;
 import com.atlassian.jira.plugin.profile.ViewProfilePanelModuleDescriptor;
-import com.atlassian.labs.speakeasy.ui.UnauthorizedAccessException;
+import com.atlassian.labs.speakeasy.UnauthorizedAccessException;
 import com.atlassian.labs.speakeasy.ui.UserProfileRenderer;
 import com.opensymphony.user.User;
 import org.slf4j.Logger;

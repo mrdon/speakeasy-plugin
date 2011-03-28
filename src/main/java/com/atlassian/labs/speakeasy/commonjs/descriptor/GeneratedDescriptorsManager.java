@@ -30,6 +30,7 @@ import java.util.Set;
 import java.util.concurrent.CopyOnWriteArraySet;
 
 import static com.google.common.collect.Sets.newHashSet;
+import static org.apache.commons.collections.SetUtils.unmodifiableSet;
 import static org.dom4j.DocumentHelper.createElement;
 
 /**
@@ -79,7 +80,7 @@ class GeneratedDescriptorsManager
 
     public Set<String> getUnresolvedExternalDependencies()
     {
-        return unresolvedExternalDependencies;
+        return unmodifiableSet(unresolvedExternalDependencies);
     }
 
     private synchronized void maybeRegisterDescriptors(CommonJsModulesDescriptor descriptor)
@@ -100,7 +101,7 @@ class GeneratedDescriptorsManager
             }
             else
             {
-                log.debug("Not exposing '{}' as there are unresolved module dependencies: {}", descriptor.getCompleteKey(), unresolvedExternalDependencies);
+                log.debug("Not exposing '{}' as there are unresolved module dependencies: {}", GeneratedDescriptorsManager.this.descriptor.getCompleteKey(), unresolvedExternalDependencies);
             }
         }
     }

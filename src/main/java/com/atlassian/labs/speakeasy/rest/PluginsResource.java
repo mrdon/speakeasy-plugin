@@ -2,6 +2,7 @@ package com.atlassian.labs.speakeasy.rest;
 
 import com.atlassian.labs.speakeasy.PluginType;
 import com.atlassian.labs.speakeasy.SpeakeasyManager;
+import com.atlassian.labs.speakeasy.UnauthorizedAccessException;
 import com.atlassian.labs.speakeasy.install.PluginOperationFailedException;
 import com.atlassian.labs.speakeasy.model.PluginIndex;
 import com.atlassian.labs.speakeasy.model.RemotePlugin;
@@ -54,7 +55,7 @@ public class PluginsResource
     @DELETE
     @Path("plugin/{pluginKey}")
     @Produces("application/json")
-    public Response uninstallPlugin(@PathParam("pluginKey") String pluginKey)
+    public Response uninstallPlugin(@PathParam("pluginKey") String pluginKey) throws UnauthorizedAccessException
     {
         String user = userManager.getRemoteUsername();
         UserPlugins entity = speakeasyManager.uninstallPlugin(pluginKey, user);
@@ -64,7 +65,7 @@ public class PluginsResource
     @GET
     @Path("download/project/{pluginKey}-project.zip")
     @Produces("application/octet-stream")
-    public Response getAsAmpsProject(@PathParam("pluginKey") String pluginKey)
+    public Response getAsAmpsProject(@PathParam("pluginKey") String pluginKey) throws UnauthorizedAccessException
     {
         String user = userManager.getRemoteUsername();
         File file = speakeasyManager.getPluginAsProject(pluginKey, user);
@@ -74,7 +75,7 @@ public class PluginsResource
     @GET
     @Path("download/extension/{pluginKeyAndExtension}")
     @Produces("application/octet-stream")
-    public Response getAsExtension(@PathParam("pluginKeyAndExtension") String pluginKeyAndExtension)
+    public Response getAsExtension(@PathParam("pluginKeyAndExtension") String pluginKeyAndExtension) throws UnauthorizedAccessException
     {
         String user = userManager.getRemoteUsername();
         int pos = pluginKeyAndExtension.lastIndexOf('.');
@@ -92,7 +93,7 @@ public class PluginsResource
     @POST
     @Path("fork/{pluginKey}")
     @Produces("application/json")
-    public Response fork(@PathParam("pluginKey") String pluginKey, @FormParam("description") String description)
+    public Response fork(@PathParam("pluginKey") String pluginKey, @FormParam("description") String description) throws UnauthorizedAccessException
     {
         UserPlugins entity = speakeasyManager.fork(pluginKey, userManager.getRemoteUsername(), description);
         return Response.ok().entity(entity).build();
@@ -101,7 +102,7 @@ public class PluginsResource
     @POST
     @Path("create/{pluginKey}")
     @Produces("application/json")
-    public Response create(@PathParam("pluginKey") String pluginKey, @FormParam("description") String description, @FormParam("name") String name)
+    public Response create(@PathParam("pluginKey") String pluginKey, @FormParam("description") String description, @FormParam("name") String name) throws UnauthorizedAccessException
     {
         UserPlugins entity = speakeasyManager.createExtension(pluginKey, PluginType.ZIP, userManager.getRemoteUsername(), description, name);
         return Response.ok().entity(entity).build();
@@ -110,7 +111,7 @@ public class PluginsResource
     @GET
     @Path("plugin/{pluginKey}/index")
     @Produces("application/json")
-    public Response getIndex(@PathParam("pluginKey") String pluginKey)
+    public Response getIndex(@PathParam("pluginKey") String pluginKey) throws UnauthorizedAccessException
     {
         String user = userManager.getRemoteUsername();
         PluginIndex index = new PluginIndex();
@@ -121,7 +122,7 @@ public class PluginsResource
     @GET
     @Path("plugin/{pluginKey}/file")
     @Produces("text/plain")
-    public Response getFileText(@PathParam("pluginKey") String pluginKey, @QueryParam("path") String fileName)
+    public Response getFileText(@PathParam("pluginKey") String pluginKey, @QueryParam("path") String fileName) throws UnauthorizedAccessException
     {
         String user = userManager.getRemoteUsername();
         Object pluginFile = speakeasyManager.getPluginFile(pluginKey, fileName, user);
@@ -131,7 +132,7 @@ public class PluginsResource
     @GET
     @Path("plugin/{pluginKey}/binary")
     @Produces("application/octet-stream")
-    public Response getFileBinary(@PathParam("pluginKey") String pluginKey, @QueryParam("path") String fileName)
+    public Response getFileBinary(@PathParam("pluginKey") String pluginKey, @QueryParam("path") String fileName) throws UnauthorizedAccessException
     {
         String user = userManager.getRemoteUsername();
         Object pluginFile = speakeasyManager.getPluginFile(pluginKey, fileName, user);
@@ -142,7 +143,7 @@ public class PluginsResource
     @Path("plugin/{pluginKey}/file")
     @Consumes("text/plain")
     @Produces("application/json")
-    public Response saveAndRebuild(@PathParam("pluginKey") String pluginKey, @QueryParam("path") String fileName, String contents)
+    public Response saveAndRebuild(@PathParam("pluginKey") String pluginKey, @QueryParam("path") String fileName, String contents) throws UnauthorizedAccessException
     {
         String user = userManager.getRemoteUsername();
         final RemotePlugin remotePlugin = speakeasyManager.saveAndRebuild(pluginKey, fileName, contents, user);
@@ -166,6 +167,10 @@ public class PluginsResource
             log.error(e.getError(), e.getCause());
             return Response.ok().entity(wrapBodyInTextArea(createErrorJson(user, e))).build();
         }
+        catch (UnauthorizedAccessException e)
+        {
+            return Response.ok().entity(wrapBodyInTextArea(createErrorJson(user, e))).build();
+        }
         catch (RuntimeException e)
         {
             log.error(e.getMessage(), e);
@@ -185,6 +190,10 @@ public class PluginsResource
         catch (JSONException e1)
         {
             throw new PluginOperationFailedException("Unable to serialize error", e1, null);
+        }
+        catch (UnauthorizedAccessException e1)
+        {
+            throw new PluginOperationFailedException("Unauthorized access", e1, null);
         }
         return obj.toString();
     }

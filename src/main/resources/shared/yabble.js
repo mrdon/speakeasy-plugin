@@ -200,6 +200,7 @@
 			
 			if (!module.exports) {
 				module.exports = {};
+                module.module.exports = module.exports;
 				var moduleDir = moduleId.substring(0, moduleId.lastIndexOf('/')+1),
 					injects = module.injects,
 					args = [];
@@ -218,7 +219,7 @@
 				
 				module.factory.apply(null, args);
 			}
-			return module.exports;
+			return module.module.exports ? module.module.exports : module.exports;
 		};
 		
 		require.ensure = function(deps, cb) {

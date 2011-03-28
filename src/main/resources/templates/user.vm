@@ -41,20 +41,24 @@
         <li class="menu-item active-tab">
             <a href="#horizontal-first"><strong>Installed Extensions</strong></a>
         </li>
+        #if ($canAuthor)
         <li class="menu-item">
             <a href="#horizontal-second" id="available-extensions-tab"><strong>Available Extensions</strong></a>
         </li>
         <li class="menu-item">
             <a href="#horizontal-third" id="jsdoc-tab"><strong>CommonJS Modules</strong></a>
         </li>
+        #end
     </ul>
     <div class="tabs-pane active-pane" id="horizontal-first">
         <p style="margin: 10px 0 15px 0;">
             These are the extensions installed on your server.<br />
             To use an extension, click <b>Enable</b>. <br />
+            #if ($canAuthor)
             To upload a new extension, use the <b>Upload</b> form.<br />
             To create a new extension, <a id="extension-wizard-link" href="javascript:void(0)">use the wizard</a>.<br />
             To develop your own extensions, <a href="mailto:don@atlassian.com">learn more</a>.
+            #end
         </p>
 
         #set ($topWebItems = $webInterfaceManager.getDisplayableItems("speakeasy.user-profile/top", $webInterfaceContext))
@@ -90,7 +94,7 @@
             </tbody>
         </table>
 
-        #if ($devmode && $installAllowed)
+        #if ($canAuthor)
             <div style="background-color: #f0f0f0; margin: 20px; padding: 10px; border: 1px solid #bbb;">
                 <form id="upload-form" action="$contextPath/rest/speakeasy/1/plugins" enctype="multipart/form-data" method="post">
                     <b>Upload New Extension:</b>
@@ -100,6 +104,7 @@
             </div>
         #end
     </div>
+    #if ($canAuthor)
     <div class="tabs-pane" id="horizontal-second">
         <p style="margin: 10px 0 15px 0;">
             These extensions are hosted on <a href="http://plugins.atlassian.com">http://plugins.atlassian.com</a>.<br />
@@ -142,6 +147,7 @@ align="absmiddle" src="$staticResourcesPrefix/download/resources/com.atlassian.l
     <div class="tabs-pane" id="horizontal-third">
         $jsdocRenderer.render()
     </div>
+    #end
 </div>
 
     <div id="speakeasy-loaded">Loading...</div>
