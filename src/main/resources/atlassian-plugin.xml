@@ -27,6 +27,11 @@
         <resource type="download" name="user-jira.css" location="jira/user-jira.css"/>
     </web-resource>
 
+    <web-resource key="user-fecru" application="fecru">
+        <context>speakeasy.user-profile</context>
+        <resource type="download" name="user-fecru.css" location="fecru/user-fecru.css"/>
+    </web-resource>
+
     <web-resource key="shared">
         <resource type="download" name="jquery.form.js" location="shared/jquery.form.js"/>
         <resource type="download" name="mustache.js" location="shared/mustache.js"/>
@@ -103,6 +108,8 @@
     <component-import key="atlassianUserManager" interface="com.atlassian.user.UserManager" application="confluence" />
     <component key="productAccessor" class="com.atlassian.labs.speakeasy.product.JiraProductAccessor"
                application="jira"/>
+    <component key="productAccessor" class="com.atlassian.labs.speakeasy.product.FecruProductAccessor"
+               application="fecru"/>
     <component key="productAccessor" class="com.atlassian.labs.speakeasy.product.RefappProductAccessor"
                application="refapp"/>
 
@@ -124,6 +131,13 @@
 
     <web-item key="conf-speakeasy-plugins.menu" name="Speakeasy Confluence User Menu Item"
               section="system.user/user-content" weight="100" application="com.atlassian.confluence">
+        <label>Speakeasy</label>
+        <link>/plugins/servlet/speakeasy/user</link>
+        <condition class="com.atlassian.labs.speakeasy.UserLoggedInCondition" />
+    </web-item>
+
+    <web-item key="fecru-speakeasy-plugins.menu" name="Speakeasy Fisheye/Crucible User Menu Item"
+              section="system.header.item" weight="100" application="fecru">
         <label>Speakeasy</label>
         <link>/plugins/servlet/speakeasy/user</link>
         <condition class="com.atlassian.labs.speakeasy.UserLoggedInCondition" />

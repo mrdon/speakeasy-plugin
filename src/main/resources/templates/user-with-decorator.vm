@@ -8,7 +8,11 @@
         </ol>
     </content>
 
-    <meta name="decorator" content="atl.userprofile"/>
+    #if ($product ==  'fecru')
+        <meta name="decorator" content="atl.general"/>
+    #else
+        <meta name="decorator" content="atl.userprofile"/>
+    #end
     <title>Speakeasy Extensions</title>
 </head>
 <body>
