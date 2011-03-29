@@ -3,6 +3,7 @@
         <description>${project.description}</description>
         <version>${project.version}</version>
         <vendor name="${project.organization.name}" url="${project.organization.url}"/>
+        <param name="configure.url">/plugins/servlet/speakeasy/admin</param>
     </plugin-info>
 
     <servlet key="optin-userprofile" name="speakeasy-plugin" class="com.atlassian.labs.speakeasy.ui.UserOptInServlet">
