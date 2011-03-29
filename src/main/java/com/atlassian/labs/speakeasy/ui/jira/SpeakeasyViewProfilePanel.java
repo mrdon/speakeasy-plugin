@@ -1,5 +1,6 @@
 package com.atlassian.labs.speakeasy.ui.jira;
 
+import com.atlassian.jira.plugin.profile.OptionalUserProfilePanel;
 import com.atlassian.jira.plugin.profile.ViewProfilePanel;
 import com.atlassian.jira.plugin.profile.ViewProfilePanelModuleDescriptor;
 import com.atlassian.labs.speakeasy.UnauthorizedAccessException;
@@ -16,7 +17,7 @@ import java.io.StringWriter;
 /**
  *
  */
-public class SpeakeasyViewProfilePanel implements ViewProfilePanel
+public class SpeakeasyViewProfilePanel implements ViewProfilePanel, OptionalUserProfilePanel
 {
     private final UserProfileRenderer renderer;
     private final static Logger log = LoggerFactory.getLogger(SpeakeasyViewProfilePanel.class);
@@ -48,5 +49,10 @@ public class SpeakeasyViewProfilePanel implements ViewProfilePanel
             log.error("Error rendering speakeasy panel", e);
         }
         return writer.toString();
+    }
+
+    public boolean showPanel(User profileUser, User currentUser)
+    {
+        return renderer.shouldRender(currentUser.getName());
     }
 }

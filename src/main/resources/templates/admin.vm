@@ -15,7 +15,7 @@
     The following settings configure who can access, enable, and author Speakeasy extensions.
 </p>
 <div id="aui-message-bar"></div>
-<form action="#" method="post" class="aui">
+<form action="#" method="post" class="aui" id="sp-form">
     <fieldset>
         <h2>Speakeasy Access</h2>
         <div class="field-group">

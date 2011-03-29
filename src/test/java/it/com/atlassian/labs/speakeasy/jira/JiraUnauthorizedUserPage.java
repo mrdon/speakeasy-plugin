@@ -16,14 +16,9 @@ public class JiraUnauthorizedUserPage extends UnauthorizedUserPage
         return "/secure/ViewProfile.jspa";
     }
 
-    @WaitUntil
-    public void initBySelectingTab()
+    @Override
+    public boolean isAccessForbidden()
     {
-        WebElement tab = driver.findElement(By.id("up_speakeasy-plugins_li"));
-        if (!tab.getAttribute("class").contains("active"))
-        {
-            tab.findElement(By.tagName("a")).click();
-        }
-        driver.waitUntilElementIsVisible(By.id("up-tab-title"));
+        return !driver.elementExists(By.id("up_speakeasy-plugins_li"));
     }
 }

@@ -21,18 +21,6 @@ public class UnauthorizedUserPage implements Page
         return "/plugins/servlet/speakeasy/user";
     }
 
-    @WaitUntil
-    public void waitUntilLoaded()
-    {
-        driver.waitUntil(new Function()
-        {
-            public Object apply(Object from)
-            {
-                return driver.elementExists(By.id("speakeasy-user-main"))
-                        || driver.findElement(By.tagName("body")).getText().contains("Cannot access Speakeasy");
-            }
-        });
-    }
     public boolean isAccessForbidden()
     {
         return driver.findElement(By.tagName("body")).getText().contains("Cannot access Speakeasy");

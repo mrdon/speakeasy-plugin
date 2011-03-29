@@ -39,8 +39,8 @@ public class Settings
         else
         {
             noAdmins = true;
-            restrictAccessToGroups = false;
-            restrictAuthorsToGroups = false;
+            restrictAccessToGroups = true;
+            restrictAuthorsToGroups = true;
         }
     }
     public boolean isNoAdmins()

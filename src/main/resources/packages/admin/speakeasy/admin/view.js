@@ -65,6 +65,7 @@ var Edit = Backbone.View.extend({
     save: function() {
         this.model.save(this.model, {
             success: function(model, resp) {
+                $.data($('#sp-form'), AJS.DIRTY_FORM_VALUE, null);
                 messages.add('success', {body:'Settings saved successfully'});
                 window.location.hash = '#';
             },

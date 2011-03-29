@@ -63,6 +63,11 @@ public class UserProfileRenderer
         this.data = data;
     }
 
+    public boolean shouldRender(String userName)
+    {
+        return speakeasyManager.canAccessSpeakeasy(userName);
+    }
+
     public void render(HttpServletRequest req, Writer output, boolean useUserProfileDecorator) throws IOException, UnauthorizedAccessException
     {
         String user = userManager.getRemoteUsername(req);
@@ -73,7 +78,7 @@ public class UserProfileRenderer
 
         webResourceManager.requireResource("com.atlassian.auiplugin:ajs");
         webResourceManager.requireResourcesForContext("speakeasy.user-profile");
-        boolean devMode = data.isDeveloperModuleEnabled(user);
+        boolean devMode = speakeasyManager.canAuthorExtensions(user);
         if (devMode)
         {
             webResourceManager.requireResource("com.atlassian.labs.speakeasy-plugin:ide");
