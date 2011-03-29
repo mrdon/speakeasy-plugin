@@ -127,33 +127,33 @@
 
     <web-item key="refimpl-speakeasy-user-menu" name="Speakeasy Plugins" section="system.admin/general" weight="1"
               application="refapp">
-        <label>Speakeasy Plugins</label>
-        <link linkId="speakeasy-admin-link">/plugins/servlet/speakeasy/user</link>
+        <label>Extensions (user)</label>
+        <link linkId="speakeasy-user-link">/plugins/servlet/speakeasy/user</link>
         <condition class="com.atlassian.labs.speakeasy.UserCanAccessSpeakeasyCondition" />
     </web-item>
 
     <web-item key="speakeasy-plugins" name="Speakeasy Tab" section="system.profile" weight="100"
               application="com.atlassian.confluence">
-        <label>Speakeasy</label>
+        <label>Extensions</label>
         <link>/plugins/servlet/speakeasy/user</link>
         <condition class="com.atlassian.labs.speakeasy.UserCanAccessSpeakeasyCondition" />
     </web-item>
 
     <web-item key="conf-speakeasy-plugins.menu" name="Speakeasy Confluence User Menu Item"
               section="system.user/user-content" weight="100" application="com.atlassian.confluence">
-        <label>Speakeasy</label>
-        <link>/plugins/servlet/speakeasy/user</link>
+        <label linkId="speakeasy-user-link">Extensions</label>
+        <link linkId="speakeasy-user-link">/plugins/servlet/speakeasy/user</link>
         <condition class="com.atlassian.labs.speakeasy.UserCanAccessSpeakeasyCondition" />
     </web-item>
 
     <web-item key="jira-speakeasy-plugins.menu" name="Speakeasy JIRA User Menu Item"
               section="system.user.options/personal" weight="100" application="jira">
-        <label>Speakeasy</label>
-        <link>/secure/ViewProfile.jspa#selectedTab=com.atlassian.labs.speakeasy-plugin:speakeasy-plugins</link>
+        <label>Extensions</label>
+        <link linkId="speakeasy-user-link">/secure/ViewProfile.jspa#selectedTab=com.atlassian.labs.speakeasy-plugin:speakeasy-plugins</link>
         <condition class="com.atlassian.labs.speakeasy.UserCanAccessSpeakeasyCondition" />
     </web-item>
 
-    <view-profile-panel key="speakeasy-plugins" i18n-name-key="Speakeasy"
+    <view-profile-panel key="speakeasy-plugins" i18n-name-key="Extensions"
                         name="User Profile Roadmap Panel"
                         class="com.atlassian.labs.speakeasy.ui.jira.SpeakeasyViewProfilePanel"
                         application="jira">
@@ -163,31 +163,31 @@
 
     <!-- admin links -->
     <web-item key="refimpl-speakeasy-admin-menu" name="Plugin Access" section="system.admin/general"  weight="1" application="refapp">
-        <label>Extension Admin</label>
+        <label>Extensions (admin)</label>
         <link linkId="speakeasy-admin-link">/plugins/servlet/speakeasy/admin</link>
         <condition class="com.atlassian.labs.speakeasy.ui.UserAdminCondition" />
     </web-item>
     
     <web-item key="confluence-speakeasy-admin-menu" name="Plugin Access" section="system.admin/configuration"  weight="40">
-        <label>Extension Admin</label>
+        <label>Extensions</label>
         <link linkId="speakeasy-admin-link">/plugins/servlet/speakeasy/admin</link>
         <condition class="com.atlassian.labs.speakeasy.ui.UserAdminCondition" />
     </web-item>
 
     <web-item key="jira-speakeasy-admin-menu" name="Plugin Access" section="system.admin/system"  weight="145" application="jira">
-        <label>Extension Admin</label>
+        <label>Extensions</label>
         <link linkId="speakeasy-admin-link">/plugins/servlet/speakeasy/admin</link>
         <condition class="com.atlassian.labs.speakeasy.ui.UserAdminCondition" />
     </web-item>
 
     <web-item key="bamboo-speakeasy-admin-menu" name="Plugin Access" section="system.admin/system"  weight="15" application="bamboo">
-        <label>Extension Admin</label>
+        <label>Extensions</label>
         <link linkId="speakeasy-admin-link">/plugins/servlet/speakeasy/admin</link>
         <condition class="com.atlassian.labs.speakeasy.ui.UserAdminCondition" />
     </web-item>
 
     <web-item key="fecru-speakeasy-admin-menu" name="Plugin Access" section="system.admin/system"  weight="15" application="fisheye">
-        <label>Extension Admin</label>
+        <label>Extensions</label>
         <link linkId="speakeasy-admin-link">/plugins/servlet/speakeasy/admin</link>
         <condition class="com.atlassian.labs.speakeasy.ui.UserAdminCondition" />
     </web-item>

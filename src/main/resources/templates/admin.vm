@@ -17,7 +17,7 @@
 <div id="aui-message-bar"></div>
 <form action="#" method="post" class="aui" id="sp-form">
     <fieldset>
-        <h2>Speakeasy Access</h2>
+        <h2>Extension Visibility</h2>
         <div class="field-group">
             <label for="sp-noadmins-edit" class="form-icon icon-required">Restrict to non-Administrators</label>
             <div class="edit">
