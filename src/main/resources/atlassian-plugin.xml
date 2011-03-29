@@ -108,6 +108,8 @@
     <component-import key="atlassianUserManager" interface="com.atlassian.user.UserManager" application="confluence" />
     <component key="productAccessor" class="com.atlassian.labs.speakeasy.product.JiraProductAccessor"
                application="jira"/>
+    <component key="productAccessor" class="com.atlassian.labs.speakeasy.product.BambooProductAccessor"
+               application="bamboo"/>
     <component key="productAccessor" class="com.atlassian.labs.speakeasy.product.RefappProductAccessor"
                application="refapp"/>
 
@@ -139,6 +141,12 @@
         <label>Speakeasy</label>
         <link>/secure/ViewProfile.jspa#selectedTab=com.atlassian.labs.speakeasy-plugin:speakeasy-plugins</link>
         <condition class="com.atlassian.labs.speakeasy.UserLoggedInCondition" />
+    </web-item>
+
+    <web-item key="bamboo-speakeasy-plugins.menu" name="Speakeasy Bamboo User Menu Item"
+              section="system.user/userconfig" weight="40" application="bamboo">
+        <label key="Speakeasy"/>
+        <link linkId="speakeasyTab">/plugins/servlet/speakeasy/user</link>
     </web-item>
 
     <view-profile-panel key="speakeasy-plugins" i18n-name-key="Speakeasy"
