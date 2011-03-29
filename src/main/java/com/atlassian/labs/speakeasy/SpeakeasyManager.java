@@ -17,6 +17,7 @@ import com.atlassian.plugin.PluginAccessor;
 import com.atlassian.plugin.descriptors.UnloadableModuleDescriptor;
 import com.atlassian.plugin.impl.UnloadablePlugin;
 import com.atlassian.sal.api.user.UserManager;
+import com.atlassian.sal.api.user.UserProfile;
 import com.google.common.base.Function;
 import com.google.common.base.Predicate;
 import com.google.common.collect.Lists;
@@ -502,7 +503,12 @@ public class SpeakeasyManager
 
         boolean canAuthor = permissionManager.canAuthorExtensions(getActualSettings(), userName);
         RemotePlugin remotePlugin = new RemotePlugin(plugin);
-        remotePlugin.setAuthor(getPluginAuthor(plugin));
+        String author = getPluginAuthor(plugin);
+        remotePlugin.setAuthor(author);
+        UserProfile profile = userManager.getUserProfile(author);
+        remotePlugin.setAuthorDisplayName(profile != null && profile.getFullName() != null
+                        ? profile.getFullName()
+                        : author);
         List<String> accessList = data.getUsersList(plugin.getKey());
         remotePlugin.setNumUsers(accessList.size());
 
@@ -602,6 +608,10 @@ public class SpeakeasyManager
         if (author == null)
         {
             author = plugin.getPluginInformation().getVendorName();
+        }
+        if (author == null)
+        {
+            author = "(unknown)";
         }
         return author;
     }

@@ -24,10 +24,10 @@
     </td>
     <td headers="plugin-author">
         {{#fork}}
-            <span class='fork-blue'>{{version}}-fork-{{author}}</span>
+            <span class='fork-blue'>{{authorDisplayName}}</span>
         {{/fork}}
         {{^fork}}
-            {{author}}
+            {{authorDisplayName}}
         {{/fork}}
     </td>
     <td headers="plugin-version">{{version}}</td>

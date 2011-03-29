@@ -238,7 +238,7 @@ public class TestUserProfile
         assertEquals("test-2", row.getKey());
         assertEquals("Test Plugin", row.getName());
         assertEquals("Desc", row.getDescription());
-        assertEquals("admin", row.getAuthor());
+        assertEquals("A. D. Ministrator (Sysadmin)", row.getAuthor());
         assertTrue(page.canExecute("test-2", Actions.UNINSTALL));
         assertTrue(page.canExecute("test-2", Actions.EDIT));
         assertTrue(page.canExecute("test-2", Actions.DOWNLOAD));
@@ -254,7 +254,7 @@ public class TestUserProfile
         assertEquals("test-2", row.getKey());
         assertEquals("Test Plugin", row.getName());
         assertEquals("Desc", row.getDescription());
-        assertEquals("admin", row.getAuthor());
+        assertEquals("A. D. Ministrator (Sysadmin)", row.getAuthor());
         page.uninstallPlugin("test-2");
     }
 

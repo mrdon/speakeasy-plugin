@@ -21,6 +21,8 @@ public class RemotePlugin implements Comparable
 
     private String author;
 
+    private String authorDisplayName;
+
     private String version;
 
     private String description;
@@ -94,6 +96,16 @@ public class RemotePlugin implements Comparable
     public void setName(String name)
     {
         this.name = name;
+    }
+
+    public String getAuthorDisplayName()
+    {
+        return authorDisplayName;
+    }
+
+    public void setAuthorDisplayName(String authorDisplayName)
+    {
+        this.authorDisplayName = authorDisplayName;
     }
 
     public String getAuthor()
