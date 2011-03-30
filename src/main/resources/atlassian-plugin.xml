@@ -143,7 +143,7 @@
         <condition class="com.atlassian.labs.speakeasy.UserLoggedInCondition" />
     </web-item>
 
-    <web-item key="bamboo-speakeasy-plugins.menu" name="Speakeasy Bamboo User Menu Item"
+    <web-item key="bamboo-speakeasy-plugins.menu" name="Speakeasy Menu"
               section="system.user/userconfig" weight="40" application="bamboo">
         <label key="Speakeasy"/>
         <link linkId="speakeasyTab">/plugins/servlet/speakeasy/user</link>

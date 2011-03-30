@@ -9,7 +9,7 @@
     </content>
 
     <meta name="decorator" content="atl.userprofile"/>
-    <meta name="tab" content="Speakeasy Bamboo User Menu Item"/>
+    <meta name="tab" content="Speakeasy Menu"/>
     <title>Speakeasy Extensions</title>
 </head>
 <body>
