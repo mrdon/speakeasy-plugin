@@ -120,6 +120,8 @@
     <component-import key="atlassianUserManager" interface="com.atlassian.user.UserManager" application="confluence" />
     <component key="productAccessor" class="com.atlassian.labs.speakeasy.product.JiraProductAccessor"
                application="jira"/>
+    <component key="productAccessor" class="com.atlassian.labs.speakeasy.product.BambooProductAccessor"
+               application="bamboo"/>
     <component key="productAccessor" class="com.atlassian.labs.speakeasy.product.RefappProductAccessor"
                application="refapp"/>
 
@@ -159,6 +161,13 @@
                         application="jira">
         <order>30</order>
     </view-profile-panel>
+
+    <web-item key="bamboo-speakeasy-plugins.menu" name="Speakeasy Menu"
+              section="system.user/userconfig" weight="40" application="bamboo">
+        <label key="Extensions"/>
+        <link linkId="speakeasyTab">/plugins/servlet/speakeasy/user</link>
+    </web-item>
+
 
 
     <!-- admin links -->
