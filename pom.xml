@@ -84,6 +84,24 @@
             <scope>provided</scope>
         </dependency>
         <dependency>
+            <groupId>com.atlassian.fisheye</groupId>
+            <artifactId>atlassian-fisheye-api</artifactId>
+            <version>${fecru.version}</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.atlassian.fisheye</groupId>
+            <artifactId>fisheye-jar</artifactId>
+            <version>${fecru.version}</version>
+            <scope>provided</scope>
+            <exclusions>
+                <exclusion>
+                    <groupId>com.atlassian.fisheye</groupId>
+                    <artifactId>atlassian-fisheye-dependencies</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
             <version>4.6</version>
@@ -322,6 +340,12 @@
                             <dataVersion>${jira.data.version}</dataVersion>
                             <productDataPath>${basedir}/src/test/resources/jira-generated-test-resources.zip</productDataPath>
                         </product>
+                        <!--<product>
+                            <id>fecru</id>
+                            <version>${fecru.version}</version>
+                            <dataVersion>${fecru.data.version}</dataVersion>
+                            <productDataPath>${basedir}/src/test/resources/jira-generated-test-resources.zip</productDataPath>
+                        </product>-->
                     </products>
                     <testGroups>
                         <testGroup>
@@ -349,6 +373,17 @@
                                 </testedProductClass>
                             </systemProperties>
                         </testGroup>
+                        <!-- TODO: implement TestedProduct<WebDriverTester> for FECRU -->
+                        <!--<testGroup
+                            <id>fecru</id>
+                            <productIds>
+                                <productId>fecru</productId>
+                            </productIds>
+                            <systemProperties>
+                                <testedProductClass>com.atlassian.webdriver.fecru.FecruTestedProduct
+                                </testedProductClass>
+                            </systemProperties>
+                        </testGroup>-->
                         <!--testGroup>
                             <id>confluence-4.0</id>
                             <productIds>
@@ -391,6 +426,8 @@
         <confluence.data.version>3.0</confluence.data.version>
         <jira.version>4.3</jira.version>
         <jira.data.version>4.1.1</jira.data.version>
+        <fecru.version>2.6.0-M2-20110329050339</fecru.version>
+        <fecru.data.version>2.5.2-20110307050326</fecru.data.version>
     </properties>
 
 </project>

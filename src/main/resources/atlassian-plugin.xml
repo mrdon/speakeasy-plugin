@@ -39,6 +39,11 @@
         <resource type="download" name="user-jira.css" location="jira/user-jira.css"/>
     </web-resource>
 
+    <web-resource key="user-fecru" application="fecru">
+        <context>speakeasy.user-profile</context>
+        <resource type="download" name="user-fecru.css" location="fecru/user-fecru.css"/>
+    </web-resource>
+
     <web-resource key="shared">
         <dependency>${project.groupId}.${project.artifactId}:mustache</dependency>
         <resource type="download" name="jquery.form.js" location="shared/jquery.form.js"/>
@@ -122,6 +127,8 @@
                application="jira"/>
     <component key="productAccessor" class="com.atlassian.labs.speakeasy.product.BambooProductAccessor"
                application="bamboo"/>
+    <component key="productAccessor" class="com.atlassian.labs.speakeasy.product.FecruProductAccessor"
+               application="fecru"/>
     <component key="productAccessor" class="com.atlassian.labs.speakeasy.product.RefappProductAccessor"
                application="refapp"/>
 
@@ -148,6 +155,13 @@
         <condition class="com.atlassian.labs.speakeasy.UserCanAccessSpeakeasyCondition" />
     </web-item>
 
+    <web-item key="fecru-speakeasy-plugins.menu" name="Speakeasy Fisheye/Crucible User Menu Item"
+              section="system.header.item" weight="100" application="fecru">
+        <label>Extensions</label>
+        <link>/plugins/servlet/speakeasy/user</link>
+        <condition class="com.atlassian.labs.speakeasy.UserCanAccessSpeakeasyCondition" />
+    </web-item>
+
     <web-item key="jira-speakeasy-plugins.menu" name="Speakeasy JIRA User Menu Item"
               section="system.user.options/personal" weight="100" application="jira">
         <label>Extensions</label>
@@ -166,6 +180,7 @@
               section="system.user/userconfig" weight="40" application="bamboo">
         <label key="Extensions"/>
         <link linkId="speakeasyTab">/plugins/servlet/speakeasy/user</link>
+        <condition class="com.atlassian.labs.speakeasy.UserCanAccessSpeakeasyCondition" />
     </web-item>
 
 
@@ -195,7 +210,7 @@
         <condition class="com.atlassian.labs.speakeasy.ui.UserAdminCondition" />
     </web-item>
 
-    <web-item key="fecru-speakeasy-admin-menu" name="Plugin Access" section="system.admin/system"  weight="15" application="fisheye">
+    <web-item key="fecru-speakeasy-admin-menu" name="Plugin Access" section="system.admin/system"  weight="15" application="fecru">
         <label>Extensions</label>
         <link linkId="speakeasy-admin-link">/plugins/servlet/speakeasy/admin</link>
         <condition class="com.atlassian.labs.speakeasy.ui.UserAdminCondition" />
