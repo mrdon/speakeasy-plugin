@@ -309,16 +309,6 @@
                                     <artifactId>mail</artifactId>
                                     <version>1.4.1</version>
                                 </libArtifact>
-                                <!--libArtifact>
-                                    <groupId>com.atlassian.plugins</groupId>
-                                    <artifactId>atlassian-plugins-core</artifactId>
-                                    <version>2.8.0-SNAPSHOT</version>
-                                </libArtifact>
-                                <libArtifact>
-                                    <groupId>com.atlassian.plugins</groupId>
-                                    <artifactId>atlassian-plugins-osgi</artifactId>
-                                    <version>2.8.0-SNAPSHOT</version>
-                                </libArtifact-->
                             </libArtifacts>
                         </product>
                         <product>
@@ -340,12 +330,18 @@
                             <dataVersion>${jira.data.version}</dataVersion>
                             <productDataPath>${basedir}/src/test/resources/jira-generated-test-resources.zip</productDataPath>
                         </product>
-                        <!--<product>
+                        <product>
                             <id>fecru</id>
                             <version>${fecru.version}</version>
                             <dataVersion>${fecru.data.version}</dataVersion>
-                            <productDataPath>${basedir}/src/test/resources/jira-generated-test-resources.zip</productDataPath>
-                        </product>-->
+                            <!--productDataPath>${basedir}/src/test/resources/jira-generated-test-resources.zip</productDataPath-->
+                        </product>
+                        <product>
+                            <id>bamboo</id>
+                            <version>${bamboo.version}</version>
+                            <dataVersion>${bamboo.data.version}</dataVersion>
+                            <!--productDataPath>${basedir}/src/test/resources/jira-generated-test-resources.zip</productDataPath-->
+                        </product>
                     </products>
                     <testGroups>
                         <testGroup>
@@ -428,6 +424,8 @@
         <jira.data.version>4.1.1</jira.data.version>
         <fecru.version>2.6.0-M2-20110329050339</fecru.version>
         <fecru.data.version>2.5.2-20110307050326</fecru.data.version>
+        <bamboo.version>3.1-m2</bamboo.version>
+        <bamboo.data.version>2.6.1</bamboo.data.version>
     </properties>
 
 </project>
