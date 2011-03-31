@@ -11,7 +11,7 @@
 
     <groupId>com.atlassian.labs</groupId>
     <artifactId>speakeasy-plugin</artifactId>
-    <version>0.8.1-SNAPSHOT</version>
+    <version>0.8.1</version>
 
     <name>Speakeasy Plugin</name>
     <description>A plugin that provides per-user plugin module management</description>
@@ -370,8 +370,7 @@
                             </systemProperties>
                         </testGroup>
                         <!-- TODO: implement TestedProduct<WebDriverTester> for FECRU -->
-                        <!--<testGroup
-                            <id>fecru</id>
+                        <!--<testGroup <id>fecru</id>
                             <productIds>
                                 <productId>fecru</productId>
                             </productIds>
