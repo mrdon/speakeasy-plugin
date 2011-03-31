@@ -119,13 +119,16 @@ public class SpeakeasyManager
         }
 
         sendEnabledEmail(pluginKey, user);
+        log.info("Allowed '{}' to access Speakeasy extension '{}'", user, pluginKey);
         return affectedPluginKeys;
     }
 
     public String disallowUserAccess(String pluginKey, String user) throws UnauthorizedAccessException
     {
         validateAccess(user);
-        return removeFromAccessList(pluginKey, user);
+        String disallowedPluginKey = removeFromAccessList(pluginKey, user);
+        log.info("Disallowed '{}' to access Speakeasy extension '{}'", user, pluginKey);
+        return disallowedPluginKey;
     }
 
     public boolean hasAccess(String pluginKey, String remoteUser) throws UnauthorizedAccessException
@@ -141,10 +144,11 @@ public class SpeakeasyManager
         {
             if (data.getUsersList(plugin.getKey()).contains(user))
             {
-                disallowUserAccess(plugin.getKey(), user);
+                removeFromAccessList(plugin.getKey(), user);
             }
             descriptorGeneratorManager.refreshGeneratedDescriptorsForPlugin(plugin.getKey());
         }
+        log.info("Disallowed  '{}' to access all Speakeasy extensions", user);
     }
 
     public UserPlugins uninstallPlugin(String pluginKey, String user) throws PluginOperationFailedException, UnauthorizedAccessException
@@ -170,6 +174,7 @@ public class SpeakeasyManager
             }
             disallowAllPluginAccess(pluginKey, user);
             pluginManager.uninstall(pluginKey, user);
+            log.info("Uninstalled extension '{}' by user '{}'", pluginKey, user);
             return getUserAccessList(user, keysModified);
         }
         catch (PluginOperationFailedException ex)
@@ -204,6 +209,7 @@ public class SpeakeasyManager
             {
                 sendForkedEmail(pluginKey, forkedPluginKey, remoteUser);
             }
+            log.info("Forked '{}' extension by '{}'", pluginKey, remoteUser);
             return getUserAccessList(remoteUser, modifiedKeys);
         }
         catch (PluginOperationFailedException ex)
@@ -322,6 +328,7 @@ public class SpeakeasyManager
                 throw new PluginOperationFailedException("Not authorized to edit " + pluginKey, pluginKey);
             }
             String installedPluginKey = pluginManager.saveAndRebuild(pluginKey, plugin.getPluginType(), fileName, contents, user);
+            log.info("Saved and rebuilt extension '{}' by user '{}'", pluginKey, user);
             return getRemotePlugin(installedPluginKey, user);
         }
         catch (PluginOperationFailedException ex)
@@ -338,6 +345,7 @@ public class SpeakeasyManager
     {
         validateAuthor(user);
         String pluginKey = pluginManager.install(uploadedFile, user);
+        log.info("Installed extension '{}' by user '{}'", pluginKey, user);
         return getUserAccessList(user, pluginKey);
     }
 
@@ -353,6 +361,7 @@ public class SpeakeasyManager
             pluginManager.createExtension(pluginType, pluginKey, remoteUser, description, name);
             List<String> modifiedKeys = new ArrayList<String>();
             modifiedKeys.add(pluginKey);
+            log.info("Created extension '{}' by user '{}'", pluginKey, remoteUser);
             return getUserAccessList(remoteUser, modifiedKeys);
         }
         catch (PluginOperationFailedException ex)
@@ -390,7 +399,9 @@ public class SpeakeasyManager
         {
             validateAdmin(userName);
             String value = JsonObjectMapper.write(settings);
-            return JsonObjectMapper.read(Settings.class, data.saveSettings(value));
+            Settings savedSettings = JsonObjectMapper.read(Settings.class, data.saveSettings(value));
+            log.info("Saved administration settings by user '{}'", userName);
+            return savedSettings;
         }
         catch (IOException e)
         {
@@ -507,8 +518,8 @@ public class SpeakeasyManager
         remotePlugin.setAuthor(author);
         UserProfile profile = userManager.getUserProfile(author);
         remotePlugin.setAuthorDisplayName(profile != null && profile.getFullName() != null
-                        ? profile.getFullName()
-                        : author);
+                ? profile.getFullName()
+                : author);
         List<String> accessList = data.getUsersList(plugin.getKey());
         remotePlugin.setNumUsers(accessList.size());
 
