@@ -83,9 +83,9 @@ public class UserProfileRenderer
             webResourceManager.requireResource("com.atlassian.labs.speakeasy-plugin:ide");
         }
 
-        final UserPlugins plugins = speakeasyManager.getUserAccessList(user);
+        final UserPlugins plugins = speakeasyManager.getRemotePluginList(user);
         render("templates/user" + (useUserProfileDecorator ? "-with-decorator" : "") + ".vm", ImmutableMap.<String,Object>builder().
-                put("accessList", speakeasyManager.getUserAccessList(user)).
+                put("accessList", speakeasyManager.getRemotePluginList(user)).
                 put("user", user).
                 put("contextPath", req.getContextPath()).
                 put("plugins", plugins.getPlugins()).

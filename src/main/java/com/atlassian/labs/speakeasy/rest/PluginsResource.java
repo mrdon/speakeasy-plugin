@@ -185,7 +185,7 @@ public class PluginsResource
         try
         {
             obj.put("error", e.getMessage());
-            obj.put("plugins", new JSONObject(jaxbJsonMarshaller.marshal(speakeasyManager.getUserAccessList(user))));
+            obj.put("plugins", new JSONObject(jaxbJsonMarshaller.marshal(speakeasyManager.getRemotePluginList(user))));
         }
         catch (JSONException e1)
         {

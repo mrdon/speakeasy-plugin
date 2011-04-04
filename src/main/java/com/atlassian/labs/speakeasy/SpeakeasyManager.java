@@ -37,6 +37,7 @@ import java.util.Set;
 import static com.atlassian.labs.speakeasy.util.BundleUtil.findBundleForPlugin;
 import static com.google.common.collect.Iterables.filter;
 import static com.google.common.collect.Lists.newArrayList;
+import static com.google.common.collect.Lists.transform;
 import static com.google.common.collect.Sets.newHashSet;
 import static java.util.Arrays.asList;
 
@@ -70,11 +71,11 @@ public class SpeakeasyManager
         this.userManager = userManager;
     }
 
-    public UserPlugins getUserAccessList(String userName, String... modifiedKeys) throws UnauthorizedAccessException
+    public UserPlugins getRemotePluginList(String userName, String... modifiedKeys) throws UnauthorizedAccessException
     {
-        return getUserAccessList(userName, asList(modifiedKeys));
+        return getRemotePluginList(userName, asList(modifiedKeys));
     }
-    public UserPlugins getUserAccessList(String userName, List<String> modifiedKeys) throws UnauthorizedAccessException
+    public UserPlugins getRemotePluginList(String userName, List<String> modifiedKeys) throws UnauthorizedAccessException
     {
         validateAccess(userName);
         List<RemotePlugin> plugins = getAllRemoteSpeakeasyPlugins(userName);
@@ -175,7 +176,7 @@ public class SpeakeasyManager
             disallowAllPluginAccess(pluginKey, user);
             pluginManager.uninstall(pluginKey, user);
             log.info("Uninstalled extension '{}' by user '{}'", pluginKey, user);
-            return getUserAccessList(user, keysModified);
+            return getRemotePluginList(user, keysModified);
         }
         catch (PluginOperationFailedException ex)
         {
@@ -210,7 +211,7 @@ public class SpeakeasyManager
                 sendForkedEmail(pluginKey, forkedPluginKey, remoteUser);
             }
             log.info("Forked '{}' extension by '{}'", pluginKey, remoteUser);
-            return getUserAccessList(remoteUser, modifiedKeys);
+            return getRemotePluginList(remoteUser, modifiedKeys);
         }
         catch (PluginOperationFailedException ex)
         {
@@ -346,7 +347,7 @@ public class SpeakeasyManager
         validateAuthor(user);
         String pluginKey = pluginManager.install(uploadedFile, user);
         log.info("Installed extension '{}' by user '{}'", pluginKey, user);
-        return getUserAccessList(user, pluginKey);
+        return getRemotePluginList(user, pluginKey);
     }
 
     public UserPlugins createExtension(String pluginKey, PluginType pluginType, String remoteUser, String description, String name) throws UnauthorizedAccessException
@@ -362,7 +363,7 @@ public class SpeakeasyManager
             List<String> modifiedKeys = new ArrayList<String>();
             modifiedKeys.add(pluginKey);
             log.info("Created extension '{}' by user '{}'", pluginKey, remoteUser);
-            return getUserAccessList(remoteUser, modifiedKeys);
+            return getRemotePluginList(remoteUser, modifiedKeys);
         }
         catch (PluginOperationFailedException ex)
         {
@@ -688,13 +689,20 @@ public class SpeakeasyManager
     private List<RemotePlugin> getAllRemoteSpeakeasyPlugins(final String userName)
     {
         final List<Plugin> rawPlugins = getAllSpeakeasyPlugins();
-        return Lists.transform(rawPlugins, new Function<Plugin,RemotePlugin>()
+        final boolean canAuthor = canAuthorExtensions(userName);
+        return newArrayList(filter(transform(rawPlugins, new Function<Plugin, RemotePlugin>()
         {
             public RemotePlugin apply(Plugin from)
             {
                 return getRemotePlugin(from.getKey(), userName, rawPlugins);
             }
-        });
+        }), new Predicate<RemotePlugin>()
+        {
+            public boolean apply(RemotePlugin input)
+            {
+                return !input.isFork() || canAuthor;
+            }
+        }));
     }
 
     private List<Plugin> getAllSpeakeasyPlugins()

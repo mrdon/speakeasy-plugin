@@ -5,7 +5,7 @@ import org.openqa.selenium.WebElement;
 /**
  *
  */
-public enum Actions
+public enum ExtensionOperations
 {
     EDIT,
     DOWNLOAD,

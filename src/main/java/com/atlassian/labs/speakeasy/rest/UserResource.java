@@ -2,9 +2,6 @@ package com.atlassian.labs.speakeasy.rest;
 
 import com.atlassian.labs.speakeasy.SpeakeasyManager;
 import com.atlassian.labs.speakeasy.UnauthorizedAccessException;
-import com.atlassian.labs.speakeasy.data.SpeakeasyData;
-import com.atlassian.labs.speakeasy.install.PluginManager;
-import com.atlassian.labs.speakeasy.model.RemotePlugin;
 import com.atlassian.labs.speakeasy.model.UserPlugins;
 import com.atlassian.sal.api.user.UserManager;
 
@@ -39,7 +36,7 @@ public class UserResource
     @Produces("application/json")
     public Response getPlugins() throws UnauthorizedAccessException
     {
-        return Response.ok(speakeasyManager.getUserAccessList(userManager.getRemoteUsername())).build();
+        return Response.ok(speakeasyManager.getRemotePluginList(userManager.getRemoteUsername())).build();
     }
 
     @PUT
@@ -49,7 +46,7 @@ public class UserResource
     {
         String user = userManager.getRemoteUsername();
         List<String> affectedKeys = speakeasyManager.allowUserAccess(pluginKey, user);
-        UserPlugins entity = speakeasyManager.getUserAccessList(user, pluginKey);
+        UserPlugins entity = speakeasyManager.getRemotePluginList(user, pluginKey);
         entity.setUpdated(affectedKeys);
         return Response.ok().entity(entity).build();
     }
@@ -62,7 +59,7 @@ public class UserResource
         String user = userManager.getRemoteUsername();
         String affectedKey = speakeasyManager.disallowUserAccess(pluginKey, user);
 
-        UserPlugins entity = speakeasyManager.getUserAccessList(user, pluginKey);
+        UserPlugins entity = speakeasyManager.getRemotePluginList(user, pluginKey);
         if (affectedKey != null)
         {
             entity.setUpdated(asList(affectedKey));

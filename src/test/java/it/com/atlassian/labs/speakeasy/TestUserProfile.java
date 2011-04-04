@@ -26,6 +26,8 @@ import java.util.zip.ZipFile;
 
 import static com.google.common.collect.Lists.newArrayList;
 import static com.google.common.collect.Sets.newHashSet;
+import static it.com.atlassian.labs.speakeasy.ExtensionBuilder.buildSimplePluginFile;
+import static it.com.atlassian.labs.speakeasy.ExtensionBuilder.startSimpleBuilder;
 import static java.util.Arrays.asList;
 import static org.junit.Assert.*;
 
@@ -239,10 +241,10 @@ public class TestUserProfile
         assertEquals("Test Plugin", row.getName());
         assertEquals("Desc", row.getDescription());
         assertEquals("A. D. Ministrator (Sysadmin)", row.getAuthor());
-        assertTrue(page.canExecute("test-2", Actions.UNINSTALL));
-        assertTrue(page.canExecute("test-2", Actions.EDIT));
-        assertTrue(page.canExecute("test-2", Actions.DOWNLOAD));
-        assertFalse(page.canExecute("test-2", Actions.FORK));
+        assertTrue(page.canExecute("test-2", ExtensionOperations.UNINSTALL));
+        assertTrue(page.canExecute("test-2", ExtensionOperations.EDIT));
+        assertTrue(page.canExecute("test-2", ExtensionOperations.DOWNLOAD));
+        assertFalse(page.canExecute("test-2", ExtensionOperations.FORK));
 
 
         // verify on reload
@@ -328,19 +330,19 @@ public class TestUserProfile
                 "First Plugin by A. D. Ministrator (Sysadmin)"
         ));
 
-        assertFalse(page.canExecute("test", Actions.FORK));
-        assertFalse(page.canExecute("test-2", Actions.FORK));
+        assertFalse(page.canExecute("test", ExtensionOperations.FORK));
+        assertFalse(page.canExecute("test-2", ExtensionOperations.FORK));
 
         SpeakeasyUserPage.PluginRow row = page.getPlugins().get("test-2-fork-barney");
         assertEquals("test-2-fork-barney", row.getKey());
         assertEquals("Fork Description", row.getDescription());
         assertFalse(page.isPluginEnabled("test-2"));
         assertTrue(page.isPluginEnabled("test-2-fork-barney"));
-        assertTrue(page.canExecute("test-2-fork-barney", Actions.UNINSTALL));
-        assertTrue(!page.canExecute("test-2-fork-barney", Actions.FORK));
-        assertTrue(page.canExecute("test-2-fork-barney", Actions.DOWNLOAD));
-        assertTrue(page.canExecute("test-2-fork-barney", Actions.EDIT));
-        assertTrue(!page.canExecute("test-2", Actions.UNINSTALL));
+        assertTrue(page.canExecute("test-2-fork-barney", ExtensionOperations.UNINSTALL));
+        assertTrue(!page.canExecute("test-2-fork-barney", ExtensionOperations.FORK));
+        assertTrue(page.canExecute("test-2-fork-barney", ExtensionOperations.DOWNLOAD));
+        assertTrue(page.canExecute("test-2-fork-barney", ExtensionOperations.EDIT));
+        assertTrue(!page.canExecute("test-2", ExtensionOperations.UNINSTALL));
 
         page.enablePlugin("test-2");
         assertFalse(page.isPluginEnabled("test-2-fork-barney"));
@@ -479,7 +481,7 @@ public class TestUserProfile
 
         SpeakeasyUserPage page = product.visit(SpeakeasyUserPage.class);
         assertTrue(page.getPluginKeys().contains("test-2"));
-        assertTrue(page.canExecute("test-2", Actions.UNINSTALL));
+        assertTrue(page.canExecute("test-2", ExtensionOperations.UNINSTALL));
         page.uninstallPlugin("test-2");
         List<String> messages = page.getSuccessMessages();
         assertEquals(1, messages.size());
@@ -496,9 +498,9 @@ public class TestUserProfile
     {
         SpeakeasyUserPage page = product.visit(SpeakeasyUserPage.class);
         assertTrue(page.getPluginKeys().contains("plugin-tests"));
-        assertFalse(page.canExecute("plugin-tests", Actions.UNINSTALL));
-        assertFalse(page.canExecute("plugin-tests", Actions.DOWNLOAD));
-        assertFalse(page.canExecute("plugin-tests", Actions.FORK));
+        assertFalse(page.canExecute("plugin-tests", ExtensionOperations.UNINSTALL));
+        assertFalse(page.canExecute("plugin-tests", ExtensionOperations.DOWNLOAD));
+        assertFalse(page.canExecute("plugin-tests", ExtensionOperations.FORK));
     }
 
     private void assertEmailExists(String to, String title, List<String> bodyStrings) throws MessagingException, IOException
@@ -526,39 +528,7 @@ public class TestUserProfile
         assertTrue(lastMessage.getHeaderValue("To").contains(to));
     }
 
-    private File buildSimplePluginFile() throws IOException
-    {
-        return buildSimplePluginFile("test-2", "Test Plugin");
-    }
 
-    private File buildSimplePluginFile(String key, String name)
-            throws IOException
-    {
-        return startSimpleBuilder(key, name)
-                .build();
-    }
-
-    private PluginJarBuilder startSimpleBuilder(String key, String name)
-    {
-        return new PluginJarBuilder()
-                .addFormattedResource("atlassian-plugin.xml",
-                         "<atlassian-plugin key='" + key + "' pluginsVersion='2' name='" + name + "'>",
-                         "    <plugin-info>",
-                         "        <version>1</version>",
-                         "        <description>Desc</description>",
-                         "    </plugin-info>",
-                         "    <scoped-web-item key='item' section='foo' />",
-                         "    <scoped-web-resource key='res'>",
-                         "      <resource type='download' name='foo.js' location='foo.js' />",
-                         "    </scoped-web-resource>",
-                         "    <scoped-modules key='modules' />",
-                         "</atlassian-plugin>")
-                .addFormattedResource("foo.js", "alert('hi');")
-                .addFormattedResource("bar/baz.js", "alert('hoho');")
-                .addFormattedResource("modules/test.js", "alert('hi');")
-                .addResource("bar/", "")
-                .addResource("modules/", "");
-    }
 
     private Set<String> getZipEntries(File artifact) throws IOException
     {

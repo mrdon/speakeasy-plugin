@@ -47,7 +47,7 @@ public class SpeakeasyManagementServlet extends HttpServlet
         }
 
         render("templates/admin.vm", ImmutableMap.<String,Object>builder().
-                put("accessList", speakeasyManager.getUserAccessList()).
+                put("accessList", speakeasyManager.getRemotePluginList()).
                 put("msg", msg).
                 build(),
                 res);

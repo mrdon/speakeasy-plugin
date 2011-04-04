@@ -7,15 +7,14 @@ import com.atlassian.webdriver.pageobjects.WebDriverTester;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
+import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
 import static com.google.common.collect.Lists.newArrayList;
-import static java.util.Collections.emptySet;
+import static it.com.atlassian.labs.speakeasy.ExtensionBuilder.buildSimplePluginFile;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
@@ -47,11 +46,11 @@ public class TestAdmin
                     .allowAdmins(false)
                     .save();
         assertFalse(product.visit(SpeakeasyUserPage.class)
-                    .canExecute("plugin-tests", Actions.ENABLE));
+                    .canExecute("plugin-tests", ExtensionOperations.ENABLE));
         logout();
         assertTrue(product.visit(LoginPage.class)
                .login("barney", "barney", SpeakeasyUserPage.class)
-                    .canExecute("plugin-tests", Actions.ENABLE));
+                    .canExecute("plugin-tests", ExtensionOperations.ENABLE));
 
         logout();
         product.visit(LoginPage.class)
@@ -60,27 +59,50 @@ public class TestAdmin
                     .allowAdmins(true)
                     .save();
         assertTrue(product.visit(SpeakeasyUserPage.class)
-                    .canExecute("plugin-tests", Actions.ENABLE));
+                    .canExecute("plugin-tests", ExtensionOperations.ENABLE));
     }
 
     @Test
-    public void testRestrictAuthors()
+    public void testRestrictAuthors() throws IOException
     {
+        // setup
+        product.visit(SpeakeasyUserPage.class)
+            .uploadPlugin(buildSimplePluginFile("restrict-authors", "Restrict Authors"));
+        logout();
+        product.visit(LoginPage.class)
+            .login("barney", "barney", SpeakeasyUserPage.class)
+            .openForkDialog("restrict-authors")
+                .fork();
+        logout();
 
-        final AdminPage admin = product.visit(AdminPage.class);
+
+        final AdminPage admin = product.visit(LoginPage.class).loginAsSysAdmin(AdminPage.class);
         Set<String> originalGroups = admin.getAuthorGroups();
         admin
                 .edit()
                 .allowAdmins(true)
                 .setAuthorGroups(Collections.<String>emptySet())
                 .save();
-        assertFalse(product.visit(SpeakeasyUserPage.class).canCreateExtension());
+        SpeakeasyUserPage userPage = product.visit(SpeakeasyUserPage.class);
+        assertFalse(userPage.canCreateExtension());
+        assertFalse(userPage.getPluginKeys().contains("restrict-authors-fork-barney"));
         product.visit(AdminPage.class)
                 .edit()
                     .allowAdmins(true)
                     .setAuthorGroups(originalGroups)
                     .save();
-        assertTrue(product.visit(SpeakeasyUserPage.class).canCreateExtension());
+
+        userPage = product.visit(SpeakeasyUserPage.class);
+        assertTrue(userPage.canCreateExtension());
+        assertTrue(userPage.getPluginKeys().contains("restrict-authors-fork-barney"));
+
+        // cleanup
+        userPage.uninstallPlugin("restrict-authors");
+        logout();
+        product.visit(LoginPage.class)
+            .login("barney", "barney", SpeakeasyUserPage.class)
+            .uninstallPlugin("restrict-authors-fork-barney");
+
     }
 
     @Test

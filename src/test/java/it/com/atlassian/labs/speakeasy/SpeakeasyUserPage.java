@@ -7,12 +7,10 @@ import com.atlassian.pageobjects.TestedProduct;
 import com.atlassian.pageobjects.binder.WaitUntil;
 import com.atlassian.webdriver.AtlassianWebDriver;
 import com.atlassian.webdriver.utils.Check;
-import com.atlassian.webdriver.utils.by.ByHelper;
 import com.google.common.base.Function;
 import org.apache.commons.lang.Validate;
 import org.openqa.selenium.By;
 import org.openqa.selenium.NoSuchElementException;
-import org.openqa.selenium.RenderedWebElement;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 
@@ -186,19 +184,19 @@ public class SpeakeasyUserPage implements Page
 
     public SpeakeasyUserPage uninstallPlugin(String pluginKey)
     {
-        WebElement uninstallLink = getActionLink(pluginKey, Actions.UNINSTALL);
+        WebElement uninstallLink = getActionLink(pluginKey, ExtensionOperations.UNINSTALL);
         uninstallLink.click();
         waitForMessages();
         return this;
     }
 
-    private WebElement getActionLink(String pluginKey, Actions action)
+    private WebElement getActionLink(String pluginKey, ExtensionOperations action)
     {
         WebElement pluginRow = getPluginRow(pluginKey);
         return pluginRow.findElement(By.className("pk-" + action.toString().toLowerCase()));
     }
 
-    public boolean canExecute(String pluginKey, Actions action)
+    public boolean canExecute(String pluginKey, ExtensionOperations action)
     {
         try
         {
