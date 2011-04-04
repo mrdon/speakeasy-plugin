@@ -137,6 +137,7 @@ function openDialog(pluginKey, href, extension){
         height: '480px',
         width: '95%',
         autoMatchParens: true,
+        lineNumbers: true,
         parserfile: ["parsexml.js", "parsecss.js", "tokenizejavascript.js", "parsejavascript.js", "parsehtmlmixed.js"],
         stylesheet: [ staticResourcesPrefix + '/download/resources/com.atlassian.labs.speakeasy-plugin:codemirror/css/xmlcolors.css', staticResourcesPrefix + '/download/resources/com.atlassian.labs.speakeasy-plugin:codemirror/css/jscolors.css', staticResourcesPrefix + '/download/resources/com.atlassian.labs.speakeasy-plugin:codemirror/css/csscolors.css'],
         path: staticResourcesPrefix + '/download/resources/com.atlassian.labs.speakeasy-plugin:codemirror/js/',

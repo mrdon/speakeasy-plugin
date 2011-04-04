@@ -6,34 +6,6 @@
         var product = "$product";
     </script>
 
-    <script type="text/x-template" title="fork-dialog">
-        <p>
-            This will create a fork of the extension '{pluginKey}'
-        </p>
-        <form id="fork-form" class="aui top-label">
-            <fieldset>
-                <div class="field-group">
-                    <label for="fork-description">New Description</label>
-                    <textarea name="fork-description" id="fork-description" cols="40" rows="5">{description}</textarea>
-                    <div class="description">A few words on why you are forking</div>
-                </div>
-            <fieldset>
-        </form>
-    </script>
-
-    <script type="text/x-template" title="available-extension-row">
-        <tr data-pluginKey="{key}">
-            <td headers="plugin-name"><span class="plugin-name">{name}</span><br><span class="plugin-description">{description}</span></td>
-            <td headers="plugin-author"><a href="{authorUrl}">{author}</a></td>
-            <td headers="plugin-version">{version}</td>
-            <td headers="plugin-actions" nowrap="true">
-                <a href="{binaryUrl}">Download</a>
-                <a href="http://plugins.atlassian.com/{id}">Learn More</a>
-            </td>
-        </tr>
-    </script>
-
-
 <div style="margin-top: -55px; margin-left: 350px;" id="aui-message-bar">
     #if (!$doesAnyGroupHaveAccess)
         <div class="aui-message warning closeable"><p class="title"><span class="aui-icon icon-warning"></span></p>

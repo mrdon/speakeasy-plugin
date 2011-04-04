@@ -8,6 +8,8 @@ var $ = require('../jquery').jQuery;
 var addMessage = require('../messages').add;
 var ide = require('./ide/ide');
 var wizard = require('./wizard/create');
+var fork = require('./fork/fork');
+var pac = require('./pac/pac');
 
 var pluginsTable;
 var pluginActions = {
@@ -15,7 +17,7 @@ var pluginActions = {
             ide.openDialog(key, getAbsoluteHref(link), link.attr("data-extension"));
         },
     'uninstall' : uninstallPlugin,
-    'fork' : openForkDialog,
+    'fork' : fork.openDialog,
     'enable' : enablePlugin,
     'disable' : disablePlugin,
     'download' : function(key, link, attachedRow) {
@@ -74,50 +76,6 @@ function uninstallPlugin(pluginKey, link, attachedRow) {
             });
 }
 
-function openForkDialog(pluginKey, link, attachedRow) {
-    var href = getAbsoluteHref(link);
-    var desc = $.trim($('.plugin-description', attachedRow).text());
-    var dialog = new AJS.Dialog({width:500, height:450, id:'fork-dialog'});
-    var pluginName = $('td[headers=plugin-name] .plugin-name', attachedRow).text();
-    dialog.addHeader("Fork '" + pluginName + "'");
-    var forkDialogContents = AJS.template.load('fork-dialog')
-                                .fill({
-                                    pluginKey : pluginKey,
-                                    href : href,
-                                    description : desc
-                                   })
-                                .toString();
-    dialog.addPanel("Fork", forkDialogContents, "panel-body");
-    dialog.addButton("Fork", function (dialog) {
-        var description = $('#fork-description').val();
-        forkPlugin(link, attachedRow, description);
-        dialog.remove();
-    }, "fork-submit");
-    dialog.addButton("Cancel", function (dialog) {
-        dialog.remove();
-    }, "fork-cancel");
-    dialog.show();
-}
-
-function forkPlugin(link, attachedRow, description) {
-    //var enabled = ("Disable" == link.text());
-    link.append('<img class="waiting" alt="waiting" src="' + staticResourcesPrefix + '/download/resources/com.atlassian.labs.speakeasy-plugin:shared/images/wait.gif" />');
-    var pluginName = $('td[headers=plugin-name] .plugin-name', attachedRow).text();
-    $.ajax({
-              url: getAbsoluteHref(link),
-              type: 'POST',
-              data: {description:description},
-              success: function(data) {
-                updateTable(data);
-                addMessage('success', {body: "<b>" + pluginName + "</b> was forked successfully", shadowed: false});
-                $('.waiting', link).remove();
-              },
-              error: function(data) {
-                  addMessage('error', {title: "Error forking extension", body: data.responseText, shadowed: false});
-                  $('.waiting', link).remove();
-              }
-            });
-}
 function updateTable(plugins) {
     var updatedPlugins = [];
     if (plugins.plugins) {
@@ -146,45 +104,6 @@ function addRow(plugin) {
     var filledRow = $(require('./row').render(data));
     filledRow.appendTo(pluginsTable);
 }
-
-function loadAvailableExtensions() {
-    $("#loading").show();
-    $('#available-extensions-tab').unbind('click.loadextensions');
-
-
-    var category = 52; // right now this is PAC > JIRA > External Tools, should obviously be switched to "Extensions"
-    var numResults = 10;
-
-    // PAC YQL OpenTable stored at https://dl.dropbox.com/u/48692/pac-open-table.xml
-    var url = "http://query.yahooapis.com/v1/public/yql?q=use%20'https%3A%2F%2Fdl.dropbox.com%2Fu%2F48692%2Fpac-open-table.xml'%20as%20pac%3B%20SELECT%20item.id%2C%20item.name%2C%20item.pluginKey%2C%20item.icon.location%2C%20item.icon.width%2C%20item.icon.height%2C%20item.latestVersion.version%2C%20item.latestVersion.summary%2C%20item.latestVersion.binaryUrl%2C%20item.vendor.url%2C%20item.vendor.name%20FROM%20pac(0%2C" + numResults + ")%20WHERE%20category%20%3D%20'" + category + "'%3B&format=json&diagnostics=true&callback=?";
-    $.getJSON(url,
-        function(data) {
-            $(data.query.results.json).each(function () { addPACRow(this); });
-            $("#loading").hide();
-            $("#available-extensions-table").show();
-        }
-    );
-}
-
-
-function addPACRow(item) {
-    var rowTemplate = AJS.template.load("available-extension-row");
-
-    var data = {};
-    data.id = item.item.id;
-    data.key = item.item.pluginKey;
-    data.name = item.item.name;
-    data.description = item.item.latestVersion.summary;
-    data.version = item.item.latestVersion.version;
-    data.binaryUrl = item.item.latestVersion.binaryUrl;
-    data.author = item.item.vendor.name;
-    data.authorUrl = item.item.vendor.url;
-//        console.dir(item)
-
-    var filledRow = $(rowTemplate.fill(data).toString());
-    filledRow.appendTo(available-extensions-table);
-}
-
 
 function initSpeakeasy() {
     pluginsTable = $("#plugins-table-body");
@@ -240,9 +159,8 @@ function initSpeakeasy() {
 
     uploadForm.resetForm();
 
-    $('#available-extensions-tab').bind('click.loadextensions', function(e) {
-        loadAvailableExtensions();
-    });
+    pac.init();
+
     $('#speakeasy-loaded').html("");
 
     $('#extension-wizard-link').click(function(e) {
