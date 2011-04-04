@@ -380,6 +380,11 @@ public class SpeakeasyManager
         return getActualSettings();
     }
 
+    public boolean doesAnyGroupHaveAccess()
+    {
+        return !getActualSettings().getAccessGroups().isEmpty();
+    }
+
     private Settings getActualSettings()
     {
         String value = data.getSettings();
@@ -398,6 +403,7 @@ public class SpeakeasyManager
         try
         {
             validateAdmin(userName);
+            
             String value = JsonObjectMapper.write(settings);
             Settings savedSettings = JsonObjectMapper.read(Settings.class, data.saveSettings(value));
             log.info("Saved administration settings by user '{}'", userName);
@@ -596,6 +602,14 @@ public class SpeakeasyManager
                     remotePlugin.setCanFork(false);
                 }
             }
+        }
+
+        // if the user is an admin and admins aren't allowed to enable
+        if (!permissionManager.canEnableExtensions(getActualSettings(), userName))
+        {
+            remotePlugin.setCanEnable(false);
+            remotePlugin.setCanFork(false);
+            remotePlugin.setCanEdit(false);
         }
         return remotePlugin;
     }

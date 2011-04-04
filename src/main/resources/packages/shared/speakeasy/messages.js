@@ -11,6 +11,9 @@ function addMessage(type, params) {
     if (type == "success") {
         AJS.messages.success(params);
     }
+    else if (type == "warning") {
+        AJS.messages.warning(params);
+    }
     else if (type == "error") {
         AJS.messages.error(params);
     }

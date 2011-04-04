@@ -171,15 +171,7 @@ public class SpeakeasyUserPage implements Page
 
     public List<String> getSuccessMessages()
     {
-        List<String> messages = new ArrayList<String>();
-        for (WebElement msg : messageBar.findElements(By.className("aui-message")))
-        {
-            if (msg.getAttribute("class").contains("success"))
-            {
-                messages.add(msg.getText().trim());
-            }
-        }
-        return messages;
+        return getMessages("success");
     }
 
     public DownloadDialog openDownloadDialog(String pluginKey) throws IOException
@@ -221,10 +213,20 @@ public class SpeakeasyUserPage implements Page
 
     public List<String> getErrorMessages()
     {
+        return getMessages("error");
+    }
+
+    public List<String> getWarningMessages()
+    {
+        return getMessages("warning");
+    }
+
+    private List<String> getMessages(String className)
+    {
         List<String> messages = new ArrayList<String>();
         for (WebElement msg : messageBar.findElements(By.className("aui-message")))
         {
-            if (msg.getAttribute("class").contains("error"))
+            if (msg.getAttribute("class").contains(className))
             {
                 messages.add(msg.getText().trim());
             }

@@ -3,10 +3,14 @@ package it.com.atlassian.labs.speakeasy;
 import com.atlassian.pageobjects.Page;
 import com.atlassian.webdriver.AtlassianWebDriver;
 import org.apache.commons.collections.ExtendedProperties;
+import org.apache.commons.lang.StringUtils;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 
 import javax.inject.Inject;
+import java.util.Set;
+
+import static com.google.common.collect.Sets.newHashSet;
 
 /**
  *
@@ -24,15 +28,25 @@ public class AdminPage implements Page
     public EditView edit()
     {
         driver.findElement(By.id("sp-edit")).click();
-        driver.waitUntilElementIsVisible(By.id("sp-noadmins-edit"));
+        driver.waitUntilElementIsVisible(By.id("sp-allowadmins-edit"));
         return new EditView();
+    }
+
+    public Set<String> getAccessGroups()
+    {
+        return newHashSet(driver.findElement(By.id("sp-access-groups-view")).getText().split("\\s*,\\s*"));
+    }
+
+    public Set<String> getAuthorGroups()
+    {
+        return newHashSet(driver.findElement(By.id("sp-author-groups-view")).getText().split("\\s*,\\s*"));
     }
 
     public class EditView
     {
-        public EditView noAdmins(boolean val)
+        public EditView allowAdmins(boolean val)
         {
-            toggle(By.id("sp-noadmins-edit"), val);
+            toggle(By.id("sp-allowadmins-edit"), val);
             return this;
         }
 
@@ -43,15 +57,19 @@ public class AdminPage implements Page
             return AdminPage.this;
         }
 
-        public EditView restrictAuthorsToGroups(boolean b)
+        public EditView setAuthorGroups(Set<String> groups)
         {
-            toggle(By.id("sp-author-groups-enable-edit"), b);
+            final WebElement textarea = driver.findElement(By.id("sp-author-groups-edit"));
+            textarea.clear();
+            textarea.sendKeys(StringUtils.join(groups, "\n"));
             return this;
         }
-
-        public EditView restrictAccessToGroups(boolean val)
+        
+        public EditView setAccessGroups(Set<String> groups)
         {
-            toggle(By.id("sp-access-groups-enable-edit"), val);
+            final WebElement textarea = driver.findElement(By.id("sp-access-groups-edit"));
+            textarea.clear();
+            textarea.sendKeys(StringUtils.join(groups, "\n"));
             return this;
         }
 

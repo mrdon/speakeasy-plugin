@@ -5,7 +5,6 @@ import com.atlassian.labs.speakeasy.UnauthorizedAccessException;
 import com.atlassian.labs.speakeasy.commonjs.CommonJsModules;
 import com.atlassian.labs.speakeasy.commonjs.CommonJsModulesAccessor;
 import com.atlassian.labs.speakeasy.data.SpeakeasyData;
-import com.atlassian.labs.speakeasy.install.PluginManager;
 import com.atlassian.labs.speakeasy.model.RemotePlugin;
 import com.atlassian.labs.speakeasy.model.UserPlugins;
 import com.atlassian.labs.speakeasy.product.ProductAccessor;
@@ -96,6 +95,7 @@ public class UserProfileRenderer
                 put("product", productAccessor.getSdkName()).
                 put("devmode", devMode).
                 put("canAuthor", speakeasyManager.canAuthorExtensions(user)).
+                put("doesAnyGroupHaveAccess", speakeasyManager.doesAnyGroupHaveAccess()).
                 put("webInterfaceManager", webInterfaceManager).
                 put("webInterfaceContext", Collections.<String, Object>emptyMap()).
                 build(),

@@ -1,8 +1,9 @@
 package com.atlassian.labs.speakeasy.model;
 
-import javax.xml.bind.annotation.XmlAttribute;
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlRootElement;
+import com.cenqua.fisheye.config1.Admins;
+import com.google.common.collect.ImmutableSet;
+
+import javax.xml.bind.annotation.*;
 import java.util.Set;
 
 import static com.google.common.collect.Sets.newHashSet;
@@ -11,46 +12,29 @@ import static com.google.common.collect.Sets.newHashSet;
  *
  */
 @XmlRootElement
+@XmlAccessorType(XmlAccessType.PROPERTY)
 public class Settings
 {
-    @XmlAttribute
-    private boolean noAdmins;
+    public static final ImmutableSet<String> ALL_USER_GROUPS = ImmutableSet.of("confluence-users", "jira-users", "users",
+            "bamboo-users", "system_administrators", "adminstrators");
+    private boolean allowAdmins;
 
-    @XmlAttribute
-    private boolean restrictAuthorsToGroups;
-
-    @XmlElement
     private Set<String> authorGroups = newHashSet();
 
-    @XmlAttribute
-    private boolean restrictAccessToGroups;
-
-    @XmlElement
     private Set<String> accessGroups = newHashSet();
 
     public Settings()
     {
         if (Boolean.getBoolean("atlassian.dev.mode"))
         {
-            noAdmins = false;
-            restrictAccessToGroups = false;
-            restrictAuthorsToGroups = false;
+            allowAdmins = true;
+            authorGroups = ALL_USER_GROUPS;
+            accessGroups = ALL_USER_GROUPS;
         }
         else
         {
-            noAdmins = true;
-            restrictAccessToGroups = true;
-            restrictAuthorsToGroups = true;
+            allowAdmins = false;
         }
-    }
-    public boolean isNoAdmins()
-    {
-        return noAdmins;
-    }
-
-    public void setNoAdmins(boolean noAdmins)
-    {
-        this.noAdmins = noAdmins;
     }
 
     public Set<String> getAuthorGroups()
@@ -75,21 +59,38 @@ public class Settings
 
     public boolean isRestrictAccessToGroups()
     {
-        return restrictAccessToGroups;
+        return true;
     }
 
     public void setRestrictAccessToGroups(boolean restrictAccessToGroups)
     {
-        this.restrictAccessToGroups = restrictAccessToGroups;
     }
 
     public boolean isRestrictAuthorsToGroups()
     {
-        return restrictAuthorsToGroups;
+        return true;
     }
 
     public void setRestrictAuthorsToGroups(boolean restrictAuthorsToGroups)
     {
-        this.restrictAuthorsToGroups = restrictAuthorsToGroups;
+    }
+
+    public boolean isAllowAdmins()
+    {
+        return allowAdmins;
+    }
+
+    public void setAllowAdmins(boolean allowAdmins)
+    {
+        this.allowAdmins = allowAdmins;
+    }
+
+    public boolean isNoAdmins()
+    {
+        return !this.allowAdmins;
+    }
+
+    public void setNoAdmins(boolean val)
+    {
     }
 }

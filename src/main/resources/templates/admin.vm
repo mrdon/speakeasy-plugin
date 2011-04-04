@@ -19,23 +19,14 @@
     <fieldset>
         <h2>Extension Visibility</h2>
         <div class="field-group">
-            <label for="sp-noadmins-edit" class="form-icon icon-required">Restrict to non-Administrators</label>
+            <label for="sp-allowadmins-edit" class="form-icon icon-required">Allow Administrators to Enable Extensions</label>
             <div class="edit">
-                <input class="checkbox" type="checkbox" id="sp-noadmins-edit" name="sp-noadmins" title="No Admins" />
-                <div class="description">Restrict Speakeasy usage to non-Administrators for security reasons</div>
+                <input class="checkbox" type="checkbox" id="sp-allowadmins-edit" name="sp-allowadmins" title="Allow Admins to Enable" />
+                <div class="description">Allow administrators to enable extensions.  Should only be checked if this application is private
+                    and the entire user base is trusted.</div>
             </div>
             <div class="view">
-                <div id="sp-noadmins-view"></div>
-            </div>
-        </div>
-        <div class="field-group">
-            <label for="sp-access-groups-enable-edit" class="form-icon icon-required">Restrict access to groups</label>
-            <div class="edit">
-                <input type="checkbox" class="checkbox" id="sp-access-groups-enable-edit" name="sp-access-groups-enable" title="Access Groups Enabled" />
-                <div class="description">Whether to restrict access to certain groups</div>
-            </div>
-            <div class="view">
-                <div id="sp-access-groups-enable-view"></div>
+                <div id="sp-allowadmins-view"></div>
             </div>
         </div>
         <div class="field-group" id="sp-access-groups">
@@ -51,21 +42,12 @@
     </fieldset>
     <fieldset>
         <h2>Extension Authoring</h2>
-        <div class="field-group">
-            <label for="sp-author-groups-enable-edit" class="form-icon icon-required">Restrict authoring to Groups</label>
-            <div class="edit">
-                <input type="checkbox" class="checkbox" id="sp-author-groups-enable-edit" name="sp-author-groups-enable" title="Author Groups Enabled" />
-                <div class="description">Whether to restrict authoring to certain groups</div>
-            </div>
-            <div class="view">
-                <div id="sp-author-groups-enable-view"></div>
-            </div>
-        </div>
         <div class="field-group" id="sp-author-groups">
             <label for="sp-author-groups-edit" class="form-icon icon-required">Author Groups</label>
             <div class="edit">
                 <textarea id="sp-author-groups-edit" name="sp-author-groups" title="Author Groups" cols="50" rows="10"></textarea>
-                <div class="description">Groups allowed to author extensions, one per line</div>
+                <div class="description">Groups allowed to author extensions, one per line.  For security reasons, only
+                    add groups for which you trust all its users.</div>
             </div>
             <div class="view">
                 <div id="sp-author-groups-view"></div>

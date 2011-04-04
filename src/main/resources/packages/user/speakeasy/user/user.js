@@ -249,7 +249,6 @@ function initSpeakeasy() {
         e.preventDefault();
         wizard.openDialog();
     });
-
 }
 
 exports.initSpeakeasy = initSpeakeasy;

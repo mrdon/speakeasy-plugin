@@ -34,7 +34,13 @@
     </script>
 
 
-<div style="margin-top: -55px; margin-left: 350px;" id="aui-message-bar"> </div>
+<div style="margin-top: -55px; margin-left: 350px;" id="aui-message-bar">
+    #if (!$doesAnyGroupHaveAccess)
+        <div class="aui-message warning closeable"><p class="title"><span class="aui-icon icon-warning"></span></p>
+            No one has access to this page.  Click <a href="$contextPath/plugins/servlet/speakeasy/admin">here</a> to change these settings.
+        </div>
+    #end
+</div>
 
 <div class="aui-tabs horizontal-tabs" id="horizontal">
     <ul class="tabs-menu">

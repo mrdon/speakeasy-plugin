@@ -21,20 +21,27 @@ public class PermissionManager
     public boolean canAccessSpeakeasy(Settings settings, String user)
     {
         boolean validUser = user != null;
-        boolean isAdmin = userManager.isAdmin(user) || userManager.isSystemAdmin(user);
-        boolean adminsAllowed = !settings.isNoAdmins();
-        boolean restrictToAccessGroup = settings.isRestrictAccessToGroups();
+
         boolean inAccessGroup = isInAllowedGroup(settings.getAccessGroups(), user);
 
-        return validUser &&
-                (!restrictToAccessGroup || inAccessGroup) &&
-                (!isAdmin || adminsAllowed);
+        return validUser && (isAdmin(user) || inAccessGroup);
+    }
+
+    public boolean canEnableExtensions(Settings settings, String user)
+    {
+        boolean isAdmin = isAdmin(user);
+        boolean adminsAllowed = settings.isAllowAdmins();
+        return canAccessSpeakeasy(settings, user) && !isAdmin || adminsAllowed;
+    }
+
+    private boolean isAdmin(String user)
+    {
+        return userManager.isAdmin(user) || userManager.isSystemAdmin(user);
     }
 
     public boolean canAuthorExtensions(Settings settings, String user)
     {
-        return canAccessSpeakeasy(settings, user) &&
-                (!settings.isRestrictAuthorsToGroups() || isInAllowedGroup(settings.getAuthorGroups(), user));
+        return canAccessSpeakeasy(settings, user) && isInAllowedGroup(settings.getAuthorGroups(), user);
     }
 
     private boolean isInAllowedGroup(Iterable<String> allowedGroups, String user)

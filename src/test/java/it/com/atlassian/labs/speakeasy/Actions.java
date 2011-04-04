@@ -10,5 +10,6 @@ public enum Actions
     EDIT,
     DOWNLOAD,
     UNINSTALL,
-    FORK;
+    FORK,
+    ENABLE
 }

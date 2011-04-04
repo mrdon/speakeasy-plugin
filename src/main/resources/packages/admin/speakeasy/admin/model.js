@@ -3,8 +3,8 @@ var Settings = Backbone.Model.extend({
     url : function() {
       return window.contextPath + '/rest/speakeasy/1/admin/settings';
     },
-    toggleNoAdmins: function() {
-        this.set({'noAdmins' : !this.get('noAdmins')});
+    toggleAllowAdmins: function() {
+        this.set({'allowAdmins' : !this.get('allowAdmins')});
     },
     id : 1,
     accessGroups : [],

@@ -11,31 +11,27 @@ var View = Backbone.View.extend({
     },
 
     render: function() {
-        $('#sp-noadmins-view').text(this.model.get('noAdmins') ? "Yes" : "No");
-        $('#sp-access-groups-enable-view').text(this.model.get('restrictAccessToGroups') ? "Yes" : "No");
-        $('#sp-author-groups-enable-view').text(this.model.get('restrictAuthorsToGroups') ? "Yes" : "No");
+        $('#sp-allowadmins-view').text(this.model.get('allowAdmins') ? "Yes" : "No");
         $('#sp-access-groups-view').text(this.model.get('accessGroups').join(', '));
         $('#sp-author-groups-view').text(this.model.get('authorGroups').join(', '));
-        if (this.model.get('restrictAccessToGroups')) {
-            $('#sp-access-groups').removeClass('hidden');
-        } else {
-            $('#sp-access-groups').addClass('hidden');
-        }
-        if (this.model.get('restrictAuthorsToGroups')) {
-            $('#sp-author-groups').removeClass('hidden');
-        } else {
-            $('#sp-author-groups').addClass('hidden');
-        }
     }
 });
+
+function toArray(val) {
+    var result = [];
+    $.each(val.split('\n'), function(x) {
+        if (this.trim().length > 0) {
+            result.push(this.trim());
+        }
+    });
+    return result;
+}
 
 var Edit = Backbone.View.extend({
     el: $('#sp-main'),
     events: {
         "submit form": "save",
-        "click #sp-noadmins-edit" : "toggleNoAdmins",
-        "change #sp-access-groups-enable-edit" : "toggleAccessGroups",
-        "change #sp-author-groups-enable-edit" : "toggleAuthorGroups",
+        "click #sp-allowadmins-edit" : "toggleAllowAdmins",
         "blur #sp-access-groups-edit" : "updateAccessGroups",
         "blur #sp-author-groups-edit" : "updateAuthorGroups"
     },
@@ -47,25 +43,19 @@ var Edit = Backbone.View.extend({
         this.render();
     },
 
-    toggleNoAdmins: function() {
-        this.model.toggleNoAdmins();
-    },
-    toggleAccessGroups: function() {
-        this.model.set({'restrictAccessToGroups' : $('#sp-access-groups-enable-edit').attr('checked')});
-    },
-    toggleAuthorGroups: function() {
-        this.model.set({'restrictAuthorsToGroups' : $('#sp-author-groups-enable-edit').attr('checked')});
+    toggleAllowAdmins: function() {
+        this.model.toggleAllowAdmins();
     },
     updateAccessGroups: function() {
-        this.model.set({'accessGroups' : $('#sp-access-groups-edit').val().split('\n')});
+        this.model.set({'accessGroups' : toArray($('#sp-access-groups-edit').val())});
     },
     updateAuthorGroups: function() {
-        this.model.set({'authorGroups' : $('#sp-author-groups-edit').val().split('\n')});
+        this.model.set({'authorGroups' : toArray($('#sp-author-groups-edit').val())});
     },
     save: function() {
         this.model.save(this.model, {
             success: function(model, resp) {
-                $.data($('#sp-form'), AJS.DIRTY_FORM_VALUE, null);
+                $.data($('#sp-form')[0], AJS.DIRTY_FORM_VALUE, null);
                 messages.add('success', {body:'Settings saved successfully'});
                 window.location.hash = '#';
             },
@@ -78,22 +68,9 @@ var Edit = Backbone.View.extend({
     },
 
     render: function() {
-        $('#sp-noadmins-edit').attr('checked', this.model.get('noAdmins'));
-
-        $('#sp-access-groups-enable-edit').attr('checked', this.model.get('restrictAccessToGroups'));
-        $('#sp-author-groups-enable-edit').attr('checked', this.model.get('restrictAuthorsToGroups'));
+        $('#sp-allowadmins-edit').attr('checked', this.model.get('allowAdmins'));
         $('#sp-access-groups-edit').val(this.model.get('accessGroups').join('\n'));
         $('#sp-author-groups-edit').val(this.model.get('authorGroups').join('\n'));
-        if (this.model.get('restrictAccessToGroups')) {
-            $('#sp-access-groups').removeClass('hidden');
-        } else {
-            $('#sp-access-groups').addClass('hidden');
-        }
-        if (this.model.get('restrictAuthorsToGroups')) {
-            $('#sp-author-groups').removeClass('hidden');
-        } else {
-            $('#sp-author-groups').addClass('hidden');
-        }
     }
 });
 exports.Edit = Edit;
