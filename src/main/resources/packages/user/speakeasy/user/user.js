@@ -85,24 +85,35 @@ function updateTable(plugins) {
             if ($.inArray(plugin.key, plugins.updated) > -1) {
                 updatedPlugins.push(plugin);
             }
-            addRow(plugin);
+            pluginsTable.append(renderRow(plugin));
         })
     } else {
-        pluginsTable.find('tr[data-pluginkey="' + plugins.key + '"]').remove();
-        addRow(plugins);
+        var pos = 0;
+        var oldRow = pluginsTable.find('tr[data-pluginkey="' + plugins.key + '"]');
+        if (oldRow) {
+            pos = oldRow.parent().children().index(oldRow);
+            oldRow.remove();
+        }
+        var rowContent = renderRow(plugins);
+        if (pos == 0) {
+            pluginsTable.prepend(rowContent);
+        } else if (pos == oldRow.parent().children().length - 1) {
+            pluginsTable.append(rowContent);
+        } else {
+            pluginsTable.find('tr').eq(pos - 1).after(rowContent);
+        }
         updatedPlugins.push(plugins);
     }
     return updatedPlugins;
 }
 
-function addRow(plugin) {
+function renderRow(plugin) {
 
     var data = $.extend({}, plugin);
     data.user = currentUser;
     data.contextPath = contextPath;
 
-    var filledRow = $(require('./row').render(data));
-    filledRow.appendTo(pluginsTable);
+    return $(require('./row').render(data));
 }
 
 function initSpeakeasy() {
