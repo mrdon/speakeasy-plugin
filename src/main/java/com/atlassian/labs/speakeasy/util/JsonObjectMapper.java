@@ -4,6 +4,8 @@ import com.atlassian.labs.speakeasy.model.JsonManifest;
 import com.atlassian.plugins.rest.common.json.JacksonJsonProviderFactory;
 import org.apache.commons.io.IOUtils;
 import org.apache.poi.hssf.record.formula.functions.T;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import javax.ws.rs.core.MediaType;
 import java.io.*;
@@ -44,7 +46,16 @@ public class JsonObjectMapper
     {
         ByteArrayOutputStream bout = new ByteArrayOutputStream();
         write(object, bout);
-        return new String(bout.toByteArray());
+
+        try
+        {
+            JSONObject result = new JSONObject(new String(bout.toByteArray(), "UTF-8"));
+            return result.toString(2);
+        }
+        catch (JSONException e)
+        {
+            throw new IOException("Unable to write json");
+        }
     }
 
     public static void write(Object object, OutputStream out) throws IOException

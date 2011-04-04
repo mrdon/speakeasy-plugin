@@ -12,6 +12,7 @@ import javax.ws.rs.core.MediaType;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.StringReader;
 
 /**
  *
@@ -56,6 +57,7 @@ public class JsonManifestHandler
 
     public void write(JsonManifest manifest, OutputStream out) throws IOException
     {
-        JsonObjectMapper.write(manifest, out);
+        String serialized = JsonObjectMapper.write(manifest);
+        IOUtils.copy(new StringReader(serialized), out);
     }
 }
