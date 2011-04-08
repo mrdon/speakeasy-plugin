@@ -89,7 +89,12 @@ public class SpeakeasyManager
     public RemotePlugin getRemotePlugin(String pluginKey, String userName) throws PluginOperationFailedException, UnauthorizedAccessException
     {
         validateAccess(userName);
-        return getRemotePlugin(pluginKey, userName, getAllSpeakeasyPlugins());
+        Plugin plugin = pluginAccessor.getPlugin(pluginKey);
+        if (plugin == null)
+        {
+            throw new PluginOperationFailedException("Plugin not found: " + pluginKey, pluginKey);
+        }
+        return getRemotePlugin(plugin, userName, getAllSpeakeasyPlugins());
     }
 
     public List<String> allowUserAccess(final String pluginKey, final String user) throws UnauthorizedAccessException
@@ -494,16 +499,10 @@ public class SpeakeasyManager
         }
     }
 
-    private RemotePlugin getRemotePlugin(String pluginKey, String userName, Iterable<Plugin> speakeasyPlugins) throws PluginOperationFailedException
+    private RemotePlugin getRemotePlugin(Plugin plugin, String userName, Iterable<Plugin> speakeasyPlugins) throws PluginOperationFailedException
     {
-        final Plugin plugin = pluginAccessor.getPlugin(pluginKey);
-        if (plugin == null)
-        {
-            throw new PluginOperationFailedException("Plugin not found: " + pluginKey, pluginKey);
-        }
-
-        boolean canAuthor = permissionManager.canAuthorExtensions(userName);
         RemotePlugin remotePlugin = new RemotePlugin(plugin);
+        boolean canAuthor = permissionManager.canAuthorExtensions(userName);
         String author = getPluginAuthor(plugin);
         remotePlugin.setAuthor(author);
         UserProfile profile = userManager.getUserProfile(author);
@@ -522,9 +521,9 @@ public class SpeakeasyManager
         }
         // try to detect a failed install of a zip plugin
         else if (plugin instanceof UnloadablePlugin &&
-                        plugin.getModuleDescriptor("modules") != null &&
-                        plugin.getModuleDescriptor("images") != null &&
-                        plugin.getModuleDescriptor("css") != null)
+                plugin.getModuleDescriptor("modules") != null &&
+                plugin.getModuleDescriptor("images") != null &&
+                plugin.getModuleDescriptor("css") != null)
         {
             remotePlugin.setExtension("zip");
             remotePlugin.setName(plugin.getName());
@@ -549,7 +548,7 @@ public class SpeakeasyManager
         boolean isAuthor = userName.equals(remotePlugin.getAuthor());
         boolean pureSpeakeasy = onlyContainsSpeakeasyModules(plugin);
 
-        if (pluginAccessor.isPluginEnabled(pluginKey))
+        if (pluginAccessor.isPluginEnabled(plugin.getKey()))
         {
             Set<String> unresolvedExternalModuleDependencies = findUnresolvedCommonJsDependencies(plugin);
             if (unresolvedExternalModuleDependencies.isEmpty())
@@ -677,7 +676,17 @@ public class SpeakeasyManager
         {
             public RemotePlugin apply(Plugin from)
             {
-                return getRemotePlugin(from.getKey(), userName, rawPlugins);
+                try
+                {
+                    return getRemotePlugin(from, userName, rawPlugins);
+                }
+                catch (RuntimeException ex)
+                {
+                    log.error("Unable to load plugin '" + from.getKey() + "'", ex);
+                    RemotePlugin plugin = new RemotePlugin(from);
+                    plugin.setDescription("Unable to load due to " + ex.getMessage());
+                    return plugin;
+                }
             }
         }), new Predicate<RemotePlugin>()
         {
