@@ -55,10 +55,11 @@ public class SpeakeasyManager
     private final BundleContext bundleContext;
     private final PermissionManager permissionManager;
     private final UserManager userManager;
+    private final SettingsManager settingsManager;
     private static final Logger log = LoggerFactory.getLogger(SpeakeasyManager.class);
 
 
-    public SpeakeasyManager(PluginAccessor pluginAccessor, SpeakeasyData data, PluginManager pluginManager, ProductAccessor productAccessor, DescriptorGeneratorManager descriptorGeneratorManager, JsonManifestHandler jsonManifestHandler, BundleContext bundleContext, PermissionManager permissionManager, UserManager userManager)
+    public SpeakeasyManager(PluginAccessor pluginAccessor, SpeakeasyData data, PluginManager pluginManager, ProductAccessor productAccessor, DescriptorGeneratorManager descriptorGeneratorManager, JsonManifestHandler jsonManifestHandler, BundleContext bundleContext, PermissionManager permissionManager, UserManager userManager, SettingsManager settingsManager)
     {
         this.descriptorGeneratorManager = descriptorGeneratorManager;
         this.pluginAccessor = pluginAccessor;
@@ -69,6 +70,7 @@ public class SpeakeasyManager
         this.bundleContext = bundleContext;
         this.permissionManager = permissionManager;
         this.userManager = userManager;
+        this.settingsManager = settingsManager;
     }
 
     public UserPlugins getRemotePluginList(String userName, String... modifiedKeys) throws UnauthorizedAccessException
@@ -378,52 +380,33 @@ public class SpeakeasyManager
     public Settings getSettings(String userName) throws UnauthorizedAccessException
     {
         validateAdmin(userName);
-        return getActualSettings();
+        return settingsManager.getSettings();
     }
 
     public boolean doesAnyGroupHaveAccess()
     {
-        return !getActualSettings().getAccessGroups().isEmpty();
+        return !settingsManager.getSettings().getAccessGroups().isEmpty();
     }
 
-    private Settings getActualSettings()
-    {
-        String value = data.getSettings();
-        try
-        {
-            return JsonObjectMapper.read(Settings.class, value);
-        }
-        catch (IOException e)
-        {
-            throw new RuntimeException("Cannot get settings", e);
-        }
-    }
+
 
     public Settings saveSettings(Settings settings, String userName) throws UnauthorizedAccessException
     {
-        try
-        {
-            validateAdmin(userName);
-            
-            String value = JsonObjectMapper.write(settings);
-            Settings savedSettings = JsonObjectMapper.read(Settings.class, data.saveSettings(value));
-            log.info("Saved administration settings by user '{}'", userName);
-            return savedSettings;
-        }
-        catch (IOException e)
-        {
-            throw new RuntimeException("Cannot save settings", e);
-        }
+        validateAdmin(userName);
+
+        Settings savedSettings = settingsManager.setSettings(settings);
+        log.info("Saved administration settings by user '{}'", userName);
+        return savedSettings;
     }
 
     public boolean canAccessSpeakeasy(String username)
     {
-        return permissionManager.canAccessSpeakeasy(getActualSettings(), username);
+        return permissionManager.canAccessSpeakeasy(username);
     }
 
     public boolean canAuthorExtensions(String user)
     {
-        return permissionManager.canAuthorExtensions(getActualSettings(), user);
+        return permissionManager.canAuthorExtensions(user);
     }
 
     private void disallowAllPluginAccess(String pluginKey, String user)
@@ -519,7 +502,7 @@ public class SpeakeasyManager
             throw new PluginOperationFailedException("Plugin not found: " + pluginKey, pluginKey);
         }
 
-        boolean canAuthor = permissionManager.canAuthorExtensions(getActualSettings(), userName);
+        boolean canAuthor = permissionManager.canAuthorExtensions(userName);
         RemotePlugin remotePlugin = new RemotePlugin(plugin);
         String author = getPluginAuthor(plugin);
         remotePlugin.setAuthor(author);
@@ -606,7 +589,7 @@ public class SpeakeasyManager
         }
 
         // if the user is an admin and admins aren't allowed to enable
-        if (!permissionManager.canEnableExtensions(getActualSettings(), userName))
+        if (!permissionManager.canEnableExtensions(userName))
         {
             remotePlugin.setCanEnable(false);
             remotePlugin.setCanFork(false);
@@ -661,7 +644,7 @@ public class SpeakeasyManager
 
     private void validateAccess(String userName) throws UnauthorizedAccessException
     {
-        if (!permissionManager.canAccessSpeakeasy(getActualSettings(), userName))
+        if (!permissionManager.canAccessSpeakeasy(userName))
         {
             log.warn("Unauthorized Speakeasy access by '" + userName + "'");
             throw new UnauthorizedAccessException(userName, "Cannot access Speakeasy due to lack of permissions");
@@ -670,7 +653,7 @@ public class SpeakeasyManager
 
     private void validateAuthor(String userName) throws UnauthorizedAccessException
     {
-        if (!permissionManager.canAuthorExtensions(getActualSettings(), userName))
+        if (!permissionManager.canAuthorExtensions(userName))
         {
             log.warn("Unauthorized Speakeasy author access by '" + userName + "'");
             throw new UnauthorizedAccessException(userName, "Cannot access Speakeasy due to lack of permissions");

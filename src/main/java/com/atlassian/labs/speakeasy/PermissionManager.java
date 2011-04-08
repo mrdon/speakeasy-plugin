@@ -12,14 +12,17 @@ import java.util.Map;
 public class PermissionManager
 {
     private final UserManager userManager;
+    private final SettingsManager settingsManager;
 
-    public PermissionManager(UserManager userManager)
+    public PermissionManager(UserManager userManager, SettingsManager settingsManager)
     {
         this.userManager = userManager;
+        this.settingsManager = settingsManager;
     }
 
-    public boolean canAccessSpeakeasy(Settings settings, String user)
+    public boolean canAccessSpeakeasy(String user)
     {
+        Settings settings = settingsManager.getSettings();
         boolean validUser = user != null;
 
         boolean inAccessGroup = isInAllowedGroup(settings.getAccessGroups(), user);
@@ -27,11 +30,12 @@ public class PermissionManager
         return validUser && (isAdmin(user) || inAccessGroup);
     }
 
-    public boolean canEnableExtensions(Settings settings, String user)
+    public boolean canEnableExtensions(String user)
     {
+        Settings settings = settingsManager.getSettings();
         boolean isAdmin = isAdmin(user);
         boolean adminsAllowed = settings.isAllowAdmins();
-        return canAccessSpeakeasy(settings, user) && !isAdmin || adminsAllowed;
+        return canAccessSpeakeasy(user) && !isAdmin || adminsAllowed;
     }
 
     private boolean isAdmin(String user)
@@ -39,9 +43,10 @@ public class PermissionManager
         return userManager.isAdmin(user) || userManager.isSystemAdmin(user);
     }
 
-    public boolean canAuthorExtensions(Settings settings, String user)
+    public boolean canAuthorExtensions(String user)
     {
-        return canAccessSpeakeasy(settings, user) && isInAllowedGroup(settings.getAuthorGroups(), user);
+        Settings settings = settingsManager.getSettings();
+        return canAccessSpeakeasy(user) && isInAllowedGroup(settings.getAuthorGroups(), user);
     }
 
     private boolean isInAllowedGroup(Iterable<String> allowedGroups, String user)

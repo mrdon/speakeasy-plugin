@@ -85,6 +85,7 @@
 
     <component key="speakeasyManager" class="com.atlassian.labs.speakeasy.SpeakeasyManager"/>
     <component key="permissionManager" class="com.atlassian.labs.speakeasy.PermissionManager"/>
+    <component key="settingsManager" class="com.atlassian.labs.speakeasy.SettingsManager"/>
     <component key="descriptorGeneratorManager" class="com.atlassian.labs.speakeasy.DescriptorGeneratorManager" />
     <component key="commonJsModulesAccessor" class="com.atlassian.labs.speakeasy.commonjs.CommonJsModulesAccessor" />
     <component key="zipTransformer" class="com.atlassian.labs.speakeasy.install.convention.ZipTransformer"/>
