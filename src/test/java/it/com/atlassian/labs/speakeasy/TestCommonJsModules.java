@@ -1,6 +1,7 @@
 package it.com.atlassian.labs.speakeasy;
 
 import com.atlassian.pageobjects.TestedProduct;
+import com.atlassian.pageobjects.page.AdminHomePage;
 import com.atlassian.pageobjects.page.HomePage;
 import com.atlassian.pageobjects.page.LoginPage;
 import com.atlassian.webdriver.pageobjects.WebDriverTester;
@@ -58,7 +59,7 @@ public class TestCommonJsModules
         File client = ExtensionBuilder.startSimpleBuilder("client", "Client")
                 .addFormattedResource("modules/client/private.js",
                         "/**",
-                        " * @context atl.general",
+                        " * @context atl.admin",
                         " */",
                         "var name = require('host/public').name;",
                         "var $ = require('speakeasy/jquery').jQuery;",
@@ -72,7 +73,7 @@ public class TestCommonJsModules
                 .enablePlugin("client")
                 .enablePlugin("host");
 
-        product.visit(SpeakeasyUserPage.class);
+        product.visit(AdminPage.class);
         assertEquals("Bob", product.getPageBinder().bind(ExampleBanner.class).getFooText());
         SpeakeasyUserPage page = product.visit(SpeakeasyUserPage.class);
         page.uninstallPlugin("host").uninstallPlugin("client");

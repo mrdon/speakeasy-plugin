@@ -38,6 +38,7 @@ public abstract class AbstractOsgiPluginTypeHandler implements PluginTypeHandler
             Pattern.compile(".*[._]jpeg", Pattern.CASE_INSENSITIVE),
             // Pattern.compile(".*\\.xml", Pattern.CASE_INSENSITIVE), // excluded for now as you could add a spring XML file and load other classes
             Pattern.compile(".*[._]css", Pattern.CASE_INSENSITIVE),
+            Pattern.compile(".*/\\._[^.]+", Pattern.CASE_INSENSITIVE),
             Pattern.compile(".*/$"),
             Pattern.compile("META-INF/MANIFEST.MF"),
             Pattern.compile(".*/pom.xml"),
