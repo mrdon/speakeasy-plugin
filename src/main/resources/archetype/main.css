@@ -1,1 +1,4 @@
-#bar { display: none; }
+#bar {
+    display: none;
+    background-image: url(@imagesPrefix/projectavatar.png);
+}

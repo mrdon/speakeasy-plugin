@@ -51,6 +51,18 @@ public class ExampleBanner
         return (Boolean) driver.executeScript(
               "return arguments[0].complete", img);
     }
+
+    public boolean isBarImageLoaded()
+    {
+        String path = (String) driver.executeScript("return jQuery('#bar').css('background-image').replace(/url\\((.*)\\)/,'$1');");
+        driver.executeScript("jQuery('<img/>').attr('src', '" + path + "').load(function() {\n" +
+                "   jQuery('<div/>').attr('id', 'imageLoaded').html('hello').prependTo('body');\n" +
+                "});");
+
+        driver.waitUntilElementIsVisible(By.id("imageLoaded"));
+        return true;
+    }
+
     public String getYahooLinkText()
     {
         WebElement link = driver.findElement(By.className("yahoo-web-item"));

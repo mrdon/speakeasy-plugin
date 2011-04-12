@@ -70,6 +70,7 @@ public class TestConventionExtensions
         assertTrue(banner.isFooImageLoaded());
         assertEquals("Yahoo", banner.getYahooLinkText());
         assertFalse(banner.isBarVisible());
+        assertTrue(banner.isBarImageLoaded());
 
         assertEquals(asList("css/test-convention.css", "images/projectavatar.png", "js/test/foo.js", "ui/web-items.json", "atlassian-extension.json"),
                 page.openEditDialog("test-convention").getFileNames());

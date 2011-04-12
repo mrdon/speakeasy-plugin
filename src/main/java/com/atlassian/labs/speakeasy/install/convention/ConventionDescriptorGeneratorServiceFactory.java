@@ -123,6 +123,14 @@ public class ConventionDescriptorGeneratorServiceFactory implements ServiceFacto
                 .addAttribute("key", type)
                 .addAttribute("scan", "/" + type);
 
+        element.addElement("transformation")
+                .addAttribute("extension", "css")
+                .addElement("transformer")
+                    .addAttribute("key", "cssVariables")
+                    .addAttribute("imagesModuleKey", plugin.getKey() + ":" + "images-" + bundle.getLastModified())
+                    .addAttribute("fullModuleKey", plugin.getKey() + ":" + "css-" + bundle.getLastModified());
+
+
         descriptor.init(plugin, element);
         bundle.getBundleContext().registerService(ModuleDescriptor.class.getName(), descriptor, null);
     }

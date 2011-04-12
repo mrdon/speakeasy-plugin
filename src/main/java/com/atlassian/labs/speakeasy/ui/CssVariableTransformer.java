@@ -45,6 +45,11 @@ public class CssVariableTransformer implements WebResourceTransformer
             {
                 content = content.replace("@modulePrefix", webResourceManager.getStaticResourcePrefix(UrlMode.RELATIVE) + "/download/resources/" + fullModuleKey);
             }
+            String imagesModuleKey = configElement.attributeValue("imagesModuleKey");
+            if (imagesModuleKey != null)
+            {
+                content = content.replace("@imagesPrefix", webResourceManager.getStaticResourcePrefix(UrlMode.RELATIVE) + "/download/resources/" + imagesModuleKey);
+            }
             return content;
         }
     }
