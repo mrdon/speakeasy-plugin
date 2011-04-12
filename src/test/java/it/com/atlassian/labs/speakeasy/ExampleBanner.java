@@ -35,6 +35,11 @@ public class ExampleBanner
         return driver.elementIsVisible(By.id("foo"));
     }
 
+    public String getFooText()
+    {
+        return driver.findElement(By.id("foo")).getText();
+    }
+
     public boolean isBarVisible()
     {
         return driver.elementIsVisible(By.id("bar"));

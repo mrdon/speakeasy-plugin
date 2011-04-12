@@ -10,6 +10,8 @@ import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.List;
 
 import static com.google.common.collect.Lists.newArrayList;
@@ -44,4 +46,37 @@ public class TestCommonJsModules
         assertEquals(newArrayList("sayHi"), tab.getExportNames("test/my-module"));
         assertTrue(tab.getExportNames("test/private").isEmpty());
     }
+
+    @Test
+    public void testSharedExports() throws IOException
+    {
+        File host = ExtensionBuilder.startSimpleBuilder("host", "Host")
+                .addFormattedResource("modules/host/public.js",
+                        "/** @public */",
+                        "exports.name = 'Bob';")
+                .build();
+        File client = ExtensionBuilder.startSimpleBuilder("client", "Client")
+                .addFormattedResource("modules/client/private.js",
+                        "/**",
+                        " * @context atl.general",
+                        " */",
+                        "var name = require('host/public').name;",
+                        "var $ = require('speakeasy/jquery').jQuery;",
+                        "$(document).ready(function() {",
+                        "    $('<h1 />').attr('id', 'foo').html(name).prependTo('body');",
+                        "});")
+                .build();
+        product.visit(SpeakeasyUserPage.class)
+                .uploadPlugin(host)
+                .uploadPlugin(client)
+                .enablePlugin("client")
+                .enablePlugin("host");
+
+        product.visit(SpeakeasyUserPage.class);
+        assertEquals("Bob", product.getPageBinder().bind(ExampleBanner.class).getFooText());
+        SpeakeasyUserPage page = product.visit(SpeakeasyUserPage.class);
+        page.uninstallPlugin("host").uninstallPlugin("client");
+    }
+
+
 }

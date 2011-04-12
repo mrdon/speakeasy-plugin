@@ -1,6 +1,7 @@
 package com.atlassian.labs.speakeasy.commonjs.descriptor;
 
 import com.atlassian.labs.speakeasy.commonjs.CommonJsModules;
+import com.atlassian.labs.speakeasy.util.BundleUtil;
 import com.atlassian.labs.speakeasy.util.WebResourceUtil;
 import com.atlassian.plugin.ModuleDescriptor;
 import com.atlassian.plugin.Plugin;
@@ -90,7 +91,7 @@ public class CommonJsModulesDescriptor extends AbstractModuleDescriptor<CommonJs
         super.enabled();
         if (generatedDescriptorsManager == null)
         {
-            pluginBundle = findBundleForPlugin(plugin);
+            pluginBundle = BundleUtil.findBundleForPlugin(bundleContext, plugin.getKey());
             modules = new CommonJsModules(this, pluginBundle, location);
             generatedDescriptorsManager = new GeneratedDescriptorsManager(pluginBundle, modules, pluginAccessor, pluginEventManager, this);
         }
@@ -120,20 +121,18 @@ public class CommonJsModulesDescriptor extends AbstractModuleDescriptor<CommonJs
         return WebResourceUtil.instantiateDescriptor(hostContainer);
     }
 
-    private Bundle findBundleForPlugin(Plugin plugin)
-    {
-        for (Bundle bundle : bundleContext.getBundles())
-        {
-            if (plugin.getKey().equals(bundle.getHeaders().get(OsgiPlugin.ATLASSIAN_PLUGIN_KEY)))
-            {
-                return bundle;
-            }
-        }
-        throw new PluginParseException("Cannot find bundle for plugin: " + plugin.getKey());
-    }
-
     String getLocation()
     {
         return location;
+    }
+
+    public String getModulesWebResourceCompleteKey()
+    {
+        return getCompleteKey() + "-modules";
+    }
+
+    protected Bundle getPluginBundle()
+    {
+        return pluginBundle;
     }
 }

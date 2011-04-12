@@ -13,6 +13,7 @@ import com.atlassian.plugin.event.PluginEventManager;
 import com.atlassian.plugin.hostcontainer.HostContainer;
 import com.atlassian.plugin.impl.StaticPlugin;
 import com.atlassian.plugin.webresource.WebResourceModuleDescriptor;
+import com.google.common.collect.Iterables;
 import com.google.common.collect.Sets;
 import org.dom4j.Element;
 import org.dom4j.io.OutputFormat;
@@ -25,6 +26,7 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.CopyOnWriteArraySet;
@@ -89,7 +91,7 @@ class GeneratedDescriptorsManager
         {
             if (unresolvedExternalDependencies.removeAll(descriptor.getModule().getPublicModuleIds()))
             {
-                resolvedExternalModules.add(descriptor.getCompleteKey() + "-modules");
+                resolvedExternalModules.add(descriptor.getModulesWebResourceCompleteKey());
             }
 
             if (unresolvedExternalDependencies.isEmpty())
