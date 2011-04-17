@@ -21,7 +21,7 @@ import static com.google.common.collect.Maps.newHashMap;
 /**
  *
  */
-public class RefappProductAccessor implements ProductAccessor
+public class RefappProductAccessor extends ProductAccessor
 {
     private final PomProperties pomProperties;
     private final UserManager userManager;

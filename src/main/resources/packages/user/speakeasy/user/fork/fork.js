@@ -1,5 +1,6 @@
 var $ = require('speakeasy/jquery').jQuery;
 var addMessage = require('speakeasy/messages').add;
+var host = require('speakeasy/host');
 
 exports.openDialog = function(pluginKey, link, attachedRow) {
     var desc = $.trim($('.plugin-description', attachedRow).text());
@@ -24,10 +25,10 @@ exports.openDialog = function(pluginKey, link, attachedRow) {
 
 function forkPlugin(link, attachedRow, description) {
     //var enabled = ("Disable" == link.text());
-    link.append('<img class="waiting" alt="waiting" src="' + staticResourcesPrefix + '/download/resources/com.atlassian.labs.speakeasy-plugin:shared/images/wait.gif" />');
+    link.append('<img class="waiting" alt="waiting" src="' + host.staticResourcesPrefix + '/download/resources/com.atlassian.labs.speakeasy-plugin:shared/images/wait.gif" />');
     var pluginName = $('td[headers=plugin-name] .plugin-name', attachedRow).text();
     $.ajax({
-              url: contextPath + link.attr('href'),
+              url: host.contextPath + link.attr('href'),
               type: 'POST',
               data: {description:description},
               success: function(data) {

@@ -10,6 +10,7 @@ var ide = require('./ide/ide');
 var wizard = require('./wizard/create');
 var fork = require('./fork/fork');
 var pac = require('./pac/pac');
+var host = require('speakeasy/host');
 
 var pluginsTable;
 var pluginActions = {
@@ -21,18 +22,18 @@ var pluginActions = {
     'enable' : enablePlugin,
     'disable' : disablePlugin,
     'download' : function(key, link, attachedRow) {
-        require('./download/download').openDialog(key, product, getAbsoluteHref(link), link.attr("data-extension"));
+        require('./download/download').openDialog(key, getAbsoluteHref(link), link.attr("data-extension"));
     }
 };
 
 function getAbsoluteHref($link) {
-    return contextPath + $link.attr("href");
+    return host.contextPath + $link.attr("href");
 }
 
 
 function enablePlugin(pluginKey, link, attachedRow) {
     var pluginName = $('td[headers=plugin-name] .plugin-name', attachedRow).text();
-    link.html('<img alt="waiting" src="' + staticResourcesPrefix + '/download/resources/com.atlassian.labs.speakeasy-plugin:shared/images/wait.gif" />');
+    link.html('<img alt="waiting" src="' + host.staticResourcesPrefix + '/download/resources/com.atlassian.labs.speakeasy-plugin:shared/images/wait.gif" />');
     $.ajax({
               url: getAbsoluteHref(link),
               type: 'PUT',
@@ -45,7 +46,7 @@ function enablePlugin(pluginKey, link, attachedRow) {
 
 function disablePlugin(pluginKey, link, attachedRow) {
     var pluginName = $('td[headers=plugin-name] .plugin-name', attachedRow).text();
-    link.html('<img alt="waiting" src="' + staticResourcesPrefix + '/download/resources/com.atlassian.labs.speakeasy-plugin:shared/images/wait.gif" />');
+    link.html('<img alt="waiting" src="' + host.staticResourcesPrefix + '/download/resources/com.atlassian.labs.speakeasy-plugin:shared/images/wait.gif" />');
     $.ajax({
               url: getAbsoluteHref(link),
               type: 'DELETE',
@@ -57,7 +58,7 @@ function disablePlugin(pluginKey, link, attachedRow) {
 }
 
 function uninstallPlugin(pluginKey, link, attachedRow) {
-    link.html('<img alt="waiting" src="' + staticResourcesPrefix + '/download/resources/com.atlassian.labs.speakeasy-plugin:shared/images/wait.gif" />');
+    link.html('<img alt="waiting" src="' + host.staticResourcesPrefix + '/download/resources/com.atlassian.labs.speakeasy-plugin:shared/images/wait.gif" />');
     var pluginName = $('td[headers=plugin-name] .plugin-name', attachedRow).text();
     var wasEnabled = $('td[headers=plugin-actions] .pk-enable-toggle', attachedRow).text() == "Disable";
     $.ajax({
@@ -108,12 +109,7 @@ function updateTable(plugins) {
 }
 
 function renderRow(plugin) {
-
-    var data = $.extend({}, plugin);
-    data.user = currentUser;
-    data.contextPath = contextPath;
-
-    return $(require('./row').render(data));
+    return $(require('./row').render(plugin));
 }
 
 function initSpeakeasy() {

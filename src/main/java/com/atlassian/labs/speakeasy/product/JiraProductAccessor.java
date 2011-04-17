@@ -20,7 +20,7 @@ import static com.google.common.collect.Maps.newHashMap;
 /**
  *
  */
-public class JiraProductAccessor implements ProductAccessor
+public class JiraProductAccessor extends ProductAccessor
 {
     private final PomProperties pomProperties;
     private final Logger log = LoggerFactory.getLogger(JiraProductAccessor.class);

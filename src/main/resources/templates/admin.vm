@@ -6,8 +6,6 @@
 <body>
 <div id="sp-main">
 <script type="text/javascript">
-        var contextPath = "$contextPath";
-        var currentUser = "$user";
         var settings = $settings.render();
     </script>
 <h1>Extension Administration</h1>

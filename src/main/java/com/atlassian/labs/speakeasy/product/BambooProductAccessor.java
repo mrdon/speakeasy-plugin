@@ -9,7 +9,7 @@ import org.slf4j.LoggerFactory;
 import java.util.Map;
 
 
-public class BambooProductAccessor implements ProductAccessor {
+public class BambooProductAccessor extends ProductAccessor {
 
     private final PomProperties pomProperties;
     private final Logger log = LoggerFactory.getLogger(JiraProductAccessor.class);

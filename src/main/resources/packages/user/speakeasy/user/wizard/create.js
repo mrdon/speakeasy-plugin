@@ -4,6 +4,7 @@
 var $ = require('speakeasy/jquery').jQuery;
 var addMessage = require('speakeasy/messages').add;
 var staticResourcesPrefix = require('speakeasy/host').staticResourcesPrefix;
+var host = require('speakeasy/host');
 
 function sendCreateData(params, callback) {
     var createButton = $('#extension-wizard-create');
@@ -11,7 +12,7 @@ function sendCreateData(params, callback) {
     createButton.parent().append('<img class="waiting" alt="waiting" src="' + staticResourcesPrefix + '/download/resources/com.atlassian.labs.speakeasy-plugin:shared/images/wait.gif">');
 
     $.ajax({
-      url: contextPath + "/rest/speakeasy/1/plugins/create/" + params.key,
+      url: host.contextPath + "/rest/speakeasy/1/plugins/create/" + params.key,
       type: 'POST',
       data: params,
       success: function(data) {

@@ -1,7 +1,8 @@
 var Backbone = require('backbone');
+var host = require("speakeasy/host");
 var Settings = Backbone.Model.extend({
     url : function() {
-      return window.contextPath + '/rest/speakeasy/1/admin/settings';
+      return host.contextPath + '/rest/speakeasy/1/admin/settings';
     },
     toggleAllowAdmins: function() {
         this.set({'allowAdmins' : !this.get('allowAdmins')});

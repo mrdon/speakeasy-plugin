@@ -23,7 +23,7 @@ import static com.google.common.collect.Maps.newHashMap;
 /**
  *
  */
-public class ConfluenceProductAccessor implements ProductAccessor
+public class ConfluenceProductAccessor extends ProductAccessor
 {
     private final PomProperties pomProperties;
     private static final Logger log = LoggerFactory.getLogger(ConfluenceProductAccessor.class);

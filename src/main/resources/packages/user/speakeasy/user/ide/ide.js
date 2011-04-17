@@ -4,6 +4,7 @@
  * @dependency treeview
  */
 var $ = require('../../jquery').jQuery;
+var host = require('speakeasy/host');
 
 var editor;
 
@@ -114,8 +115,8 @@ function openDialog(pluginKey, href, extension){
 
     var ideDialogContents = require('./dialog').render({
             pluginKey : pluginKey,
-            staticResourcesPrefix : staticResourcesPrefix,
-            "firstScript" : '<script src="' + staticResourcesPrefix + '/download/resources/com.atlassian.labs.speakeasy-plugin:codemirror/js/codemirror.js"></script>'
+            staticResourcesPrefix : host.staticResourcesPrefix,
+            "firstScript" : '<script src="' + host.staticResourcesPrefix + '/download/resources/com.atlassian.labs.speakeasy-plugin:codemirror/js/codemirror.js"></script>'
            });
 
     dialog.addPanel("IDE", ideDialogContents, "panel-body");
@@ -139,8 +140,10 @@ function openDialog(pluginKey, href, extension){
         autoMatchParens: true,
         lineNumbers: true,
         parserfile: ["parsexml.js", "parsecss.js", "tokenizejavascript.js", "parsejavascript.js", "parsehtmlmixed.js"],
-        stylesheet: [ staticResourcesPrefix + '/download/resources/com.atlassian.labs.speakeasy-plugin:codemirror/css/xmlcolors.css', staticResourcesPrefix + '/download/resources/com.atlassian.labs.speakeasy-plugin:codemirror/css/jscolors.css', staticResourcesPrefix + '/download/resources/com.atlassian.labs.speakeasy-plugin:codemirror/css/csscolors.css'],
-        path: staticResourcesPrefix + '/download/resources/com.atlassian.labs.speakeasy-plugin:codemirror/js/',
+        stylesheet: [ host.staticResourcesPrefix + '/download/resources/com.atlassian.labs.speakeasy-plugin:codemirror/css/xmlcolors.css',
+            host.staticResourcesPrefix + '/download/resources/com.atlassian.labs.speakeasy-plugin:codemirror/css/jscolors.css',
+            host.staticResourcesPrefix + '/download/resources/com.atlassian.labs.speakeasy-plugin:codemirror/css/csscolors.css'],
+        path: host.staticResourcesPrefix + '/download/resources/com.atlassian.labs.speakeasy-plugin:codemirror/js/',
         onLoad: function() { loadFile(pluginKey, firstFile); }
 
         //, lineNumbers: true
@@ -149,7 +152,7 @@ function openDialog(pluginKey, href, extension){
 
 function loadFile(pluginKey, filePath) {
     updateStatus("Loading " + filePath + " . . .");
-    $.get(contextPath + "/rest/speakeasy/1/plugins/plugin/" + pluginKey + "/file", {path:filePath}, function(data) {
+    $.get(host.contextPath + "/rest/speakeasy/1/plugins/plugin/" + pluginKey + "/file", {path:filePath}, function(data) {
         editor.setCode(data);
         var editorEl = retrieveEditor();
         editorEl.text(data);
@@ -178,7 +181,7 @@ function loadFile(pluginKey, filePath) {
 function saveAndReload(pluginKey, fileName, contents) {
     updateStatus("Saving " + fileName + " and reloading plugin '" + pluginKey + "' . . . ");
     $.ajax({
-        url: contextPath + "/rest/speakeasy/1/plugins/plugin/" + pluginKey + "/file?path=" + fileName,
+        url: host.contextPath + "/rest/speakeasy/1/plugins/plugin/" + pluginKey + "/file?path=" + fileName,
         data: contents,
         type: 'PUT',
         contentType: "text/plain",

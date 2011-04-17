@@ -15,7 +15,7 @@ import java.io.IOException;
 import java.io.StringWriter;
 import java.util.Map;
 
-public class FecruProductAccessor implements ProductAccessor {
+public class FecruProductAccessor extends ProductAccessor {
 
     private final PomProperties pomProperties;
     private final UserManager userManager;

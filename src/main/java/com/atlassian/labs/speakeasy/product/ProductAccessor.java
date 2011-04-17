@@ -5,15 +5,27 @@ import java.util.Map;
 /**
  *
  */
-public interface ProductAccessor
+public abstract class ProductAccessor
 {
-    String getSdkName();
+    private static volatile ProductAccessor INSTANCE;
 
-    String getVersion();
+    protected ProductAccessor()
+    {
+        INSTANCE = this;
+    }
 
-    String getDataVersion();
+    public static ProductAccessor getInstance()
+    {
+        return INSTANCE;
+    }
 
-    String getUserFullName(String username);
+    public abstract String getSdkName();
 
-    void sendEmail(String toUsername, String subjectTemplate, String bodyTemplate, Map<String,Object> context);
+    public abstract String getVersion();
+
+    public abstract String getDataVersion();
+
+    public abstract String getUserFullName(String username);
+
+    public abstract void sendEmail(String toUsername, String subjectTemplate, String bodyTemplate, Map<String,Object> context);
 }

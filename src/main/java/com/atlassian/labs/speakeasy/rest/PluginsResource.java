@@ -52,6 +52,15 @@ public class PluginsResource
         this.speakeasyManager = speakeasyManager;
     }
 
+    @GET
+    @Path("")
+    public Response getAllPlugins() throws UnauthorizedAccessException
+    {
+        String user = userManager.getRemoteUsername();
+        UserPlugins entity = speakeasyManager.getRemotePluginList(user);
+        return Response.ok().entity(entity).build();
+    }
+
     @DELETE
     @Path("plugin/{pluginKey}")
     @Produces("application/json")

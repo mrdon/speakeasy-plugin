@@ -2,14 +2,15 @@
  * Renders the download dialog for the Speakeasy user page
  */
 var $ = require('speakeasy/jquery').jQuery;
+var host = require('speakeasy/host');
 
-exports.openDialog = function(key, product, href, extension) {
+exports.openDialog = function(key, href, extension) {
     var dialog = new AJS.Dialog({width:500, height:430, id:'download-dialog'});
     dialog.addHeader("Download '" + key + "'");
     var downloadDialogContents = require('./download-dialog').render({
                                     pluginKey : key,
                                     href : href,
-                                    product : product,
+                                    product : host.product,
                                     extension : extension,
                                     allowAmps : extension == "jar"
                                    });

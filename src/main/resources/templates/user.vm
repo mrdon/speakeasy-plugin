@@ -1,10 +1,6 @@
 <div id="speakeasy-user-main">
-    <script type="text/javascript">
-        var staticResourcesPrefix = "$staticResourcesPrefix";
-        var contextPath = "$contextPath";
-        var currentUser = "$user";
-        var product = "$product";
-    </script>
+    <div id="sp-extension-detail"></div>
+    <div id="sp-extension-list">
 
 <div style="margin-top: -55px; margin-left: 350px;" id="aui-message-bar">
     #if (!$doesAnyGroupHaveAccess)
@@ -132,5 +128,5 @@ align="absmiddle" src="$staticResourcesPrefix/download/resources/com.atlassian.l
 <script type="text/javascript">
         require.run('speakeasy/user/user').initSpeakeasy();
 </script>
-
+</div>
 </div>

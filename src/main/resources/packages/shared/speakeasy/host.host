@@ -8,3 +8,5 @@
  * The relative static resources prefix, including context path
  */
 exports.staticResourcesPrefix = "@staticResourcePrefix";
+exports.contextPath = "@contextPath";
+exports.product = "@product";
