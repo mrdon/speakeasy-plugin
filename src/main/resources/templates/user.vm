@@ -35,7 +35,7 @@
             #if ($canAuthor)
             To upload a new extension, use the <b>Upload</b> form.<br />
             To create a new extension, <a id="extension-wizard-link" href="javascript:void(0)">use the wizard</a>.<br />
-            To develop your own extensions, <a href="mailto:don@atlassian.com">learn more</a>.
+            To develop your own extensions, <a href="http://confluence.atlassian.com/display/DEVNET/Speakeasy+Overview">learn more</a>.
             #end
         </p>
 
