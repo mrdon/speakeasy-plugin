@@ -11,6 +11,7 @@ import org.slf4j.LoggerFactory;
 import webwork.action.ServletActionContext;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.StringWriter;
 
@@ -34,10 +35,11 @@ public class SpeakeasyViewProfilePanel implements ViewProfilePanel, OptionalUser
     public String getHtml(User user)
     {
         HttpServletRequest req = ServletActionContext.getRequest();
+        HttpServletResponse resp = ServletActionContext.getResponse();
         StringWriter writer = new StringWriter();
         try
         {
-            renderer.render(req, writer, false);
+            renderer.render(req, resp, writer, false);
         }
         catch (UnauthorizedAccessException e)
         {

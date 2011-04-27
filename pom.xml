@@ -287,6 +287,7 @@
                             com.atlassian.jira.plugin.webfragment.descriptors;resolution:=optional,
                             com.atlassian.jira.security;resolution:=optional,
                             com.atlassian.jira;resolution:=optional,
+                            com.atlassian.plugins.rest.common.security.RequiresXsrfCheck,
                             *;resolution:=optional
                         </Import-Package>
                         <Export-Package>

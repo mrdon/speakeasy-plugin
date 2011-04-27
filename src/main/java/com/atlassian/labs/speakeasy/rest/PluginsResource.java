@@ -8,7 +8,9 @@ import com.atlassian.labs.speakeasy.model.PluginIndex;
 import com.atlassian.labs.speakeasy.model.RemotePlugin;
 import com.atlassian.labs.speakeasy.model.UserPlugins;
 import com.atlassian.plugins.rest.common.json.JaxbJsonMarshaller;
+import com.atlassian.plugins.rest.common.security.RequiresXsrfCheck;
 import com.atlassian.sal.api.user.UserManager;
+import com.atlassian.sal.api.xsrf.XsrfTokenValidator;
 import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.fileupload.FileUploadException;
 import org.apache.commons.fileupload.disk.DiskFileItemFactory;
@@ -43,13 +45,15 @@ public class PluginsResource
     private final SpeakeasyManager speakeasyManager;
     private final UserManager userManager;
     private final JaxbJsonMarshaller jaxbJsonMarshaller;
+    private final XsrfTokenValidator xsrfTokenValidator;
     private static final Logger log = LoggerFactory.getLogger(PluginsResource.class);
 
-    public PluginsResource(UserManager userManager, JaxbJsonMarshaller jaxbJsonMarshaller, SpeakeasyManager speakeasyManager)
+    public PluginsResource(UserManager userManager, JaxbJsonMarshaller jaxbJsonMarshaller, SpeakeasyManager speakeasyManager, XsrfTokenValidator xsrfTokenValidator)
     {
         this.userManager = userManager;
         this.jaxbJsonMarshaller = jaxbJsonMarshaller;
         this.speakeasyManager = speakeasyManager;
+        this.xsrfTokenValidator = xsrfTokenValidator;
     }
 
     @DELETE
@@ -158,6 +162,7 @@ public class PluginsResource
         String user = userManager.getRemoteUsername(request);
         try
         {
+            xsrfTokenValidator.validateFormEncodedToken(request);
             File uploadedFile = extractPluginFile(request);
             UserPlugins plugins = speakeasyManager.installPlugin(uploadedFile, user);
             return Response.ok().entity(wrapBodyInTextArea(jaxbJsonMarshaller.marshal(plugins))).build();

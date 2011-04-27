@@ -75,6 +75,7 @@
         #if ($canAuthor)
             <div style="background-color: #f0f0f0; margin: 20px; padding: 10px; border: 1px solid #bbb;">
                 <form id="upload-form" action="$contextPath/rest/speakeasy/1/plugins" enctype="multipart/form-data" method="post">
+                    <input type="hidden" name="$xsrfTokenName" value="$xsrfToken" />
                     <b>Upload New Extension:</b>
                     <label for="plugin-file">Install a new extension by uploading from your computer:</label> <input id="plugin-file" type="file" name="plugin-file" size="40">
                     <button id="submit-plugin-file">Upload</button>

@@ -14,6 +14,8 @@ import com.atlassian.plugin.web.WebInterfaceManager;
 import com.atlassian.plugin.webresource.UrlMode;
 import com.atlassian.plugin.webresource.WebResourceManager;
 import com.atlassian.sal.api.user.UserManager;
+import com.atlassian.sal.api.xsrf.XsrfTokenAccessor;
+import com.atlassian.sal.api.xsrf.XsrfTokenValidator;
 import com.atlassian.templaterenderer.TemplateRenderer;
 import com.atlassian.templaterenderer.annotations.HtmlSafe;
 import com.google.common.collect.ImmutableMap;
@@ -23,6 +25,7 @@ import com.samskivert.mustache.Template;
 import org.apache.commons.io.IOUtils;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -47,13 +50,17 @@ public class UserProfileRenderer
     private final SpeakeasyData data;
     private final Plugin plugin;
     private final WebInterfaceManager webInterfaceManager;
+    private final XsrfTokenAccessor xsrfTokenAccessor;
+    private final XsrfTokenValidator xsrfTokenValidator;
 
 
-    public UserProfileRenderer(PluginAccessor pluginAccessor, TemplateRenderer templateRenderer, SpeakeasyManager speakeasyManager, UserManager userManager, WebResourceManager webResourceManager, ProductAccessor productAccessor, SpeakeasyData data, CommonJsModulesAccessor commonJsModulesAccessor, WebInterfaceManager webInterfaceManager)
+    public UserProfileRenderer(PluginAccessor pluginAccessor, TemplateRenderer templateRenderer, SpeakeasyManager speakeasyManager, UserManager userManager, WebResourceManager webResourceManager, ProductAccessor productAccessor, SpeakeasyData data, CommonJsModulesAccessor commonJsModulesAccessor, WebInterfaceManager webInterfaceManager, XsrfTokenAccessor xsrfTokenAccessor, XsrfTokenValidator xsrfTokenValidator)
     {
         this.templateRenderer = templateRenderer;
         this.commonJsModulesAccessor = commonJsModulesAccessor;
         this.webInterfaceManager = webInterfaceManager;
+        this.xsrfTokenAccessor = xsrfTokenAccessor;
+        this.xsrfTokenValidator = xsrfTokenValidator;
         this.plugin = pluginAccessor.getPlugin("com.atlassian.labs.speakeasy-plugin");
         this.speakeasyManager = speakeasyManager;
         this.userManager = userManager;
@@ -67,7 +74,7 @@ public class UserProfileRenderer
         return speakeasyManager.canAccessSpeakeasy(userName);
     }
 
-    public void render(HttpServletRequest req, Writer output, boolean useUserProfileDecorator) throws IOException, UnauthorizedAccessException
+    public void render(HttpServletRequest req, HttpServletResponse resp, Writer output, boolean useUserProfileDecorator) throws IOException, UnauthorizedAccessException
     {
         String user = userManager.getRemoteUsername(req);
         if (user == null)
@@ -98,6 +105,8 @@ public class UserProfileRenderer
                 put("doesAnyGroupHaveAccess", speakeasyManager.doesAnyGroupHaveAccess()).
                 put("webInterfaceManager", webInterfaceManager).
                 put("webInterfaceContext", Collections.<String, Object>emptyMap()).
+                put("xsrfToken", xsrfTokenAccessor.getXsrfToken(req, resp, true)).
+                put("xsrfTokenName", xsrfTokenValidator.getXsrfParameterName()).
                 build(),
                 output);
     }
