@@ -97,6 +97,7 @@ public class PluginsResource
     @POST
     @Path("fork/{pluginKey}")
     @Produces("application/json")
+    @RequiresXsrfCheck
     public Response fork(@PathParam("pluginKey") String pluginKey, @FormParam("description") String description) throws UnauthorizedAccessException
     {
         UserPlugins entity = speakeasyManager.fork(pluginKey, userManager.getRemoteUsername(), description);
@@ -106,6 +107,7 @@ public class PluginsResource
     @POST
     @Path("create/{pluginKey}")
     @Produces("application/json")
+    @RequiresXsrfCheck
     public Response create(@PathParam("pluginKey") String pluginKey, @FormParam("description") String description, @FormParam("name") String name) throws UnauthorizedAccessException
     {
         UserPlugins entity = speakeasyManager.createExtension(pluginKey, PluginType.ZIP, userManager.getRemoteUsername(), description, name);

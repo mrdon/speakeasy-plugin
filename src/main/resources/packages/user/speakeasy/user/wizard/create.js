@@ -13,6 +13,9 @@ function sendCreateData(params, callback) {
     $.ajax({
       url: contextPath + "/rest/speakeasy/1/plugins/create/" + params.key,
       type: 'POST',
+      beforeSend: function(jqXHR, settings) {
+        jqXHR.setRequestHeader("X-Atlassian-Token", "nocheck");
+      },
       data: params,
       success: function(data) {
         $('#plugins-table-body').trigger('pluginsUpdated', data);
