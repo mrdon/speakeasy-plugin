@@ -56,6 +56,15 @@ public class PluginsResource
         this.xsrfTokenValidator = xsrfTokenValidator;
     }
 
+    @GET
+    @Path("atom")
+    @Produces("application/atom+xml")
+    public Response atom() throws UnauthorizedAccessException
+    {
+        String user = userManager.getRemoteUsername();
+        return Response.ok().entity(speakeasyManager.getPluginFeed(user)).build();
+    }
+
     @DELETE
     @Path("plugin/{pluginKey}")
     @Produces("application/json")

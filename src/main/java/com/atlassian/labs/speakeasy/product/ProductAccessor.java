@@ -16,4 +16,6 @@ public interface ProductAccessor
     String getUserFullName(String username);
 
     void sendEmail(String toUsername, String subjectTemplate, String bodyTemplate, Map<String,Object> context);
+
+    String getProfilePath();
 }

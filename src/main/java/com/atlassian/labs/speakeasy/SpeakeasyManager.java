@@ -10,12 +10,14 @@ import com.atlassian.labs.speakeasy.model.RemotePlugin;
 import com.atlassian.labs.speakeasy.model.Settings;
 import com.atlassian.labs.speakeasy.model.UserPlugins;
 import com.atlassian.labs.speakeasy.product.ProductAccessor;
+import com.atlassian.labs.speakeasy.util.FeedBuilder;
 import com.atlassian.labs.speakeasy.util.JsonObjectMapper;
 import com.atlassian.plugin.ModuleDescriptor;
 import com.atlassian.plugin.Plugin;
 import com.atlassian.plugin.PluginAccessor;
 import com.atlassian.plugin.descriptors.UnloadableModuleDescriptor;
 import com.atlassian.plugin.impl.UnloadablePlugin;
+import com.atlassian.sal.api.ApplicationProperties;
 import com.atlassian.sal.api.user.UserManager;
 import com.atlassian.sal.api.user.UserProfile;
 import com.google.common.base.Function;
@@ -46,6 +48,7 @@ import static java.util.Arrays.asList;
  */
 public class SpeakeasyManager
 {
+    private final ApplicationProperties applicationProperties;
     private final PluginAccessor pluginAccessor;
     private final SpeakeasyData data;
     private final PluginManager pluginManager;
@@ -59,7 +62,7 @@ public class SpeakeasyManager
     private static final Logger log = LoggerFactory.getLogger(SpeakeasyManager.class);
 
 
-    public SpeakeasyManager(PluginAccessor pluginAccessor, SpeakeasyData data, PluginManager pluginManager, ProductAccessor productAccessor, DescriptorGeneratorManager descriptorGeneratorManager, JsonManifestHandler jsonManifestHandler, BundleContext bundleContext, PermissionManager permissionManager, UserManager userManager, SettingsManager settingsManager)
+    public SpeakeasyManager(PluginAccessor pluginAccessor, SpeakeasyData data, PluginManager pluginManager, ProductAccessor productAccessor, DescriptorGeneratorManager descriptorGeneratorManager, JsonManifestHandler jsonManifestHandler, BundleContext bundleContext, PermissionManager permissionManager, UserManager userManager, SettingsManager settingsManager, ApplicationProperties applicationProperties)
     {
         this.descriptorGeneratorManager = descriptorGeneratorManager;
         this.pluginAccessor = pluginAccessor;
@@ -71,6 +74,7 @@ public class SpeakeasyManager
         this.permissionManager = permissionManager;
         this.userManager = userManager;
         this.settingsManager = settingsManager;
+        this.applicationProperties = applicationProperties;
     }
 
     public UserPlugins getRemotePluginList(String userName, String... modifiedKeys) throws UnauthorizedAccessException
@@ -84,6 +88,17 @@ public class SpeakeasyManager
         UserPlugins userPlugins = new UserPlugins(plugins);
         userPlugins.setUpdated(modifiedKeys);
         return userPlugins;
+    }
+
+    public String getPluginFeed(String userName) throws UnauthorizedAccessException
+    {
+        validateAccess(userName);
+        List<Plugin> plugins = getAllSpeakeasyPlugins();
+        return new FeedBuilder(plugins, bundleContext.getBundles()).
+                serverName(applicationProperties.getDisplayName()).
+                serverBaseUrl(applicationProperties.getBaseUrl()).
+                profilePath(productAccessor.getProfilePath()).
+                build();
     }
 
     public RemotePlugin getRemotePlugin(String pluginKey, String userName) throws PluginOperationFailedException, UnauthorizedAccessException

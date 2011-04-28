@@ -40,6 +40,11 @@ public class RefappProductAccessor implements ProductAccessor
         return "refapp";
     }
 
+    public String getProfilePath()
+    {
+        return "/plugins/servlet/speakeasy/user";
+    }
+
     public String getVersion()
     {
         return pomProperties.get("refapp.version");
