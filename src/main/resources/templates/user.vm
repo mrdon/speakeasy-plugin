@@ -128,7 +128,9 @@ align="absmiddle" src="$staticResourcesPrefix/download/resources/com.atlassian.l
     </div>
     #end
 </div>
-
+<div>
+    <a id="unsubscribe-all" href="$contextPath/plugins/servlet/speakeasy/unsubscribe">Unsubscribe from all extensions</a>
+</div>
     <div id="speakeasy-loaded">Loading...</div>
 <script type="text/javascript">
         require.run('speakeasy/user/user').initSpeakeasy();

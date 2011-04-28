@@ -4,6 +4,7 @@ import com.atlassian.pageobjects.Page;
 import com.atlassian.pageobjects.PageBinder;
 import com.atlassian.pageobjects.ProductInstance;
 import com.atlassian.pageobjects.TestedProduct;
+import com.atlassian.pageobjects.binder.InvalidPageStateException;
 import com.atlassian.pageobjects.binder.WaitUntil;
 import com.atlassian.webdriver.AtlassianWebDriver;
 import com.atlassian.webdriver.utils.Check;
@@ -266,6 +267,13 @@ public class SpeakeasyUserPage implements Page
     public boolean canCreateExtension()
     {
         return driver.elementExists(By.id("extension-wizard-link"));
+    }
+
+    public SpeakeasyUserPage unsubscribeFromAllPlugins()
+    {
+        driver.findElement(By.id("unsubscribe-all")).click();
+        driver.waitUntilElementIsLocated(By.className("success"));
+        return pageBinder.navigateToAndBind(SpeakeasyUserPage.class);
     }
 
     public static class PluginRow
