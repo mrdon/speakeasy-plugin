@@ -47,4 +47,9 @@ public class BambooProductAccessor extends ProductAccessor {
     public void sendEmail(String toUsername, String subjectTemplate, String bodyTemplate, Map<String, Object> context) {
         // implement later
     }
+
+    public String getProfilePath()
+    {
+        return "/plugins/servlet/speakeasy/user";
+    }
 }

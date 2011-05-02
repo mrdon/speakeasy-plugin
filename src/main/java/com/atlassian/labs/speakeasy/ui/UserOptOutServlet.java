@@ -2,7 +2,10 @@ package com.atlassian.labs.speakeasy.ui;
 
 import com.atlassian.labs.speakeasy.SpeakeasyManager;
 import com.atlassian.labs.speakeasy.UnauthorizedAccessException;
+import com.atlassian.labs.speakeasy.product.ProductAccessor;
+import com.atlassian.sal.api.ApplicationProperties;
 import com.atlassian.sal.api.user.UserManager;
+import sun.net.ApplicationProxy;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -17,11 +20,15 @@ public class UserOptOutServlet extends HttpServlet
 {
     private final SpeakeasyManager speakeasyManager;
     private final UserManager userManager;
+    private final ProductAccessor productAccessor;
+    private final ApplicationProperties applicationProperties;
 
-    public UserOptOutServlet(SpeakeasyManager speakeasyManager, UserManager userManager)
+    public UserOptOutServlet(SpeakeasyManager speakeasyManager, UserManager userManager, ProductAccessor productAccessor, ApplicationProperties applicationProperties)
     {
         this.speakeasyManager = speakeasyManager;
         this.userManager = userManager;
+        this.productAccessor = productAccessor;
+        this.applicationProperties = applicationProperties;
     }
 
     @Override
@@ -40,8 +47,9 @@ public class UserOptOutServlet extends HttpServlet
                 return;
             }
         }
+        String userPage = applicationProperties.getBaseUrl() + productAccessor.getProfilePath();
         resp.setContentType("text/html");
-        resp.getWriter().append("<html><body class=\"success\">Unsubscribed</body></html>");
+        resp.getWriter().append("<html><head><meta http-equiv=\"refresh\" content=\"2;url=" + userPage + "\"><body class=\"success\">Unsubscribed</body></html>");
         resp.getWriter().close();
     }
 }

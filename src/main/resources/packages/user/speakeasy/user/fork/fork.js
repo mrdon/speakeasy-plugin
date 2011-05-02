@@ -30,6 +30,9 @@ function forkPlugin(link, attachedRow, description) {
     $.ajax({
               url: host.contextPath + link.attr('href'),
               type: 'POST',
+              beforeSend: function(jqXHR, settings) {
+                jqXHR.setRequestHeader("X-Atlassian-Token", "nocheck");
+              },
               data: {description:description},
               success: function(data) {
                 $('#plugins-table-body').trigger('pluginsUpdated', data);

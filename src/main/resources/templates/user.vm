@@ -31,7 +31,7 @@
             #if ($canAuthor)
             To upload a new extension, use the <b>Upload</b> form.<br />
             To create a new extension, <a id="extension-wizard-link" href="javascript:void(0)">use the wizard</a>.<br />
-            To develop your own extensions, <a href="mailto:don@atlassian.com">learn more</a>.
+            To develop your own extensions, <a href="http://confluence.atlassian.com/display/DEVNET/Speakeasy+Overview">learn more</a>.
             #end
         </p>
 
@@ -71,6 +71,7 @@
         #if ($canAuthor)
             <div style="background-color: #f0f0f0; margin: 20px; padding: 10px; border: 1px solid #bbb;">
                 <form id="upload-form" action="$contextPath/rest/speakeasy/1/plugins" enctype="multipart/form-data" method="post">
+                    <input type="hidden" name="$xsrfTokenName" value="$xsrfToken" />
                     <b>Upload New Extension:</b>
                     <label for="plugin-file">Install a new extension by uploading from your computer:</label> <input id="plugin-file" type="file" name="plugin-file" size="40">
                     <button id="submit-plugin-file">Upload</button>
@@ -123,7 +124,9 @@ align="absmiddle" src="$staticResourcesPrefix/download/resources/com.atlassian.l
     </div>
     #end
 </div>
-
+<div>
+    <a id="unsubscribe-all" href="$contextPath/plugins/servlet/speakeasy/unsubscribe">Unsubscribe from all extensions</a>
+</div>
     <div id="speakeasy-loaded">Loading...</div>
 <script type="text/javascript">
         require.run('speakeasy/user/user').initSpeakeasy();

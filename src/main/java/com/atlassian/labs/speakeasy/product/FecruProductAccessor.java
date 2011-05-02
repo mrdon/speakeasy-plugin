@@ -36,6 +36,11 @@ public class FecruProductAccessor extends ProductAccessor {
         return "fecru";
     }
 
+    public String getProfilePath()
+    {
+        return "/plugins/servlet/speakeasy/user";
+    }
+
     public String getVersion() {
         return pomProperties.get("fecru.version");
     }

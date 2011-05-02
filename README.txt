@@ -1,3 +1,7 @@
+Atlassian Speakeasy is a plugin that allows users to author, enable, and share extensions for Atlassian products.
+
+http://confluence.atlassian.com/display/DEVNET/Speakeasy+Overview
+
 When getting started developing the Speakeasy plugin, these commands will come in handy
 
 * Start the plugin in the desired product:

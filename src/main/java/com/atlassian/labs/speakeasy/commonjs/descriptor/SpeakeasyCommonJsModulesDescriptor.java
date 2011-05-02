@@ -11,6 +11,7 @@ import org.osgi.framework.BundleContext;
 
 import java.util.List;
 
+import static com.atlassian.labs.speakeasy.DescriptorGeneratorManager.getStatefulKey;
 import static java.util.Collections.emptySet;
 
 /**
@@ -40,5 +41,11 @@ public class SpeakeasyCommonJsModulesDescriptor extends CommonJsModulesDescripto
     public ModuleDescriptor createIndividualModuleDescriptor()
     {
         return new SpeakeasyWebResourceModuleDescriptor(hostContainer, bundleContext, descriptorGeneratorManager);
+    }
+
+    @Override
+    public String getModulesWebResourceCompleteKey()
+    {
+        return getStatefulKey(super.getModulesWebResourceCompleteKey(), getPluginBundle().getLastModified());
     }
 }

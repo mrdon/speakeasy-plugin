@@ -1,5 +1,5 @@
 /**
- * Executes Confluence remote API methods
+ * Executes Confluence remote API methods.
  *
  * @public
  */
@@ -102,7 +102,8 @@ function fetchForList(list, callbacks) {
  */
 exports.getBlogSummaries = getBlogSummaries;
 /**
- * Gets a <a href="http://confluence.atlassian.com/display/CONFDEV/Remote+API+Specification#RemoteAPISpecification-BlogEntry">BlogEntry</a>.
+ * Gets a <a href="http://confluence.atlassian.com/display/CONFDEV/Remote+API+Specification#RemoteAPISpecification-BlogEntry">BlogEntry</a>. Only
+ * works for Confluence 3.5 or earlier as the API has changed for Confluence 4.
  * Parameters:
  * <ul>
  *     <li><code>pageId</code> - The blog (page) id</li>
@@ -112,7 +113,7 @@ exports.getBlogSummaries = getBlogSummaries;
 exports.getBlogEntry = getBlogEntry;
 /**
  * Gets a list of <a href="http://confluence.atlassian.com/display/CONFDEV/Remote+API+Specification#RemoteAPISpecification-BlogEntry">BlogEntry</a>
- * entries in the space with labels. Parameters:
+ * entries in the space with labels. Only works for Confluence 3.5 or earlier as the API has changed for Confluence 4.  Parameters:
  * <ul>
  *     <li><code>spaceKey</code> - The space key</li>
  *     <li><code>start</code> - The start date</li>

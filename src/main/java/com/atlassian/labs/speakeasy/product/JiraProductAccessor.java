@@ -88,6 +88,11 @@ public class JiraProductAccessor extends ProductAccessor
         }
     }
 
+    public String getProfilePath()
+    {
+        return "/secure/ViewProfile.jspa#selectedTab=com.atlassian.labs.speakeasy-plugin:speakeasy-plugins";
+    }
+
     private String render(String templateName, Map<String,Object> context) throws IOException
     {
         StringWriter writer = new StringWriter();

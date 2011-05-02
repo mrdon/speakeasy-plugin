@@ -8,7 +8,9 @@ import com.atlassian.labs.speakeasy.model.PluginIndex;
 import com.atlassian.labs.speakeasy.model.RemotePlugin;
 import com.atlassian.labs.speakeasy.model.UserPlugins;
 import com.atlassian.plugins.rest.common.json.JaxbJsonMarshaller;
+import com.atlassian.plugins.rest.common.security.RequiresXsrfCheck;
 import com.atlassian.sal.api.user.UserManager;
+import com.atlassian.sal.api.xsrf.XsrfTokenValidator;
 import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.fileupload.FileUploadException;
 import org.apache.commons.fileupload.disk.DiskFileItemFactory;
@@ -43,13 +45,24 @@ public class PluginsResource
     private final SpeakeasyManager speakeasyManager;
     private final UserManager userManager;
     private final JaxbJsonMarshaller jaxbJsonMarshaller;
+    private final XsrfTokenValidator xsrfTokenValidator;
     private static final Logger log = LoggerFactory.getLogger(PluginsResource.class);
 
-    public PluginsResource(UserManager userManager, JaxbJsonMarshaller jaxbJsonMarshaller, SpeakeasyManager speakeasyManager)
+    public PluginsResource(UserManager userManager, JaxbJsonMarshaller jaxbJsonMarshaller, SpeakeasyManager speakeasyManager, XsrfTokenValidator xsrfTokenValidator)
     {
         this.userManager = userManager;
         this.jaxbJsonMarshaller = jaxbJsonMarshaller;
         this.speakeasyManager = speakeasyManager;
+        this.xsrfTokenValidator = xsrfTokenValidator;
+    }
+
+    @GET
+    @Path("atom")
+    @Produces("application/atom+xml")
+    public Response atom() throws UnauthorizedAccessException
+    {
+        String user = userManager.getRemoteUsername();
+        return Response.ok().entity(speakeasyManager.getPluginFeed(user)).build();
     }
 
     @GET
@@ -102,6 +115,7 @@ public class PluginsResource
     @POST
     @Path("fork/{pluginKey}")
     @Produces("application/json")
+    @RequiresXsrfCheck
     public Response fork(@PathParam("pluginKey") String pluginKey, @FormParam("description") String description) throws UnauthorizedAccessException
     {
         UserPlugins entity = speakeasyManager.fork(pluginKey, userManager.getRemoteUsername(), description);
@@ -111,6 +125,7 @@ public class PluginsResource
     @POST
     @Path("create/{pluginKey}")
     @Produces("application/json")
+    @RequiresXsrfCheck
     public Response create(@PathParam("pluginKey") String pluginKey, @FormParam("description") String description, @FormParam("name") String name) throws UnauthorizedAccessException
     {
         UserPlugins entity = speakeasyManager.createExtension(pluginKey, PluginType.ZIP, userManager.getRemoteUsername(), description, name);
@@ -167,6 +182,7 @@ public class PluginsResource
         String user = userManager.getRemoteUsername(request);
         try
         {
+            xsrfTokenValidator.validateFormEncodedToken(request);
             File uploadedFile = extractPluginFile(request);
             UserPlugins plugins = speakeasyManager.installPlugin(uploadedFile, user);
             return Response.ok().entity(wrapBodyInTextArea(jaxbJsonMarshaller.marshal(plugins))).build();

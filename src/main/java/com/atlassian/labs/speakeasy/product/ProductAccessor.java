@@ -28,4 +28,6 @@ public abstract class ProductAccessor
     public abstract String getUserFullName(String username);
 
     public abstract void sendEmail(String toUsername, String subjectTemplate, String bodyTemplate, Map<String,Object> context);
+
+    public abstract String getProfilePath();
 }

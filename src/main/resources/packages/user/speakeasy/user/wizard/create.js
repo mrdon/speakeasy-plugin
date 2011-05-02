@@ -14,6 +14,9 @@ function sendCreateData(params, callback) {
     $.ajax({
       url: host.contextPath + "/rest/speakeasy/1/plugins/create/" + params.key,
       type: 'POST',
+      beforeSend: function(jqXHR, settings) {
+        jqXHR.setRequestHeader("X-Atlassian-Token", "nocheck");
+      },
       data: params,
       success: function(data) {
         $('#plugins-table-body').trigger('pluginsUpdated', data);
@@ -43,11 +46,11 @@ function validate(data) {
 
     var errors = [];
     if (!data.key || !data.key.match(/[a-zA-Z-_]+/) || data.key.length > 20) {
-        errors.push("Invalid key");
+        errors.push("Invalid key, must be less than 20 characters and only include letters, dashes, and underscores");
     } else if (!data.name || data.name.length > 30) {
-        errors.push("Invalid name");
-    } else if (!data.description || data.description.length > 30) {
-        errors.push("Invalid description");
+        errors.push("Invalid name, must be less than 30 characters");
+    } else if (!data.description || data.description.length > 60) {
+        errors.push("Invalid description, must be less than 60 characters");
     }
 
     if (errors.length > 0) {

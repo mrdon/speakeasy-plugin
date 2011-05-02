@@ -11,7 +11,7 @@
 
     <groupId>com.atlassian.labs</groupId>
     <artifactId>speakeasy-plugin</artifactId>
-    <version>0.8.2-SNAPSHOT</version>
+    <version>0.9.3-SNAPSHOT</version>
 
     <name>Speakeasy Plugin</name>
     <description>A plugin that provides per-user plugin module management</description>
@@ -287,6 +287,7 @@
                             com.atlassian.jira.plugin.webfragment.descriptors;resolution:=optional,
                             com.atlassian.jira.security;resolution:=optional,
                             com.atlassian.jira;resolution:=optional,
+                            com.atlassian.plugins.rest.common.security,
                             *;resolution:=optional
                         </Import-Package>
                         <Export-Package>

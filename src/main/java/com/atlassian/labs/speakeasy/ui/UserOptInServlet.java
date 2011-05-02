@@ -23,7 +23,7 @@ public class UserOptInServlet extends HttpServlet
         try
         {
             res.setContentType("text/html; charset=utf-8");
-            renderer.render(req, res.getWriter(), true);
+            renderer.render(req, res, res.getWriter(), true);
         }
         catch (UnauthorizedAccessException e)
         {

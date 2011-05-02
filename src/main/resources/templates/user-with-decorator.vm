@@ -15,6 +15,7 @@
         <meta name="decorator" content="atl.userprofile"/>
     #end
     <title>Speakeasy Extensions</title>
+    <link href="$contextPath/rest/speakeasy/latest/plugins/atom" type="application/atom+xml" rel="alternate" title="Extensions ATOM Feed" />
 </head>
 <body>
 #parse( "templates/user.vm" )

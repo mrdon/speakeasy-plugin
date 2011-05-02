@@ -97,6 +97,11 @@ public class ConfluenceProductAccessor extends ProductAccessor
         }
     }
 
+    public String getProfilePath()
+    {
+        return "/plugins/servlet/speakeasy/user";
+    }
+
     private String render(String templateName, Map<String,Object> context) throws IOException
     {
         StringWriter writer = new StringWriter();
