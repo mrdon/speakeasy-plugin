@@ -53,6 +53,10 @@ var Edit = Backbone.View.extend({
         this.model.set({'authorGroups' : toArray($('#sp-author-groups-edit').val())});
     },
     save: function() {
+        // just in case the onblur hasn't fired yet
+        this.updateAccessGroups();
+        this.updateAuthorGroups();
+        
         this.model.save(this.model, {
             success: function(model, resp) {
                 $.data($('#sp-form')[0], AJS.DIRTY_FORM_VALUE, null);

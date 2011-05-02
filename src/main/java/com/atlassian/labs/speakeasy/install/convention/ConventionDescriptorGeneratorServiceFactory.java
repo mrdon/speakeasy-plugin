@@ -6,11 +6,13 @@ import com.atlassian.labs.speakeasy.commonjs.descriptor.SpeakeasyCommonJsModules
 import com.atlassian.labs.speakeasy.install.PluginOperationFailedException;
 import com.atlassian.labs.speakeasy.install.convention.external.ConventionDescriptorGenerator;
 import com.atlassian.labs.speakeasy.descriptor.webfragment.SpeakeasyWebItemModuleDescriptor;
+import com.atlassian.labs.speakeasy.model.JsonManifest;
 import com.atlassian.plugin.*;
 import com.atlassian.plugin.event.PluginEventManager;
 import com.atlassian.plugin.hostcontainer.HostContainer;
 import com.atlassian.plugin.osgi.util.OsgiHeaderUtil;
 import com.atlassian.plugin.webresource.WebResourceManager;
+import com.atlassian.plugin.webresource.WebResourceModuleDescriptor;
 import org.dom4j.DocumentFactory;
 import org.dom4j.Element;
 import org.osgi.framework.Bundle;
@@ -32,11 +34,12 @@ public class ConventionDescriptorGeneratorServiceFactory implements ServiceFacto
     private final PluginEventManager pluginEventManager;
     private final JsonToElementParser jsonToElementParser;
     private final WebResourceManager webResourceManager;
+    private final JsonManifestHandler jsonManifestHandler;
     private final PluginController pluginController;
 
     //private final Set<String> trackedPlugins = new CopyOnWriteArraySet<String>();
 
-    public ConventionDescriptorGeneratorServiceFactory(final BundleContext bundleContext, final PluginAccessor pluginAccessor, HostContainer hostContainer, DescriptorGeneratorManager descriptorGeneratorManager, JsonToElementParser jsonToElementParser, WebResourceManager webResourceManager, PluginEventManager pluginEventManager, final PluginController pluginController)
+    public ConventionDescriptorGeneratorServiceFactory(final BundleContext bundleContext, final PluginAccessor pluginAccessor, HostContainer hostContainer, DescriptorGeneratorManager descriptorGeneratorManager, JsonToElementParser jsonToElementParser, WebResourceManager webResourceManager, PluginEventManager pluginEventManager, final PluginController pluginController, JsonManifestHandler jsonManifestHandler)
     {
         this.bundleContext = bundleContext;
         this.pluginAccessor = pluginAccessor;
@@ -46,6 +49,7 @@ public class ConventionDescriptorGeneratorServiceFactory implements ServiceFacto
         this.pluginEventManager = pluginEventManager;
         this.webResourceManager = webResourceManager;
         this.pluginController = pluginController;
+        this.jsonManifestHandler = jsonManifestHandler;
     }
 
     public Object getService(Bundle bundle, ServiceRegistration registration)
@@ -53,6 +57,12 @@ public class ConventionDescriptorGeneratorServiceFactory implements ServiceFacto
         DocumentFactory factory = DocumentFactory.getInstance();
         String pluginKey = OsgiHeaderUtil.getPluginKey(bundle);
         Plugin plugin = pluginAccessor.getPlugin(pluginKey);
+
+        if (bundle.getEntry("atlassian-extension.json") != null)
+        {
+            JsonManifest mf = jsonManifestHandler.read(plugin);
+            registerScreenshotWebResourceDescriptor(bundle, factory, plugin, mf.getScreenshot());
+        }
 
         if (bundle.getEntry("js/") != null)
         {
@@ -110,6 +120,21 @@ public class ConventionDescriptorGeneratorServiceFactory implements ServiceFacto
             e.setPluginKey(plugin.getKey());
             throw e;
         }
+    }
+
+    private void registerScreenshotWebResourceDescriptor(Bundle bundle, DocumentFactory factory, Plugin plugin, String screenshotPath)
+    {
+        WebResourceModuleDescriptor descriptor = new WebResourceModuleDescriptor(hostContainer);
+
+        Element element = factory.createElement("web-resource")
+                .addAttribute("key", "screenshot");
+
+        element.addElement("resource")
+                .addAttribute("type", "download")
+                .addAttribute("name", "screenshot.png")
+                .addAttribute("location", screenshotPath);
+        descriptor.init(plugin, element);
+        bundle.getBundleContext().registerService(ModuleDescriptor.class.getName(), descriptor, null);
     }
 
     private void registerSpeakeasyWebResourceDescriptor(Bundle bundle, DocumentFactory factory, Plugin plugin, String type)

@@ -1,6 +1,7 @@
 package it.com.atlassian.labs.speakeasy;
 
 import com.atlassian.pageobjects.Page;
+import com.atlassian.pageobjects.binder.WaitUntil;
 import com.atlassian.webdriver.AtlassianWebDriver;
 import org.apache.commons.collections.ExtendedProperties;
 import org.apache.commons.lang.StringUtils;
@@ -23,6 +24,12 @@ public class AdminPage implements Page
     public String getUrl()
     {
         return "/plugins/servlet/speakeasy/admin";
+    }
+
+    @WaitUntil
+    public void waitForBody()
+    {
+        driver.waitUntilElementIsLocated(By.id("sp-edit"));
     }
 
     public EditView edit()

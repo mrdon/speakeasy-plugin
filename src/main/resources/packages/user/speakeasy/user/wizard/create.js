@@ -18,7 +18,7 @@ function sendCreateData(params, callback) {
       },
       data: params,
       success: function(data) {
-        $('#plugins-table-body').trigger('pluginsUpdated', data);
+        $('#plugins-table').trigger('pluginsUpdated', data);
         addMessage('success', {body: "<b>" + params.name + "</b> was created successfully", shadowed: false});
         $('.waiting', createButton).remove();
           $('#extension-wizard-create').removeAttr('disabled');
@@ -48,8 +48,8 @@ function validate(data) {
         errors.push("Invalid key, must be less than 20 characters and only include letters, dashes, and underscores");
     } else if (!data.name || data.name.length > 30) {
         errors.push("Invalid name, must be less than 30 characters");
-    } else if (!data.description || data.description.length > 60) {
-        errors.push("Invalid description, must be less than 60 characters");
+    } else if (!data.description || data.description.length > 120) {
+        errors.push("Invalid description, must be less than 200 characters");
     }
 
     if (errors.length > 0) {
@@ -64,7 +64,7 @@ function validate(data) {
 
 
 exports.openDialog = function() {
-    var dialog = new AJS.Dialog({width:470, height:400, id:'extension-wizard'});
+    var dialog = new AJS.Dialog({width:470, height:450, id:'extension-wizard'});
     dialog.addHeader("Create Extension");
     var wizardContents = require('./wizard').render({});
     dialog.addPanel("Info", wizardContents, "panel-body");

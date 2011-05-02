@@ -34,7 +34,7 @@ public class JsonManifest
     private Map<Integer, String> icons;
 
     @XmlElement
-    private List<String> screenshots;
+    private String screenshot;
 
     public String getKey()
     {
@@ -96,13 +96,13 @@ public class JsonManifest
         this.icons = icons;
     }
 
-    public List<String> getScreenshots()
+    public String getScreenshot()
     {
-        return screenshots;
+        return screenshot;
     }
 
-    public void setScreenshots(List<String> screenshots)
+    public void setScreenshot(String screenshot)
     {
-        this.screenshots = screenshots;
+        this.screenshot = screenshot;
     }
 }

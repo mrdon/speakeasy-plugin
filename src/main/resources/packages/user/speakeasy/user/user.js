@@ -11,7 +11,6 @@ var wizard = require('./wizard/create');
 var fork = require('./fork/fork');
 var pac = require('./pac/pac');
 
-var pluginsTable;
 var pluginActions = {
     'edit' : function (key, link, attachedRow) {
             ide.openDialog(key, getAbsoluteHref(link), link.attr("data-extension"));
@@ -26,12 +25,13 @@ var pluginActions = {
 };
 
 function getAbsoluteHref($link) {
-    return contextPath + $link.attr("href");
+    var href = $link.attr('href') || $link.attr('data-href');
+    return contextPath + href;
 }
 
 
 function enablePlugin(pluginKey, link, attachedRow) {
-    var pluginName = $('td[headers=plugin-name] .plugin-name', attachedRow).text();
+    var pluginName = $('.plugin-name', attachedRow).text();
     link.html('<img alt="waiting" src="' + staticResourcesPrefix + '/download/resources/com.atlassian.labs.speakeasy-plugin:shared/images/wait.gif" />');
     $.ajax({
               url: getAbsoluteHref(link),
@@ -44,7 +44,7 @@ function enablePlugin(pluginKey, link, attachedRow) {
 }
 
 function disablePlugin(pluginKey, link, attachedRow) {
-    var pluginName = $('td[headers=plugin-name] .plugin-name', attachedRow).text();
+    var pluginName = $('.plugin-name', attachedRow).text();
     link.html('<img alt="waiting" src="' + staticResourcesPrefix + '/download/resources/com.atlassian.labs.speakeasy-plugin:shared/images/wait.gif" />');
     $.ajax({
               url: getAbsoluteHref(link),
@@ -58,8 +58,8 @@ function disablePlugin(pluginKey, link, attachedRow) {
 
 function uninstallPlugin(pluginKey, link, attachedRow) {
     link.html('<img alt="waiting" src="' + staticResourcesPrefix + '/download/resources/com.atlassian.labs.speakeasy-plugin:shared/images/wait.gif" />');
-    var pluginName = $('td[headers=plugin-name] .plugin-name', attachedRow).text();
-    var wasEnabled = $('td[headers=plugin-actions] .pk-enable-toggle', attachedRow).text() == "Disable";
+    var pluginName = $('.plugin-name', attachedRow).text();
+    var wasEnabled = $('.pk-enable-toggle', attachedRow).text() == "Disable";
     $.ajax({
               url: getAbsoluteHref(link),
               type: 'DELETE',
@@ -77,32 +77,43 @@ function uninstallPlugin(pluginKey, link, attachedRow) {
 }
 
 function updateTable(plugins) {
+    var enabledUpdatedPlugins = updateTableBody(plugins, $('#enabled-plugins-body'), function(plugin) { return plugin.enabled; });
+    var availableUpdatedPlugins = updateTableBody(plugins, $('#available-plugins-body'), function(plugin) { return !plugin.enabled; });
+    return enabledUpdatedPlugins.concat(availableUpdatedPlugins);
+}
+
+function updateTableBody(plugins, tableBody, selector) {
     var updatedPlugins = [];
     if (plugins.plugins) {
-        pluginsTable.find('tr').remove();
+        tableBody.find('tr').remove();
         $.each(plugins.plugins, function() {
-            var plugin = this;
-            if ($.inArray(plugin.key, plugins.updated) > -1) {
-                updatedPlugins.push(plugin);
+            if (selector(this)) {
+                var plugin = this;
+                if ($.inArray(plugin.key, plugins.updated) > -1) {
+                    updatedPlugins.push(plugin);
+                }
+                tableBody.append(renderRow(plugin));
             }
-            pluginsTable.append(renderRow(plugin));
         })
-    } else {
+    } else if (selector(plugins)) {
         var pos = 0;
-        var oldRow = pluginsTable.find('tr[data-pluginkey="' + plugins.key + '"]');
+        var oldRow = tableBody.find('tr[data-pluginkey="' + plugins.key + '"]');
         if (oldRow) {
             pos = oldRow.parent().children().index(oldRow);
             oldRow.remove();
         }
         var rowContent = renderRow(plugins);
         if (pos == 0) {
-            pluginsTable.prepend(rowContent);
+            tableBody.prepend(rowContent);
         } else if (pos == oldRow.parent().children().length - 1) {
-            pluginsTable.append(rowContent);
+            tableBody.append(rowContent);
         } else {
-            pluginsTable.find('tr').eq(pos - 1).after(rowContent);
+            tableBody.find('tr').eq(pos - 1).after(rowContent);
         }
         updatedPlugins.push(plugins);
+    }
+    if (tableBody.find('tr').length == 0) {
+        tableBody.append('<tr><td colspan="3">No extensions</td></tr>');
     }
     return updatedPlugins;
 }
@@ -117,8 +128,8 @@ function renderRow(plugin) {
 }
 
 function initSpeakeasy() {
-    pluginsTable = $("#plugins-table-body");
-    pluginsTable.delegate("a", 'click', function(e) {
+    var pluginsTable = $("#plugins-table");
+    var eventDelegate = function(e) {
         e.preventDefault();
         var $link = $(e.target);
         var $row = $link.closest('tr');
@@ -127,7 +138,9 @@ function initSpeakeasy() {
         if (msg)
             msg.remove();
         action($row.attr("data-pluginkey"), $link, $row);
-    });
+    };
+    pluginsTable.delegate("a", 'click', eventDelegate);
+    pluginsTable.delegate("button", 'click', eventDelegate);
     pluginsTable.bind('pluginsUpdated', function(e, data) {
        updateTable(data.plugin || data);
     });

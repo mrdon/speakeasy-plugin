@@ -34,7 +34,7 @@ function forkPlugin(link, attachedRow, description) {
               },
               data: {description:description},
               success: function(data) {
-                $('#plugins-table-body').trigger('pluginsUpdated', data);
+                $('#plugins-table').trigger('pluginsUpdated', data);
                 addMessage('success', {body: "<b>" + pluginName + "</b> was forked successfully", shadowed: false});
                 $('.waiting', link).remove();
               },

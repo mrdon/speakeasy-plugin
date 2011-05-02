@@ -187,13 +187,13 @@ function saveAndReload(pluginKey, fileName, contents) {
         success : function(data) {
             console.log('success');
             updateStatus(data.name + " was saved successfully and reloaded");
-            $('#plugins-table-body').trigger('pluginsUpdated', {'plugin': data})
+            $('#plugins-table').trigger('pluginsUpdated', {'plugin': data})
         },
         error : function(xhr) {
             console.log('error');
             var data = JSON.parse(xhr.responseText);
             updateStatus("Error - " + data.error);
-            $('#plugins-table-body').trigger('pluginsUpdated', {'plugin': data.plugin})
+            $('#plugins-table').trigger('pluginsUpdated', {'plugin': data.plugin})
         }
     })
 }

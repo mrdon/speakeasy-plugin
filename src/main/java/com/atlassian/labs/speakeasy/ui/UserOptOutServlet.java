@@ -5,7 +5,6 @@ import com.atlassian.labs.speakeasy.UnauthorizedAccessException;
 import com.atlassian.labs.speakeasy.product.ProductAccessor;
 import com.atlassian.sal.api.ApplicationProperties;
 import com.atlassian.sal.api.user.UserManager;
-import sun.net.ApplicationProxy;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;

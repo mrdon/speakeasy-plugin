@@ -17,6 +17,8 @@ import com.atlassian.plugin.Plugin;
 import com.atlassian.plugin.PluginAccessor;
 import com.atlassian.plugin.descriptors.UnloadableModuleDescriptor;
 import com.atlassian.plugin.impl.UnloadablePlugin;
+import com.atlassian.plugin.webresource.UrlMode;
+import com.atlassian.plugin.webresource.WebResourceManager;
 import com.atlassian.sal.api.ApplicationProperties;
 import com.atlassian.sal.api.user.UserManager;
 import com.atlassian.sal.api.user.UserProfile;
@@ -30,6 +32,7 @@ import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -59,10 +62,12 @@ public class SpeakeasyManager
     private final PermissionManager permissionManager;
     private final UserManager userManager;
     private final SettingsManager settingsManager;
+    private final WebResourceManager webResourceManager;
+    private final ModuleDescriptor unknownScreenshotDescriptor;
     private static final Logger log = LoggerFactory.getLogger(SpeakeasyManager.class);
 
 
-    public SpeakeasyManager(PluginAccessor pluginAccessor, SpeakeasyData data, PluginManager pluginManager, ProductAccessor productAccessor, DescriptorGeneratorManager descriptorGeneratorManager, JsonManifestHandler jsonManifestHandler, BundleContext bundleContext, PermissionManager permissionManager, UserManager userManager, SettingsManager settingsManager, ApplicationProperties applicationProperties)
+    public SpeakeasyManager(PluginAccessor pluginAccessor, SpeakeasyData data, PluginManager pluginManager, ProductAccessor productAccessor, DescriptorGeneratorManager descriptorGeneratorManager, JsonManifestHandler jsonManifestHandler, BundleContext bundleContext, PermissionManager permissionManager, UserManager userManager, SettingsManager settingsManager, ApplicationProperties applicationProperties, WebResourceManager webResourceManager)
     {
         this.descriptorGeneratorManager = descriptorGeneratorManager;
         this.pluginAccessor = pluginAccessor;
@@ -75,6 +80,8 @@ public class SpeakeasyManager
         this.userManager = userManager;
         this.settingsManager = settingsManager;
         this.applicationProperties = applicationProperties;
+        this.webResourceManager = webResourceManager;
+        this.unknownScreenshotDescriptor = pluginAccessor.getPluginModule("com.atlassian.labs.speakeasy-plugin:shared");
     }
 
     public UserPlugins getRemotePluginList(String userName, String... modifiedKeys) throws UnauthorizedAccessException
@@ -104,12 +111,18 @@ public class SpeakeasyManager
     public RemotePlugin getRemotePlugin(String pluginKey, String userName) throws PluginOperationFailedException, UnauthorizedAccessException
     {
         validateAccess(userName);
+        Plugin plugin = getPlugin(pluginKey);
+        return getRemotePlugin(plugin, userName, getAllSpeakeasyPlugins());
+    }
+
+    private Plugin getPlugin(String pluginKey)
+    {
         Plugin plugin = pluginAccessor.getPlugin(pluginKey);
         if (plugin == null)
         {
             throw new PluginOperationFailedException("Plugin not found: " + pluginKey, pluginKey);
         }
-        return getRemotePlugin(plugin, userName, getAllSpeakeasyPlugins());
+        return plugin;
     }
 
     public List<String> allowUserAccess(final String pluginKey, final String user) throws UnauthorizedAccessException
@@ -429,6 +442,18 @@ public class SpeakeasyManager
         return permissionManager.canAuthorExtensions(user);
     }
 
+    public String getScreenshotUrl(String pluginKey, String user) throws UnauthorizedAccessException
+    {
+        validateAccess(user);
+        Plugin plugin = getPlugin(pluginKey);
+        ModuleDescriptor<?> screenshotDescriptor = plugin.getModuleDescriptor("screenshot");
+        if (screenshotDescriptor == null)
+        {
+            screenshotDescriptor = unknownScreenshotDescriptor;
+        }
+        return webResourceManager.getStaticPluginResource(screenshotDescriptor, "screenshot.png", UrlMode.ABSOLUTE);
+    }
+
     private void disallowAllPluginAccess(String pluginKey, String user)
     {
         List<String> accessList = data.getUsersList(pluginKey);
@@ -648,7 +673,8 @@ public class SpeakeasyManager
             if (!(descriptor instanceof DescriptorGenerator)
                     // FIXME: these checks are hacks
                     && !descriptor.getKey().endsWith(stateIdentifier) && !descriptor.getKey().endsWith("-modules")
-                    && !(descriptor instanceof UnloadableModuleDescriptor))
+                    && !(descriptor instanceof UnloadableModuleDescriptor)
+                    && !"screenshot".equals(descriptor.getKey()))
             {
                 return false;
             }
@@ -728,4 +754,5 @@ public class SpeakeasyManager
         }
         return plugins;
     }
+
 }

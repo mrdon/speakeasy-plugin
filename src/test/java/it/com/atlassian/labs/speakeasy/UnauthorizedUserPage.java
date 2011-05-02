@@ -26,4 +26,9 @@ public class UnauthorizedUserPage implements Page
         return driver.findElement(By.tagName("body")).getText().contains("Cannot access Speakeasy");
     }
 
+    @WaitUntil
+    public void waitForBody()
+    {
+        driver.waitUntilElementIsLocated(By.tagName("body"));
+    }
 }

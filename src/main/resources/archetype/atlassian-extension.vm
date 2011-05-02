@@ -6,5 +6,7 @@
 	
 	"vendor": {	"name": "Joe",
 			     "url": "http://example.com/extension-homepage.html",
-		       "email": "jane@example.com" }
+		       "email": "jane@example.com" },
+
+    "screenshot":   "screenshot.png"
 }

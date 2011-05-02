@@ -4,7 +4,6 @@ import com.atlassian.pageobjects.Page;
 import com.atlassian.pageobjects.PageBinder;
 import com.atlassian.pageobjects.ProductInstance;
 import com.atlassian.pageobjects.TestedProduct;
-import com.atlassian.pageobjects.binder.InvalidPageStateException;
 import com.atlassian.pageobjects.binder.WaitUntil;
 import com.atlassian.webdriver.AtlassianWebDriver;
 import com.atlassian.webdriver.utils.Check;
@@ -37,8 +36,8 @@ public class SpeakeasyUserPage implements Page
     @Inject
     PageBinder pageBinder;
 
-    @FindBy(id = "plugins-table-body")
-    private WebElement pluginsTableBody;
+    @FindBy(id = "plugins-table")
+    private WebElement pluginsTable;
 
     @FindBy(name = "plugin-file")
     private WebElement pluginFileUpload;
@@ -71,7 +70,7 @@ public class SpeakeasyUserPage implements Page
     public List<String> getPluginKeys()
     {
         List<String> pluginKeys = new ArrayList<String>();
-        for (WebElement e : pluginsTableBody.findElements(By.tagName("tr")))
+        for (WebElement e : pluginsTable.findElements(By.tagName("tr")))
         {
             pluginKeys.add(e.getAttribute("data-pluginkey"));
         }
@@ -81,18 +80,20 @@ public class SpeakeasyUserPage implements Page
     public Map<String, PluginRow> getPlugins()
     {
         Map<String,PluginRow> plugins = new LinkedHashMap<String,PluginRow>();
-        for (WebElement e : pluginsTableBody.findElements(By.tagName("tr")))
+        for (WebElement e : pluginsTable.findElements(By.tagName("tr")))
         {
             PluginRow row = new PluginRow();
             final String key = e.getAttribute("data-pluginkey");
-            row.setKey(key);
-            WebElement nameTd = e.findElement(By.xpath("td[@headers='plugin-name']"));
-            row.setName(nameTd.findElement(By.className("plugin-name")).getText());
-            row.setDescription(nameTd.findElement(By.className("plugin-description")).getText());
-            row.setAuthor(e.findElement(By.xpath("td[@headers='plugin-author']")).getText());
-            row.setUsers(parseInt(e.findElement(By.xpath("td[@headers='plugin-users']")).getText()));
-            row.setVersion(e.findElement(By.xpath("td[@headers='plugin-version']")).getText());
-            plugins.put(key,row);
+            if (key != null)
+            {
+                row.setKey(key);
+                row.setName(e.findElement(By.className("plugin-name")).getText());
+                row.setDescription(e.findElement(By.className("plugin-description")).getText());
+                row.setAuthor(e.findElement(By.className("plugin-author")).getText());
+                row.setUsers(parseInt(e.findElement(By.className("plugin-users")).getText()));
+                row.setVersion(e.findElement(By.className("plugin-version")).getText());
+                plugins.put(key,row);
+            }
         }
         return plugins;
     }
@@ -124,7 +125,7 @@ public class SpeakeasyUserPage implements Page
 
     private WebElement getPluginRow(String key)
     {
-        for (WebElement row : pluginsTableBody.findElements(By.tagName("tr")))
+        for (WebElement row : pluginsTable.findElements(By.tagName("tr")))
         {
             if (key.equals(row.getAttribute("data-pluginkey")))
             {

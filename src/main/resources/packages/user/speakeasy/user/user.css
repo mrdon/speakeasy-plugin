@@ -21,7 +21,36 @@
     box-shadow: 5px 5px 5px #999;
 }
 
+#plugins-table td {
+    white-space: nowrap;
+}
+#plugins-table td.plugin-info {
+    white-space: normal;
+    width: 100%;
+}
+div.plugin-enable-links {
+}
+
+div.plugin-author-links {
+    margin-top: 1em;
+}
+
+#extension-wizard-cancel {
+    background: none;
+}
+td .plugin-name {
+    font-weight: bold;
+}
+
+td .plugin-screenshot {
+    border: 1px black solid;
+}
+td .plugin-stats {
+    font-size: 90%;
+    color: #555;
+}
 td .plugin-description {
+    margin-top: 1em;
     font-size: 90%;
     color: #555;
 }

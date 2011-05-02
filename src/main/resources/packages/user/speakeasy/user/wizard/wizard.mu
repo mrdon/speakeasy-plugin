@@ -15,7 +15,7 @@
     </div>
     <div class="field-group">
         <label for="wizard-description" class="form-icon icon-required">Description</label>
-        <input class="text" type="text" id="wizard-description" name="wizard-description" title="Extension description">
+        <textarea id="wizard-description" name="wizard-description" title="Extension description" rows="5" cols="30"/>
         <div class="description">A short description for your extension.</div>
     </div>
     <div class="buttons-container">

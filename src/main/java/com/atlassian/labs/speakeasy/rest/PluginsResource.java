@@ -34,6 +34,8 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
 import java.io.File;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.List;
 
 /**
@@ -83,6 +85,16 @@ public class PluginsResource
         String user = userManager.getRemoteUsername();
         File file = speakeasyManager.getPluginAsProject(pluginKey, user);
         return Response.ok().entity(file).build();
+    }
+
+    @GET
+    @Path("screenshot/{pluginKey}.png")
+    @Produces("image/png")
+    public Response getScreenshot(@PathParam("pluginKey") String pluginKey) throws UnauthorizedAccessException, URISyntaxException
+    {
+        String user = userManager.getRemoteUsername();
+        String url = speakeasyManager.getScreenshotUrl(pluginKey, user);
+        return Response.status(301).location(new URI(url)).build();
     }
 
     @GET

@@ -33,7 +33,6 @@
 
     <commonjs key="adminModules" location="packages/admin" />
 
-
     <web-resource key="user-jira" application="jira">
         <context>speakeasy.user-profile</context>
         <resource type="download" name="user-jira.css" location="jira/user-jira.css"/>
@@ -48,6 +47,7 @@
         <dependency>${project.groupId}.${project.artifactId}:mustache</dependency>
         <resource type="download" name="jquery.form.js" location="shared/jquery.form.js"/>
         <resource type="download" name="images/" location="shared/images/"/>
+        <resource type="download" name="screenshot.png" location="shared/images/prohibition.png" />
     </web-resource>
 
     <web-resource key="mustache">

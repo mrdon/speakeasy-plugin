@@ -10,14 +10,18 @@ import com.atlassian.labs.speakeasy.model.UserPlugins;
 import com.atlassian.labs.speakeasy.product.ProductAccessor;
 import com.atlassian.plugin.Plugin;
 import com.atlassian.plugin.PluginAccessor;
+import com.atlassian.plugin.servlet.filter.PluginFilterConfig;
 import com.atlassian.plugin.web.WebInterfaceManager;
 import com.atlassian.plugin.webresource.UrlMode;
 import com.atlassian.plugin.webresource.WebResourceManager;
+import com.atlassian.sal.api.ApplicationProperties;
 import com.atlassian.sal.api.user.UserManager;
 import com.atlassian.sal.api.xsrf.XsrfTokenAccessor;
 import com.atlassian.sal.api.xsrf.XsrfTokenValidator;
 import com.atlassian.templaterenderer.TemplateRenderer;
 import com.atlassian.templaterenderer.annotations.HtmlSafe;
+import com.google.common.base.Function;
+import com.google.common.base.Predicate;
 import com.google.common.collect.ImmutableMap;
 import com.samskivert.mustache.Mustache;
 import com.samskivert.mustache.Options;
@@ -33,6 +37,7 @@ import java.io.Writer;
 import java.util.Collections;
 import java.util.Map;
 
+import static com.google.common.collect.Collections2.filter;
 import static java.util.Collections.singletonMap;
 
 /**
@@ -48,19 +53,21 @@ public class UserProfileRenderer
     private final CommonJsModulesAccessor commonJsModulesAccessor;
     private final ProductAccessor productAccessor;
     private final SpeakeasyData data;
+    private final ApplicationProperties applicationProperties;
     private final Plugin plugin;
     private final WebInterfaceManager webInterfaceManager;
     private final XsrfTokenAccessor xsrfTokenAccessor;
     private final XsrfTokenValidator xsrfTokenValidator;
 
 
-    public UserProfileRenderer(PluginAccessor pluginAccessor, TemplateRenderer templateRenderer, SpeakeasyManager speakeasyManager, UserManager userManager, WebResourceManager webResourceManager, ProductAccessor productAccessor, SpeakeasyData data, CommonJsModulesAccessor commonJsModulesAccessor, WebInterfaceManager webInterfaceManager, XsrfTokenAccessor xsrfTokenAccessor, XsrfTokenValidator xsrfTokenValidator)
+    public UserProfileRenderer(PluginAccessor pluginAccessor, TemplateRenderer templateRenderer, SpeakeasyManager speakeasyManager, UserManager userManager, WebResourceManager webResourceManager, ProductAccessor productAccessor, SpeakeasyData data, CommonJsModulesAccessor commonJsModulesAccessor, WebInterfaceManager webInterfaceManager, XsrfTokenAccessor xsrfTokenAccessor, XsrfTokenValidator xsrfTokenValidator, ApplicationProperties applicationProperties)
     {
         this.templateRenderer = templateRenderer;
         this.commonJsModulesAccessor = commonJsModulesAccessor;
         this.webInterfaceManager = webInterfaceManager;
         this.xsrfTokenAccessor = xsrfTokenAccessor;
         this.xsrfTokenValidator = xsrfTokenValidator;
+        this.applicationProperties = applicationProperties;
         this.plugin = pluginAccessor.getPlugin("com.atlassian.labs.speakeasy-plugin");
         this.speakeasyManager = speakeasyManager;
         this.userManager = userManager;
@@ -91,11 +98,13 @@ public class UserProfileRenderer
         }
 
         final UserPlugins plugins = speakeasyManager.getRemotePluginList(user);
-        render("templates/user" + (useUserProfileDecorator ? "-with-decorator" : "") + ".vm", ImmutableMap.<String,Object>builder().
+        render("templates/user" + (useUserProfileDecorator ? "-with-decorator" : "") + ".vm", ImmutableMap.<String, Object>builder().
                 put("accessList", speakeasyManager.getRemotePluginList(user)).
                 put("user", user).
+                put("baseUrl", applicationProperties.getBaseUrl()).
                 put("contextPath", req.getContextPath()).
-                put("plugins", plugins.getPlugins()).
+                put("enabledPlugins", filter(plugins.getPlugins(), new EnabledPluginsFilter())).
+                put("availablePlugins", filter(plugins.getPlugins(), new AvailablePluginsFilter())).
                 put("rowRenderer", new RowRenderer(plugin)).
                 put("jsdocRenderer", new JsDocRenderer(plugin, commonJsModulesAccessor.getAllCommonJsModules())).
                 put("staticResourcesPrefix", webResourceManager.getStaticResourcePrefix(UrlMode.RELATIVE)).
@@ -107,8 +116,7 @@ public class UserProfileRenderer
                 put("webInterfaceContext", Collections.<String, Object>emptyMap()).
                 put("xsrfToken", xsrfTokenAccessor.getXsrfToken(req, resp, true)).
                 put("xsrfTokenName", xsrfTokenValidator.getXsrfParameterName()).
-                build(),
-                output);
+                build(), output);
     }
 
     protected void render(final String template, final Map<String, Object> renderContext,
@@ -166,6 +174,22 @@ public class UserProfileRenderer
         finally
         {
             IOUtils.closeQuietly(in);
+        }
+    }
+
+    private static class EnabledPluginsFilter implements Predicate<RemotePlugin>
+    {
+        public boolean apply(RemotePlugin input)
+        {
+            return input.isEnabled();
+        }
+    }
+
+    private static class AvailablePluginsFilter implements Predicate<RemotePlugin>
+    {
+        public boolean apply(RemotePlugin input)
+        {
+            return !input.isEnabled();
         }
     }
 }
