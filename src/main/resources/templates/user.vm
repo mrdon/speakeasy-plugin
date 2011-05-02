@@ -62,9 +62,6 @@
                 </tr>
             </thead>
             <tbody id="plugins-table-body">
-                #foreach ($plugin in $plugins)
-                    $rowRenderer.render($plugin)
-                #end
             </tbody>
         </table>
 
@@ -129,7 +126,8 @@ align="absmiddle" src="$staticResourcesPrefix/download/resources/com.atlassian.l
 </div>
     <div id="speakeasy-loaded">Loading...</div>
 <script type="text/javascript">
-        require.run('speakeasy/user/user').initSpeakeasy();
+       // require.run('speakeasy/user/user').initSpeakeasy();
+     require.run('speakeasy/user/app').init($pluginsJson.render());
 </script>
 </div>
 </div>

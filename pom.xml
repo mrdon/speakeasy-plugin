@@ -275,6 +275,7 @@
                 <version>3.3-m8</version>
                 <extensions>true</extensions>
                 <configuration>
+                    <skipManifestValidation>true</skipManifestValidation>
                     <systemPropertyVariables>
                         <xvfb.enable>${xvfb.enable}</xvfb.enable>
                         <webdriver.browser>firefox-3.6</webdriver.browser>

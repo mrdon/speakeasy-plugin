@@ -8,6 +8,7 @@ import com.atlassian.labs.speakeasy.data.SpeakeasyData;
 import com.atlassian.labs.speakeasy.model.RemotePlugin;
 import com.atlassian.labs.speakeasy.model.UserPlugins;
 import com.atlassian.labs.speakeasy.product.ProductAccessor;
+import com.atlassian.labs.speakeasy.util.JsonObjectMapper;
 import com.atlassian.plugin.Plugin;
 import com.atlassian.plugin.PluginAccessor;
 import com.atlassian.plugin.web.WebInterfaceManager;
@@ -47,14 +48,13 @@ public class UserProfileRenderer
     private final WebResourceManager webResourceManager;
     private final CommonJsModulesAccessor commonJsModulesAccessor;
     private final ProductAccessor productAccessor;
-    private final SpeakeasyData data;
     private final Plugin plugin;
     private final WebInterfaceManager webInterfaceManager;
     private final XsrfTokenAccessor xsrfTokenAccessor;
     private final XsrfTokenValidator xsrfTokenValidator;
 
 
-    public UserProfileRenderer(PluginAccessor pluginAccessor, TemplateRenderer templateRenderer, SpeakeasyManager speakeasyManager, UserManager userManager, WebResourceManager webResourceManager, ProductAccessor productAccessor, SpeakeasyData data, CommonJsModulesAccessor commonJsModulesAccessor, WebInterfaceManager webInterfaceManager, XsrfTokenAccessor xsrfTokenAccessor, XsrfTokenValidator xsrfTokenValidator)
+    public UserProfileRenderer(PluginAccessor pluginAccessor, TemplateRenderer templateRenderer, SpeakeasyManager speakeasyManager, UserManager userManager, WebResourceManager webResourceManager, ProductAccessor productAccessor, CommonJsModulesAccessor commonJsModulesAccessor, WebInterfaceManager webInterfaceManager, XsrfTokenAccessor xsrfTokenAccessor, XsrfTokenValidator xsrfTokenValidator)
     {
         this.templateRenderer = templateRenderer;
         this.commonJsModulesAccessor = commonJsModulesAccessor;
@@ -66,7 +66,6 @@ public class UserProfileRenderer
         this.userManager = userManager;
         this.webResourceManager = webResourceManager;
         this.productAccessor = productAccessor;
-        this.data = data;
     }
 
     public boolean shouldRender(String userName)
@@ -107,6 +106,7 @@ public class UserProfileRenderer
                 put("webInterfaceContext", Collections.<String, Object>emptyMap()).
                 put("xsrfToken", xsrfTokenAccessor.getXsrfToken(req, resp, true)).
                 put("xsrfTokenName", xsrfTokenValidator.getXsrfParameterName()).
+                put("pluginsJson", new StringRenderer(JsonObjectMapper.write(plugins.getPlugins()))).
                 build(),
                 output);
     }
@@ -151,6 +151,24 @@ public class UserProfileRenderer
         public String render()
         {
             return template.execute(singletonMap("pluginModules", modules));
+        }
+    }
+
+    public static class StringRenderer
+    {
+        private final String value;
+
+        public StringRenderer(String value)
+        {
+            this.value = value;
+        }
+
+
+        @HtmlSafe
+        @com.atlassian.velocity.htmlsafe.HtmlSafe
+        public String render()
+        {
+            return value;
         }
     }
 

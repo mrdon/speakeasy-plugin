@@ -1,5 +1,11 @@
-exports.init = function() {
-    var controllers = require('./controllers');
-    new controllers.Extensions({plugins: window.plugins});
-    Backbone.history.start();
+/**
+ * Speakeasy asdfe
+ *
+ * @dependency shared
+ * @context speakeasy.user-profile
+ */
+exports.init = function(plugins) {
+    var Controller = require('./controllers').Controller;
+    new Controller({plugins: plugins});
+    require('backbone').history.start();
 };

@@ -4,6 +4,7 @@ import com.atlassian.labs.speakeasy.model.JsonManifest;
 import com.atlassian.plugins.rest.common.json.JacksonJsonProviderFactory;
 import org.apache.commons.io.IOUtils;
 import org.apache.poi.hssf.record.formula.functions.T;
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -49,12 +50,25 @@ public class JsonObjectMapper
 
         try
         {
-            JSONObject result = new JSONObject(new String(bout.toByteArray(), "UTF-8"));
-            return result.toString(2);
+            final String contents = new String(bout.toByteArray(), "UTF-8");
+            if (contents.startsWith("{"))
+            {
+                JSONObject result = new JSONObject(contents);
+                return result.toString(2);
+            } else if (contents.startsWith("["))
+            {
+                JSONArray result = new JSONArray(contents);
+                return result.toString(2);
+            }
+            else
+            {
+                throw new JSONException("Invalid json");
+            }
+
         }
         catch (JSONException e)
         {
-            throw new IOException("Unable to write json");
+            throw new IOException("Unable to write json", e);
         }
     }
 

@@ -120,9 +120,11 @@ public class Module
                                 {
                                     String exportName = left.getProperty().getIdentifier();
                                     Export export = new Export(exportName, JsDocParser.parse(getId(), node.getJsDoc()));
+
+                                    // if there is only one jsdoc for both the file and export, assume it is for the file
                                     if (jsDoc.get().getDescription().length() > 0 && export.getJsDoc().getDescription().equals(jsDoc.get().getDescription()))
                                     {
-                                        jsDoc.set(new JsDoc(""));
+                                        export = new Export(exportName, new JsDoc(""));
                                     }
                                     exports.put(exportName, export);
                                 }

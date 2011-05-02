@@ -2,7 +2,7 @@
  * Methods for the Speakeasy user page
  *
  * @dependency shared
- * @context speakeasy.user-profile
+ * @ context speakeasy.user-profile
  */
 var $ = require('../jquery').jQuery;
 var addMessage = require('../messages').add;
