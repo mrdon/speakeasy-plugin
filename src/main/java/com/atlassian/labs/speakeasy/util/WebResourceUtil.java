@@ -1,21 +1,16 @@
 package com.atlassian.labs.speakeasy.util;
 
-import com.atlassian.labs.speakeasy.SpeakeasyWebResourceModuleDescriptor;
+import com.atlassian.labs.speakeasy.descriptor.SpeakeasyWebResourceModuleDescriptor;
 import com.atlassian.labs.speakeasy.UserScopedCondition;
 import com.atlassian.plugin.ModuleDescriptor;
 import com.atlassian.plugin.Plugin;
-import com.atlassian.plugin.PluginParseException;
 import com.atlassian.plugin.hostcontainer.HostContainer;
 import com.atlassian.plugin.webresource.WebResourceModuleDescriptor;
 import org.apache.commons.lang.StringUtils;
 import org.dom4j.Element;
 
 import java.lang.reflect.InvocationTargetException;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
-
-import static java.util.Arrays.asList;
 
 /**
  *

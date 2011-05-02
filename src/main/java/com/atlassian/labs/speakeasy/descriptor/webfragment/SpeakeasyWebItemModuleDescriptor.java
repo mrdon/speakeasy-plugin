@@ -1,4 +1,4 @@
-package com.atlassian.labs.speakeasy.webfragment;
+package com.atlassian.labs.speakeasy.descriptor.webfragment;
 
 import com.atlassian.labs.speakeasy.DescriptorGenerator;
 import com.atlassian.labs.speakeasy.DescriptorGeneratorManager;

@@ -2,10 +2,9 @@ package com.atlassian.labs.speakeasy.commonjs.descriptor;
 
 import com.atlassian.labs.speakeasy.DescriptorGenerator;
 import com.atlassian.labs.speakeasy.DescriptorGeneratorManager;
-import com.atlassian.labs.speakeasy.SpeakeasyWebResourceModuleDescriptor;
+import com.atlassian.labs.speakeasy.descriptor.SpeakeasyWebResourceModuleDescriptor;
 import com.atlassian.plugin.ModuleDescriptor;
 import com.atlassian.plugin.PluginAccessor;
-import com.atlassian.plugin.event.PluginEventManager;
 import com.atlassian.plugin.hostcontainer.HostContainer;
 import org.osgi.framework.BundleContext;
 

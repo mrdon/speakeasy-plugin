@@ -1,5 +1,8 @@
-package com.atlassian.labs.speakeasy;
+package com.atlassian.labs.speakeasy.descriptor;
 
+import com.atlassian.labs.speakeasy.DescriptorGenerator;
+import com.atlassian.labs.speakeasy.DescriptorGeneratorManager;
+import com.atlassian.labs.speakeasy.UserScopedCondition;
 import com.atlassian.labs.speakeasy.util.BundleUtil;
 import com.atlassian.labs.speakeasy.util.WebResourceUtil;
 import com.atlassian.plugin.Plugin;

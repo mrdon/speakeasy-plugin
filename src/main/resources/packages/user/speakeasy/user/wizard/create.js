@@ -8,7 +8,7 @@ var staticResourcesPrefix = require('speakeasy/host').staticResourcesPrefix;
 function sendCreateData(params, callback) {
     var createButton = $('#extension-wizard-create');
     $('#extension-wizard-create').attr('disabled', 'true');
-    createButton.parent().append('<img class="waiting" alt="waiting" src="' + staticResourcesPrefix + '/download/resources/com.atlassian.labs.speakeasy-plugin:shared/images/wait.gif">');
+    createButton.parent().append('<img class="waiting" alt="waiting" src="' + staticResourcesPrefix + '/com.atlassian.labs.speakeasy-plugin:shared/images/wait.gif">');
 
     $.ajax({
       url: contextPath + "/rest/speakeasy/1/plugins/create/" + params.key,

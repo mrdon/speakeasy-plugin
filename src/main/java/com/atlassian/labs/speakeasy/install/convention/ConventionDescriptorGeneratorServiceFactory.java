@@ -1,11 +1,11 @@
 package com.atlassian.labs.speakeasy.install.convention;
 
 import com.atlassian.labs.speakeasy.DescriptorGeneratorManager;
-import com.atlassian.labs.speakeasy.SpeakeasyWebResourceModuleDescriptor;
+import com.atlassian.labs.speakeasy.descriptor.SpeakeasyWebResourceModuleDescriptor;
 import com.atlassian.labs.speakeasy.commonjs.descriptor.SpeakeasyCommonJsModulesDescriptor;
 import com.atlassian.labs.speakeasy.install.PluginOperationFailedException;
 import com.atlassian.labs.speakeasy.install.convention.external.ConventionDescriptorGenerator;
-import com.atlassian.labs.speakeasy.webfragment.SpeakeasyWebItemModuleDescriptor;
+import com.atlassian.labs.speakeasy.descriptor.webfragment.SpeakeasyWebItemModuleDescriptor;
 import com.atlassian.plugin.*;
 import com.atlassian.plugin.event.PluginEventManager;
 import com.atlassian.plugin.hostcontainer.HostContainer;
@@ -17,9 +17,6 @@ import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceFactory;
 import org.osgi.framework.ServiceRegistration;
-
-import java.util.Set;
-import java.util.concurrent.CopyOnWriteArraySet;
 
 import static com.google.common.collect.Sets.newHashSet;
 

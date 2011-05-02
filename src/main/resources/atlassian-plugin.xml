@@ -114,10 +114,10 @@
     <component-import key="xsrfTokenAccessor" interface="com.atlassian.sal.api.xsrf.XsrfTokenAccessor" />
     <component-import key="xsrfTokenValidator" interface="com.atlassian.sal.api.xsrf.XsrfTokenValidator" />
 
-    <module-type key="scoped-web-resource" class="com.atlassian.labs.speakeasy.SpeakeasyWebResourceModuleDescriptor"/>
+    <module-type key="scoped-web-resource" class="com.atlassian.labs.speakeasy.descriptor.SpeakeasyWebResourceModuleDescriptor"/>
 
     <module-type key="scoped-web-item"
-                 class="com.atlassian.labs.speakeasy.webfragment.SpeakeasyWebItemModuleDescriptor"/>
+                 class="com.atlassian.labs.speakeasy.descriptor.webfragment.SpeakeasyWebItemModuleDescriptor"/>
 
     <module-type key="scoped-modules" class="com.atlassian.labs.speakeasy.commonjs.descriptor.SpeakeasyCommonJsModulesDescriptor" />
 
