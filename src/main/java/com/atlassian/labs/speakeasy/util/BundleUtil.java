@@ -32,7 +32,7 @@ public class BundleUtil
         return null;
     }
 
-    public static List<String> getBundlePathsRecursive(Bundle bundle, String startPath)
+    public static List<String> getPublicBundlePathsRecursive(Bundle bundle, String startPath)
     {
         List<String> paths = new ArrayList<String>();
         for (String path : getDirContents(bundle, startPath))
@@ -44,7 +44,7 @@ public class BundleUtil
             if (path.endsWith("/"))
             {
                 paths.add(path);
-                paths.addAll(getBundlePathsRecursive(bundle, path));
+                paths.addAll(getPublicBundlePathsRecursive(bundle, path));
             }
             else
             {

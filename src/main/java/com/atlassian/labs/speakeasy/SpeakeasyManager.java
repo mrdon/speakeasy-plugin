@@ -25,6 +25,7 @@ import com.atlassian.sal.api.user.UserProfile;
 import com.google.common.base.Function;
 import com.google.common.base.Predicate;
 import com.google.common.collect.Lists;
+import org.eclipse.jgit.lib.Repository;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.slf4j.Logger;
@@ -755,4 +756,15 @@ public class SpeakeasyManager
         return plugins;
     }
 
+    public boolean canEditPlugin(String remoteUsername, String name)
+    {
+        try
+        {
+            return canAuthorExtensions(remoteUsername) && getRemotePlugin(name, remoteUsername).isCanEdit();
+        }
+        catch (UnauthorizedAccessException e)
+        {
+            return false;
+        }
+    }
 }

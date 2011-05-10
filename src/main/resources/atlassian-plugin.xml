@@ -19,6 +19,11 @@
         <url-pattern>/speakeasy/unsubscribe</url-pattern>
     </servlet>
 
+    <servlet key="git-servlet" name="Git Repository Servlet"
+             class="com.atlassian.labs.speakeasy.git.ExtensionGitServlet">
+        <url-pattern>/speakeasy/git</url-pattern>
+     </servlet>
+
     <commonjs key="sharedModules" location="packages/shared">
         <transformation extension="host">
             <transformer key="commonjs-module" fullModuleKey="${project.groupId}.${project.artifactId}:sharedModules"/>
@@ -96,6 +101,8 @@
     <component key="userProfileRenderer" class="com.atlassian.labs.speakeasy.ui.UserProfileRenderer"/>
     <component key="jsonHandler" class="com.atlassian.labs.speakeasy.install.convention.JsonManifestHandler" />
     <component key="jsonParser" class="com.atlassian.labs.speakeasy.install.convention.JsonToElementParser" />
+    <component key="gitRepositoryManager" class="com.atlassian.labs.speakeasy.git.GitRepositoryManager" />
+    <component key="gitConfiguration" class="com.atlassian.labs.speakeasy.git.GitConfiguration" />
 
     <component key="conventionDescriptorGenerator" class="com.atlassian.labs.speakeasy.install.convention.ConventionDescriptorGeneratorServiceFactory" public="true">
         <interface>com.atlassian.labs.speakeasy.install.convention.external.ConventionDescriptorGenerator</interface>

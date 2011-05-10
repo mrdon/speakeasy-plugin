@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
     <modelVersion>4.0.0</modelVersion>
     <parent>
@@ -53,6 +54,17 @@
             <groupId>org.twdata.com.samskivert</groupId>
             <artifactId>jmustache</artifactId>
             <version>1.1-db2</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.eclipse.jgit</groupId>
+            <artifactId>org.eclipse.jgit</artifactId>
+            <version>0.12.1</version>
+        </dependency>
+        <dependency>
+            <groupId>org.eclipse.jgit</groupId>
+            <artifactId>org.eclipse.jgit.http.server</artifactId>
+            <version>0.12.1</version>
         </dependency>
         <!--dependency>
             <groupId>com.github.spullara.mustache.java</groupId>
@@ -317,20 +329,23 @@
                             <id>confluence</id>
                             <version>${confluence.version}</version>
                             <dataVersion>${confluence.data.version}</dataVersion>
-                            <productDataPath>${basedir}/src/test/resources/confluence-generated-test-resources.zip</productDataPath>
+                            <productDataPath>${basedir}/src/test/resources/confluence-generated-test-resources.zip
+                            </productDataPath>
                         </product>
                         <product>
                             <instanceId>confluence-4.0</instanceId>
                             <id>confluence</id>
                             <version>${confluence.4.0.version}</version>
                             <dataVersion>${confluence.data.version}</dataVersion>
-                            <productDataPath>${basedir}/src/test/resources/confluence-generated-test-resources.zip</productDataPath>
+                            <productDataPath>${basedir}/src/test/resources/confluence-generated-test-resources.zip
+                            </productDataPath>
                         </product>
                         <product>
                             <id>jira</id>
                             <version>${jira.version}</version>
                             <dataVersion>${jira.data.version}</dataVersion>
-                            <productDataPath>${basedir}/src/test/resources/jira-generated-test-resources.zip</productDataPath>
+                            <productDataPath>${basedir}/src/test/resources/jira-generated-test-resources.zip
+                            </productDataPath>
                         </product>
                         <product>
                             <id>fecru</id>
@@ -395,16 +410,16 @@
                 </configuration>
             </plugin>
             <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-surefire-plugin</artifactId>
-                    <version>2.4.3</version>
-                    <configuration>
-                        <excludes>
-                            <exclude>**/*$*</exclude>
-                            <exclude>it/**</exclude>
-                        </excludes>
-                    </configuration>
-                </plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>2.4.3</version>
+                <configuration>
+                    <excludes>
+                        <exclude>**/*$*</exclude>
+                        <exclude>it/**</exclude>
+                    </excludes>
+                </configuration>
+            </plugin>
         </plugins>
     </build>
 
@@ -413,6 +428,13 @@
         <developerConnection>scm:git:git://github.com/mrdon/speakeasy-plugin.git</developerConnection>
         <url>scm:git:git://github.com/mrdon/speakeasy-plugin.git</url>
     </scm>
+
+    <repositories>
+        <repository>
+            <id>jgit-repository</id>
+            <url>http://download.eclipse.org/jgit/maven</url>
+        </repository>
+    </repositories>
 
     <properties>
         <xvfb.enable>true</xvfb.enable>

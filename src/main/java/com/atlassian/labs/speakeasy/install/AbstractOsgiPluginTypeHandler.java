@@ -2,7 +2,6 @@ package com.atlassian.labs.speakeasy.install;
 
 import com.atlassian.plugin.*;
 import com.atlassian.templaterenderer.TemplateRenderer;
-import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
@@ -10,7 +9,6 @@ import org.osgi.framework.BundleContext;
 import java.io.*;
 import java.net.URL;
 import java.util.Enumeration;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
@@ -19,7 +17,7 @@ import java.util.zip.ZipFile;
 import java.util.zip.ZipOutputStream;
 
 import static com.atlassian.labs.speakeasy.util.BundleUtil.findBundleForPlugin;
-import static com.atlassian.labs.speakeasy.util.BundleUtil.getBundlePathsRecursive;
+import static com.atlassian.labs.speakeasy.util.BundleUtil.getPublicBundlePathsRecursive;
 import static java.util.Arrays.asList;
 import static org.apache.commons.lang.Validate.notNull;
 
@@ -208,7 +206,7 @@ public abstract class AbstractOsgiPluginTypeHandler implements PluginTypeHandler
         {
             tmpFile = createTempFile("fork");
             zout = new ZipOutputStream(new FileOutputStream(tmpFile));
-            List<String> bundlePaths = getBundlePathsRecursive(bundle, "");
+            List<String> bundlePaths = getPublicBundlePathsRecursive(bundle, "");
             bundlePaths.remove(getDescriptorPath());
             for (String path : bundlePaths)
             {
@@ -243,7 +241,7 @@ public abstract class AbstractOsgiPluginTypeHandler implements PluginTypeHandler
         {
             tmpFile = createTempFile("edit");
             zout = new ZipOutputStream(new FileOutputStream(tmpFile));
-            for (String path : getBundlePathsRecursive(bundle, ""))
+            for (String path : getPublicBundlePathsRecursive(bundle, ""))
             {
                 if (!path.equals(fileName) && !path.contains("-min."))
                 {
@@ -280,7 +278,7 @@ public abstract class AbstractOsgiPluginTypeHandler implements PluginTypeHandler
     private List<String> getPluginFileNames(Bundle bundle)
     {
         notNull(bundle);
-        return getBundlePathsRecursive(bundle, "");
+        return getPublicBundlePathsRecursive(bundle, "");
     }
 
     protected abstract Iterable<Pattern> getWhitelistPatterns();
