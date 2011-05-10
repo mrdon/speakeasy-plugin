@@ -92,7 +92,7 @@ function updateTableBody(plugins, tableBody, selector) {
                 if ($.inArray(plugin.key, plugins.updated) > -1) {
                     updatedPlugins.push(plugin);
                 }
-                tableBody.append(renderRow(plugin));
+                bindOptionsDropdown($(renderRow(plugin)).appendTo(tableBody));
             }
         })
     } else if (selector(plugins)) {
@@ -103,13 +103,15 @@ function updateTableBody(plugins, tableBody, selector) {
             oldRow.remove();
         }
         var rowContent = renderRow(plugins);
+        var row;
         if (pos == 0) {
-            tableBody.prepend(rowContent);
+            row = $(rowContent).prependTo(tableBody);
         } else if (pos == oldRow.parent().children().length - 1) {
-            tableBody.append(rowContent);
+            row = $(rowContent).appendTo(tableBody);
         } else {
-            tableBody.find('tr').eq(pos - 1).after(rowContent);
+            row = $(rowContent).insertAfter(tableBody.find('tr').eq(pos - 1));
         }
+        bindOptionsDropdown(row);
         updatedPlugins.push(plugins);
     }
     if (tableBody.find('tr').length == 0) {
@@ -127,18 +129,37 @@ function renderRow(plugin) {
     return $(require('./row').render(data));
 }
 
+function getActionFromClass(link) {
+  var classList = link.attr('class').split(/\s+/);
+  var action;
+  $.each( classList, function(index, item){
+      if (item.indexOf("pk-") == 0) {
+        action = item.substring(3);
+      }
+  });
+  return action;
+}
+
+function bindOptionsDropdown(ctx) {
+  $(".plugin-options", ctx).dropDown("Standard", {alignment: "right"});
+}
+
 function initSpeakeasy() {
     var pluginsTable = $("#plugins-table");
     var eventDelegate = function(e) {
-        e.preventDefault();
         var $link = $(e.target);
+        if ($link.attr('href') && $link.attr('href').indexOf('mailto:') == 0) return;
+        e.preventDefault();
         var $row = $link.closest('tr');
-        var action = pluginActions[$link.attr("class").substring(3)];
+        var action = pluginActions[getActionFromClass($link)];
+        if (!action) return;
         var msg = AJS.$("#aui-message-bar").children(".aui-message");
         if (msg)
             msg.remove();
         action($row.attr("data-pluginkey"), $link, $row);
     };
+    bindOptionsDropdown(pluginsTable);
+
     pluginsTable.delegate("a", 'click', eventDelegate);
     pluginsTable.delegate("button", 'click', eventDelegate);
     pluginsTable.bind('pluginsUpdated', function(e, data) {
@@ -161,8 +182,6 @@ function initSpeakeasy() {
                }
             },
             success: function(response, status, xhr, $form) {
-                console.log('success');
-
                 // marker necessary as sometimes Confluence decides to decorate the response
                 var start = response.indexOf("JSON_MARKER||") + "JSON_MARKER||".length;
                 var end = response.indexOf("||", start);

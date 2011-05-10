@@ -280,6 +280,7 @@
                         <xvfb.enable>${xvfb.enable}</xvfb.enable>
                         <webdriver.browser>firefox-3.6</webdriver.browser>
                         <atlassian.mail.senddisabled>false</atlassian.mail.senddisabled>
+                        <!--atlassian.dev.mode>false</atlassian.dev.mode-->
                     </systemPropertyVariables>
                     <instructions>
                         <Import-Package>
@@ -421,7 +422,7 @@
         <confluence.version>3.5.2</confluence.version>
         <confluence.4.0.version>4.0-m18</confluence.4.0.version>
         <confluence.data.version>3.0</confluence.data.version>
-        <jira.version>4.3.1</jira.version>
+        <jira.version>4.3.3</jira.version>
         <jira.data.version>4.1.1</jira.data.version>
         <fecru.version>2.6.0-M2-20110329050339</fecru.version>
         <fecru.data.version>2.5.2-20110307050326</fecru.data.version>

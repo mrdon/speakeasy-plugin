@@ -37,10 +37,30 @@
             </p>
         </div>
     </td>
-    <td headers="plugin-actions">
+    <td headers="plugin-actions" class="plugin-actions">
+        <!--div class="aui-toolbar">
+            <div class="toolbar-split">
+                <ul class="toolbar-group">
+                    <li class="toolbar-item
+                    {{^canEnable}}
+                    disabled
+                    {{/canEnable}}
+                    ">
+                        <a class="pk-enable toolbar-trigger" data-href="/rest/speakeasy/1/user/{{key}}">Enable</a>
+                    </li>
+                    <li class="toolbar-item
+                    {{^canDisable}}
+                    disabled
+                    {{/canDisable}}
+                    ">
+                        <a class="pk-disable toolbar-trigger" data-href="/rest/speakeasy/1/user/{{key}}">Disable</a>
+                    </li>
+                </ul>
+            </div>
+        </div-->
         <div class="plugin-enable-links">
-            <div id="options-{{key}}" class="aui-dd-parent">
-                <button class="pk-options aui-dd-trigger last" data-href="#">Options</button>
+            <div class="plugin-options" class="aui-dd-parent">
+                <button class="aui-dd-trigger last" data-href="#">Options</button>
                 <ul class="aui-dropdown">
                     {{#canFork}}
                     <li><a class="pk-fork" href="/rest/speakeasy/1/plugins/fork/{{key}}">Fork</a></li>
@@ -54,15 +74,11 @@
                     {{#canDownload}}
                     <li><a class="pk-download" data-extension="{{extension}}" href="/rest/speakeasy/1/plugins/download">Download</a></li>
                     {{/canDownload}}
+                    <li><a class="plugin-feedback" href="mailto:{{authorEmail}}?Subject=Speakeasy%20Extension%20Feedback">Feedback</a></li>
                 </ul>
-                <script>
-                    AJS.$(document).ready(function() {
-                        AJS.$("#options-{{key}}").dropDown("Standard", {alignment: "right"});
-                    });
-                </script>
             </div>
-            <button class="pk-disable active" data-href="/rest/speakeasy/1/user/{{key}}">Disable</button>
-            <button class="pk-enable first" data-href="/rest/speakeasy/1/user/{{key}}">Enable</button>
+            <button class="pk-disable active {{^canDisable}}disabled{{/canDisable}}" data-href="/rest/speakeasy/1/user/{{key}}">Disable</button>
+            <button class="pk-enable first {{^canEnable}}disabled{{/canEnable}}" data-href="/rest/speakeasy/1/user/{{key}}">Enable</button>
         </div>
     </td>
 </tr>
