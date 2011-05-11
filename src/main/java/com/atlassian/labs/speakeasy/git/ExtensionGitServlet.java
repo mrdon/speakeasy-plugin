@@ -1,17 +1,23 @@
 package com.atlassian.labs.speakeasy.git;
 
 import com.atlassian.labs.speakeasy.SpeakeasyManager;
+import com.atlassian.labs.speakeasy.UnauthorizedAccessException;
 import com.atlassian.sal.api.user.UserManager;
 import org.eclipse.jgit.http.server.GitServlet;
-import org.eclipse.jgit.http.server.resolver.AsIsFileService;
 import org.eclipse.jgit.lib.Repository;
-import org.eclipse.jgit.transport.resolver.FileResolver;
-import org.eclipse.jgit.transport.resolver.ServiceNotAuthorizedException;
-import org.eclipse.jgit.transport.resolver.ServiceNotEnabledException;
 
+import javax.servlet.Filter;
+import javax.servlet.FilterChain;
+import javax.servlet.FilterConfig;
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
+import javax.servlet.ServletRequest;
+import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+
+import static org.eclipse.jgit.http.server.ServletUtils.ATTRIBUTE_REPOSITORY;
 
 /**
  *
@@ -19,31 +25,95 @@ import javax.servlet.http.HttpServletRequest;
 public class ExtensionGitServlet extends GitServlet
 {
     private final SpeakeasyManager speakeasyManager;
-    private final GitConfiguration gitConfiguration;
+    private final SpeakeasyRepositoryResolver speakeasyRepositoryResolver;
+    private final GitRepositoryManager gitRepositoryManager;
     private final UserManager userManager;
 
-    public ExtensionGitServlet(UserManager userManager, SpeakeasyManager speakeasyManager, GitConfiguration gitConfiguration)
+    public ExtensionGitServlet(UserManager userManager, SpeakeasyManager speakeasyManager, SpeakeasyRepositoryResolver speakeasyRepositoryResolver, GitRepositoryManager gitRepositoryManager)
     {
         this.userManager = userManager;
         this.speakeasyManager = speakeasyManager;
-        this.gitConfiguration = gitConfiguration;
+        this.speakeasyRepositoryResolver = speakeasyRepositoryResolver;
+        this.gitRepositoryManager = gitRepositoryManager;
     }
 
     @Override
     public void init(ServletConfig config) throws ServletException
     {
-        setAsIsFileService(new AsIsFileService()
+        addUploadPackFilter(new UploadPackFilter());
+        addReceivePackFilter(new ReceivePackFilter());
+        setRepositoryResolver(speakeasyRepositoryResolver);
+        super.init(config);
+    }
+
+    @Override
+    protected void service(HttpServletRequest req, HttpServletResponse rsp) throws ServletException, IOException
+    {
+        String user = userManager.getRemoteUsername(req);
+        if (user == null)
         {
-            @Override
-            public void access(HttpServletRequest req, Repository db) throws ServiceNotEnabledException, ServiceNotAuthorizedException
+            rsp.setHeader("WWW-Authenticate","Basic realm=\"Speakeasy git server\"");
+            rsp.sendError(HttpServletResponse.SC_UNAUTHORIZED, "");
+        }
+        else
+        {
+            super.service(req,  rsp);
+        }
+    }
+
+    private abstract class AuthenticationFilter implements Filter
+    {
+        public void init(FilterConfig filterConfig) throws ServletException
+        {
+        }
+
+        public void destroy()
+        {
+        }
+    }
+
+    private class UploadPackFilter extends AuthenticationFilter
+    {
+        public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException
+        {
+            String user = userManager.getRemoteUsername((HttpServletRequest) request);
+            if (speakeasyManager.canAuthorExtensions(user))
             {
-                if (!speakeasyManager.canEditPlugin(userManager.getRemoteUsername(req), db.getWorkTree().getName()))
+                chain.doFilter(request, response);
+            }
+        }
+    }
+
+    private class ReceivePackFilter extends AuthenticationFilter
+    {
+        public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException
+        {
+            HttpServletRequest req = (HttpServletRequest) request;
+            String user = userManager.getRemoteUsername(req);
+            Repository repo = (Repository) request.getAttribute(ATTRIBUTE_REPOSITORY);
+            if (repo != null)
+            {
+                String pluginKey = repo.getWorkTree().getName();
+                if (speakeasyManager.canEditPlugin(user, pluginKey))
                 {
-                    throw new ServiceNotAuthorizedException();
+                    chain.doFilter(request, response);
+                    if (req.getRequestURI().endsWith("receive-pack"))
+                    {
+
+                        try
+                        {
+                            speakeasyManager.installPlugin(
+                                    gitRepositoryManager.buildJarFromRepository(pluginKey),
+                                    user);
+                        }
+                        catch (UnauthorizedAccessException e)
+                        {
+                            // should never happen
+                            throw new ServletException(e);
+                        }
+                    }
                 }
             }
-        });
-        setRepositoryResolver(new FileResolver<HttpServletRequest>(gitConfiguration.getRepositoryBase(), true));
-        super.init(config);
+        }
     }
 }

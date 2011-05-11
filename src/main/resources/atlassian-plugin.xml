@@ -21,7 +21,7 @@
 
     <servlet key="git-servlet" name="Git Repository Servlet"
              class="com.atlassian.labs.speakeasy.git.ExtensionGitServlet">
-        <url-pattern>/speakeasy/git</url-pattern>
+        <url-pattern>/git/*</url-pattern>
      </servlet>
 
     <commonjs key="sharedModules" location="packages/shared">
@@ -102,7 +102,7 @@
     <component key="jsonHandler" class="com.atlassian.labs.speakeasy.install.convention.JsonManifestHandler" />
     <component key="jsonParser" class="com.atlassian.labs.speakeasy.install.convention.JsonToElementParser" />
     <component key="gitRepositoryManager" class="com.atlassian.labs.speakeasy.git.GitRepositoryManager" />
-    <component key="gitConfiguration" class="com.atlassian.labs.speakeasy.git.GitConfiguration" />
+    <component key="git-resolver" class="com.atlassian.labs.speakeasy.git.SpeakeasyRepositoryResolver" />
 
     <component key="conventionDescriptorGenerator" class="com.atlassian.labs.speakeasy.install.convention.ConventionDescriptorGeneratorServiceFactory" public="true">
         <interface>com.atlassian.labs.speakeasy.install.convention.external.ConventionDescriptorGenerator</interface>

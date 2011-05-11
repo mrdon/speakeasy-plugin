@@ -4,8 +4,11 @@ import com.atlassian.plugin.PluginParseException;
 import com.atlassian.plugin.osgi.factory.OsgiPlugin;
 import com.google.common.base.Predicate;
 import com.google.common.base.Predicates;
+import org.apache.commons.lang.Validate;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -14,11 +17,14 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import static com.google.common.base.Predicates.notNull;
+
 /**
  *
  */
 public class BundleUtil
 {
+    private static final Logger log = LoggerFactory.getLogger(BundleUtil.class);
     public static Bundle findBundleForPlugin(BundleContext bundleContext, String pluginKey)
     {
         for (Bundle bundle : bundleContext.getBundles())
@@ -34,6 +40,7 @@ public class BundleUtil
 
     public static List<String> getPublicBundlePathsRecursive(Bundle bundle, String startPath)
     {
+        Validate.notNull(bundle);
         List<String> paths = new ArrayList<String>();
         for (String path : getDirContents(bundle, startPath))
         {
@@ -58,7 +65,8 @@ public class BundleUtil
     {
         List<String> dirs = new ArrayList<String>();
         List<String> files = new ArrayList<String>();
-        for (Enumeration<String> e = bundle.getEntryPaths(startPath); e.hasMoreElements(); )
+        Enumeration<String> e = bundle.getEntryPaths(startPath);
+        while (e != null && e.hasMoreElements())
         {
             String path = e.nextElement();
             if (path.endsWith("/") && !dirs.contains(path))
@@ -90,7 +98,7 @@ public class BundleUtil
         scanPath(bundle, startPath, startPath, paths, predicate);
         if (paths.isEmpty())
         {
-            throw new PluginParseException("No resources found at " + startPath);
+            log.debug("No resources found at " + startPath + " in bundle " + bundle.getSymbolicName());
         }
         return paths;
     }

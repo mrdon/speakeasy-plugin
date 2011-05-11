@@ -1,145 +1,228 @@
 package com.atlassian.labs.speakeasy.git;
 
+import com.atlassian.labs.speakeasy.install.ZipWriter;
+import com.atlassian.labs.speakeasy.util.BundleUtil;
 import com.atlassian.plugin.osgi.util.OsgiHeaderUtil;
+import com.atlassian.plugin.util.concurrent.CopyOnWriteMap;
+import com.atlassian.sal.api.ApplicationProperties;
 import com.atlassian.sal.api.user.UserManager;
 import com.atlassian.sal.api.user.UserProfile;
-import com.atlassian.util.concurrent.CopyOnWriteMap;
+import com.google.common.base.Function;
+import com.google.common.collect.MapMaker;
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.eclipse.jgit.api.Git;
+import org.eclipse.jgit.api.ResetCommand;
 import org.eclipse.jgit.api.Status;
 import org.eclipse.jgit.api.errors.*;
 import org.eclipse.jgit.lib.Repository;
+import org.eclipse.jgit.lib.StoredConfig;
 import org.eclipse.jgit.storage.file.FileRepositoryBuilder;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReadWriteLock;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import static com.atlassian.labs.speakeasy.util.BundleUtil.findBundleForPlugin;
 import static com.atlassian.labs.speakeasy.util.BundleUtil.getPublicBundlePathsRecursive;
+import static com.google.common.collect.Sets.newHashSet;
 
 /**
  *
  */
 public class GitRepositoryManager
 {
+    private static final String BUNDLELASTMODIFIED = "bundlelastmodified";
     private final File repositoriesDir;
-    private final Map<String,Repository> repositories = CopyOnWriteMap.newHashMap();
-    private final UserManager userManager;
+    private final Map<String,Repository> repositories = new MapMaker().makeMap();
+    private final Map<String,ReadWriteLock> repositoryLocks = new MapMaker().makeComputingMap(new Function<String,ReadWriteLock>()
+    {
+        public ReadWriteLock apply(String from)
+        {
+            return new ReentrantReadWriteLock();
+        }
+    });
     private final BundleContext bundleContext;
 
-    public GitRepositoryManager(UserManager userManager, GitConfiguration gitConfiguration, BundleContext bundleContext)
+    public GitRepositoryManager(BundleContext bundleContext, ApplicationProperties applicationProperties)
     {
-        this.userManager = userManager;
         this.bundleContext = bundleContext;
-        repositoriesDir = gitConfiguration.getRepositoryBase();
+        repositoriesDir = new File(applicationProperties.getHomeDirectory(), "data/speakeasy/repositories");
+        repositoriesDir.mkdirs();
     }
 
-    private Repository getRepository(String id, String user) throws NoHeadException, NoMessageException, ConcurrentRefUpdateException, WrongRepositoryStateException, IOException, NoFilepatternException
+    private Repository getRepository(String id) throws NoHeadException, NoMessageException, ConcurrentRefUpdateException, WrongRepositoryStateException, IOException, NoFilepatternException
     {
         Repository repo = repositories.get(id);
         if (repo == null)
         {
             final File repoDir = new File(repositoriesDir, id);
-
-            try
-            {
-                FileRepositoryBuilder builder = new FileRepositoryBuilder();
-                repo = builder.setWorkTree(repoDir).
-                        setGitDir(new File(repoDir, ".git")).
-                        setMustExist(false).
-                        build();
-            }
-            catch (IOException e)
-            {
-                e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
-            }
+            FileRepositoryBuilder builder = new FileRepositoryBuilder();
+            repo = builder.setWorkTree(repoDir).
+                    setGitDir(new File(repoDir, ".git")).
+                    setMustExist(false).
+                    build();
             Bundle bundle = findBundleForPlugin(bundleContext, id);
             if (bundle != null)
             {
-                updateRepositoryIfDirty(repo, bundle, user);
+                if (!repo.getObjectDatabase().exists())
+                {
+                    repo.create();
+                    updateRepositoryIfDirty(repo, bundle);
+                }
+                else
+                {
+                    long modified = repo.getConfig().getLong("speakeasy", null, BUNDLELASTMODIFIED, 0);
+                    if (modified != bundle.getLastModified())
+                    {
+                        updateRepositoryIfDirty(repo, bundle);
+                    }
+                }
+
+                repositories.put(id, repo);
             }
+
         }
         return repo;
     }
 
-    public GitRepositoryManager init(String id, String user)
+    public File getRepositoriesDir()
     {
-        forRepository(id, user, new RepositoryOperation()
-        {
-            public void operateOn(Repository repo) throws IOException
-            {
-                repo.create(false);
-            }
-        });
-        return this;
+        return this.repositoriesDir;
     }
 
-    public GitRepositoryManager updateIfDirty(final Bundle bundle, final String user)
-    {
-        final String pluginKey = OsgiHeaderUtil.getPluginKey(bundle);
-        forRepository(pluginKey, user, new RepositoryOperation()
-        {
-            public void operateOn(Repository repo) throws IOException, NoFilepatternException, NoHeadException, NoMessageException, ConcurrentRefUpdateException, WrongRepositoryStateException
-            {
-                updateRepositoryIfDirty(repo, bundle, user);
-            }
-        });
-        return this;
-    }
-
-    private void updateRepositoryIfDirty(Repository repo, Bundle bundle, String user) throws IOException, NoFilepatternException, NoHeadException, NoMessageException, ConcurrentRefUpdateException, WrongRepositoryStateException
+    private void updateRepositoryIfDirty(Repository repo, Bundle bundle) throws IOException, NoFilepatternException, NoHeadException, NoMessageException, ConcurrentRefUpdateException, WrongRepositoryStateException
     {
         final File workTree = repo.getWorkTree();
         Git git = new Git(repo);
+
+        Set<File> workTreeFilesToDelete = findFiles(repo.getWorkTree());
         for (String path : getPublicBundlePathsRecursive(bundle, ""))
         {
             File target = new File(workTree, path);
-            // todo close shit properly
-            FileOutputStream fout = new FileOutputStream(target);
-            IOUtils.copy(bundle.getResource(path).openStream(), fout);
-            fout.close();
-            git.add().addFilepattern(path).call();
+            workTreeFilesToDelete.remove(target);
+            if (path.endsWith("/"))
+            {
+                target.mkdirs();
+            }
+            else
+            {
+                FileOutputStream fout = null;
+                try
+                {
+                    fout = new FileOutputStream(target);
+                    IOUtils.copy(bundle.getResource(path).openStream(), fout);
+                    fout.close();
+                }
+                finally
+                {
+                    IOUtils.closeQuietly(fout);
+                }
+                git.add().addFilepattern(path).call();
+            }
         }
-        final UserProfile profile = userManager.getUserProfile(user);
+        for (File file : workTreeFilesToDelete)
+        {
+            FileUtils.deleteQuietly(file);
+        }
+
         Status status = git.status().call();
         if (!status.getAdded().isEmpty() ||
             !status.getChanged().isEmpty() ||
-            !status.getMissing().isEmpty() ||
             !status.getMissing().isEmpty() ||
             !status.getRemoved().isEmpty() ||
             !status.getUntracked().isEmpty())
         {
             git.commit().
-                setAuthor(profile.getUsername(), profile.getEmail()).
-                setCommitter(profile.getUsername(), profile.getEmail()).
-                setMessage("Update from bundle").
+                setAll(true).
+                setAuthor("speakeasy", "speakeasy@atlassian.com").
+                setCommitter("speakeasy", "speakeasy@atlassian.com").
+                setMessage("Auto-sync from bundle").
                 call();
         }
+        StoredConfig config = repo.getConfig();
+        config.setLong("speakeasy", null, BUNDLELASTMODIFIED, bundle.getLastModified());
+        config.save();
     }
 
-    private void forRepository(String id, String user, RepositoryOperation repositoryOperation)
+    private Set<File> findFiles(File workTree)
     {
-        // todo: ensure only one thread working with the repo at a time
+        Set<File> paths = newHashSet();
+        for (File child : workTree.listFiles())
+        {
+            if (!".git".equals(child.getName()))
+            {
+                paths.add(child);
+                if (child.isDirectory())
+                {
+                    paths.addAll(findFiles(child));
+                }
+            }
+        }
+        return paths;
+    }
 
+    private <T> T  forRepository(String id, RepositoryOperation<T> repositoryOperation)
+    {
+        // todo: use read locks for read operations
+        ReadWriteLock lock = repositoryLocks.get(id);
+        lock.writeLock().lock();
         try
         {
-            Repository repository = getRepository(id, user);
-            repositoryOperation.operateOn(repository);
+            Repository repository = getRepository(id);
+            return repositoryOperation.operateOn(repository);
         }
         catch (Exception e)
         {
-            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+            throw new RuntimeException(e);
+        }
+        finally
+        {
+            lock.writeLock().unlock();
         }
     }
 
-    private static interface RepositoryOperation
+    public void ensureRepository(String name)
     {
-        void operateOn(Repository repo) throws Exception;
+        forRepository(name, new RepositoryOperation<Void>()
+        {
+            public Void operateOn(Repository repo) throws Exception
+            {
+                return null;
+            }
+        });
+    }
+
+    public File buildJarFromRepository(String pluginKey)
+    {
+        return forRepository(pluginKey, new RepositoryOperation<File>()
+        {
+            public File operateOn(Repository repo) throws Exception
+            {
+                Git git = new Git(repo);
+                git.reset()
+                        .setMode(ResetCommand.ResetType.HARD)
+                        .setRef("HEAD")
+                        .call();
+                for (String path : git.status().call().getUntracked())
+                {
+                    new File(repo.getWorkTree(), path).delete();
+                }
+                return ZipWriter.addDirectoryContentsToZip(repo.getWorkTree(), ".git");
+            }
+        });
+    }
+
+    private static interface RepositoryOperation<T>
+    {
+        T operateOn(Repository repo) throws Exception;
     }
 
     private static interface ReadOnlyRepositoryOperation extends RepositoryOperation {}
