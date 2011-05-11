@@ -22,13 +22,110 @@
 }
 
 #plugins-table td {
+    vertical-align: top;
     white-space: nowrap;
+    border-top: 1px solid #DDD;
+    padding-top: 15px;
+    padding-bottom: 15px;
 }
+
+#plugins-table tr {
+    background-color: #fafafa;
+}
+
+#plugins-table tr.zebra {
+    background-color: #EAEAE9;
+}
+
+#plugins-table tr.enabled {
+    background: rgba(0,169,12, 0.1);
+}
+
+#plugins-table tr.disabled {
+    background: rgba(204, 0, 0, 0.1);
+}
+
+#plugins-table td h3,
+#plugins-table td p {
+    color: #333;
+}
+
+#plugins-table td h3 {
+    margin: 0;
+    padding: 0;
+    font-size: 18px;
+}
+
+#plugins-table td p {
+    margin: 0;
+    font-size: 11px;
+}
+
+#plugins-table td p.plugin-author-line {
+    margin: 0 0 5px 0;
+}
+
+#plugins-table td p.plugin-description {
+    margin: 10px 0;
+    font-size: 12px;
+}
+
 #plugins-table td.plugin-info {
     white-space: normal;
     width: 100%;
 }
+
 div.plugin-enable-links {
+    -moz-border-radius: 3px;
+    border-radius: 3px;
+    width: 191px;
+}
+
+div.plugin-enable-links,
+div.plugin-enable-links .aui-dd-parent, 
+div.plugin-enable-links button {
+    position:relative;
+    float: right;
+}
+
+div.plugin-enable-links .aui-dd-parent {
+    width: auto;
+    position: relative;
+}
+
+div.plugin-enable-links button {
+    border-width: 1px 0;
+    border-color: #AAA;
+    border-style: solid;
+    font-size: 12px;
+    padding: 7px;
+    margin: 0;
+    display: block;
+    background: none;
+    background-color: #EEE; 
+    -webkit-transition: background-color 0.2s 0;   
+    -moz-transition: background-color 0.2s 0;  
+    -o-transition: background-color 0.2s 0;  
+    transition: background-color 0.2s 0;   
+}
+
+div.plugin-enable-links button:hover {
+    background-color: #69C;
+    color: #FFF;
+}
+
+div.plugin-enable-links button.first {
+    border-left: 1px solid #AAA;
+    border-right: 1px solid #DDD;
+    -moz-border-radius: 3px 0 0 3px;
+    border-radius: 3px 0 0 3px;
+}
+
+div.plugin-enable-links button.last {
+    border-right: 1px solid #AAA;
+    border-left: 1px solid #DDD;
+    -moz-border-radius: 0 3px 3px 0;
+    border-radius: 0px 3px 3px 0;
 }
 
 div.plugin-author-links {
@@ -45,13 +142,9 @@ td .plugin-name {
 td .plugin-screenshot {
     border: 1px black solid;
 }
+
 td .plugin-stats {
-    font-size: 90%;
-    color: #555;
-}
-td .plugin-description {
-    margin-top: 1em;
-    font-size: 90%;
+    font-size: 11px;
     color: #555;
 }
 

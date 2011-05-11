@@ -10,6 +10,5 @@ public enum ExtensionOperations
     EDIT,
     DOWNLOAD,
     UNINSTALL,
-    FORK,
-    ENABLE
+    FORK
 }

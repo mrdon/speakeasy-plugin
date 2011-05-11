@@ -29,7 +29,7 @@
         #end
     </ul>
     <div class="tabs-pane active-pane" id="horizontal-first">
-        <p style="margin: 10px 0 15px 0;">
+        <p style="margin: 10px 0 15px 8px;">
             These are the <a href="http://confluence.atlassian.com/display/DEVNET/Speakeasy+Overview">Speakeasy extensions</a> installed on your server.
             These user-created extensions may <b>change</b>, <b>break</b> or <b>disappear</b> at any time.  If (when) an extension breaks, and you're
             having trouble loading this page, there's an escape hatch. Use
@@ -68,7 +68,7 @@
                 #end
                 #if ($enabledPlugins.isEmpty())
                 <tr>
-                    <td>No extensions</td>
+                    <td colspan="3">No extensions</td>
                 </tr>
                 #end
             </tbody>
@@ -90,7 +90,7 @@
         </table>
 
         #if ($canAuthor)
-            <div style="background-color: #f0f0f0; margin: 20px; padding: 10px; border: 1px solid #bbb;">
+            <div style="background-color: #f0f0f0; padding: 10px; border: 1px solid #bbb;">
                 <form id="upload-form" action="$contextPath/rest/speakeasy/1/plugins" enctype="multipart/form-data" method="post">
                     <input type="hidden" name="$xsrfTokenName" value="$xsrfToken" />
                     <b>Upload New Extension:</b>

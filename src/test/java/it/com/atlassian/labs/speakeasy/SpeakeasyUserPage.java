@@ -120,7 +120,12 @@ public class SpeakeasyUserPage implements Page
 
     public boolean isPluginEnabled(String pluginKey)
     {
-        return Check.elementExists(By.className("pk-disable"), getPluginRow(pluginKey));
+        return !canEnable(pluginKey);
+    }
+
+    public boolean canEnable(String pluginKey)
+    {
+        return !getPluginRow(pluginKey).findElement(By.className("pk-enable")).getAttribute("class").contains("disabled");
     }
 
     private WebElement getPluginRow(String key)
@@ -176,38 +181,50 @@ public class SpeakeasyUserPage implements Page
 
     public DownloadDialog openDownloadDialog(String pluginKey) throws IOException
     {
-        WebElement pluginRow = getPluginRow(pluginKey);
-        WebElement downloadAction =  pluginRow.findElement(By.className("pk-download"));
-        downloadAction.click();
-
+        clickActionLink(pluginKey, ExtensionOperations.DOWNLOAD);
         return pageBinder.bind(DownloadDialog.class, pluginKey);
     }
 
-
     public SpeakeasyUserPage uninstallPlugin(String pluginKey)
     {
-        WebElement uninstallLink = getActionLink(pluginKey, ExtensionOperations.UNINSTALL);
-        uninstallLink.click();
+        clickActionLink(pluginKey, ExtensionOperations.UNINSTALL);
         waitForMessages();
         return this;
     }
 
-    private WebElement getActionLink(String pluginKey, ExtensionOperations action)
+    private void clickActionLink(String pluginKey, ExtensionOperations action)
     {
         WebElement pluginRow = getPluginRow(pluginKey);
+        WebElement actionElement = getActionLink(action, pluginRow);
+        actionElement.click();
+    }
+
+    private WebElement getActionLink(ExtensionOperations action, WebElement pluginRow)
+    {
+        triggerOptionsDropdown(pluginRow);
         return pluginRow.findElement(By.className("pk-" + action.toString().toLowerCase()));
+    }
+
+    private void triggerOptionsDropdown(WebElement pluginRow)
+    {
+        pluginRow.findElement(By.className("aui-dd-trigger")).click();
     }
 
     public boolean canExecute(String pluginKey, ExtensionOperations action)
     {
+        WebElement pluginRow = getPluginRow(pluginKey);
         try
         {
-            getActionLink(pluginKey, action);
+            getActionLink(action, pluginRow);
             return true;
         }
         catch (NoSuchElementException ex)
         {
             return false;
+        }
+        finally
+        {
+            triggerOptionsDropdown(pluginRow);
         }
     }
 
@@ -236,9 +253,7 @@ public class SpeakeasyUserPage implements Page
 
     public IdeDialog openEditDialog(String pluginKey)
     {
-        WebElement pluginRow = getPluginRow(pluginKey);
-        WebElement editAction =  pluginRow.findElement(By.className("pk-edit"));
-        editAction.click();
+        clickActionLink(pluginKey, ExtensionOperations.EDIT);
 
         return pageBinder.bind(IdeDialog.class, pluginKey);
 
@@ -246,9 +261,7 @@ public class SpeakeasyUserPage implements Page
 
     public ForkDialog openForkDialog(String pluginKey)
     {
-        WebElement pluginRow = getPluginRow(pluginKey);
-        WebElement forkAction =  pluginRow.findElement(By.className("pk-fork"));
-        forkAction.click();
+        clickActionLink(pluginKey, ExtensionOperations.FORK);
 
         return pageBinder.bind(ForkDialog.class, pluginKey);
     }

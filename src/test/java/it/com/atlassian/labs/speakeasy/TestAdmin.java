@@ -46,11 +46,11 @@ public class TestAdmin
                     .allowAdmins(false)
                     .save();
         assertFalse(product.visit(SpeakeasyUserPage.class)
-                    .canExecute("plugin-tests", ExtensionOperations.ENABLE));
+                    .canEnable("plugin-tests"));
         logout();
         assertTrue(product.visit(LoginPage.class)
                .login("barney", "barney", SpeakeasyUserPage.class)
-                    .canExecute("plugin-tests", ExtensionOperations.ENABLE));
+                    .canEnable("plugin-tests"));
 
         logout();
         product.visit(LoginPage.class)
@@ -59,7 +59,7 @@ public class TestAdmin
                     .allowAdmins(true)
                     .save();
         assertTrue(product.visit(SpeakeasyUserPage.class)
-                    .canExecute("plugin-tests", ExtensionOperations.ENABLE));
+                    .canEnable("plugin-tests"));
     }
 
     @Test

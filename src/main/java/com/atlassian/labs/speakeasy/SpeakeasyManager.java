@@ -550,6 +550,7 @@ public class SpeakeasyManager
         remotePlugin.setAuthorDisplayName(profile != null && profile.getFullName() != null
                 ? profile.getFullName()
                 : author);
+        remotePlugin.setAuthorEmail(profile != null ? profile.getEmail() : "unknown@example.com");
         List<String> accessList = data.getUsersList(plugin.getKey());
         remotePlugin.setNumUsers(accessList.size());
 
