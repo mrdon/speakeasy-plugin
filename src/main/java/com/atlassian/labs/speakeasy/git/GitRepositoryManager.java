@@ -29,6 +29,7 @@ import org.osgi.framework.BundleContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.DisposableBean;
+import org.springframework.osgi.util.internal.BundleUtils;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -246,6 +247,7 @@ public class GitRepositoryManager implements DisposableBean
             public Void operateOn(Repository repo) throws Exception
             {
                 // just getting the repo for the first time will create it
+                updateRepositoryIfDirty(repo, BundleUtil.findBundleForPlugin(bundleContext, repo.getWorkTree().getName()));
                 return null;
             }
         });
