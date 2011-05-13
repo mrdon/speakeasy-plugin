@@ -141,7 +141,7 @@ function getActionFromClass(link) {
 }
 
 function bindOptionsDropdown(ctx) {
-  $(".plugin-options", ctx).dropDown("Standard", {alignment: "right"});
+  $(".options-menu", ctx).dropDown("Standard", {alignment: "right"});
 }
 
 function initSpeakeasy() {
