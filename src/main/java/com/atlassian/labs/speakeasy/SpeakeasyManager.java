@@ -1,7 +1,12 @@
 package com.atlassian.labs.speakeasy;
 
+import com.atlassian.event.api.EventPublisher;
 import com.atlassian.labs.speakeasy.commonjs.descriptor.CommonJsModulesDescriptor;
 import com.atlassian.labs.speakeasy.data.SpeakeasyData;
+import com.atlassian.labs.speakeasy.event.PluginForkedEvent;
+import com.atlassian.labs.speakeasy.event.PluginInstalledEvent;
+import com.atlassian.labs.speakeasy.event.PluginUninstalledEvent;
+import com.atlassian.labs.speakeasy.event.PluginUpdatedEvent;
 import com.atlassian.labs.speakeasy.install.PluginManager;
 import com.atlassian.labs.speakeasy.install.PluginOperationFailedException;
 import com.atlassian.labs.speakeasy.install.convention.JsonManifestHandler;
@@ -11,7 +16,6 @@ import com.atlassian.labs.speakeasy.model.Settings;
 import com.atlassian.labs.speakeasy.model.UserPlugins;
 import com.atlassian.labs.speakeasy.product.ProductAccessor;
 import com.atlassian.labs.speakeasy.util.FeedBuilder;
-import com.atlassian.labs.speakeasy.util.JsonObjectMapper;
 import com.atlassian.plugin.ModuleDescriptor;
 import com.atlassian.plugin.Plugin;
 import com.atlassian.plugin.PluginAccessor;
@@ -24,16 +28,12 @@ import com.atlassian.sal.api.user.UserManager;
 import com.atlassian.sal.api.user.UserProfile;
 import com.google.common.base.Function;
 import com.google.common.base.Predicate;
-import com.google.common.collect.Lists;
-import org.eclipse.jgit.lib.Repository;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -65,10 +65,11 @@ public class SpeakeasyManager
     private final SettingsManager settingsManager;
     private final WebResourceManager webResourceManager;
     private final ModuleDescriptor unknownScreenshotDescriptor;
+    private final EventPublisher eventPublisher;
     private static final Logger log = LoggerFactory.getLogger(SpeakeasyManager.class);
 
 
-    public SpeakeasyManager(PluginAccessor pluginAccessor, SpeakeasyData data, PluginManager pluginManager, ProductAccessor productAccessor, DescriptorGeneratorManager descriptorGeneratorManager, JsonManifestHandler jsonManifestHandler, BundleContext bundleContext, PermissionManager permissionManager, UserManager userManager, SettingsManager settingsManager, ApplicationProperties applicationProperties, WebResourceManager webResourceManager)
+    public SpeakeasyManager(PluginAccessor pluginAccessor, SpeakeasyData data, PluginManager pluginManager, ProductAccessor productAccessor, DescriptorGeneratorManager descriptorGeneratorManager, JsonManifestHandler jsonManifestHandler, BundleContext bundleContext, PermissionManager permissionManager, UserManager userManager, SettingsManager settingsManager, ApplicationProperties applicationProperties, WebResourceManager webResourceManager, EventPublisher eventPublisher)
     {
         this.descriptorGeneratorManager = descriptorGeneratorManager;
         this.pluginAccessor = pluginAccessor;
@@ -82,6 +83,7 @@ public class SpeakeasyManager
         this.settingsManager = settingsManager;
         this.applicationProperties = applicationProperties;
         this.webResourceManager = webResourceManager;
+        this.eventPublisher = eventPublisher;
         this.unknownScreenshotDescriptor = pluginAccessor.getPluginModule("com.atlassian.labs.speakeasy-plugin:shared");
     }
 
@@ -211,6 +213,11 @@ public class SpeakeasyManager
             }
             disallowAllPluginAccess(pluginKey, user);
             pluginManager.uninstall(pluginKey, user);
+            eventPublisher.publish(new PluginUninstalledEvent(pluginKey)
+                .setUserName(user)
+                .setUserEmail(plugin.getAuthorEmail())
+                .setMessage("Uninstalled from the UI"));
+
             log.info("Uninstalled extension '{}' by user '{}'", pluginKey, user);
             return getRemotePluginList(user, keysModified);
         }
@@ -246,6 +253,10 @@ public class SpeakeasyManager
             {
                 sendForkedEmail(pluginKey, forkedPluginKey, remoteUser);
             }
+            eventPublisher.publish(new PluginForkedEvent(pluginKey, forkedPluginKey)
+                    .setUserName(remoteUser)
+                    .setUserEmail(userManager.getUserProfile(remoteUser).getEmail())
+                    .setMessage("Forked from the UI"));
             log.info("Forked '{}' extension by '{}'", pluginKey, remoteUser);
             return getRemotePluginList(remoteUser, modifiedKeys);
         }
@@ -365,6 +376,11 @@ public class SpeakeasyManager
                 throw new PluginOperationFailedException("Not authorized to edit " + pluginKey, pluginKey);
             }
             String installedPluginKey = pluginManager.saveAndRebuild(pluginKey, plugin.getPluginType(), fileName, contents, user);
+            eventPublisher.publish(new PluginUpdatedEvent(pluginKey)
+                    .setUserName(user)
+                    .setUserEmail(plugin.getAuthorEmail())
+                    .addUpdatedFile(fileName)
+                    .setMessage("Edit from the UI"));
             log.info("Saved and rebuilt extension '{}' by user '{}'", pluginKey, user);
             return getRemotePlugin(installedPluginKey, user);
         }
@@ -382,6 +398,10 @@ public class SpeakeasyManager
     {
         validateAuthor(user);
         String pluginKey = pluginManager.install(uploadedFile, user);
+        eventPublisher.publish(new PluginInstalledEvent(pluginKey)
+                .setUserName(user)
+                .setUserEmail(userManager.getUserProfile(user).getEmail())
+                .setMessage("Installed from a JAR upload"));
         log.info("Installed extension '{}' by user '{}'", pluginKey, user);
         return getRemotePluginList(user, pluginKey);
     }
@@ -398,6 +418,10 @@ public class SpeakeasyManager
             pluginManager.createExtension(pluginType, pluginKey, remoteUser, description, name);
             List<String> modifiedKeys = new ArrayList<String>();
             modifiedKeys.add(pluginKey);
+            eventPublisher.publish(new PluginInstalledEvent(pluginKey)
+                .setUserName(remoteUser)
+                .setUserEmail(userManager.getUserProfile(remoteUser).getEmail())
+                .setMessage("Created from the UI"));
             log.info("Created extension '{}' by user '{}'", pluginKey, remoteUser);
             return getRemotePluginList(remoteUser, modifiedKeys);
         }
@@ -421,8 +445,6 @@ public class SpeakeasyManager
     {
         return !settingsManager.getSettings().getAccessGroups().isEmpty();
     }
-
-
 
     public Settings saveSettings(Settings settings, String userName) throws UnauthorizedAccessException
     {

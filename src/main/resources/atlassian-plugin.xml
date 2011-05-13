@@ -120,6 +120,7 @@
     <component-import key="webInterfaceManager" interface="com.atlassian.plugin.web.WebInterfaceManager" />
     <component-import key="xsrfTokenAccessor" interface="com.atlassian.sal.api.xsrf.XsrfTokenAccessor" />
     <component-import key="xsrfTokenValidator" interface="com.atlassian.sal.api.xsrf.XsrfTokenValidator" />
+    <component-import key="eventPublisher" interface="com.atlassian.event.api.EventPublisher" />
 
     <module-type key="scoped-web-resource" class="com.atlassian.labs.speakeasy.descriptor.SpeakeasyWebResourceModuleDescriptor"/>
 

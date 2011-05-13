@@ -1,12 +1,14 @@
 package com.atlassian.labs.speakeasy.git;
 
+import com.atlassian.event.api.EventListener;
+import com.atlassian.event.api.EventPublisher;
+import com.atlassian.labs.speakeasy.event.PluginForkedEvent;
+import com.atlassian.labs.speakeasy.event.PluginInstalledEvent;
+import com.atlassian.labs.speakeasy.event.PluginUninstalledEvent;
+import com.atlassian.labs.speakeasy.event.PluginUpdatedEvent;
 import com.atlassian.labs.speakeasy.install.ZipWriter;
 import com.atlassian.labs.speakeasy.util.BundleUtil;
-import com.atlassian.plugin.osgi.util.OsgiHeaderUtil;
-import com.atlassian.plugin.util.concurrent.CopyOnWriteMap;
 import com.atlassian.sal.api.ApplicationProperties;
-import com.atlassian.sal.api.user.UserManager;
-import com.atlassian.sal.api.user.UserProfile;
 import com.google.common.base.Function;
 import com.google.common.collect.MapMaker;
 import org.apache.commons.io.FileUtils;
@@ -14,19 +16,25 @@ import org.apache.commons.io.IOUtils;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.ResetCommand;
 import org.eclipse.jgit.api.Status;
-import org.eclipse.jgit.api.errors.*;
+import org.eclipse.jgit.api.errors.ConcurrentRefUpdateException;
+import org.eclipse.jgit.api.errors.NoFilepatternException;
+import org.eclipse.jgit.api.errors.NoHeadException;
+import org.eclipse.jgit.api.errors.NoMessageException;
+import org.eclipse.jgit.api.errors.WrongRepositoryStateException;
 import org.eclipse.jgit.lib.Repository;
 import org.eclipse.jgit.lib.StoredConfig;
 import org.eclipse.jgit.storage.file.FileRepositoryBuilder;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.DisposableBean;
 
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
@@ -37,7 +45,7 @@ import static com.google.common.collect.Sets.newHashSet;
 /**
  *
  */
-public class GitRepositoryManager
+public class GitRepositoryManager implements DisposableBean
 {
     private static final String BUNDLELASTMODIFIED = "bundlelastmodified";
     private final File repositoriesDir;
@@ -50,12 +58,16 @@ public class GitRepositoryManager
         }
     });
     private final BundleContext bundleContext;
+    private final EventPublisher eventPublisher;
+    private static final Logger log = LoggerFactory.getLogger(GitRepositoryManager.class);
 
-    public GitRepositoryManager(BundleContext bundleContext, ApplicationProperties applicationProperties)
+    public GitRepositoryManager(BundleContext bundleContext, ApplicationProperties applicationProperties, EventPublisher eventPublisher)
     {
         this.bundleContext = bundleContext;
+        this.eventPublisher = eventPublisher;
         repositoriesDir = new File(applicationProperties.getHomeDirectory(), "data/speakeasy/repositories");
         repositoriesDir.mkdirs();
+        eventPublisher.register(this);
     }
 
     private Repository getRepository(String id) throws NoHeadException, NoMessageException, ConcurrentRefUpdateException, WrongRepositoryStateException, IOException, NoFilepatternException
@@ -146,7 +158,13 @@ public class GitRepositoryManager
                 setCommitter("speakeasy", "speakeasy@atlassian.com").
                 setMessage("Auto-sync from bundle").
                 call();
+            log.info("Git repository {} updated", repo.getWorkTree().getName());
         }
+        updateWithBundleTimestamp(repo, bundle);
+    }
+
+    private void updateWithBundleTimestamp(Repository repo, Bundle bundle) throws IOException
+    {
         StoredConfig config = repo.getConfig();
         config.setLong("speakeasy", null, BUNDLELASTMODIFIED, bundle.getLastModified());
         config.save();
@@ -218,6 +236,90 @@ public class GitRepositoryManager
                 return ZipWriter.addDirectoryContentsToZip(repo.getWorkTree(), ".git");
             }
         });
+    }
+
+    @EventListener
+    public void onPluginInstalledEvent(final PluginInstalledEvent event)
+    {
+        forRepository(event.getPluginKey(), new RepositoryOperation<Void>()
+        {
+            public Void operateOn(Repository repo) throws Exception
+            {
+                // just getting the repo for the first time will create it
+                return null;
+            }
+        });
+    }
+
+    @EventListener
+    public void onPluginUninstalledEvent(final PluginUninstalledEvent event)
+    {
+        forRepository(event.getPluginKey(), new RepositoryOperation<Void>()
+        {
+            public Void operateOn(Repository repo) throws Exception
+            {
+                removeRepository(repo);
+                return null;
+            }
+        });
+    }
+
+    @EventListener
+    public void onPluginUpdatedEvent(final PluginUpdatedEvent event)
+    {
+        forRepository(event.getPluginKey(), new RepositoryOperation<Void>()
+        {
+            public Void operateOn(Repository repo) throws Exception
+            {
+                updateRepositoryIfDirty(repo, BundleUtil.findBundleForPlugin(bundleContext, event.getPluginKey()));
+                return null;
+            }
+        });
+    }
+
+    @EventListener
+    public void onPluginForkedEvent(final PluginForkedEvent event)
+    {
+        forRepository(event.getPluginKey(), new RepositoryOperation<Void>()
+        {
+            public Void operateOn(Repository repo) throws Exception
+            {
+                cloneRepository(repo, event.getForkedPluginKey());
+                return null;
+            }
+        });
+    }
+
+    private void cloneRepository(Repository repo, String forkedPluginKey)
+    {
+        Git git = new Git(repo);
+        git.cloneRepository()
+            .setURI(repo.getDirectory().toURI().toString())
+            .setDirectory(new File(repositoriesDir, forkedPluginKey))
+            .setBare(false)
+            .call();
+        forRepository(forkedPluginKey, new RepositoryOperation()
+        {
+            public Object operateOn(Repository repo) throws Exception
+            {
+                // do nothing, we just want to force a sync
+                return null;
+            }
+        });
+        log.info("Git repository {} cloned to {}", repo.getWorkTree().getName(), forkedPluginKey);
+    }
+
+    private void removeRepository(Repository repo) throws IOException
+    {
+        File workTreeDir = repo.getWorkTree();
+        repo.close();
+        FileUtils.deleteDirectory(workTreeDir);
+        log.info("Git repository {} removed", repo.getWorkTree().getName());
+    }
+
+    public void destroy() throws Exception
+    {
+        eventPublisher.unregister(this);
     }
 
     private static interface RepositoryOperation<T>
