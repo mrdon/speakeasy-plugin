@@ -83,7 +83,7 @@
                 #end
                 #if ($availablePlugins.isEmpty())
                 <tr>
-                    <td>No extensions</td>
+                    <td colspan="3">No extensions</td>
                 </tr>
                 #end
             </tbody>

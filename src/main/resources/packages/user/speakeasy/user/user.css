@@ -72,7 +72,6 @@
 
 #plugins-table td.plugin-info {
     white-space: normal;
-    width: 100%;
 }
 
 div.plugin-enable-links {
@@ -139,13 +138,39 @@ td .plugin-name {
     font-weight: bold;
 }
 
-td .plugin-screenshot {
+td.plugin-screenshot {
+    width: 10%;
+}
+
+td.plugin-screenshot img {
     border: 1px black solid;
 }
 
 td .plugin-stats {
     font-size: 11px;
     color: #555;
+}
+
+#plugins-table td.plugin-actions {
+    width: 20%;
+    text-align: right;
+}
+#plugins-table td.plugin-actions svg{
+    position: relative !important;
+}
+#plugins-table td.plugin-actions .aui-dropdown{
+    width: inherit;
+    min-width: inherit;
+}
+#plugins-table .aui-dropdown li a.item-link {
+    width: inherit;
+    min-width: inherit;
+}
+
+td.plugin-actions .aui-toolbar {
+    background: transparent;
+    border: none;
+    width: auto;
 }
 
 #available-extensions-table {
