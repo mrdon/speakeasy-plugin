@@ -58,7 +58,7 @@
                     <li class="toolbar-item toolbar-dropdown options-menu">
                         <div class="aui-dd-parent">
                             <a href="#" class="toolbar-trigger aui-dd-trigger" title="Insert">
-                                <span class="dropdown-text">Options</span>
+                                <span class="dropdown-text">More</span>
                                 <span class="icon icon-dropdown"></span>
                             </a>
                             <ul class="aui-dropdown">
