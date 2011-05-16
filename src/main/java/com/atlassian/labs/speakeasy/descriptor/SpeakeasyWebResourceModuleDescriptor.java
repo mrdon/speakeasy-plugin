@@ -1,8 +1,5 @@
 package com.atlassian.labs.speakeasy.descriptor;
 
-import com.atlassian.labs.speakeasy.DescriptorGenerator;
-import com.atlassian.labs.speakeasy.DescriptorGeneratorManager;
-import com.atlassian.labs.speakeasy.UserScopedCondition;
 import com.atlassian.labs.speakeasy.util.BundleUtil;
 import com.atlassian.labs.speakeasy.util.WebResourceUtil;
 import com.atlassian.plugin.Plugin;
@@ -25,7 +22,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import static com.atlassian.labs.speakeasy.DescriptorGeneratorManager.getStatefulKey;
+import static com.atlassian.labs.speakeasy.descriptor.DescriptorGeneratorManager.getStatefulKey;
 
 /**
  *

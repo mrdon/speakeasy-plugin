@@ -7,6 +7,8 @@ import com.atlassian.labs.speakeasy.event.PluginForkedEvent;
 import com.atlassian.labs.speakeasy.event.PluginInstalledEvent;
 import com.atlassian.labs.speakeasy.event.PluginUninstalledEvent;
 import com.atlassian.labs.speakeasy.event.PluginUpdatedEvent;
+import com.atlassian.labs.speakeasy.descriptor.DescriptorGenerator;
+import com.atlassian.labs.speakeasy.descriptor.DescriptorGeneratorManager;
 import com.atlassian.labs.speakeasy.install.PluginManager;
 import com.atlassian.labs.speakeasy.install.PluginOperationFailedException;
 import com.atlassian.labs.speakeasy.install.convention.JsonManifestHandler;
@@ -39,6 +41,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.regex.Pattern;
 
 import static com.atlassian.labs.speakeasy.util.BundleUtil.findBundleForPlugin;
 import static com.google.common.collect.Iterables.filter;
@@ -58,7 +61,6 @@ public class SpeakeasyManager
     private final PluginManager pluginManager;
     private final ProductAccessor productAccessor;
     private final DescriptorGeneratorManager descriptorGeneratorManager;
-    private final JsonManifestHandler jsonManifestHandler;
     private final BundleContext bundleContext;
     private final PermissionManager permissionManager;
     private final UserManager userManager;
@@ -66,17 +68,16 @@ public class SpeakeasyManager
     private final WebResourceManager webResourceManager;
     private final ModuleDescriptor unknownScreenshotDescriptor;
     private final EventPublisher eventPublisher;
+    private final RemotePluginBuilder remotePluginBuilder;
     private static final Logger log = LoggerFactory.getLogger(SpeakeasyManager.class);
 
-
-    public SpeakeasyManager(PluginAccessor pluginAccessor, SpeakeasyData data, PluginManager pluginManager, ProductAccessor productAccessor, DescriptorGeneratorManager descriptorGeneratorManager, JsonManifestHandler jsonManifestHandler, BundleContext bundleContext, PermissionManager permissionManager, UserManager userManager, SettingsManager settingsManager, ApplicationProperties applicationProperties, WebResourceManager webResourceManager, EventPublisher eventPublisher)
+    public SpeakeasyManager(PluginAccessor pluginAccessor, SpeakeasyData data, PluginManager pluginManager, ProductAccessor productAccessor, DescriptorGeneratorManager descriptorGeneratorManager, BundleContext bundleContext, PermissionManager permissionManager, UserManager userManager, SettingsManager settingsManager, ApplicationProperties applicationProperties, WebResourceManager webResourceManager, RemotePluginBuilder remotePluginBuilder, EventPublisher eventPublisher)
     {
         this.descriptorGeneratorManager = descriptorGeneratorManager;
         this.pluginAccessor = pluginAccessor;
         this.data = data;
         this.pluginManager = pluginManager;
         this.productAccessor = productAccessor;
-        this.jsonManifestHandler = jsonManifestHandler;
         this.bundleContext = bundleContext;
         this.permissionManager = permissionManager;
         this.userManager = userManager;
@@ -84,6 +85,7 @@ public class SpeakeasyManager
         this.applicationProperties = applicationProperties;
         this.webResourceManager = webResourceManager;
         this.eventPublisher = eventPublisher;
+        this.remotePluginBuilder = remotePluginBuilder;
         this.unknownScreenshotDescriptor = pluginAccessor.getPluginModule("com.atlassian.labs.speakeasy-plugin:shared");
     }
 
@@ -115,7 +117,7 @@ public class SpeakeasyManager
     {
         validateAccess(userName);
         Plugin plugin = getPlugin(pluginKey);
-        return getRemotePlugin(plugin, userName, getAllSpeakeasyPlugins());
+        return remotePluginBuilder.build(plugin, userName, getAllSpeakeasyPlugins());
     }
 
     private Plugin getPlugin(String pluginKey)
@@ -241,7 +243,8 @@ public class SpeakeasyManager
             {
                 throw new PluginOperationFailedException("Not authorized to fork " + pluginKey, pluginKey);
             }
-            String forkedPluginKey = pluginManager.forkAndInstall(pluginKey, plugin.getPluginType(), remoteUser, description);
+            String forkedPluginKey = createForkPluginKey(pluginKey, remoteUser);
+            pluginManager.forkAndInstall(pluginKey, forkedPluginKey, plugin.getPluginType(), remoteUser, description);
             List<String> modifiedKeys = new ArrayList<String>();
             modifiedKeys.add(forkedPluginKey);
             if (hasAccess(pluginKey, remoteUser))
@@ -268,6 +271,19 @@ public class SpeakeasyManager
         {
             throw new PluginOperationFailedException(ex.getMessage(), ex, pluginKey);
         }
+    }
+
+    private String createForkPluginKey(String pluginKey, String remoteUser)
+    {
+        StringBuilder safeName = new StringBuilder();
+        for (char c : remoteUser.toCharArray())
+        {
+            if (Character.isLetterOrDigit(c))
+            {
+                safeName.append(c);
+            }
+        }
+        return pluginKey + "-fork-" + safeName;
     }
 
     public File getPluginAsProject(String pluginKey, String user) throws UnauthorizedAccessException
@@ -562,150 +578,6 @@ public class SpeakeasyManager
         }
     }
 
-    private RemotePlugin getRemotePlugin(Plugin plugin, String userName, Iterable<Plugin> speakeasyPlugins) throws PluginOperationFailedException
-    {
-        RemotePlugin remotePlugin = new RemotePlugin(plugin);
-        boolean canAuthor = permissionManager.canAuthorExtensions(userName);
-        String author = getPluginAuthor(plugin);
-        remotePlugin.setAuthor(author);
-        UserProfile profile = userManager.getUserProfile(author);
-        remotePlugin.setAuthorDisplayName(profile != null && profile.getFullName() != null
-                ? profile.getFullName()
-                : author);
-        remotePlugin.setAuthorEmail(profile != null ? profile.getEmail() : "unknown@example.com");
-        List<String> accessList = data.getUsersList(plugin.getKey());
-        remotePlugin.setNumUsers(accessList.size());
-
-        if (plugin.getResource("/" + JsonManifest.ATLASSIAN_EXTENSION_PATH) != null)
-        {
-            JsonManifest mf = jsonManifestHandler.read(plugin);
-            remotePlugin.setDescription(mf.getDescription());
-            remotePlugin.setName(mf.getName());
-            remotePlugin.setExtension("zip");
-        }
-        // try to detect a failed install of a zip plugin
-        else if (plugin instanceof UnloadablePlugin &&
-                plugin.getModuleDescriptor("modules") != null &&
-                plugin.getModuleDescriptor("images") != null &&
-                plugin.getModuleDescriptor("css") != null)
-        {
-            remotePlugin.setExtension("zip");
-            remotePlugin.setName(plugin.getName());
-            remotePlugin.setDescription(((UnloadablePlugin) plugin).getErrorText());
-        }
-        else if (plugin.getResource("/atlassian-plugin.xml") != null)
-        {
-            remotePlugin.setExtension("jar");
-        }
-        else
-        {
-            remotePlugin.setExtension("xml");
-        }
-        if (remotePlugin.getName() == null)
-        {
-            remotePlugin.setName(remotePlugin.getKey());
-        }
-        if (remotePlugin.getDescription() == null)
-        {
-            remotePlugin.setDescription("");
-        }
-        boolean isAuthor = userName.equals(remotePlugin.getAuthor());
-        boolean pureSpeakeasy = onlyContainsSpeakeasyModules(plugin);
-
-        if (pluginAccessor.isPluginEnabled(plugin.getKey()))
-        {
-            Set<String> unresolvedExternalModuleDependencies = findUnresolvedCommonJsDependencies(plugin);
-            if (unresolvedExternalModuleDependencies.isEmpty())
-            {
-                remotePlugin.setAvailable(true);
-                remotePlugin.setEnabled(accessList.contains(userName));
-                remotePlugin.setCanEnable(!remotePlugin.isEnabled());
-                remotePlugin.setCanDisable(remotePlugin.isEnabled());
-            }
-            else
-            {
-                remotePlugin.setDescription("Unable to find modules: " + unresolvedExternalModuleDependencies);
-            }
-        }
-        else if (plugin instanceof UnloadablePlugin)
-        {
-            remotePlugin.setDescription(((UnloadablePlugin)plugin).getErrorText());
-        }
-        boolean canUninstall = isAuthor && pureSpeakeasy && canAuthor;
-        remotePlugin.setFork(remotePlugin.getForkedPluginKey() != null);
-        remotePlugin.setCanUninstall(canUninstall);
-        remotePlugin.setCanEdit(isAuthor && pureSpeakeasy && canAuthor);
-        remotePlugin.setCanFork(!remotePlugin.isFork() && pureSpeakeasy && !isAuthor && canAuthor);
-        remotePlugin.setCanDownload(pureSpeakeasy && canAuthor);
-
-
-        // if the user has already forked this, don't let them fork again
-        if (!remotePlugin.isFork())
-        {
-            for (Plugin plug : speakeasyPlugins)
-            {
-                if (remotePlugin.getKey().equals(RemotePlugin.getForkedPluginKey(plug.getKey())) && userName.equals(getPluginAuthor(plug)))
-                {
-                    remotePlugin.setCanFork(false);
-                }
-            }
-        }
-
-        // if the user is an admin and admins aren't allowed to enable
-        if (!permissionManager.canEnableExtensions(userName))
-        {
-            remotePlugin.setCanEnable(false);
-            remotePlugin.setCanFork(false);
-            remotePlugin.setCanEdit(false);
-        }
-        return remotePlugin;
-    }
-
-    private Set<String> findUnresolvedCommonJsDependencies(Plugin plugin)
-    {
-        Set<String> unresolved = newHashSet();
-        for (ModuleDescriptor descriptor : plugin.getModuleDescriptors())
-        {
-            if (descriptor instanceof CommonJsModulesDescriptor)
-            {
-                unresolved.addAll(((CommonJsModulesDescriptor)descriptor).getUnresolvedExternalModuleDependencies());
-            }
-        }
-        return unresolved;
-    }
-
-    private String getPluginAuthor(Plugin plugin)
-    {
-        String author = data.getPluginAuthor(plugin.getKey());
-        if (author == null)
-        {
-            author = plugin.getPluginInformation().getVendorName();
-        }
-        if (author == null)
-        {
-            author = "(unknown)";
-        }
-        return author;
-    }
-
-    private boolean onlyContainsSpeakeasyModules(Plugin plugin)
-    {
-        Bundle bundle = findBundleForPlugin(bundleContext, plugin.getKey());
-        String stateIdentifier = String.valueOf(bundle.getLastModified());
-        for (ModuleDescriptor descriptor : plugin.getModuleDescriptors())
-        {
-            if (!(descriptor instanceof DescriptorGenerator)
-                    // FIXME: these checks are hacks
-                    && !descriptor.getKey().endsWith(stateIdentifier) && !descriptor.getKey().endsWith("-modules")
-                    && !(descriptor instanceof UnloadableModuleDescriptor)
-                    && !"screenshot".equals(descriptor.getKey()))
-            {
-                return false;
-            }
-        }
-        return true;
-    }
-
     private void validateAccess(String userName) throws UnauthorizedAccessException
     {
         if (!permissionManager.canAccessSpeakeasy(userName))
@@ -743,7 +615,7 @@ public class SpeakeasyManager
             {
                 try
                 {
-                    return getRemotePlugin(from, userName, rawPlugins);
+                    return remotePluginBuilder.build(from, userName, rawPlugins);
                 }
                 catch (RuntimeException ex)
                 {

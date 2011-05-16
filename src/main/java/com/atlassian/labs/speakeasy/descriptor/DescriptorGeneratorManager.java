@@ -1,25 +1,15 @@
-package com.atlassian.labs.speakeasy;
+package com.atlassian.labs.speakeasy.descriptor;
 
 import com.atlassian.labs.speakeasy.data.SpeakeasyData;
 import com.atlassian.plugin.ModuleDescriptor;
-import com.atlassian.plugin.Plugin;
 import com.atlassian.plugin.PluginAccessor;
 import com.atlassian.plugin.PluginController;
-import com.atlassian.plugin.event.PluginEventListener;
-import com.atlassian.plugin.event.PluginEventManager;
-import com.atlassian.plugin.event.events.PluginDisabledEvent;
-import com.atlassian.plugin.event.events.PluginEnabledEvent;
-import com.atlassian.plugin.hostcontainer.HostContainer;
 import com.atlassian.plugin.util.WaitUntil;
-import com.atlassian.plugin.webresource.WebResourceModuleDescriptor;
-import com.sun.syndication.io.ModuleGenerator;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceRegistration;
-import org.springframework.beans.factory.DisposableBean;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;

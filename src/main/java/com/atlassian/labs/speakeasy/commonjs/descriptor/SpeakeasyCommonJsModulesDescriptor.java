@@ -1,7 +1,7 @@
 package com.atlassian.labs.speakeasy.commonjs.descriptor;
 
-import com.atlassian.labs.speakeasy.DescriptorGenerator;
-import com.atlassian.labs.speakeasy.DescriptorGeneratorManager;
+import com.atlassian.labs.speakeasy.descriptor.DescriptorGenerator;
+import com.atlassian.labs.speakeasy.descriptor.DescriptorGeneratorManager;
 import com.atlassian.labs.speakeasy.descriptor.SpeakeasyWebResourceModuleDescriptor;
 import com.atlassian.plugin.ModuleDescriptor;
 import com.atlassian.plugin.PluginAccessor;
@@ -10,7 +10,7 @@ import org.osgi.framework.BundleContext;
 
 import java.util.List;
 
-import static com.atlassian.labs.speakeasy.DescriptorGeneratorManager.getStatefulKey;
+import static com.atlassian.labs.speakeasy.descriptor.DescriptorGeneratorManager.getStatefulKey;
 import static java.util.Collections.emptySet;
 
 /**

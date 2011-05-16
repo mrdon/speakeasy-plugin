@@ -220,7 +220,7 @@ public abstract class AbstractOsgiPluginTypeHandler implements PluginTypeHandler
             }
 
             zout.putNextEntry(new ZipEntry(getDescriptorPath()));
-            forkDescriptor(new ByteArrayInputStream(readEntry(bundle, getDescriptorPath())), zout, pluginKey + "-fork-" + user, description);
+            forkDescriptor(new ByteArrayInputStream(readEntry(bundle, getDescriptorPath())), zout, forkPluginKey, description);
 
             zout.close();
         }

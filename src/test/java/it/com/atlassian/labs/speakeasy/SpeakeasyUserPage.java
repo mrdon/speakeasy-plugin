@@ -125,7 +125,8 @@ public class SpeakeasyUserPage implements Page
 
     public boolean canEnable(String pluginKey)
     {
-        return !getPluginRow(pluginKey).findElement(By.className("pk-enable")).getAttribute("class").contains("disabled");
+        final String disabled = getPluginRow(pluginKey).findElement(By.className("pk-enable")).getAttribute("disabled");
+        return disabled == null || "false".equalsIgnoreCase(disabled);
     }
 
     private WebElement getPluginRow(String key)

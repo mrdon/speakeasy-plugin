@@ -1,6 +1,6 @@
 package com.atlassian.labs.speakeasy.install.convention;
 
-import com.atlassian.labs.speakeasy.DescriptorGeneratorManager;
+import com.atlassian.labs.speakeasy.descriptor.DescriptorGeneratorManager;
 import com.atlassian.labs.speakeasy.descriptor.SpeakeasyWebResourceModuleDescriptor;
 import com.atlassian.labs.speakeasy.commonjs.descriptor.SpeakeasyCommonJsModulesDescriptor;
 import com.atlassian.labs.speakeasy.install.PluginOperationFailedException;
