@@ -6,6 +6,7 @@ import com.atlassian.labs.speakeasy.event.PluginForkedEvent;
 import com.atlassian.labs.speakeasy.event.PluginInstalledEvent;
 import com.atlassian.labs.speakeasy.event.PluginUninstalledEvent;
 import com.atlassian.labs.speakeasy.event.PluginUpdatedEvent;
+import com.atlassian.labs.speakeasy.install.PluginOperationFailedException;
 import com.atlassian.labs.speakeasy.install.ZipWriter;
 import com.atlassian.labs.speakeasy.util.BundleUtil;
 import com.atlassian.sal.api.ApplicationProperties;
@@ -41,6 +42,7 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import static com.atlassian.labs.speakeasy.util.BundleUtil.findBundleForPlugin;
 import static com.atlassian.labs.speakeasy.util.BundleUtil.getPublicBundlePathsRecursive;
+import static com.atlassian.labs.speakeasy.util.ExtensionValidate.isValidExtensionKey;
 import static com.google.common.collect.Sets.newHashSet;
 
 /**
@@ -190,21 +192,29 @@ public class GitRepositoryManager implements DisposableBean
 
     private <T> T  forRepository(String id, RepositoryOperation<T> repositoryOperation)
     {
-        // todo: use read locks for read operations
-        ReadWriteLock lock = repositoryLocks.get(id);
-        lock.writeLock().lock();
-        try
+        // only sync with git repo if a valid plugin key
+        if (isValidExtensionKey(id))
         {
-            Repository repository = getRepository(id);
-            return repositoryOperation.operateOn(repository);
+            // todo: use read locks for read operations
+            ReadWriteLock lock = repositoryLocks.get(id);
+            lock.writeLock().lock();
+            try
+            {
+                Repository repository = getRepository(id);
+                return repositoryOperation.operateOn(repository);
+            }
+            catch (Exception e)
+            {
+                throw new RuntimeException(e);
+            }
+            finally
+            {
+                lock.writeLock().unlock();
+            }
         }
-        catch (Exception e)
+        else
         {
-            throw new RuntimeException(e);
-        }
-        finally
-        {
-            lock.writeLock().unlock();
+            return null;
         }
     }
 
@@ -221,7 +231,7 @@ public class GitRepositoryManager implements DisposableBean
 
     public File buildJarFromRepository(String pluginKey)
     {
-        return forRepository(pluginKey, new RepositoryOperation<File>()
+        File jar = forRepository(pluginKey, new RepositoryOperation<File>()
         {
             public File operateOn(Repository repo) throws Exception
             {
@@ -237,6 +247,11 @@ public class GitRepositoryManager implements DisposableBean
                 return ZipWriter.addDirectoryContentsToZip(repo.getWorkTree(), ".git");
             }
         });
+        if (jar == null)
+        {
+            throw new PluginOperationFailedException("Invalid plugin key: " + pluginKey, pluginKey);
+        }
+        return jar;
     }
 
     @EventListener

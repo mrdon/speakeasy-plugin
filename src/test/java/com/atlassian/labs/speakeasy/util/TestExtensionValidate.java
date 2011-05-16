@@ -1,5 +1,6 @@
-package com.atlassian.labs.speakeasy;
+package com.atlassian.labs.speakeasy.util;
 
+import com.atlassian.labs.speakeasy.RemotePluginBuilder;
 import com.atlassian.plugin.ModuleDescriptor;
 import com.atlassian.plugin.Plugin;
 import com.atlassian.plugin.osgi.factory.OsgiPlugin;
@@ -22,7 +23,7 @@ import static org.mockito.Mockito.when;
  *
  */
 @RunWith(MockitoJUnitRunner.class)
-public class TestRemotePluginBuilder
+public class TestExtensionValidate
 {
     @Mock
     BundleContext bundleContext;
@@ -70,6 +71,6 @@ public class TestRemotePluginBuilder
         }});
         when(bundleContext.getBundles()).thenReturn(new Bundle[] {pluginBundle});
         when(plugin.getKey()).thenReturn(pluginKey);
-        return RemotePluginBuilder.isPureSpeakeasyExtension(bundleContext, plugin);
+        return ExtensionValidate.isPureSpeakeasyExtension(bundleContext, plugin);
     }
 }

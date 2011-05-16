@@ -18,6 +18,7 @@ import java.util.zip.ZipOutputStream;
 
 import static com.atlassian.labs.speakeasy.util.BundleUtil.findBundleForPlugin;
 import static com.atlassian.labs.speakeasy.util.BundleUtil.getPublicBundlePathsRecursive;
+import static com.atlassian.labs.speakeasy.util.ExtensionValidate.isValidExtensionKey;
 import static java.util.Arrays.asList;
 import static org.apache.commons.lang.Validate.notNull;
 
@@ -74,7 +75,11 @@ public abstract class AbstractOsgiPluginTypeHandler implements PluginTypeHandler
         PluginArtifact artifact = new JarPluginArtifact(file);
         if (artifact.doesResourceExist(getDescriptorPath()))
         {
-            return extractPluginKey(artifact);
+            String key = extractPluginKey(artifact);
+            if (isValidExtensionKey(key))
+            {
+                return key;
+            }
         }
         return null;
     }

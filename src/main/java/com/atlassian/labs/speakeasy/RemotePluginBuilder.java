@@ -7,6 +7,7 @@ import com.atlassian.labs.speakeasy.install.PluginOperationFailedException;
 import com.atlassian.labs.speakeasy.install.convention.JsonManifestHandler;
 import com.atlassian.labs.speakeasy.model.JsonManifest;
 import com.atlassian.labs.speakeasy.model.RemotePlugin;
+import com.atlassian.labs.speakeasy.util.ExtensionValidate;
 import com.atlassian.plugin.ModuleDescriptor;
 import com.atlassian.plugin.Plugin;
 import com.atlassian.plugin.PluginAccessor;
@@ -36,7 +37,7 @@ public class RemotePluginBuilder
     private final PluginAccessor pluginAccessor;
     private final BundleContext bundleContext;
 
-    public static final Pattern VALID_PLUGIN_KEY = Pattern.compile("[a-zA-Z0-9-_.]+");
+
 
     public RemotePluginBuilder(PermissionManager permissionManager, UserManager userManager, SpeakeasyData data, JsonManifestHandler jsonManifestHandler, PluginAccessor pluginAccessor, BundleContext bundleContext)
     {
@@ -96,7 +97,7 @@ public class RemotePluginBuilder
             remotePlugin.setDescription("");
         }
         boolean isAuthor = userName.equals(remotePlugin.getAuthor());
-        boolean pureSpeakeasy = isPureSpeakeasyExtension(bundleContext, plugin);
+        boolean pureSpeakeasy = ExtensionValidate.isPureSpeakeasyExtension(bundleContext, plugin);
 
         if (pluginAccessor.isPluginEnabled(plugin.getKey()))
         {
@@ -172,27 +173,5 @@ public class RemotePluginBuilder
             author = "(unknown)";
         }
         return author;
-    }
-
-    static boolean isPureSpeakeasyExtension(BundleContext bundleContext, Plugin plugin)
-    {
-        Bundle bundle = findBundleForPlugin(bundleContext, plugin.getKey());
-
-        // verify only speakeasy modules with known exceptions
-        String stateIdentifier = String.valueOf(bundle.getLastModified());
-        for (ModuleDescriptor descriptor : plugin.getModuleDescriptors())
-        {
-            if (!(descriptor instanceof DescriptorGenerator)
-                    // FIXME: these checks are hacks
-                    && !descriptor.getKey().endsWith(stateIdentifier) && !descriptor.getKey().endsWith("-modules")
-                    && !(descriptor instanceof UnloadableModuleDescriptor)
-                    && !"screenshot".equals(descriptor.getKey()))
-            {
-                return false;
-            }
-        }
-
-        // ensure the plugin doesn't have any invalid characters that will screw up later operations like forking
-        return VALID_PLUGIN_KEY.matcher(plugin.getKey()).matches();
     }
 }

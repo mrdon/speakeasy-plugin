@@ -77,10 +77,8 @@ public class PluginManager
         }
         if (pluginArtifact == null)
         {
-            throw new PluginOperationFailedException("Unable to handle plugin file " + pluginFile.toString(), null);
+            throw new PluginOperationFailedException("Unable to handle plugin file " + pluginFile.toString() + ", likely due to an invalid plugin key", null);
         }
-
-
 
         Set<String> pluginKeys = pluginController.installPlugins(pluginArtifact);
         if (pluginKeys.size() == 1)
