@@ -1,5 +1,6 @@
-package com.atlassian.labs.speakeasy;
+package com.atlassian.labs.speakeasy.descriptor;
 
+import com.atlassian.labs.speakeasy.SpeakeasyManager;
 import com.atlassian.plugin.PluginParseException;
 import com.atlassian.plugin.web.Condition;
 import com.atlassian.sal.api.user.UserManager;

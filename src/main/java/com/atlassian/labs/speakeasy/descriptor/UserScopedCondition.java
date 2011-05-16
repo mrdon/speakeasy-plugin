@@ -1,4 +1,4 @@
-package com.atlassian.labs.speakeasy;
+package com.atlassian.labs.speakeasy.descriptor;
 
 import com.atlassian.plugin.PluginParseException;
 import com.atlassian.plugin.web.Condition;

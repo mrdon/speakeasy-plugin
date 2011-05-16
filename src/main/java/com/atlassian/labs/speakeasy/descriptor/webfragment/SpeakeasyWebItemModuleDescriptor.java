@@ -1,7 +1,7 @@
 package com.atlassian.labs.speakeasy.descriptor.webfragment;
 
-import com.atlassian.labs.speakeasy.DescriptorGenerator;
-import com.atlassian.labs.speakeasy.DescriptorGeneratorManager;
+import com.atlassian.labs.speakeasy.descriptor.DescriptorGenerator;
+import com.atlassian.labs.speakeasy.descriptor.DescriptorGeneratorManager;
 import com.atlassian.labs.speakeasy.util.WebResourceUtil;
 import com.atlassian.plugin.Plugin;
 import com.atlassian.plugin.PluginParseException;
@@ -18,7 +18,7 @@ import org.osgi.framework.BundleContext;
 import java.util.Collections;
 import java.util.List;
 
-import static com.atlassian.labs.speakeasy.DescriptorGeneratorManager.getStatefulKey;
+import static com.atlassian.labs.speakeasy.descriptor.DescriptorGeneratorManager.getStatefulKey;
 
 /**
  *

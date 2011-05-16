@@ -44,7 +44,7 @@ function validate(data) {
     $("#wizard-errors").children().remove();
 
     var errors = [];
-    if (!data.key || !data.key.match(/[a-zA-Z-_]+/) || data.key.length > 20) {
+    if (!data.key || !data.key.match(/[a-zA-Z0-9-_.]+/) || data.key.length > 20) {
         errors.push("Invalid key, must be less than 20 characters and only include letters, dashes, and underscores");
     } else if (!data.name || data.name.length > 30) {
         errors.push("Invalid name, must be less than 30 characters");

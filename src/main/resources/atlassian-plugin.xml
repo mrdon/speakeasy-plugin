@@ -86,7 +86,7 @@
     <component key="speakeasyManager" class="com.atlassian.labs.speakeasy.SpeakeasyManager"/>
     <component key="permissionManager" class="com.atlassian.labs.speakeasy.PermissionManager"/>
     <component key="settingsManager" class="com.atlassian.labs.speakeasy.SettingsManager"/>
-    <component key="descriptorGeneratorManager" class="com.atlassian.labs.speakeasy.DescriptorGeneratorManager" />
+    <component key="descriptorGeneratorManager" class="com.atlassian.labs.speakeasy.descriptor.DescriptorGeneratorManager" />
     <component key="commonJsModulesAccessor" class="com.atlassian.labs.speakeasy.commonjs.CommonJsModulesAccessor" />
     <component key="zipTransformer" class="com.atlassian.labs.speakeasy.install.convention.ZipTransformer"/>
     <component key="pluginManager" class="com.atlassian.labs.speakeasy.install.PluginManager"/>
@@ -96,6 +96,7 @@
     <component key="userProfileRenderer" class="com.atlassian.labs.speakeasy.ui.UserProfileRenderer"/>
     <component key="jsonHandler" class="com.atlassian.labs.speakeasy.install.convention.JsonManifestHandler" />
     <component key="jsonParser" class="com.atlassian.labs.speakeasy.install.convention.JsonToElementParser" />
+    <component key="remotePluginBuilder" class="com.atlassian.labs.speakeasy.RemotePluginBuilder" />
 
     <component key="conventionDescriptorGenerator" class="com.atlassian.labs.speakeasy.install.convention.ConventionDescriptorGeneratorServiceFactory" public="true">
         <interface>com.atlassian.labs.speakeasy.install.convention.external.ConventionDescriptorGenerator</interface>
@@ -141,35 +142,35 @@
               application="refapp">
         <label>Extensions (user)</label>
         <link linkId="speakeasy-user-link">/plugins/servlet/speakeasy/user</link>
-        <condition class="com.atlassian.labs.speakeasy.UserCanAccessSpeakeasyCondition" />
+        <condition class="com.atlassian.labs.speakeasy.descriptor.UserCanAccessSpeakeasyCondition" />
     </web-item>
 
     <web-item key="speakeasy-plugins" name="Speakeasy Tab" section="system.profile" weight="100"
               application="com.atlassian.confluence">
         <label>Extensions</label>
         <link>/plugins/servlet/speakeasy/user</link>
-        <condition class="com.atlassian.labs.speakeasy.UserCanAccessSpeakeasyCondition" />
+        <condition class="com.atlassian.labs.speakeasy.descriptor.UserCanAccessSpeakeasyCondition" />
     </web-item>
 
     <web-item key="conf-speakeasy-plugins.menu" name="Speakeasy Confluence User Menu Item"
               section="system.user/user-content" weight="100" application="com.atlassian.confluence">
         <label linkId="speakeasy-user-link">Extensions</label>
         <link linkId="speakeasy-user-link">/plugins/servlet/speakeasy/user</link>
-        <condition class="com.atlassian.labs.speakeasy.UserCanAccessSpeakeasyCondition" />
+        <condition class="com.atlassian.labs.speakeasy.descriptor.UserCanAccessSpeakeasyCondition" />
     </web-item>
 
     <web-item key="fecru-speakeasy-plugins.menu" name="Speakeasy Fisheye/Crucible User Menu Item"
               section="system.header.item" weight="100" application="fecru">
         <label>Extensions</label>
         <link>/plugins/servlet/speakeasy/user</link>
-        <condition class="com.atlassian.labs.speakeasy.UserCanAccessSpeakeasyCondition" />
+        <condition class="com.atlassian.labs.speakeasy.descriptor.UserCanAccessSpeakeasyCondition" />
     </web-item>
 
     <web-item key="jira-speakeasy-plugins.menu" name="Speakeasy JIRA User Menu Item"
               section="system.user.options/personal" weight="100" application="jira">
         <label>Extensions</label>
         <link linkId="speakeasy-user-link">/secure/ViewProfile.jspa#selectedTab=com.atlassian.labs.speakeasy-plugin:speakeasy-plugins</link>
-        <condition class="com.atlassian.labs.speakeasy.UserCanAccessSpeakeasyCondition" />
+        <condition class="com.atlassian.labs.speakeasy.descriptor.UserCanAccessSpeakeasyCondition" />
     </web-item>
 
     <view-profile-panel key="speakeasy-plugins" i18n-name-key="Extensions"
@@ -183,7 +184,7 @@
               section="system.user/userconfig" weight="40" application="bamboo">
         <label key="Extensions"/>
         <link linkId="speakeasyTab">/plugins/servlet/speakeasy/user</link>
-        <condition class="com.atlassian.labs.speakeasy.UserCanAccessSpeakeasyCondition" />
+        <condition class="com.atlassian.labs.speakeasy.descriptor.UserCanAccessSpeakeasyCondition" />
     </web-item>
 
 

@@ -218,7 +218,7 @@ public class PluginManager
         }
     }
 
-    public String forkAndInstall(String pluginKey, PluginType pluginType, String user, String description) throws PluginOperationFailedException
+    public String forkAndInstall(String pluginKey, String forkPluginKey, PluginType pluginType, String user, String description) throws PluginOperationFailedException
     {
         if (pluginKey.contains("-fork-"))
         {
@@ -228,7 +228,7 @@ public class PluginManager
         try
         {
 
-            File forkFile = typeHandlers.get(pluginType).createFork(pluginKey, pluginKey + "-fork-" + user, user, description);
+            File forkFile = typeHandlers.get(pluginType).createFork(pluginKey, forkPluginKey, user, description);
 
             return install(forkFile, user);
         }
