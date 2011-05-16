@@ -8,7 +8,9 @@
         {{/available}}
         >
     <td class="plugin-screenshot" headers="plugin-screenshot">
-        <img height="80" width="175" src="../../../rest/speakeasy/1/plugins/screenshot/{{key}}.png" alt="Screenshot" />
+        {{#params}}
+        <img height="80" width="175" src="{{screenshotUrl}}" alt="Screenshot" />
+        {{/params}}
     </td>
     <td headers="plugin-info" class="plugin-info">
         <div class="plugin-summary">

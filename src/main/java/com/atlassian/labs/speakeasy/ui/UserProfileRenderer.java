@@ -52,7 +52,6 @@ public class UserProfileRenderer
     private final WebResourceManager webResourceManager;
     private final CommonJsModulesAccessor commonJsModulesAccessor;
     private final ProductAccessor productAccessor;
-    private final SpeakeasyData data;
     private final ApplicationProperties applicationProperties;
     private final Plugin plugin;
     private final WebInterfaceManager webInterfaceManager;
@@ -60,7 +59,7 @@ public class UserProfileRenderer
     private final XsrfTokenValidator xsrfTokenValidator;
 
 
-    public UserProfileRenderer(PluginAccessor pluginAccessor, TemplateRenderer templateRenderer, SpeakeasyManager speakeasyManager, UserManager userManager, WebResourceManager webResourceManager, ProductAccessor productAccessor, SpeakeasyData data, CommonJsModulesAccessor commonJsModulesAccessor, WebInterfaceManager webInterfaceManager, XsrfTokenAccessor xsrfTokenAccessor, XsrfTokenValidator xsrfTokenValidator, ApplicationProperties applicationProperties)
+    public UserProfileRenderer(PluginAccessor pluginAccessor, TemplateRenderer templateRenderer, SpeakeasyManager speakeasyManager, UserManager userManager, WebResourceManager webResourceManager, ProductAccessor productAccessor, CommonJsModulesAccessor commonJsModulesAccessor, WebInterfaceManager webInterfaceManager, XsrfTokenAccessor xsrfTokenAccessor, XsrfTokenValidator xsrfTokenValidator, ApplicationProperties applicationProperties)
     {
         this.templateRenderer = templateRenderer;
         this.commonJsModulesAccessor = commonJsModulesAccessor;
@@ -73,7 +72,6 @@ public class UserProfileRenderer
         this.userManager = userManager;
         this.webResourceManager = webResourceManager;
         this.productAccessor = productAccessor;
-        this.data = data;
     }
 
     public boolean shouldRender(String userName)
@@ -105,7 +103,7 @@ public class UserProfileRenderer
                 put("contextPath", req.getContextPath()).
                 put("enabledPlugins", filter(plugins.getPlugins(), new EnabledPluginsFilter())).
                 put("availablePlugins", filter(plugins.getPlugins(), new AvailablePluginsFilter())).
-                put("rowRenderer", new RowRenderer(plugin)).
+                put("rowRenderer", new RowRenderer(req.getContextPath(), plugin)).
                 put("jsdocRenderer", new JsDocRenderer(plugin, commonJsModulesAccessor.getAllCommonJsModules())).
                 put("staticResourcesPrefix", webResourceManager.getStaticResourcePrefix(UrlMode.RELATIVE)).
                 put("product", productAccessor.getSdkName()).
@@ -129,9 +127,11 @@ public class UserProfileRenderer
     public static class RowRenderer
     {
         private final Template rowTemplate;
+        private final String contextPath;
 
-        public RowRenderer(Plugin plugin)
+        public RowRenderer(String contextPath, Plugin plugin)
         {
+            this.contextPath = contextPath;
             this.rowTemplate = compile(plugin, "packages/user/speakeasy/user/row.mu");
         }
 
@@ -139,6 +139,7 @@ public class UserProfileRenderer
         @com.atlassian.velocity.htmlsafe.HtmlSafe
         public String render(RemotePlugin plugin)
         {
+            plugin.getParams().put("screenshotUrl", contextPath + "/rest/speakeasy/1/plugins/screenshot/" + plugin.getKey() + ".png");
             return rowTemplate.execute(plugin);
         }
     }

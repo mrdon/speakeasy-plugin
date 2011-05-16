@@ -93,10 +93,12 @@ public class TestUserProfile
     }
 
     @Test
-    public void testEditAndBreakWithMissingModuleThenFixPlugin() throws IOException
+    public void testEditAndBreakThenFixPlugin() throws IOException
     {
         product.visit(SpeakeasyUserPage.class)
                 .uploadPlugin(buildSimplePluginFile());
+
+        // break with non-existent module
         IdeDialog ide =  product.visit(SpeakeasyUserPage.class)
                 .uploadPlugin(buildSimplePluginFile())
                 .openEditDialog("test-2")
@@ -107,10 +109,16 @@ public class TestUserProfile
         SpeakeasyUserPage page = ide.done();
         assertTrue(page.getPlugins().get("test-2").getDescription().contains("nonexistent/module"));
 
-        page = page
-                .openEditDialog("test-2")
+        // break by changing the plugin key
+        ide = page.openEditDialog("test-2");
+        final String oldXml = ide.getFileContents("atlassian-plugin.xml");
+        page = ide
                 .editAndSaveFile("modules/test.js", "require('speakeasy/jquery');")
+                .editAndSaveFile("atlassian-plugin.xml",
+                        oldXml.replaceAll("test-2", "test-3"), "Unable to install")
+                .editAndSaveFile("atlassian-plugin.xml", oldXml)
                 .done();
+
 
         assertEquals("Desc", page.getPlugins().get("test-2").getDescription());
         page.uninstallPlugin("test-2");
