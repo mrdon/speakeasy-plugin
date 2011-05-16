@@ -69,9 +69,10 @@ public abstract class AbstractOsgiPluginTypeHandler implements PluginTypeHandler
         return File.createTempFile("speakeasy-" + operation + "-", "." + getExtension());
     }
 
-    public final String canInstall(File artifact)
+    public final String canInstall(File file)
     {
-        if (artifact.getName().endsWith("." + getExtension()))
+        PluginArtifact artifact = new JarPluginArtifact(file);
+        if (artifact.doesResourceExist(getDescriptorPath()))
         {
             return extractPluginKey(artifact);
         }
@@ -285,7 +286,7 @@ public abstract class AbstractOsgiPluginTypeHandler implements PluginTypeHandler
 
     protected abstract void createExampleContents(ZipOutputStream zout, String pluginKey, String name, String description) throws IOException;
 
-    protected abstract String extractPluginKey(File artifact);
+    protected abstract String extractPluginKey(PluginArtifact artifact);
 
     protected abstract String getExtension();
 

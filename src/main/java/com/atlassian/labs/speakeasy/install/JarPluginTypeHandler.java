@@ -86,9 +86,9 @@ public class JarPluginTypeHandler extends AbstractOsgiPluginTypeHandler implemen
     }
 
     @Override
-    protected String extractPluginKey(File artifact)
+    protected String extractPluginKey(PluginArtifact artifact)
     {
-        return loadPluginDescriptor(new JarPluginArtifact(artifact)).getRootElement().attributeValue("key");
+        return loadPluginDescriptor(artifact).getRootElement().attributeValue("key");
     }
 
     @Override

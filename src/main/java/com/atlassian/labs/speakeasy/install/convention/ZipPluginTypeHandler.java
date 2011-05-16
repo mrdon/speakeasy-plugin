@@ -91,9 +91,9 @@ public class ZipPluginTypeHandler extends AbstractOsgiPluginTypeHandler implemen
     }
 
     @Override
-    protected String extractPluginKey(File artifact)
+    protected String extractPluginKey(PluginArtifact artifact)
     {
-        return zipTransformer.extractPluginKey(new JarPluginArtifact(artifact));
+        return zipTransformer.extractPluginKey(artifact);
     }
 
     @Override
