@@ -316,7 +316,9 @@ public class GitRepositoryManager implements DisposableBean
         File workTreeDir = repo.getWorkTree();
         repo.close();
         FileUtils.deleteDirectory(workTreeDir);
-        log.info("Git repository {} removed", repo.getWorkTree().getName());
+        final String pluginKey = workTreeDir.getName();
+        repositories.remove(pluginKey);
+        log.info("Git repository {} removed", pluginKey);
     }
 
     public void destroy() throws Exception
