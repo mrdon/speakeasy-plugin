@@ -1,0 +1,10 @@
+.git-commands {
+    font-family: "Consolas","Bitstream Vera Sans Mono","Courier New",Courier,monospace !important;
+    border: 1px dashed;
+    border-right-width: 0px;
+    border-left-width: 0px;
+    padding-top: .7em;
+    padding-bottom: .7em;
+    padding-left: .3em;
+    background-color: #f5f5dc;
+}

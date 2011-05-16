@@ -51,7 +51,7 @@ public class PluginManager
         );
     }
 
-    public String install(File pluginFile, String user) throws PluginOperationFailedException
+    public String install(File pluginFile, String expectedPluginKey, String user) throws PluginOperationFailedException
     {
         PluginArtifact pluginArtifact = null;
         String pluginKey;
@@ -60,6 +60,12 @@ public class PluginManager
             pluginKey = handler.canInstall(pluginFile);
             if (pluginKey != null)
             {
+                if (expectedPluginKey != null && !pluginKey.equals(expectedPluginKey))
+                {
+                    throw new PluginOperationFailedException("Unable to install plugin file "+
+                        "because the expected plugin key, " + expectedPluginKey + ", is different than the one in the file - " +
+                        pluginKey, expectedPluginKey);
+                }
                 String recordedAuthor = data.getPluginAuthor(pluginKey);
                 if (pluginAccessor.getPlugin(pluginKey) != null && !user.equals(recordedAuthor))
                 {
@@ -208,7 +214,7 @@ public class PluginManager
         {
             File tmpFile = typeHandlers.get(pluginType).rebuildPlugin(pluginKey, fileName, contents);
 
-            return install(tmpFile, user);
+            return install(tmpFile, pluginKey, user);
         }
         catch (IOException e)
         {
@@ -230,7 +236,7 @@ public class PluginManager
 
             File forkFile = typeHandlers.get(pluginType).createFork(pluginKey, forkPluginKey, user, description);
 
-            return install(forkFile, user);
+            return install(forkFile, forkPluginKey, user);
         }
         catch (IOException e)
         {
@@ -252,7 +258,7 @@ public class PluginManager
         try
         {
             File tmpFile = typeHandler.createExample(pluginKey, name, description);
-            return install(tmpFile, remoteUser);
+            return install(tmpFile, pluginKey, remoteUser);
         }
         catch (IOException e)
         {

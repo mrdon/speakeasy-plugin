@@ -412,8 +412,13 @@ public class SpeakeasyManager
 
     public UserPlugins installPlugin(File uploadedFile, String user) throws UnauthorizedAccessException
     {
+        return installPlugin(uploadedFile, null, user);
+    }
+
+    public UserPlugins installPlugin(File uploadedFile, String expectedPluginKey, String user) throws UnauthorizedAccessException
+    {
         validateAuthor(user);
-        String pluginKey = pluginManager.install(uploadedFile, user);
+        String pluginKey = pluginManager.install(uploadedFile, expectedPluginKey, user);
         eventPublisher.publish(new PluginInstalledEvent(pluginKey)
                 .setUserName(user)
                 .setUserEmail(userManager.getUserProfile(user).getEmail())

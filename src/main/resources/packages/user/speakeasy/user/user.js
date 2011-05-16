@@ -10,6 +10,7 @@ var ide = require('./ide/ide');
 var wizard = require('./wizard/create');
 var fork = require('./fork/fork');
 var pac = require('./pac/pac');
+var git = require('./git/git');
 
 var pluginActions = {
     'edit' : function (key, link, attachedRow) {
@@ -21,6 +22,15 @@ var pluginActions = {
     'disable' : disablePlugin,
     'download' : function(key, link, attachedRow) {
         require('./download/download').openDialog(key, product, getAbsoluteHref(link), link.attr("data-extension"));
+    },
+    'gitclone' : function (key, link, attachedRow) {
+        git.gitclone(key, getAbsoluteHref(link), link.attr("data-extension"));
+    },
+    'gitpush' : function (key, link, attachedRow) {
+        git.gitpush(key, getAbsoluteHref(link));
+    },
+    'gitpull' : function (key, link, attachedRow) {
+        git.gitpull(key, getAbsoluteHref(link), link);
     }
 };
 
