@@ -50,7 +50,6 @@
 
     <web-resource key="shared">
         <dependency>${project.groupId}.${project.artifactId}:mustache</dependency>
-        <resource type="download" name="jquery.form.js" location="shared/jquery.form.js"/>
         <resource type="download" name="images/" location="shared/images/"/>
         <resource type="download" name="screenshot.png" location="shared/images/prohibition.png" />
     </web-resource>

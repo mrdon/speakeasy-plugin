@@ -209,10 +209,9 @@ public class PluginsResource
     private String createErrorJson(String user, Exception e)
     {
         JSONObject obj = new JSONObject();
-
         try
         {
-            obj.put("error", e.getMessage());
+            obj.put("error", e.toString());
             obj.put("plugins", new JSONObject(jaxbJsonMarshaller.marshal(speakeasyManager.getRemotePluginList(user))));
         }
         catch (JSONException e1)

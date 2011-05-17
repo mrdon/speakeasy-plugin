@@ -22,9 +22,9 @@ import static com.google.common.collect.Sets.newHashSet;
  */
 public class ZipWriter
 {
-    public static File addDirectoryContentsToZip(File dir, String... pathsToExclude) throws IOException
+    public static File addDirectoryContentsToJar(File dir, String... pathsToExclude) throws IOException
     {
-        File zipFile = File.createTempFile("speakeasy-", ".zip");
+        File zipFile = File.createTempFile("speakeasy-", ".jar");
         Set<String> excludes = newHashSet(pathsToExclude);
         ZipOutputStream zos = null;
         try

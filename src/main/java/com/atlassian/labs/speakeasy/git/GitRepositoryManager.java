@@ -30,7 +30,6 @@ import org.osgi.framework.BundleContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.DisposableBean;
-import org.springframework.osgi.util.internal.BundleUtils;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -244,7 +243,7 @@ public class GitRepositoryManager implements DisposableBean
                 {
                     new File(repo.getWorkTree(), path).delete();
                 }
-                return ZipWriter.addDirectoryContentsToZip(repo.getWorkTree(), ".git");
+                return ZipWriter.addDirectoryContentsToJar(repo.getWorkTree(), ".git");
             }
         });
         if (jar == null)

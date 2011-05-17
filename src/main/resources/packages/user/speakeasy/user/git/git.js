@@ -3,7 +3,8 @@ var $ = require('speakeasy/jquery').jQuery;
 function getFullUrl(url)
 {
     var loc = document.location;
-    return loc.protocol + "//" + loc.hostname + ":" + loc.port + url;
+    var port = loc.port ? ":" + loc.port : "";
+    return loc.protocol + "//" + loc.hostname + ":" + port + url;
 }
 exports.gitclone = function(key, url, extension)
 {
