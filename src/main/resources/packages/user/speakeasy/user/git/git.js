@@ -4,7 +4,7 @@ function getFullUrl(url)
 {
     var loc = document.location;
     var port = loc.port ? ":" + loc.port : "";
-    return loc.protocol + "//" + loc.hostname + ":" + port + url;
+    return loc.protocol + "//" + loc.hostname + port + url;
 }
 exports.gitclone = function(key, url, extension)
 {
