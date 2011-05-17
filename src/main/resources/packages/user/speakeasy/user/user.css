@@ -34,7 +34,7 @@
 }
 
 #plugins-table tr.zebra {
-    background-color: #EAEAE9;
+    /*background-color: #EAEAE9;*/
 }
 
 #plugins-table tr.enabled {

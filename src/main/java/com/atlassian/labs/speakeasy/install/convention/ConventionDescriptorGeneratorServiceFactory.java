@@ -61,7 +61,10 @@ public class ConventionDescriptorGeneratorServiceFactory implements ServiceFacto
         if (bundle.getEntry("atlassian-extension.json") != null)
         {
             JsonManifest mf = jsonManifestHandler.read(plugin);
-            registerScreenshotWebResourceDescriptor(bundle, factory, plugin, mf.getScreenshot());
+            if (mf.getScreenshot() != null)
+            {
+                registerScreenshotWebResourceDescriptor(bundle, factory, plugin, mf.getScreenshot());
+            }
         }
 
         if (bundle.getEntry("js/") != null)

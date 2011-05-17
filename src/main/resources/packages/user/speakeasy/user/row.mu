@@ -78,7 +78,6 @@
                             {{/canDownload}}
                             <li class="dropdown-item"><a class="item-link plugin-feedback" href="mailto:{{authorEmail}}?Subject=Speakeasy%20Extension%20Feedback">Feedback</a></li>
                             {{#canDownload}}
-                            <li class="dropdown-item"><hr /></li>
                             <li class="dropdown-item"><a class="item-link pk-gitclone" data-extension="{{extension}}" href="/plugins/servlet/git/{{key}}.git">git clone</a></li>
                             <li class="dropdown-item"><a class="item-link pk-gitpull" href="/plugins/servlet/git/{{key}}.git">git pull</a></li>
                             {{/canDownload}}
