@@ -97,15 +97,17 @@ function handleBrowserFileClick(pluginKey, event) {
         loadFile(pluginKey, event.target.id);
     }
 }
-function openDialog(pluginKey, href, extension){
+function openDialog(pluginKey, href, extension, readOnly){
     var dialog = new AJS.Dialog({width: $(window).width() * .95, height: 620, id:'ide-dialog'});
 
     dialog.addHeader("Edit Extension : " + pluginKey);
 
-    dialog.addButton("Save", function (dialog) {
-        var editorEl = retrieveEditor();
-        saveAndReload(pluginKey,  editorEl.data('filename'), editor.getCode());
-    }, "ide-save");
+    if (!readOnly) {
+      dialog.addButton("Save", function (dialog) {
+          var editorEl = retrieveEditor();
+          saveAndReload(pluginKey,  editorEl.data('filename'), editor.getCode());
+      }, "ide-save");
+    }
 
     // addLink not compatible with JIRA 4.2
     dialog.addButton("Done", function (dialog) {
@@ -129,7 +131,6 @@ function openDialog(pluginKey, href, extension){
     dialog.show();
 
     var firstFile = extension == "jar" ? "atlassian-plugin.xml" : "atlassian-extension.json";
-    // loadFile("atlassian-plugin.xml");
     $("#ide-loading").hide();
     $("#ide-editor").show();
 
@@ -138,12 +139,11 @@ function openDialog(pluginKey, href, extension){
         width: '95%',
         autoMatchParens: true,
         lineNumbers: true,
+        readOnly: readOnly,
         parserfile: ["parsexml.js", "parsecss.js", "tokenizejavascript.js", "parsejavascript.js", "parsehtmlmixed.js"],
         stylesheet: [ staticResourcesPrefix + '/download/resources/com.atlassian.labs.speakeasy-plugin:codemirror/css/xmlcolors.css', staticResourcesPrefix + '/download/resources/com.atlassian.labs.speakeasy-plugin:codemirror/css/jscolors.css', staticResourcesPrefix + '/download/resources/com.atlassian.labs.speakeasy-plugin:codemirror/css/csscolors.css'],
         path: staticResourcesPrefix + '/download/resources/com.atlassian.labs.speakeasy-plugin:codemirror/js/',
         onLoad: function() { loadFile(pluginKey, firstFile); }
-
-        //, lineNumbers: true
     });
 }
 

@@ -14,7 +14,10 @@ var git = require('./git/git');
 
 var pluginActions = {
     'edit' : function (key, link, attachedRow) {
-            ide.openDialog(key, getAbsoluteHref(link), link.attr("data-extension"));
+            ide.openDialog(key, getAbsoluteHref(link), link.attr("data-extension"), false);
+        },
+    'viewsource' : function (key, link, attachedRow) {
+            ide.openDialog(key, getAbsoluteHref(link), link.attr("data-extension"), true);
         },
     'uninstall' : uninstallPlugin,
     'fork' : fork.openDialog,

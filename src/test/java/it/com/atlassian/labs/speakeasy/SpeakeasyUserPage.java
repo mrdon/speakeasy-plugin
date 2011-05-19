@@ -6,7 +6,6 @@ import com.atlassian.pageobjects.ProductInstance;
 import com.atlassian.pageobjects.TestedProduct;
 import com.atlassian.pageobjects.binder.WaitUntil;
 import com.atlassian.webdriver.AtlassianWebDriver;
-import com.atlassian.webdriver.utils.Check;
 import com.google.common.base.Function;
 import org.apache.commons.lang.Validate;
 import org.openqa.selenium.By;
@@ -256,7 +255,7 @@ public class SpeakeasyUserPage implements Page
     {
         clickActionLink(pluginKey, ExtensionOperations.EDIT);
 
-        return pageBinder.bind(IdeDialog.class, pluginKey);
+        return pageBinder.bind(IdeDialog.class, pluginKey, false);
 
     }
 
@@ -289,6 +288,13 @@ public class SpeakeasyUserPage implements Page
         driver.findElement(By.id("unsubscribe-all")).click();
         driver.waitUntilElementIsLocated(By.className("success"));
         return pageBinder.navigateToAndBind(SpeakeasyUserPage.class);
+    }
+
+    public IdeDialog openViewSourceDialog(String pluginKey)
+    {
+        clickActionLink(pluginKey, ExtensionOperations.VIEWSOURCE);
+
+        return pageBinder.bind(IdeDialog.class, pluginKey, true);
     }
 
     public static class PluginRow

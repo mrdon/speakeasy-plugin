@@ -75,6 +75,7 @@
                             {{/canUninstall}}
                             {{#canDownload}}
                             <li class="dropdown-item"><a class="item-link pk-download" data-extension="{{extension}}" href="/rest/speakeasy/1/plugins/download">Download</a></li>
+                            <li class="dropdown-item"><a class="item-link pk-viewsource" data-extension="{{extension}}" href="/rest/speakeasy/1/plugins/plugin/{{key}}/index">View Source</a></li>
                             {{/canDownload}}
                             <li class="dropdown-item"><a class="item-link plugin-feedback" href="mailto:{{authorEmail}}?Subject=Speakeasy%20Extension%20Feedback">Feedback</a></li>
                             {{#canDownload}}

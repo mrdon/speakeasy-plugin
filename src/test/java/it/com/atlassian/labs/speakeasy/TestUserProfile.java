@@ -93,6 +93,22 @@ public class TestUserProfile
     }
 
     @Test
+    public void testViewSourceOnPlugin() throws IOException
+    {
+        IdeDialog ide = product.visit(SpeakeasyUserPage.class)
+                .uploadPlugin(
+                        startSimpleBuilder("viewsource", "View Source")
+                            .addFormattedResource("foo.js", "var bar;")
+                            .build())
+                .openViewSourceDialog("viewsource");
+
+        assertEquals(asList("bar/baz.js", "modules/test.js", "atlassian-plugin.xml", "foo.js"), ide.getFileNames());
+
+        assertEquals("var bar;", ide.getFileContents("foo.js").trim());
+        ide.done().uninstallPlugin("viewsource");
+    }
+
+    @Test
     public void testEditAndBreakThenFixPlugin() throws IOException
     {
         product.visit(SpeakeasyUserPage.class)

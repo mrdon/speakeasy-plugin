@@ -10,5 +10,6 @@ public enum ExtensionOperations
     EDIT,
     DOWNLOAD,
     UNINSTALL,
+    VIEWSOURCE,
     FORK
 }

@@ -45,10 +45,12 @@ public class IdeDialog
     private WebElement ideDoneLink;
 
     private final String pluginKey;
+    private final boolean readOnly;
 
-    public IdeDialog(String pluginKey)
+    public IdeDialog(String pluginKey, Boolean readOnly)
     {
         this.pluginKey = pluginKey;
+        this.readOnly = readOnly;
     }
 
     @WaitUntil
@@ -93,6 +95,10 @@ public class IdeDialog
     }
     public IdeDialog editAndSaveFile(String fileName, String contents, final String statusExpected)
     {
+        if (readOnly)
+        {
+            throw new IllegalStateException("Can't edit file in readonly mode");
+        }
         ideBrowser.findElement(By.id(fileName)).click();
         driver.waitUntil(new Function() {
 
