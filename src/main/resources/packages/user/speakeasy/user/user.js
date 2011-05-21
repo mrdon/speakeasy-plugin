@@ -5,7 +5,7 @@
  * @context speakeasy.user-profile
  */
 var $ = require('../jquery').jQuery;
-var addMessage = require('../messages').add;
+var messages = require('../messages');
 var ide = require('./ide/ide');
 var wizard = require('./wizard/create');
 var fork = require('./fork/fork');
@@ -51,7 +51,7 @@ function enablePlugin(pluginKey, link, attachedRow) {
               type: 'PUT',
               success: function(data) {
                   updateTable(data);
-                  addMessage('success', {body: "<b>" + pluginName + "</b> was enabled successfully", shadowed: false});
+                  messages.add('success', {body: "<b>" + pluginName + "</b> was enabled successfully", shadowed: false});
               }
             });
 }
@@ -64,7 +64,7 @@ function disablePlugin(pluginKey, link, attachedRow) {
               type: 'DELETE',
               success: function(data) {
                   updateTable(data);
-                  addMessage('success', {body: "<b>" + pluginName + "</b> was disabled successfully", shadowed: false});
+                  messages.add('success', {body: "<b>" + pluginName + "</b> was disabled successfully", shadowed: false});
               }
             });
 }
@@ -72,7 +72,6 @@ function disablePlugin(pluginKey, link, attachedRow) {
 function uninstallPlugin(pluginKey, link, attachedRow) {
     link.html('<img alt="waiting" src="' + staticResourcesPrefix + '/download/resources/com.atlassian.labs.speakeasy-plugin:shared/images/wait.gif" />');
     var pluginName = $('.plugin-name', attachedRow).text();
-    var wasEnabled = $('.pk-enable-toggle', attachedRow).text() == "Disable";
     $.ajax({
               url: getAbsoluteHref(link),
               type: 'DELETE',
@@ -80,11 +79,34 @@ function uninstallPlugin(pluginKey, link, attachedRow) {
                   link.closest("tr").each(function() {
                       $(this).detach();
                       updateTable(data);
-                      addMessage('success', {body: "<b>" + pluginName + "</b> was uninstalled successfully", shadowed: false});
+                      messages.add('success', {body: "<b>" + pluginName + "</b> was uninstalled successfully", shadowed: false});
                   })
               },
               error: function(data) {
-                  addMessage('error', {title: "Error uninstalling extension", body: data.responseText, shadowed: false});
+                  messages.add('error', {title: "Error uninstalling extension", body: data.responseText, shadowed: false});
+              }
+            });
+}
+
+function voteUp($link) {
+    messages.clear();
+    $link.html('<img alt="waiting" src="' + staticResourcesPrefix + '/download/resources/com.atlassian.labs.speakeasy-plugin:shared/images/wait.gif" />');
+    var pluginName = $('.plugin-name', $link.closest('tr')).text();
+    $.ajax({
+              url: getAbsoluteHref($link),
+              type: 'POST',
+              beforeSend: function(jqXHR, settings) {
+                jqXHR.setRequestHeader("X-Atlassian-Token", "nocheck");
+                jqXHR.setRequestHeader("Content-Type", "text/plain");
+              },
+              success: function(data) {
+                  updateTable(data);
+                  messages.add('success', {body: "<b>" + pluginName + "</b> was voted up", shadowed: false});
+              },
+              error: function(xhr) {
+                  var data  = $.parseJSON(xhr.responseText)
+                  updateTable(data.plugin);
+                  messages.add('error', {title: "Error voting up extension", body: data.error, shadowed: false});
               }
             });
 }
@@ -176,6 +198,12 @@ function initSpeakeasy() {
 
     pluginsTable.delegate("a", 'click', eventDelegate);
     pluginsTable.delegate("button", 'click', eventDelegate);
+
+    pluginsTable.delegate("div.vote-up-icon", 'click', function(e) {
+        e.preventDefault();
+        var $link = $(e.target);
+        voteUp($link);
+    });
     pluginsTable.bind('pluginsUpdated', function(e, data) {
        updateTable(data.plugin || data);
     });
@@ -191,7 +219,7 @@ function initSpeakeasy() {
             beforeSubmit: function() {
                var extension = pluginFile.val().substring(pluginFile.val().lastIndexOf('.'));
                if (extension != '.jar' && extension != '.zip' && extension != '.xml') {
-                  addMessage('error', {body: "The extension '" + extension + "' is not allowed", shadowed: false});
+                  messages.add('error', {body: "The extension '" + extension + "' is not allowed", shadowed: false});
                   return false;
                }
             },
@@ -202,10 +230,10 @@ function initSpeakeasy() {
                 var data = $.parseJSON(response.substring(start, end));
                 if (data.error) {
                     if (data.plugins) pluginsTable.trigger('pluginsUpdated', data.plugins);
-                    addMessage('error', {title: "Error installing extension", body: data.error, shadowed: false});
+                    messages.add('error', {title: "Error installing extension", body: data.error, shadowed: false});
                 } else {
                     var updatedPlugin = updateTable(data)[0];
-                    addMessage('success', {body: "<b>" + updatedPlugin.name + "</b> was uploaded successfully", shadowed: false});
+                    messages.add('success', {body: "<b>" + updatedPlugin.name + "</b> was uploaded successfully", shadowed: false});
                 }
                 pluginFile.val("");
             }

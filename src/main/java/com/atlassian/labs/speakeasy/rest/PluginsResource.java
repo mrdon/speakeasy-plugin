@@ -126,6 +126,16 @@ public class PluginsResource
     }
 
     @POST
+    @Path("voteup/{pluginKey}")
+    @Produces("application/json")
+    @RequiresXsrfCheck
+    public Response voteUp(@PathParam("pluginKey") String pluginKey) throws UnauthorizedAccessException
+    {
+        UserPlugins entity = speakeasyManager.voteUp(pluginKey, userManager.getRemoteUsername());
+        return Response.ok().entity(entity).build();
+    }
+
+    @POST
     @Path("create/{pluginKey}")
     @Produces("application/json")
     @RequiresXsrfCheck

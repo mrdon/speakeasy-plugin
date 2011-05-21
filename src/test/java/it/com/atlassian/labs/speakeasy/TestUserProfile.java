@@ -4,6 +4,7 @@ import com.atlassian.pageobjects.TestedProduct;
 import com.atlassian.pageobjects.page.HomePage;
 import com.atlassian.pageobjects.page.LoginPage;
 import com.atlassian.plugin.test.PluginJarBuilder;
+import com.atlassian.plugin.util.WaitUntil;
 import com.atlassian.plugin.util.zip.FileUnzipper;
 import com.atlassian.webdriver.pageobjects.WebDriverTester;
 import com.dumbster.smtp.SimpleSmtpServer;
@@ -21,6 +22,7 @@ import javax.mail.MessagingException;
 import java.io.File;
 import java.io.IOException;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
@@ -30,6 +32,7 @@ import static it.com.atlassian.labs.speakeasy.ExtensionBuilder.buildSimplePlugin
 import static it.com.atlassian.labs.speakeasy.ExtensionBuilder.startSimpleBuilder;
 import static java.util.Arrays.asList;
 import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 public class TestUserProfile
 {
@@ -297,7 +300,7 @@ public class TestUserProfile
                .login("barney", "barney", SpeakeasyUserPage.class)
                .enablePlugin("test-2");
 
-        assertEmailExists("admin@example.com", "Barney User has enabled your Speakeasy extension!", asList(
+        assertEmailExists("admin@example.com", "Barney User has enabled ", asList(
                 "you may want to try",
                 "Test Plugin"
         ));
@@ -321,7 +324,37 @@ public class TestUserProfile
         logout();
         product.visit(LoginPage.class)
            .loginAsSysAdmin(SpeakeasyUserPage.class)
-           .disablePlugin("test-2");
+           .uninstallPlugin("test-2");
+    }
+
+    @Test
+    public void testVoteUpPlugin() throws IOException, MessagingException
+    {
+        File jar = buildSimplePluginFile("test", "First Plugin");
+
+        SpeakeasyUserPage page = product.visit(SpeakeasyUserPage.class)
+                .uploadPlugin(jar)
+                .voteUp("test");
+        assertTrue(page.getErrorMessages().get(0).contains("Cannot vote for"));
+        assertEquals(0, page.getPlugins().get("test").getVotes());
+        logout();
+        page = product.visit(LoginPage.class)
+               .login("barney", "barney", SpeakeasyUserPage.class)
+                .voteUp("plugin-tests")
+                .voteUp("test");
+
+        List<String> messages = page.getSuccessMessages();
+        assertEquals(1, messages.size());
+        assertTrue(messages.get(0).contains("was voted up"));
+        assertEquals(1, page.getPlugins().get("test").getVotes());
+        assertEmailExists("admin@example.com", "Barney User has voted", asList(
+                "you may want to try",
+                "plugin-tests"
+        ));
+        logout();
+        product.visit(LoginPage.class)
+           .loginAsSysAdmin(SpeakeasyUserPage.class)
+           .uninstallPlugin("test");
     }
 
     @Test
@@ -529,24 +562,40 @@ public class TestUserProfile
 
     private void assertEmailExists(String to, String title, List<String> bodyStrings) throws MessagingException, IOException
     {
-        SmtpMessage lastMessage = null;
-        assertTrue(mailServer.getReceivedEmailSize() > 0);
 
-        Iterator itr = mailServer.getReceivedEmail();
-        while(itr.hasNext())
+        final AtomicReference<SmtpMessage> ref = new AtomicReference<SmtpMessage>();
+        WaitUntil.invoke(new WaitUntil.WaitCondition()
         {
-            lastMessage = (SmtpMessage) itr.next();
-        }
-        assertNotNull(lastMessage);
+            public boolean isFinished()
+            {
+                Iterator itr = mailServer.getReceivedEmail();
+                while(itr.hasNext())
+                {
+                    ref.set((SmtpMessage) itr.next());
+                }
+                return ref.get() != null;
+            }
+
+            public String getWaitMessage()
+            {
+                return null;  //To change body of implemented methods use File | Settings | File Templates.
+            }
+        });
+        assertTrue(ref.get() != null);
+
+        SmtpMessage lastMessage = ref.get();
         log.error("msg: " + lastMessage.toString());
         String subject = lastMessage.getHeaderValue("Subject");
-        assertEquals("[test] " + title, subject);
+        assertTrue(subject.startsWith("[test] " + title));
         assertFalse(subject.contains("$"));
         String body = lastMessage.getBody();
         assertFalse(body.contains("$"));
         for (String toMatch : bodyStrings)
         {
-            assertTrue(body.contains(toMatch));
+            if (!body.contains(toMatch))
+            {
+                fail("Couldn't match " + toMatch);
+            }
         }
 
         assertTrue(lastMessage.getHeaderValue("To").contains(to));

@@ -77,11 +77,6 @@ public class IdeDialog
         }
         return names;
     }
-//    public IdeDialog getFileContents(String file)
-//    {
-//        String href = ideLink.getAttribute("href");
-//
-//    }
 
     public String getFileContents(String fileName)
     {

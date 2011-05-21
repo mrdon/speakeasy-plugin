@@ -33,6 +33,8 @@ public class RemotePlugin implements Comparable
 
     private int numUsers = 0;
 
+    private int numVotes = 0;
+
     private boolean available;
 
     private boolean enabled;
@@ -156,6 +158,16 @@ public class RemotePlugin implements Comparable
 
     public void setNumUsers(int numUsers) {
         this.numUsers = numUsers;
+    }
+
+    public int getNumVotes()
+    {
+        return numVotes;
+    }
+
+    public void setNumVotes(int numVotes)
+    {
+        this.numVotes = numVotes;
     }
 
     public boolean isCanUninstall()

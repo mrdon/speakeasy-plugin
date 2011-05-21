@@ -90,6 +90,7 @@ public class SpeakeasyUserPage implements Page
                 row.setDescription(e.findElement(By.className("plugin-description")).getText());
                 row.setAuthor(e.findElement(By.className("plugin-author")).getText());
                 row.setUsers(parseInt(e.findElement(By.className("plugin-users")).getText()));
+                row.setVotes(parseInt(e.findElement(By.className("plugin-votes")).getText()));
                 row.setVersion(e.findElement(By.className("plugin-version")).getText());
                 plugins.put(key,row);
             }
@@ -297,6 +298,15 @@ public class SpeakeasyUserPage implements Page
         return pageBinder.bind(IdeDialog.class, pluginKey, true);
     }
 
+    public SpeakeasyUserPage voteUp(String pluginKey)
+    {
+        WebElement pluginRow = getPluginRow(pluginKey);
+        WebElement voteUp = pluginRow.findElement(By.className("vote-up-icon"));
+        voteUp.click();
+        waitForMessages();
+        return this;
+    }
+
     public static class PluginRow
     {
         private String key;
@@ -305,6 +315,7 @@ public class SpeakeasyUserPage implements Page
         private int users;
         private String description;
         private String version;
+        private int votes;
 
         public String getKey()
         {
@@ -364,6 +375,16 @@ public class SpeakeasyUserPage implements Page
         public void setVersion(String version)
         {
             this.version = version;
+        }
+
+        public void setVotes(int votes)
+        {
+            this.votes = votes;
+        }
+
+        public int getVotes()
+        {
+            return votes;
         }
     }
 }

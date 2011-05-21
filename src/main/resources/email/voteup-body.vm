@@ -1,0 +1,20 @@
+$voterFullName ($voter) has voted up your Speakeasy extension '$plugin.name'.
+
+#if (!$commonExtensions.isEmpty())
+
+You have these voted for these extensions in common with $voterFullName:
+
+#foreach ($ext in $commonExtensions)
+ * $ext.name
+#end
+#end
+
+#if (!$suggestedExtensions.isEmpty())
+$voterFullName has these voted for these extensions you may want to try:
+
+#foreach ($ext in $suggestedExtensions)
+ * $ext.name
+#end
+#end
+
+This extension has now been voted by $voteTotal#if ($voteTotal > 1) people.#else person.#end

@@ -14,13 +14,18 @@ import java.util.List;
  */
 public class SpeakeasyData
 {
-    private final PluginSettings pluginSettings;
+    private final PluginSettingsFactory pluginSettingsFactory;
     private final PomProperties pomProperties;
 
     public SpeakeasyData(PluginSettingsFactory pluginSettingsFactory, PomProperties pomProperties)
     {
+        this.pluginSettingsFactory = pluginSettingsFactory;
         this.pomProperties = pomProperties;
-        this.pluginSettings = pluginSettingsFactory.createGlobalSettings();
+    }
+
+    private PluginSettings getPluginSettings()
+    {
+        return pluginSettingsFactory.createGlobalSettings();
     }
 
 
@@ -30,23 +35,23 @@ public class SpeakeasyData
     }
     public void setPluginAuthor(String pluginKey, String username)
     {
-        pluginSettings.put(createAccessKey(pluginKey, "author"), username);
+        getPluginSettings().put(createAccessKey(pluginKey, "author"), username);
     }
 
     public void clearPluginAuthor(String pluginKey)
     {
-        pluginSettings.remove(createAccessKey(pluginKey, "author"));
+        getPluginSettings().remove(createAccessKey(pluginKey, "author"));
     }
 
     public String getPluginAuthor(String pluginKey)
     {
-        return (String) pluginSettings.get(createAccessKey(pluginKey, "author"));
+        return (String) getPluginSettings().get(createAccessKey(pluginKey, "author"));
     }
 
     public List<String> getUsersList(String pluginKey)
     {
         String key = createAccessKey(pluginKey, "users");
-         List<String> accessList = (List<String>) pluginSettings.get(key);
+         List<String> accessList = (List<String>) getPluginSettings().get(key);
         if (accessList == null)
         {
             accessList = new ArrayList<String>();
@@ -54,10 +59,21 @@ public class SpeakeasyData
         return accessList;
     }
 
+    public List<String> getVotes(String pluginKey)
+    {
+        String key = createAccessKey(pluginKey, "votes");
+        List<String> votesList = (List<String>) getPluginSettings().get(key);
+        if (votesList == null)
+        {
+            votesList = new ArrayList<String>();
+        }
+        return votesList;
+    }
+
     public void saveUsersList(String pluginKey, Collection<String> users)
     {
         String key = createAccessKey(pluginKey, "users");
-        pluginSettings.put(key, users);
+        getPluginSettings().put(key, users);
     }
 
     private String createAccessKey(String pluginKey, String propertyName)
@@ -72,7 +88,7 @@ public class SpeakeasyData
 
     public String getSettings()
     {
-        String result = (String) pluginSettings.get(createAccessKey("settings"));
+        String result = (String) getPluginSettings().get(createAccessKey("settings"));
         if (result == null)
         {
             result = saveSettings("{}");
@@ -82,7 +98,24 @@ public class SpeakeasyData
 
     public String saveSettings(String value)
     {
-        pluginSettings.put(createAccessKey("settings"), value);
+        getPluginSettings().put(createAccessKey("settings"), value);
         return value;
+    }
+
+    public void voteUp(String pluginKey, String user)
+    {
+        // todo: voting from two threads could miss a vote
+        String key = createAccessKey(pluginKey, "votes");
+        final List<String> votes = getVotes(pluginKey);
+        if (votes.indexOf(user) == -1)
+        {
+            votes.add(user);
+            getPluginSettings().put(key, votes);
+        }
+    }
+
+    public void clearVotes(String pluginKey)
+    {
+        getPluginSettings().remove(createAccessKey(pluginKey, "votes"));
     }
 }

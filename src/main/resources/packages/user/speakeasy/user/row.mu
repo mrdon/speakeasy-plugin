@@ -14,28 +14,38 @@
     </td>
     <td headers="plugin-info" class="plugin-info">
         <div class="plugin-summary">
-            <h3 class="plugin-name">
-                {{#fork}}
-                    <span class='fork-blue'>{{name}} (forked)</span>
-                {{/fork}}
-                {{^fork}}
-                    {{name}}
-                {{/fork}}
-            </h3>
-            <p class="plugin-author-line">
-                <em>By <span class="plugin-author">{{#fork}}
-                    <span class='fork-blue'>{{authorDisplayName}}</span>
-                {{/fork}}
-                {{^fork}}
-                    {{authorDisplayName}}
-                {{/fork}}
-                </span>
-            </em></p>
+            <div>
+                <div class="plugin-feedback">
+                    <div class="vote-up-icon" data-href="/rest/speakeasy/1/plugins/voteup/{{key}}"></div>
+                    <div class="broken-icon" data-href="/rest/speakeasy/1/plugins/broken/{{key}}"></div>
+                </div>
+                <div class="plugin-title-info">
+                    <h3 class="plugin-name">
+                        {{#fork}}
+                            <span class='fork-blue'>{{name}} (forked)</span>
+                        {{/fork}}
+                        {{^fork}}
+                            {{name}}
+                        {{/fork}}
+                    </h3>
+                    <p class="plugin-author-line">
+                        <em>By <span class="plugin-author">{{#fork}}
+                            <span class='fork-blue'>{{authorDisplayName}}</span>
+                        {{/fork}}
+                        {{^fork}}
+                            {{authorDisplayName}}
+                        {{/fork}}
+                        </span>
+                    </em></p>
+                </div>
+            </div>
             <p class="plugin-description">
                 {{description}}
             </p>
             <p class="plugin-stats">
-                <strong>version: </strong><span class="plugin-version">{{version}}</span> / <strong>users: </strong><span class="plugin-users">{{numUsers}}</span>
+                <strong>votes: </strong><span class="plugin-votes">{{numVotes}}</span> /
+                <strong>users: </strong><span class="plugin-users">{{numUsers}}</span> /
+                <strong>version: </strong><span class="plugin-version">{{version}}</span>
             </p>
         </div>
     </td>

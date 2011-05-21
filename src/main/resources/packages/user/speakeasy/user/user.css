@@ -74,6 +74,27 @@
     white-space: normal;
 }
 
+#plugins-table div.plugin-feedback {
+    float:left;
+    width: 16px;
+    height: 100%;
+}
+
+#plugins-table div.plugin-title-info {
+   margin-left: 20px;
+}
+
+#plugins-table div.vote-up-icon {
+    width: 16px;
+    height: 20px;
+    background: url("@modulePrefix/speakeasy/user/images/vote_up.png") no-repeat center;
+}
+#plugins-table div.broken-icon {
+    width: 16px;
+    height: 20px;
+    background: url("@modulePrefix/speakeasy/user/images/broken.png") no-repeat center;
+}
+
 div.plugin-enable-links {
     -moz-border-radius: 3px;
     border-radius: 3px;

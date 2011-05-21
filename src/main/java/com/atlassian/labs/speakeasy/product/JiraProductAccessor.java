@@ -77,6 +77,10 @@ public class JiraProductAccessor implements ProductAccessor
             SingleMailQueueItem item = new SingleMailQueueItem(email);
             item.setMailThreader(null);
             ManagerFactory.getMailQueue().addItem(item);
+            if (Boolean.getBoolean("atlassian.dev.mode"))
+            {
+                ManagerFactory.getMailQueue().sendBuffer();
+            }
         }
         catch (EntityNotFoundException e)
         {

@@ -62,6 +62,7 @@ public class RemotePluginBuilder
         remotePlugin.setAuthorEmail(profile != null ? profile.getEmail() : "unknown@example.com");
         List<String> accessList = data.getUsersList(plugin.getKey());
         remotePlugin.setNumUsers(accessList.size());
+        remotePlugin.setNumVotes(data.getVotes(plugin.getKey()).size());
 
         if (plugin.getResource("/" + JsonManifest.ATLASSIAN_EXTENSION_PATH) != null)
         {

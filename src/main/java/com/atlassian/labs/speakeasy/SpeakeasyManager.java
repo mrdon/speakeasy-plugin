@@ -122,12 +122,8 @@ public class SpeakeasyManager
 
     private Plugin getPlugin(String pluginKey)
     {
-        Plugin plugin = pluginAccessor.getPlugin(pluginKey);
-        if (plugin == null)
-        {
-            throw new PluginOperationFailedException("Plugin not found: " + pluginKey, pluginKey);
-        }
-        return plugin;
+        validatePluginExists(pluginKey);
+        return pluginAccessor.getPlugin(pluginKey);
     }
 
     public List<String> allowUserAccess(final String pluginKey, final String user) throws UnauthorizedAccessException
@@ -214,6 +210,7 @@ public class SpeakeasyManager
                 }
             }
             disallowAllPluginAccess(pluginKey, user);
+            data.clearVotes(pluginKey);
             pluginManager.uninstall(pluginKey, user);
             eventPublisher.publish(new PluginUninstalledEvent(pluginKey)
                 .setUserName(user)
@@ -335,6 +332,7 @@ public class SpeakeasyManager
         try
         {
             validateAuthor(user);
+            validatePluginExists(pluginKey);
             RemotePlugin plugin = getRemotePlugin(pluginKey, user);
             if (!plugin.isCanEdit())
             {
@@ -363,6 +361,7 @@ public class SpeakeasyManager
         try
         {
             validateAuthor(user);
+            validatePluginExists(pluginKey);
             RemotePlugin plugin = getRemotePlugin(pluginKey, user);
             if (!plugin.isCanEdit())
             {
@@ -385,6 +384,7 @@ public class SpeakeasyManager
         try
         {
             validateAuthor(user);
+            validatePluginExists(pluginKey);
             RemotePlugin plugin = getRemotePlugin(pluginKey, user);
 
             if (!plugin.isCanEdit())
@@ -399,6 +399,31 @@ public class SpeakeasyManager
                     .setMessage("Edit from the UI"));
             log.info("Saved and rebuilt extension '{}' by user '{}'", pluginKey, user);
             return getRemotePlugin(installedPluginKey, user);
+        }
+        catch (PluginOperationFailedException ex)
+        {
+            throw ex;
+        }
+        catch (RuntimeException ex)
+        {
+            throw new PluginOperationFailedException(ex.getMessage(), ex, pluginKey);
+        }
+    }
+
+    public UserPlugins voteUp(String pluginKey, String user) throws UnauthorizedAccessException
+    {
+        try
+        {
+            validateAccess(user);
+            validatePluginExists(pluginKey);
+            if (user.equals(getRemotePlugin(pluginKey, user).getAuthor()))
+            {
+                throw new PluginOperationFailedException("Cannot vote for your own extension.  Nice try though...", pluginKey);
+            }
+            data.voteUp(pluginKey, user);
+            sendVoteUpEmail(pluginKey, user);
+            log.info("Voted '{}' up by user '{}'", pluginKey, user);
+            return getRemotePluginList(user, pluginKey);
         }
         catch (PluginOperationFailedException ex)
         {
@@ -583,6 +608,43 @@ public class SpeakeasyManager
         }
     }
 
+    private void sendVoteUpEmail(final String pluginKey, final String user) throws UnauthorizedAccessException
+    {
+        final String userFullName = productAccessor.getUserFullName(user);
+        String pluginAuthor = data.getPluginAuthor(pluginKey);
+        if (pluginAuthor != null)
+        {
+            final Set<RemotePlugin> commonExtensions = new HashSet<RemotePlugin>();
+            final Set<RemotePlugin> suggestedExtensions = new HashSet<RemotePlugin>();
+            for (RemotePlugin plugin : getAllRemoteSpeakeasyPlugins(user))
+            {
+                if (plugin.getKey().equals(pluginKey))
+                {
+                    continue;
+                }
+
+                List<String> votedList = data.getVotes(plugin.getKey());
+                if (votedList.contains(pluginAuthor))
+                {
+                    commonExtensions.add(plugin);
+                }
+                else
+                {
+                    suggestedExtensions.add(plugin);
+                }
+            }
+            productAccessor.sendEmail(pluginAuthor, "email/voteup-subject.vm", "email/voteup-body.vm", new HashMap<String, Object>()
+            {{
+                    put("plugin", getRemotePlugin(pluginKey, user));
+                    put("voterFullName", userFullName);
+                    put("voter", user);
+                    put("commonExtensions", commonExtensions);
+                    put("suggestedExtensions", suggestedExtensions);
+                    put("voteTotal", data.getVotes(pluginKey).size());
+                }});
+        }
+    }
+
     private void validateAccess(String userName) throws UnauthorizedAccessException
     {
         if (!permissionManager.canAccessSpeakeasy(userName))
@@ -607,6 +669,14 @@ public class SpeakeasyManager
         {
             log.warn("Unauthorized Speakeasy admin access by '" + userName + "'");
             throw new UnauthorizedAccessException(userName, "Cannot access Speakeasy due to lack of permissions");
+        }
+    }
+
+    public void validatePluginExists(String pluginKey) throws PluginOperationFailedException
+    {
+        if (pluginAccessor.getPlugin(pluginKey) == null)
+        {
+            throw new PluginOperationFailedException("Extension '" + pluginKey + "' doesn't exists", null);
         }
     }
 
@@ -667,4 +737,5 @@ public class SpeakeasyManager
             return false;
         }
     }
+
 }

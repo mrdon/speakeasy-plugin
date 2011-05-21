@@ -6,7 +6,7 @@
 var $ = require('./jquery').jQuery;
 
 function addMessage(type, params) {
-    var msg = $("#aui-message-bar").children(".aui-message").remove();
+    clear();
 
     if (type == "success") {
         AJS.messages.success(params);
@@ -18,11 +18,20 @@ function addMessage(type, params) {
         AJS.messages.error(params);
     }
 
-    msg = $("#aui-message-bar").children(".aui-message");
+    var msg = $("#aui-message-bar").children(".aui-message");
     window.setTimeout(function() { msg.fadeOut(1500) }, 5000);
+}
+
+function clear() {
+    $("#aui-message-bar").children(".aui-message").remove();
 }
 
 /**
  * Adds a message to #aui-message-bar, clearing the previous and fading it out after 5 seconds
  */
 exports.add = addMessage;
+
+/**
+ * Clears all messages from #aui-message-bar
+ */
+exports.clear = clear;
