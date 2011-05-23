@@ -2,10 +2,7 @@ package com.atlassian.labs.speakeasy.git;
 
 import com.atlassian.event.api.EventListener;
 import com.atlassian.event.api.EventPublisher;
-import com.atlassian.labs.speakeasy.event.PluginForkedEvent;
-import com.atlassian.labs.speakeasy.event.PluginInstalledEvent;
-import com.atlassian.labs.speakeasy.event.PluginUninstalledEvent;
-import com.atlassian.labs.speakeasy.event.PluginUpdatedEvent;
+import com.atlassian.labs.speakeasy.event.*;
 import com.atlassian.labs.speakeasy.install.PluginOperationFailedException;
 import com.atlassian.labs.speakeasy.install.ZipWriter;
 import com.atlassian.labs.speakeasy.util.BundleUtil;
@@ -73,7 +70,7 @@ public class GitRepositoryManager implements DisposableBean
         eventPublisher.register(this);
     }
 
-    private Repository getRepository(String id) throws NoHeadException, NoMessageException, ConcurrentRefUpdateException, WrongRepositoryStateException, IOException, NoFilepatternException
+    private Repository getRepository(String id, AbstractPluginEvent event) throws NoHeadException, NoMessageException, ConcurrentRefUpdateException, WrongRepositoryStateException, IOException, NoFilepatternException
     {
         Repository repo = repositories.get(id);
         if (repo == null)
@@ -90,14 +87,14 @@ public class GitRepositoryManager implements DisposableBean
                 if (!repo.getObjectDatabase().exists())
                 {
                     repo.create();
-                    updateRepositoryIfDirty(repo, bundle);
+                    updateRepositoryIfDirty(repo, event, bundle);
                 }
                 else
                 {
                     long modified = repo.getConfig().getLong("speakeasy", null, BUNDLELASTMODIFIED, 0);
                     if (modified != bundle.getLastModified())
                     {
-                        updateRepositoryIfDirty(repo, bundle);
+                        updateRepositoryIfDirty(repo, event, bundle);
                     }
                 }
 
@@ -120,7 +117,7 @@ public class GitRepositoryManager implements DisposableBean
         return this.repositoriesDir;
     }
 
-    private void updateRepositoryIfDirty(Repository repo, Bundle bundle) throws IOException, NoFilepatternException, NoHeadException, NoMessageException, ConcurrentRefUpdateException, WrongRepositoryStateException
+    private void updateRepositoryIfDirty(Repository repo, AbstractPluginEvent event, Bundle bundle) throws IOException, NoFilepatternException, NoHeadException, NoMessageException, ConcurrentRefUpdateException, WrongRepositoryStateException
     {
         final File workTree = repo.getWorkTree();
         Git git = new Git(repo);
@@ -164,9 +161,9 @@ public class GitRepositoryManager implements DisposableBean
         {
             git.commit().
                 setAll(true).
-                setAuthor("speakeasy", "speakeasy@atlassian.com").
+                setAuthor(event.getUserName(), event.getUserEmail()). //"speakeasy", "speakeasy@atlassian.com").
                 setCommitter("speakeasy", "speakeasy@atlassian.com").
-                setMessage("Auto-sync from bundle").
+                setMessage(event.getMessage()).
                 call();
             log.info("Git repository {} updated", repo.getWorkTree().getName());
         }
@@ -199,6 +196,30 @@ public class GitRepositoryManager implements DisposableBean
 
     private <T> T  forRepository(String id, RepositoryOperation<T> repositoryOperation)
     {
+        return forRepository(id, new AbstractPluginEvent(id)
+        {
+            @Override
+            public String getMessage()
+            {
+                return "Auto-sync from deployed extension";
+            }
+
+            @Override
+            public String getUserEmail()
+            {
+                return "speakeasy@atlassian.com";
+            }
+
+            @Override
+            public String getUserName()
+            {
+                return "speakeasy";
+            }
+        }, repositoryOperation);
+    }
+
+    private <T> T  forRepository(String id, AbstractPluginEvent event, RepositoryOperation<T> repositoryOperation)
+    {
         // only sync with git repo if a valid plugin key
         if (isValidExtensionKey(id))
         {
@@ -207,7 +228,7 @@ public class GitRepositoryManager implements DisposableBean
             lock.writeLock().lock();
             try
             {
-                Repository repository = getRepository(id);
+                Repository repository = getRepository(id, event);
                 return repositoryOperation.operateOn(repository);
             }
             catch (Exception e)
@@ -264,12 +285,12 @@ public class GitRepositoryManager implements DisposableBean
     @EventListener
     public void onPluginInstalledEvent(final PluginInstalledEvent event)
     {
-        forRepository(event.getPluginKey(), new RepositoryOperation<Void>()
+        forRepository(event.getPluginKey(), event, new RepositoryOperation<Void>()
         {
             public Void operateOn(Repository repo) throws Exception
             {
                 // just getting the repo for the first time will create it
-                updateRepositoryIfDirty(repo, BundleUtil.findBundleForPlugin(bundleContext, repo.getWorkTree().getName()));
+                updateRepositoryIfDirty(repo, event, BundleUtil.findBundleForPlugin(bundleContext, repo.getWorkTree().getName()));
                 return null;
             }
         });
@@ -278,7 +299,7 @@ public class GitRepositoryManager implements DisposableBean
     @EventListener
     public void onPluginUninstalledEvent(final PluginUninstalledEvent event)
     {
-        forRepository(event.getPluginKey(), new RepositoryOperation<Void>()
+        forRepository(event.getPluginKey(), event, new RepositoryOperation<Void>()
         {
             public Void operateOn(Repository repo) throws Exception
             {
@@ -291,11 +312,11 @@ public class GitRepositoryManager implements DisposableBean
     @EventListener
     public void onPluginUpdatedEvent(final PluginUpdatedEvent event)
     {
-        forRepository(event.getPluginKey(), new RepositoryOperation<Void>()
+        forRepository(event.getPluginKey(), event, new RepositoryOperation<Void>()
         {
             public Void operateOn(Repository repo) throws Exception
             {
-                updateRepositoryIfDirty(repo, BundleUtil.findBundleForPlugin(bundleContext, event.getPluginKey()));
+                updateRepositoryIfDirty(repo, event, BundleUtil.findBundleForPlugin(bundleContext, event.getPluginKey()));
                 return null;
             }
         });
@@ -304,7 +325,7 @@ public class GitRepositoryManager implements DisposableBean
     @EventListener
     public void onPluginForkedEvent(final PluginForkedEvent event)
     {
-        forRepository(event.getPluginKey(), new RepositoryOperation<Void>()
+        forRepository(event.getPluginKey(), event, new RepositoryOperation<Void>()
         {
             public Void operateOn(Repository repo) throws Exception
             {
