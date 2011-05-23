@@ -4,6 +4,7 @@ import com.atlassian.pageobjects.Page;
 import com.atlassian.pageobjects.PageBinder;
 import com.atlassian.pageobjects.ProductInstance;
 import com.atlassian.pageobjects.TestedProduct;
+import com.atlassian.pageobjects.binder.Init;
 import com.atlassian.pageobjects.binder.WaitUntil;
 import com.atlassian.webdriver.AtlassianWebDriver;
 import com.google.common.base.Function;
@@ -35,16 +36,10 @@ public class SpeakeasyUserPage implements Page
     @Inject
     PageBinder pageBinder;
 
+    MessagesBar messagesBar;
+
     @FindBy(id = "plugins-table")
     private WebElement pluginsTable;
-
-    @FindBy(name = "plugin-file")
-    private WebElement pluginFileUpload;
-    @FindBy(id = "submit-plugin-file")
-    private WebElement pluginFileUploadSubmit;
-
-    @FindBy(id = "aui-message-bar")
-    private WebElement messageBar;
 
     @FindBy(id = "jsdoc-tab")
     private WebElement jsdocTab;
@@ -52,6 +47,11 @@ public class SpeakeasyUserPage implements Page
     @Inject
     private TestedProduct testedProduct;
 
+    @Init
+    public void init()
+    {
+        messagesBar = pageBinder.bind(MessagesBar.class);
+    }
     @WaitUntil
     public void waitForSpeakeasyInit()
     {
@@ -141,49 +141,27 @@ public class SpeakeasyUserPage implements Page
         return null;
     }
 
-    public SpeakeasyUserPage uploadPlugin(File jar)
-    {
-        upload(jar);
-        Validate.isTrue(getErrorMessages().isEmpty(), "Error installing '" + jar.getPath() + "': " + getErrorMessages());
-        return this;
-    }
-
-    public SpeakeasyUserPage uploadPluginExpectingFailure(File jar)
-    {
-        upload(jar);
-        Validate.isTrue(!getErrorMessages().isEmpty(), "Expected error installing plugin");
-        return this;
-    }
-
-    private void upload(File jar)
-    {
-        pluginFileUpload.sendKeys(jar.getAbsolutePath());
-        pluginFileUploadSubmit.click();
-        driver.waitUntil(new Function()
-        {
-            public Object apply(Object from)
-            {
-                return "".equals(pluginFileUpload.getValue());
-            }
-        });
-        //waitForMessages();
-    }
-
     public SpeakeasyUserPage waitForMessages()
     {
-        driver.waitUntilElementIsVisibleAt(By.className("aui-message"), messageBar);
+        messagesBar.waitForMessages();
         return this;
     }
 
     public List<String> getSuccessMessages()
     {
-        return getMessages("success");
+        return messagesBar.getSuccessMessages();
     }
 
     public DownloadDialog openDownloadDialog(String pluginKey) throws IOException
     {
         clickActionLink(pluginKey, ExtensionOperations.DOWNLOAD);
         return pageBinder.bind(DownloadDialog.class, pluginKey);
+    }
+
+    public InstallDialog openInstallDialog() throws IOException
+    {
+        driver.findElement(By.id("sp-install")).click();
+        return pageBinder.bind(InstallDialog.class);
     }
 
     public SpeakeasyUserPage uninstallPlugin(String pluginKey)
@@ -231,25 +209,12 @@ public class SpeakeasyUserPage implements Page
 
     public List<String> getErrorMessages()
     {
-        return getMessages("error");
+        return messagesBar.getErrorMessages();
     }
 
     public List<String> getWarningMessages()
     {
-        return getMessages("warning");
-    }
-
-    private List<String> getMessages(String className)
-    {
-        List<String> messages = new ArrayList<String>();
-        for (WebElement msg : messageBar.findElements(By.className("aui-message")))
-        {
-            if (msg.getAttribute("class").contains(className))
-            {
-                messages.add(msg.getText().trim());
-            }
-        }
-        return messages;
+        return messagesBar.getWarningMessages();
     }
 
     public IdeDialog openEditDialog(String pluginKey)
@@ -273,15 +238,9 @@ public class SpeakeasyUserPage implements Page
         return pageBinder.bind(CommonJsModulesTab.class);
     }
 
-    public ExtensionWizard openCreateExtensionDialog()
-    {
-        driver.findElement(By.id("extension-wizard-link")).click();
-        return pageBinder.bind(ExtensionWizard.class);
-    }
-
     public boolean canCreateExtension()
     {
-        return driver.elementExists(By.id("extension-wizard-link"));
+        return driver.elementExists(By.id("sp-top-bar"));
     }
 
     public SpeakeasyUserPage unsubscribeFromAllPlugins()

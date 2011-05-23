@@ -68,7 +68,9 @@ public class TestCommonJsModules
                         "});")
                 .build();
         product.visit(SpeakeasyUserPage.class)
+                .openInstallDialog()
                 .uploadPlugin(host)
+                .openInstallDialog()
                 .uploadPlugin(client)
                 .enablePlugin("client")
                 .enablePlugin("host");

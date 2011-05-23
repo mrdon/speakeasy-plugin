@@ -39,6 +39,7 @@ public class TestExtensionWizard
     public void testCreate() throws IOException
     {
         SpeakeasyUserPage page = product.visit(SpeakeasyUserPage.class)
+                .openInstallDialog()
                 .openCreateExtensionDialog()
                     .key("myextension")
                     .name("My Extension")
@@ -57,6 +58,7 @@ public class TestExtensionWizard
     public void testEditPlugin() throws IOException
     {
         product.visit(SpeakeasyUserPage.class)
+                .openInstallDialog()
                 .openCreateExtensionDialog()
                     .key("myextension")
                     .name("My Extension")

@@ -7,10 +7,10 @@
 var $ = require('../jquery').jQuery;
 var messages = require('../messages');
 var ide = require('./ide/ide');
-var wizard = require('./wizard/create');
 var fork = require('./fork/fork');
 var pac = require('./pac/pac');
 var git = require('./git/git');
+var install = require('./install/install');
 
 var pluginActions = {
     'edit' : function (key, link, attachedRow) {
@@ -208,50 +208,15 @@ function initSpeakeasy() {
        updateTable(data.plugin || data);
     });
 
-    var pluginFile = $('#plugin-file');
-    var uploadForm = $('#upload-form');
-
-    var changeForm = function(e) {
+    $('#sp-install').click(function(e) {
         e.preventDefault();
-        uploadForm.ajaxSubmit({
-            dataType: null, //"json",
-            iframe: "true",
-            beforeSubmit: function() {
-               var extension = pluginFile.val().substring(pluginFile.val().lastIndexOf('.'));
-               if (extension != '.jar' && extension != '.zip' && extension != '.xml') {
-                  messages.add('error', {body: "The extension '" + extension + "' is not allowed", shadowed: false});
-                  return false;
-               }
-            },
-            success: function(response, status, xhr, $form) {
-                // marker necessary as sometimes Confluence decides to decorate the response
-                var start = response.indexOf("JSON_MARKER||") + "JSON_MARKER||".length;
-                var end = response.indexOf("||", start);
-                var data = $.parseJSON(response.substring(start, end));
-                if (data.error) {
-                    if (data.plugins) pluginsTable.trigger('pluginsUpdated', data.plugins);
-                    messages.add('error', {title: "Error installing extension", body: data.error, shadowed: false});
-                } else {
-                    var updatedPlugin = updateTable(data)[0];
-                    messages.add('success', {body: "<b>" + updatedPlugin.name + "</b> was uploaded successfully", shadowed: false});
-                }
-                pluginFile.val("");
-            }
-        });
-    };
-
-    $('#submit-plugin-file').click(changeForm);
-
-    uploadForm.resetForm();
+        install.openDialog();
+    });
 
     pac.init();
 
     $('#speakeasy-loaded').html("");
 
-    $('#extension-wizard-link').click(function(e) {
-        e.preventDefault();
-        wizard.openDialog();
-    });
 }
 
 exports.initSpeakeasy = initSpeakeasy;

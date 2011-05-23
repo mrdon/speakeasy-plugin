@@ -76,7 +76,8 @@ public class TestUserProfile
     public void testEditPlugin() throws IOException
     {
         SpeakeasyUserPage page = product.visit(SpeakeasyUserPage.class)
-                .uploadPlugin(startSimpleBuilder("edit", "Edit").addFormattedResource("foo-min.js", "var bar;").build());
+                .openInstallDialog()
+                    .uploadPlugin(startSimpleBuilder("edit", "Edit").addFormattedResource("foo-min.js", "var bar;").build());
         IdeDialog ide =  page.openEditDialog("edit");
 
         assertEquals(asList("bar/baz.js", "modules/test.js", "atlassian-plugin.xml", "foo.js"), ide.getFileNames());
@@ -99,6 +100,7 @@ public class TestUserProfile
     public void testViewSourceOnPlugin() throws IOException
     {
         IdeDialog ide = product.visit(SpeakeasyUserPage.class)
+                .openInstallDialog()
                 .uploadPlugin(
                         startSimpleBuilder("viewsource", "View Source")
                             .addFormattedResource("foo.js", "var bar;")
@@ -115,10 +117,12 @@ public class TestUserProfile
     public void testEditAndBreakThenFixPlugin() throws IOException
     {
         product.visit(SpeakeasyUserPage.class)
+                .openInstallDialog()
                 .uploadPlugin(buildSimplePluginFile());
 
         // break with non-existent module
         IdeDialog ide =  product.visit(SpeakeasyUserPage.class)
+                .openInstallDialog()
                 .uploadPlugin(buildSimplePluginFile())
                 .openEditDialog("test-2")
                 .editAndSaveFile("modules/test.js", "require('nonexistent/module');", "nonexistent/module");
@@ -146,7 +150,10 @@ public class TestUserProfile
     @Test
     public void testDownloadPluginJarAsAmpsProject() throws IOException
     {
-        final SpeakeasyUserPage page = product.visit(SpeakeasyUserPage.class).uploadPlugin(buildSimplePluginFile("download.jar-project", "Download Jar"));
+        final SpeakeasyUserPage page = product.visit(SpeakeasyUserPage.class)
+                .openInstallDialog()
+                .uploadPlugin(
+                        buildSimplePluginFile("download.jar-project", "Download Jar"));
         File file = page
                 .openDownloadDialog("download.jar-project")
                 .downloadAsAmpsProject();
@@ -188,6 +195,7 @@ public class TestUserProfile
     {
         final SpeakeasyUserPage page = product.
                 visit(SpeakeasyUserPage.class).
+                openInstallDialog().
                 uploadPlugin(buildSimplePluginFile("download.jar-file", "Jar File"));
         File file = page
                 .openDownloadDialog("download.jar-file")
@@ -228,7 +236,7 @@ public class TestUserProfile
         assertEquals(0, page.getPlugins().get("plugin-tests").getUsers());
         PluginTestActivated activated = product.getPageBinder().bind(PluginTestActivated.class);
         assertFalse(activated.isBannerVisible());
-        assertTrue(activated.isUploadFormVisible());
+        assertTrue(activated.isUploadDialogVisible());
         assertFalse(activated.isGoogleLinkVisible());
         page.enablePlugin("plugin-tests");
         assertEquals(1, page.getPlugins().get("plugin-tests").getUsers());
@@ -236,7 +244,7 @@ public class TestUserProfile
         assertEquals(1, page.getPlugins().get("plugin-tests").getUsers());
         activated.waitForBanner();
         assertTrue(activated.isBannerVisible());
-        assertFalse(activated.isUploadFormVisible());
+        assertFalse(activated.isUploadDialogVisible());
         assertTrue(activated.isGoogleLinkVisible());
         page.disablePlugin("plugin-tests");
         assertEquals(0, page.getPlugins().get("plugin-tests").getUsers());
@@ -244,48 +252,10 @@ public class TestUserProfile
         assertEquals(0, page.getPlugins().get("plugin-tests").getUsers());
         activated = product.getPageBinder().bind(PluginTestActivated.class);
         assertFalse(activated.isBannerVisible());
-        assertTrue(activated.isUploadFormVisible());
+        assertTrue(activated.isUploadDialogVisible());
         assertFalse(activated.isGoogleLinkVisible());
     }
 
-
-    @Test
-    public void testInstallPlugin() throws IOException
-    {
-        File jar = buildSimplePluginFile();
-
-        SpeakeasyUserPage page = product.visit(SpeakeasyUserPage.class)
-                .uploadPlugin(jar);
-
-        List<String> messages = page.getSuccessMessages();
-        assertEquals(1, messages.size());
-        assertTrue(messages.get(0).contains("Test Plugin"));
-        assertTrue(page.getPluginKeys().contains("test-2"));
-
-        SpeakeasyUserPage.PluginRow row = page.getPlugins().get("test-2");
-        assertNotNull(row);
-        assertEquals("test-2", row.getKey());
-        assertEquals("Test Plugin", row.getName());
-        assertEquals("Desc", row.getDescription());
-        assertEquals("A. D. Ministrator (Sysadmin)", row.getAuthor());
-        assertTrue(page.canExecute("test-2", ExtensionOperations.UNINSTALL));
-        assertTrue(page.canExecute("test-2", ExtensionOperations.EDIT));
-        assertTrue(page.canExecute("test-2", ExtensionOperations.DOWNLOAD));
-        assertFalse(page.canExecute("test-2", ExtensionOperations.FORK));
-
-
-        // verify on reload
-        page = product.visit(SpeakeasyUserPage.class);
-        assertTrue(page.getPluginKeys().contains("test-2"));
-
-        row = page.getPlugins().get("test-2");
-        assertNotNull(row);
-        assertEquals("test-2", row.getKey());
-        assertEquals("Test Plugin", row.getName());
-        assertEquals("Desc", row.getDescription());
-        assertEquals("A. D. Ministrator (Sysadmin)", row.getAuthor());
-        page.uninstallPlugin("test-2");
-    }
 
     @Test
     public void testEmailAuthorOnEnable() throws IOException, MessagingException
@@ -293,6 +263,7 @@ public class TestUserProfile
         File jar = buildSimplePluginFile();
 
         product.visit(SpeakeasyUserPage.class)
+                .openInstallDialog()
                 .uploadPlugin(jar);
 
         logout();
@@ -333,6 +304,7 @@ public class TestUserProfile
         File jar = buildSimplePluginFile("test", "First Plugin");
 
         SpeakeasyUserPage page = product.visit(SpeakeasyUserPage.class)
+                .openInstallDialog()
                 .uploadPlugin(jar)
                 .voteUp("test");
         assertTrue(page.getErrorMessages().get(0).contains("Cannot vote for"));
@@ -364,7 +336,9 @@ public class TestUserProfile
         File jar2 = buildSimplePluginFile("test-2", "Second Plugin");
 
         product.visit(SpeakeasyUserPage.class)
+                .openInstallDialog()
                 .uploadPlugin(jar)
+                .openInstallDialog()
                 .uploadPlugin(jar2);
 
         logout();
@@ -430,6 +404,7 @@ public class TestUserProfile
     public void testForkZipPlugin() throws IOException, MessagingException
     {
         product.visit(SpeakeasyUserPage.class)
+                .openInstallDialog()
                 .openCreateExtensionDialog()
                     .key("tofork-zip")
                     .description("Description")
@@ -462,6 +437,7 @@ public class TestUserProfile
         File jar = buildSimplePluginFile();
 
         SpeakeasyUserPage page = product.visit(SpeakeasyUserPage.class)
+                .openInstallDialog()
                 .uploadPlugin(jar)
                 .enablePlugin("test-2")
                 .enablePlugin("plugin-tests");
@@ -490,6 +466,7 @@ public class TestUserProfile
                 .build();
 
         SpeakeasyUserPage page = product.visit(SpeakeasyUserPage.class)
+                .openInstallDialog()
                 .uploadPluginExpectingFailure(jar);
 
         List<String> messages = page.getErrorMessages();
@@ -517,6 +494,7 @@ public class TestUserProfile
                 .build();
 
         SpeakeasyUserPage page = product.visit(SpeakeasyUserPage.class)
+                .openInstallDialog()
                 .uploadPluginExpectingFailure(jar);
 
         List<String> messages = page.getErrorMessages();
@@ -534,6 +512,7 @@ public class TestUserProfile
         File jar = buildSimplePluginFile();
 
         product.visit(SpeakeasyUserPage.class)
+                .openInstallDialog()
                 .uploadPlugin(jar);
 
         SpeakeasyUserPage page = product.visit(SpeakeasyUserPage.class);

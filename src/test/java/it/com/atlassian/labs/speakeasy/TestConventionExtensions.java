@@ -61,6 +61,7 @@ public class TestConventionExtensions
         FileUtils.moveFile(jar, zip);
 
         product.visit(SpeakeasyUserPage.class)
+                .openInstallDialog()
                 .uploadPlugin(zip)
                 .enablePlugin("test-convention");
 
@@ -82,6 +83,7 @@ public class TestConventionExtensions
     public void testEditAndBreakWithJavascriptSyntaxErrorThenFixPlugin() throws IOException
     {
         SpeakeasyUserPage page = product.visit(SpeakeasyUserPage.class)
+                .openInstallDialog()
                 .openCreateExtensionDialog()
                     .key("breakjs")
                     .name("Breaking JS")

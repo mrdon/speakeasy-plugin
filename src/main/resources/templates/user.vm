@@ -4,6 +4,8 @@
         var contextPath = "$contextPath";
         var currentUser = "$user";
         var product = "$product";
+        var xsrfTokenName = "$xsrfTokenName";
+        var xsrfToken = "$xsrfToken";
     </script>
 
 <div style="margin-top: -55px; margin-left: 350px;" id="aui-message-bar">
@@ -13,7 +15,12 @@
         </div>
     #end
 </div>
-
+#if ($canAuthor)
+<div id="sp-top-bar">
+    <a href="#"><span id="sp-install">Install</span></a>
+    <a href="$contextPath/rest/speakeasy/latest/plugins/atom"><span id="sp-updates">Updates</span></a>
+</div>
+#end
 <div class="aui-tabs horizontal-tabs" id="horizontal">
     <ul class="tabs-menu">
         <li class="menu-item active-tab">
@@ -37,9 +44,6 @@
               href="$contextPath/plugins/servlet/speakeasy/unsubscribe">$baseUrl/plugins/servlet/speakeasy/unsubscribe</a>
             <br /><br />
             To use an extension, click <b>Enable</b>. <br />
-            #if ($canAuthor)
-            To create a new extension, <a id="extension-wizard-link" href="javascript:void(0)">use the wizard</a> or <b>Upload</b> a file.<br />
-            #end
         </p>
         #set ($topWebItems = $webInterfaceManager.getDisplayableItems("speakeasy.user-profile/top", $webInterfaceContext))
         #if (!$topWebItems.empty)
@@ -89,16 +93,6 @@
             </tbody>
         </table>
 
-        #if ($canAuthor)
-            <div style="background-color: #f0f0f0; padding: 10px; border: 1px solid #bbb;">
-                <form id="upload-form" action="$contextPath/rest/speakeasy/1/plugins" enctype="multipart/form-data" method="post">
-                    <input type="hidden" name="$xsrfTokenName" value="$xsrfToken" />
-                    <b>Upload New Extension:</b>
-                    <label for="plugin-file">Install a new extension by uploading from your computer:</label> <input id="plugin-file" type="file" name="plugin-file" size="40" />
-                    <button id="submit-plugin-file">Upload</button>
-                </form>
-            </div>
-        #end
     </div>
     #if ($canAuthor)
     <!--div class="tabs-pane" id="horizontal-second">

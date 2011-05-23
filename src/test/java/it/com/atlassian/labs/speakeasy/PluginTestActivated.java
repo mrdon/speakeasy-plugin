@@ -19,9 +19,9 @@ public class PluginTestActivated
         return Check.elementIsVisible(By.id("plugin-tests-enabled"), driver);
     }
 
-    public boolean isUploadFormVisible()
+    public boolean isUploadDialogVisible()
     {
-        return Check.elementIsVisible(By.id("upload-form"), driver);
+        return Check.elementIsVisible(By.id("sp-top-bar"), driver);
     }
 
     public boolean isGoogleLinkVisible()

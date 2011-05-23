@@ -21,6 +21,22 @@
     box-shadow: 5px 5px 5px #999;
 }
 
+#sp-top-bar {
+    float: right;
+}
+#sp-top-bar a:link{
+    text-decoration: none;
+}
+#sp-install {
+    padding-left: 24px;
+    background: url("@modulePrefix/speakeasy/user/images/add_20.png") no-repeat 0 50%;
+}
+#sp-updates {
+    margin-left: 2em;
+    padding-left: 24px;
+    background: url("@modulePrefix/speakeasy/user/images/rss_20.png") no-repeat 0 50%;
+}
+
 #plugins-table td {
     vertical-align: top;
     white-space: nowrap;

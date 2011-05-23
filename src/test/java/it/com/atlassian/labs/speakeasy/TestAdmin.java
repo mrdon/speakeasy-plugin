@@ -67,6 +67,7 @@ public class TestAdmin
     {
         // setup
         product.visit(SpeakeasyUserPage.class)
+            .openInstallDialog()
             .uploadPlugin(buildSimplePluginFile("restrict-authors", "Restrict Authors"));
         logout();
         product.visit(LoginPage.class)
