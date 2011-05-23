@@ -94,12 +94,12 @@ public class ExtensionGitServlet extends GitServlet
             if (repo != null)
             {
                 String pluginKey = repo.getWorkTree().getName();
-                if (speakeasyManager.canEditPlugin(user, pluginKey))
+                if (speakeasyManager.canAuthorExtensions(user) &&
+                        (!speakeasyManager.doesPluginExist(pluginKey) || speakeasyManager.canEditPlugin(pluginKey, user)))
                 {
                     chain.doFilter(request, response);
                     if (req.getRequestURI().endsWith("receive-pack"))
                     {
-
                         try
                         {
                             speakeasyManager.installPlugin(

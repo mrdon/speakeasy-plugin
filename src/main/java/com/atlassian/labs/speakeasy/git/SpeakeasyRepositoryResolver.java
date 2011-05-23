@@ -35,17 +35,10 @@ public class SpeakeasyRepositoryResolver implements RepositoryResolver<HttpServl
     {
         String pluginKey = name.endsWith(".git") ? name.substring(0, name.length() - 4) : name;
         String userName = userManager.getRemoteUsername(req);
-        try
+        if (speakeasyManager.canAuthorExtensions(userName))
         {
-            if (speakeasyManager.getRemotePlugin(pluginKey, userName) != null)
-            {
-                gitRepositoryManager.ensureRepository(pluginKey);
-                return resolver.open(req, pluginKey);
-            }
-        }
-        catch (UnauthorizedAccessException e)
-        {
-            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+            gitRepositoryManager.ensureRepository(pluginKey);
+            return resolver.open(req, pluginKey);
         }
         // todo: better handling
         return null;

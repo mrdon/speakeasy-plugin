@@ -113,6 +113,11 @@ public class SpeakeasyManager
                 build();
     }
 
+    public boolean doesPluginExist(String pluginKey)
+    {
+        return pluginAccessor.getPlugin(pluginKey) != null;
+    }
+
     public RemotePlugin getRemotePlugin(String pluginKey, String userName) throws PluginOperationFailedException, UnauthorizedAccessException
     {
         validateAccess(userName);
@@ -726,7 +731,7 @@ public class SpeakeasyManager
         return plugins;
     }
 
-    public boolean canEditPlugin(String remoteUsername, String name)
+    public boolean canEditPlugin(String name, String remoteUsername)
     {
         try
         {

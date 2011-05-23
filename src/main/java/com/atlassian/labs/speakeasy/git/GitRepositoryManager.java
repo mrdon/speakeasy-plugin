@@ -9,6 +9,7 @@ import com.atlassian.labs.speakeasy.event.PluginUpdatedEvent;
 import com.atlassian.labs.speakeasy.install.PluginOperationFailedException;
 import com.atlassian.labs.speakeasy.install.ZipWriter;
 import com.atlassian.labs.speakeasy.util.BundleUtil;
+import com.atlassian.labs.speakeasy.util.ExtensionValidate;
 import com.atlassian.sal.api.ApplicationProperties;
 import com.google.common.base.Function;
 import com.google.common.collect.MapMaker;
@@ -100,9 +101,16 @@ public class GitRepositoryManager implements DisposableBean
                     }
                 }
 
-                repositories.put(id, repo);
-            }
 
+            }
+            else
+            {
+                if (ExtensionValidate.isValidExtensionKey(id))
+                {
+                    repo.create();
+                }
+            }
+            repositories.put(id, repo);
         }
         return repo;
     }
