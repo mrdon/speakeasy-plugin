@@ -84,7 +84,7 @@ public class UserProfileRenderer
         String user = userManager.getRemoteUsername(req);
         if (user == null)
         {
-            throw new UnauthorizedAccessException(null, "Unauthorized - must be a valid user");
+            throw new UnauthorizedAccessException(null, "Unauthorized - must be logged in and have access to Speakeasy");
         }
 
         webResourceManager.requireResource("com.atlassian.auiplugin:ajs");
