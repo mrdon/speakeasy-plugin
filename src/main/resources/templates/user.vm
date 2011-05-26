@@ -17,8 +17,8 @@
 </div>
 #if ($canAuthor)
 <div id="sp-top-bar">
-    <a href="#"><span id="sp-install">Install</span></a>
-    <a href="$contextPath/rest/speakeasy/latest/plugins/atom"><span id="sp-updates">Updates</span></a>
+    <a id="sp-install" href="#">Install</a>
+    <a id="sp-updates" href="$contextPath/rest/speakeasy/latest/plugins/atom">Updates</a>
 </div>
 #end
 <div class="aui-tabs horizontal-tabs" id="horizontal">
