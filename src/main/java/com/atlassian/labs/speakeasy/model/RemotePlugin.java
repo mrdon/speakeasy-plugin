@@ -285,7 +285,15 @@ public class RemotePlugin implements Comparable
 
     public int compareTo(Object o)
     {
-        return getName().compareTo(((RemotePlugin)o).getName());
+        int nameDiff = getName().compareTo(((RemotePlugin)o).getName());
+        if (nameDiff != 0)
+        {
+            return nameDiff;
+        }
+        else
+        {
+            return getKey().compareTo(((RemotePlugin)o).getKey());
+        }
     }
 
     @Override
