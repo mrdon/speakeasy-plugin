@@ -17,7 +17,9 @@
             <div>
                 <div class="plugin-feedback">
                     <div class="vote-up-icon" data-href="/rest/speakeasy/1/plugins/voteup/{{key}}"></div>
-                    <div class="broken-icon" data-href="/rest/speakeasy/1/plugins/broken/{{key}}"></div>
+                    <a href="mailto:{{authorEmail}}?Subject=Speakeasy%20Extension%20Feedback">
+                        <div class="broken-icon" data-href="/rest/speakeasy/1/plugins/broken/{{key}}"></div>
+                    </a>
                 </div>
                 <div class="plugin-title-info">
                     <h3 class="plugin-name">
