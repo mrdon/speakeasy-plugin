@@ -25,7 +25,7 @@ exports.openDialog = function(pluginKey, link, attachedRow) {
 function forkPlugin(link, attachedRow, description) {
     //var enabled = ("Disable" == link.text());
     link.append('<img class="waiting" alt="waiting" src="' + staticResourcesPrefix + '/download/resources/com.atlassian.labs.speakeasy-plugin:shared/images/wait.gif" />');
-    var pluginName = $('td[headers=plugin-name] .plugin-name', attachedRow).text();
+    var pluginName = $('.plugin-name', attachedRow).text();
     $.ajax({
               url: contextPath + link.attr('href'),
               type: 'POST',
