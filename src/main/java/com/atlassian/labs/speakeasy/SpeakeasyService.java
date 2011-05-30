@@ -323,20 +323,36 @@ public class SpeakeasyService
         return getRemotePlugin(installedKey, user);
     }
 
-    public UserPlugins voteUp(final String pluginKey, final String user) throws UnauthorizedAccessException
+    public UserPlugins favorite(final String pluginKey, final String user) throws UnauthorizedAccessException
     {
         validateAccess(user);
         validatePluginExists(pluginKey);
-        String votedPluginKey = exec.forKey(pluginKey, user, new Operation<UserExtension, String>()
+        String favoritedPluginKey = exec.forKey(pluginKey, user, new Operation<UserExtension, String>()
         {
             public String operateOn(UserExtension repo) throws Exception
             {
-                validateAccessType(repo, "vote up", repo.isCanVoteUp(), user);
-                return extensionOperationManager.voteUp(repo, user);
+                validateAccessType(repo, "favorite", repo.isCanFavorite(), user);
+                return extensionOperationManager.favorite(repo, user);
             }
         });
-        log.info("Voted '{}' up by user '{}'", votedPluginKey, user);
-        return getRemotePluginList(user, votedPluginKey);
+        log.info("Favorited '{}' by user '{}'", favoritedPluginKey, user);
+        return getRemotePluginList(user, favoritedPluginKey);
+    }
+
+    public UserPlugins unfavorite(final String pluginKey, final String user) throws UnauthorizedAccessException
+    {
+        validateAccess(user);
+        validatePluginExists(pluginKey);
+        String unfavoritedPluginkey = exec.forKey(pluginKey, user, new Operation<UserExtension, String>()
+        {
+            public String operateOn(UserExtension repo) throws Exception
+            {
+                validateAccessType(repo, "unfavorite", !repo.isCanFavorite(), user);
+                return extensionOperationManager.unfavorite(repo, user);
+            }
+        });
+        log.info("Unfavorited '{}' by user '{}'", unfavoritedPluginkey, user);
+        return getRemotePluginList(user, unfavoritedPluginkey);
     }
 
     public UserPlugins installPlugin(File uploadedFile, String user) throws UnauthorizedAccessException

@@ -88,25 +88,31 @@ function uninstallPlugin(pluginKey, link, attachedRow) {
             });
 }
 
-function voteUp($link) {
+function favorite($link) {
+    updateFavorite($link, "POST", "marked as a favorite", "mark as a favorite");
+}
+function unfavorite($link) {
+    updateFavorite($link, "DELETE", "removed as a favorite", "remove as a favorite");
+}
+function updateFavorite($link, method, successActionText, failureActionText) {
     messages.clear();
     $link.html('<img alt="waiting" src="' + staticResourcesPrefix + '/download/resources/com.atlassian.labs.speakeasy-plugin:shared/images/wait.gif" />');
     var pluginName = $('.plugin-name', $link.closest('tr')).text();
     $.ajax({
               url: getAbsoluteHref($link),
-              type: 'POST',
+              type: method,
               beforeSend: function(jqXHR, settings) {
                 jqXHR.setRequestHeader("X-Atlassian-Token", "nocheck");
                 jqXHR.setRequestHeader("Content-Type", "text/plain");
               },
               success: function(data) {
                   updateTable(data);
-                  messages.add('success', {body: "<b>" + pluginName + "</b> was voted up", shadowed: false});
+                  messages.add('success', {body: "<b>" + pluginName + "</b> was " + successActionText, shadowed: false});
               },
               error: function(xhr) {
                   var data  = $.parseJSON(xhr.responseText)
                   updateTable(data.plugin);
-                  messages.add('error', {title: "Error voting up extension", body: data.error, shadowed: false});
+                  messages.add('error', {title: "Error, unable to " + failureActionText, body: data.error, shadowed: false});
               }
             });
 }
@@ -199,10 +205,15 @@ function initSpeakeasy() {
     pluginsTable.delegate("a", 'click', eventDelegate);
     pluginsTable.delegate("button", 'click', eventDelegate);
 
-    pluginsTable.delegate("div.vote-up-icon", 'click', function(e) {
+    pluginsTable.delegate("div.unfavorite-icon", 'click', function(e) {
         e.preventDefault();
         var $link = $(e.target);
-        voteUp($link);
+        favorite($link);
+    });
+    pluginsTable.delegate("div.favorite-icon", 'click', function(e) {
+        e.preventDefault();
+        var $link = $(e.target);
+        unfavorite($link);
     });
     pluginsTable.bind('pluginsUpdated', function(e, data) {
        updateTable(data.plugin || data);

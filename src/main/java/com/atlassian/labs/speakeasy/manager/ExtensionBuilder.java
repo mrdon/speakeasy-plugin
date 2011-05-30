@@ -53,7 +53,7 @@ class ExtensionBuilder
         List<String> accessList = data.getUsersList(plugin.getKey());
 
         boolean isAuthor = userName.equals(extension.getAuthor());
-        boolean hasVoted = data.getVotes(plugin.getKey()).contains(userName);
+        boolean hasFavorited = data.getFavorites(plugin.getKey()).contains(userName);
         boolean pureSpeakeasy = ExtensionValidate.isPureSpeakeasyExtension(bundleContext, plugin);
 
         if (extension.isAvailable())
@@ -67,7 +67,7 @@ class ExtensionBuilder
         extension.setCanEdit(canEdit);
         extension.setCanUninstall(canEdit);
         extension.setCanFork(!extension.isFork() && pureSpeakeasy && !isAuthor && canAuthor);
-        extension.setCanVoteUp(!isAuthor && !hasVoted);
+        extension.setCanFavorite(!hasFavorited);
         extension.setCanDownload(pureSpeakeasy && canAuthor);
 
         // if the user has already forked this, don't let them fork again
@@ -103,7 +103,7 @@ class ExtensionBuilder
         extension.setAuthorEmail(profile != null ? profile.getEmail() : "unknown@example.com");
         List<String> accessList = data.getUsersList(plugin.getKey());
         extension.setNumUsers(accessList.size());
-        extension.setNumVotes(data.getVotes(plugin.getKey()).size());
+        extension.setNumFavorites(data.getFavorites(plugin.getKey()).size());
 
         if (plugin.getResource("/" + JsonManifest.ATLASSIAN_EXTENSION_PATH) != null)
         {

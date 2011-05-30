@@ -1,6 +1,5 @@
 package com.atlassian.labs.speakeasy.data;
 
-import com.atlassian.labs.speakeasy.model.Settings;
 import com.atlassian.labs.speakeasy.util.PomProperties;
 import com.atlassian.sal.api.pluginsettings.PluginSettings;
 import com.atlassian.sal.api.pluginsettings.PluginSettingsFactory;
@@ -69,11 +68,11 @@ public class SpeakeasyData
         }
     }
 
-    public List<String> getVotes(String pluginKey)
+    public List<String> getFavorites(String pluginKey)
     {
         String key = createAccessKey(pluginKey, "votes");
-        List<String> votesList = getListCopy(key);
-        return votesList;
+        List<String> list = getListCopy(key);
+        return list;
     }
 
     public void saveUsersList(String pluginKey, Collection<String> users)
@@ -108,19 +107,31 @@ public class SpeakeasyData
         return value;
     }
 
-    public void voteUp(String pluginKey, String user)
+    public void favorite(String pluginKey, String user)
     {
-        // concurrent votes handled through lock higher up
+        // concurrent marks handled through lock higher up
         String key = createAccessKey(pluginKey, "votes");
-        final List<String> votes = getVotes(pluginKey);
-        if (votes.indexOf(user) == -1)
+        final List<String> marks = getFavorites(pluginKey);
+        if (marks.indexOf(user) == -1)
         {
-            votes.add(user);
-            getPluginSettings().put(key, votes);
+            marks.add(user);
+            getPluginSettings().put(key, marks);
         }
     }
 
-    public void clearVotes(String pluginKey)
+    public void unfavorite(String pluginKey, String user)
+    {
+        // concurrent marks handled through lock higher up
+        String key = createAccessKey(pluginKey, "votes");
+        final List<String> marks = getFavorites(pluginKey);
+        if (marks.contains(user))
+        {
+            marks.remove(user);
+            getPluginSettings().put(key, marks);
+        }
+    }
+
+    public void clearFavorites(String pluginKey)
     {
         getPluginSettings().remove(createAccessKey(pluginKey, "votes"));
     }

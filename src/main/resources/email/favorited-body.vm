@@ -1,0 +1,20 @@
+$favoriteMarkerFullName ($favoriteMarker) has marked your Speakeasy extension '$plugin.name' as a favorite.
+
+#if (!$commonExtensions.isEmpty())
+
+You have these common favorites with $favoriteMarkerFullName:
+
+#foreach ($ext in $commonExtensions)
+ * $ext.name
+#end
+#end
+
+#if (!$suggestedExtensions.isEmpty())
+$favoriteMarkerFullName has also marked these extensions as favorites that you may want to try:
+
+#foreach ($ext in $suggestedExtensions)
+ * $ext.name
+#end
+#end
+
+This extension has now been favorited by $favoriteTotal#if ($favoriteTotal > 1) people.#else person.#end

@@ -16,12 +16,12 @@
         <div class="plugin-summary">
             <div>
                 <div class="plugin-feedback">
-                    {{#canVoteUp}}
-                    <div class="vote-up-icon" data-href="/rest/speakeasy/1/plugins/voteup/{{key}}"></div>
-                    {{/canVoteUp}}
-                    {{^canVoteUp}}
-                    <div class="voted"></div>
-                    {{/canVoteUp}}
+                    {{#canFavorite}}
+                    <div class="unfavorite-icon" data-href="/rest/speakeasy/1/plugins/favorite/{{key}}"></div>
+                    {{/canFavorite}}
+                    {{^canFavorite}}
+                    <div class="favorite-icon" data-href="/rest/speakeasy/1/plugins/favorite/{{key}}"></div>
+                    {{/canFavorite}}
                     <a href="mailto:{{authorEmail}}?Subject=Speakeasy%20Extension%20Feedback">
                         <div class="broken-icon" data-href="/rest/speakeasy/1/plugins/broken/{{key}}"></div>
                     </a>
@@ -50,7 +50,7 @@
                 {{description}}
             </p>
             <p class="plugin-stats">
-                <strong>votes: </strong><span class="plugin-votes">{{numVotes}}</span> /
+                <strong>favorites: </strong><span class="plugin-favorites">{{numFavorites}}</span> /
                 <strong>users: </strong><span class="plugin-users">{{numUsers}}</span> /
                 <strong>version: </strong><span class="plugin-version">{{version}}</span>
             </p>

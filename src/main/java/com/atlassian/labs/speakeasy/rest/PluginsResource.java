@@ -126,12 +126,21 @@ public class PluginsResource
     }
 
     @POST
-    @Path("voteup/{pluginKey}")
+    @Path("favorite/{pluginKey}")
     @Produces("application/json")
     @RequiresXsrfCheck
-    public Response voteUp(@PathParam("pluginKey") String pluginKey) throws UnauthorizedAccessException
+    public Response favorite(@PathParam("pluginKey") String pluginKey) throws UnauthorizedAccessException
     {
-        UserPlugins entity = speakeasyService.voteUp(pluginKey, userManager.getRemoteUsername());
+        UserPlugins entity = speakeasyService.favorite(pluginKey, userManager.getRemoteUsername());
+        return Response.ok().entity(entity).build();
+    }
+
+    @DELETE
+    @Path("favorite/{pluginKey}")
+    @Produces("application/json")
+    public Response unfavorite(@PathParam("pluginKey") String pluginKey) throws UnauthorizedAccessException
+    {
+        UserPlugins entity = speakeasyService.unfavorite(pluginKey, userManager.getRemoteUsername());
         return Response.ok().entity(entity).build();
     }
 

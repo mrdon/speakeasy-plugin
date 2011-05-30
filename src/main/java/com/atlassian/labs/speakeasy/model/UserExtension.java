@@ -5,7 +5,6 @@ import com.atlassian.plugin.Plugin;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlRootElement;
-import java.util.HashMap;
 
 /**
  *
@@ -22,7 +21,7 @@ public class UserExtension extends Extension implements Comparable
     private boolean canEnable;
     private boolean canDisable;
     private boolean canDownload;
-    private boolean canVoteUp;
+    private boolean canFavorite;
 
     public UserExtension()
     {
@@ -104,13 +103,13 @@ public class UserExtension extends Extension implements Comparable
         this.canDownload = canDownload;
     }
 
-    public boolean isCanVoteUp()
+    public boolean isCanFavorite()
     {
-        return canVoteUp;
+        return canFavorite;
     }
 
-    public void setCanVoteUp(boolean canVoteUp)
+    public void setCanFavorite(boolean canFavorite)
     {
-        this.canVoteUp = canVoteUp;
+        this.canFavorite = canFavorite;
     }
 }

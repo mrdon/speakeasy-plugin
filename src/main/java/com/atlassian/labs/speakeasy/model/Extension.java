@@ -33,7 +33,7 @@ public class Extension implements Comparable
 
     private int numUsers = 0;
 
-    private int numVotes = 0;
+    private int numFavorites = 0;
 
     private HashMap<String,String> params;
 
@@ -142,14 +142,14 @@ public class Extension implements Comparable
         this.numUsers = numUsers;
     }
 
-    public int getNumVotes()
+    public int getNumFavorites()
     {
-        return numVotes;
+        return numFavorites;
     }
 
-    public void setNumVotes(int numVotes)
+    public void setNumFavorites(int numFavorites)
     {
-        this.numVotes = numVotes;
+        this.numFavorites = numFavorites;
     }
 
     public void setForkedPluginKey(String ntohing)

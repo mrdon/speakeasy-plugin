@@ -299,7 +299,7 @@ public class TestUserProfile
     }
 
     @Test
-    public void testVoteUpPlugin() throws IOException, MessagingException
+    public void testFavoritePlugin() throws IOException, MessagingException
     {
         File jar = buildSimplePluginFile("test", "First Plugin");
 
@@ -307,25 +307,23 @@ public class TestUserProfile
                 .openInstallDialog()
                 .uploadPlugin(jar);
 
-        assertFalse(page.canVoteUp("test"));
-        assertEquals(0, page.getPlugins().get("test").getVotes());
+        assertFalse(page.isFavorite("test"));
+        assertEquals(0, page.getPlugins().get("test").getFavorites());
         logout();
         page = product.visit(LoginPage.class)
                .login("barney", "barney", SpeakeasyUserPage.class)
-                .voteUp("test");
-        if (page.canVoteUp("plugin-tests"))
-        {
-            page.voteUp("plugin-tests");
-        }
+                .favorite("plugin-tests")
+                .favorite("test");
 
         List<String> messages = page.getSuccessMessages();
         assertEquals(1, messages.size());
-        assertTrue(messages.get(0).contains("was voted up"));
-        assertEquals(1, page.getPlugins().get("test").getVotes());
-        assertEmailExists("admin@example.com", "Barney User has voted", asList(
+        assertTrue(messages.get(0).contains("was marked as"));
+        assertEquals(1, page.getPlugins().get("test").getFavorites());
+        assertEmailExists("admin@example.com", "Barney User has marked", asList(
                 "you may want to try",
                 "plugin-tests"
         ));
+        page.unfavorite("plugin-tests");
         logout();
         product.visit(LoginPage.class)
            .loginAsSysAdmin(SpeakeasyUserPage.class)

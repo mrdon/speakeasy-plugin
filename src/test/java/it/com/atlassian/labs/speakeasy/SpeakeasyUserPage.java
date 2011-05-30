@@ -8,14 +8,12 @@ import com.atlassian.pageobjects.binder.Init;
 import com.atlassian.pageobjects.binder.WaitUntil;
 import com.atlassian.webdriver.AtlassianWebDriver;
 import com.google.common.base.Function;
-import org.apache.commons.lang.Validate;
 import org.openqa.selenium.By;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 
 import javax.inject.Inject;
-import java.io.File;
 import java.io.IOException;
 import java.util.*;
 
@@ -90,7 +88,7 @@ public class SpeakeasyUserPage implements Page
                 row.setDescription(e.findElement(By.className("plugin-description")).getText());
                 row.setAuthor(e.findElement(By.className("plugin-author")).getText());
                 row.setUsers(parseInt(e.findElement(By.className("plugin-users")).getText()));
-                row.setVotes(parseInt(e.findElement(By.className("plugin-votes")).getText()));
+                row.setFavorites(parseInt(e.findElement(By.className("plugin-favorites")).getText()));
                 row.setVersion(e.findElement(By.className("plugin-version")).getText());
                 plugins.put(key,row);
             }
@@ -257,19 +255,28 @@ public class SpeakeasyUserPage implements Page
         return pageBinder.bind(IdeDialog.class, pluginKey, true);
     }
 
-    public SpeakeasyUserPage voteUp(String pluginKey)
+    public SpeakeasyUserPage favorite(String pluginKey)
     {
         WebElement pluginRow = getPluginRow(pluginKey);
-        WebElement voteUp = pluginRow.findElement(By.className("vote-up-icon"));
-        voteUp.click();
+        WebElement link = pluginRow.findElement(By.className("unfavorite-icon"));
+        link.click();
         waitForMessages();
         return this;
     }
 
-    public boolean canVoteUp(String pluginKey)
+    public SpeakeasyUserPage unfavorite(String pluginKey)
     {
         WebElement pluginRow = getPluginRow(pluginKey);
-        return driver.elementIsVisibleAt(By.className("vote-up-icon"), pluginRow);
+        WebElement link = pluginRow.findElement(By.className("favorite-icon"));
+        link.click();
+        waitForMessages();
+        return this;
+    }
+
+    public boolean isFavorite(String pluginKey)
+    {
+        WebElement pluginRow = getPluginRow(pluginKey);
+        return driver.elementIsVisible(By.className("favorite-icon"));
     }
 
     public static class PluginRow
@@ -280,7 +287,7 @@ public class SpeakeasyUserPage implements Page
         private int users;
         private String description;
         private String version;
-        private int votes;
+        private int favorites;
 
         public String getKey()
         {
@@ -342,14 +349,14 @@ public class SpeakeasyUserPage implements Page
             this.version = version;
         }
 
-        public void setVotes(int votes)
+        public void setFavorites(int marks)
         {
-            this.votes = votes;
+            this.favorites = marks;
         }
 
-        public int getVotes()
+        public int getFavorites()
         {
-            return votes;
+            return favorites;
         }
     }
 }

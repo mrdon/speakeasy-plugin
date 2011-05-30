@@ -17,12 +17,8 @@ import com.atlassian.labs.speakeasy.util.exec.Operation;
 import com.atlassian.plugin.ModuleDescriptor;
 import com.atlassian.plugin.Plugin;
 import com.atlassian.plugin.PluginAccessor;
-import com.atlassian.plugin.webresource.WebResourceManager;
-import com.atlassian.sal.api.ApplicationProperties;
 import com.atlassian.sal.api.user.UserManager;
 import com.google.common.base.Function;
-import com.google.common.base.Predicate;
-import org.osgi.framework.BundleContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -125,7 +121,7 @@ public class ExtensionOperationManager
             }
         }
         disallowAllPluginAccess(pluginKey);
-        data.clearVotes(pluginKey);
+        data.clearFavorites(pluginKey);
         pluginSystemManager.uninstall(pluginKey, user);
         eventPublisher.publish(new PluginUninstalledEvent(pluginKey)
             .setUserName(user)
@@ -167,11 +163,18 @@ public class ExtensionOperationManager
         return installedPluginKey;
     }
 
-    public String voteUp(Extension ex, String user)
+    public String favorite(Extension ex, String user)
     {
         String pluginKey = ex.getKey();
-        data.voteUp(pluginKey, user);
-        sendVoteUpEmail(ex, user);
+        data.favorite(pluginKey, user);
+        sendFavoritedEmail(ex, user);
+        return pluginKey;
+    }
+
+    public String unfavorite(Extension ex, String user)
+    {
+        String pluginKey = ex.getKey();
+        data.unfavorite(pluginKey, user);
         return pluginKey;
     }
 
@@ -185,12 +188,12 @@ public class ExtensionOperationManager
         return pluginKey;
     }
 
-    private void sendVoteUpEmail(final Extension extension, final String user)
+    private void sendFavoritedEmail(final Extension extension, final String user)
     {
         final String userFullName = productAccessor.getUserFullName(user);
         final String pluginKey = extension.getKey();
         String pluginAuthor = extension.getAuthor();
-        if (pluginAuthor != null && userManager.getUserProfile(pluginAuthor) != null)
+        if (pluginAuthor != null && !user.equals(pluginAuthor) && userManager.getUserProfile(pluginAuthor) != null)
         {
             final Set<Extension> commonExtensions = new HashSet<Extension>();
             final Set<Extension> suggestedExtensions = new HashSet<Extension>();
@@ -201,8 +204,8 @@ public class ExtensionOperationManager
                     continue;
                 }
 
-                List<String> votedList = data.getVotes(plugin.getKey());
-                if (votedList.contains(pluginAuthor))
+                List<String> favoritedKeys = data.getFavorites(plugin.getKey());
+                if (favoritedKeys.contains(pluginAuthor))
                 {
                     commonExtensions.add(plugin);
                 }
@@ -211,14 +214,14 @@ public class ExtensionOperationManager
                     suggestedExtensions.add(plugin);
                 }
             }
-            productAccessor.sendEmail(pluginAuthor, "email/voteup-subject.vm", "email/voteup-body.vm", new HashMap<String, Object>()
+            productAccessor.sendEmail(pluginAuthor, "email/favorited-subject.vm", "email/favorited-body.vm", new HashMap<String, Object>()
             {{
                     put("plugin", extension);
-                    put("voterFullName", userFullName);
-                    put("voter", user);
+                    put("favoriteMarkerFullName", userFullName);
+                    put("favoriteMarker", user);
                     put("commonExtensions", commonExtensions);
                     put("suggestedExtensions", suggestedExtensions);
-                    put("voteTotal", data.getVotes(pluginKey).size());
+                    put("favoriteTotal", data.getFavorites(pluginKey).size());
                 }});
         }
     }

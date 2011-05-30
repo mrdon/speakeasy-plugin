@@ -100,15 +100,16 @@
    margin-left: 20px;
 }
 
-#plugins-table div.vote-up-icon {
+#plugins-table div.unfavorite-icon {
     width: 16px;
     height: 20px;
-    background: url("@modulePrefix/speakeasy/user/images/vote_up.png") no-repeat center;
+    background: url("@modulePrefix/speakeasy/user/images/star_grey_16.png") no-repeat center;
 }
 
-#plugins-table div.voted{
+#plugins-table div.favorite-icon{
     width: 16px;
     height: 20px;
+    background: url("@modulePrefix/speakeasy/user/images/star_yellow_16.png") no-repeat center;
 }
 #plugins-table div.broken-icon {
     width: 16px;
