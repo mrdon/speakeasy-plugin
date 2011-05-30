@@ -87,25 +87,27 @@
         <dispatcher>INCLUDE</dispatcher>
     </rest>
 
-    <component key="speakeasyManager" class="com.atlassian.labs.speakeasy.SpeakeasyManager"/>
-    <component key="permissionManager" class="com.atlassian.labs.speakeasy.PermissionManager"/>
-    <component key="settingsManager" class="com.atlassian.labs.speakeasy.SettingsManager"/>
+    <component key="speakeasyManager" class="com.atlassian.labs.speakeasy.SpeakeasyService"/>
+    <component key="permissionManager" class="com.atlassian.labs.speakeasy.manager.PermissionManager"/>
+    <component key="settingsManager" class="com.atlassian.labs.speakeasy.manager.SettingsManager"/>
     <component key="descriptorGeneratorManager" class="com.atlassian.labs.speakeasy.descriptor.DescriptorGeneratorManager" />
     <component key="commonJsModulesAccessor" class="com.atlassian.labs.speakeasy.commonjs.CommonJsModulesAccessor" />
-    <component key="zipTransformer" class="com.atlassian.labs.speakeasy.install.convention.ZipTransformer"/>
-    <component key="pluginManager" class="com.atlassian.labs.speakeasy.install.PluginManager"/>
+    <component key="zipTransformer" class="com.atlassian.labs.speakeasy.manager.convention.ZipTransformer"/>
+    <component key="pluginManager" class="com.atlassian.labs.speakeasy.manager.PluginSystemManager"/>
     <component key="classPrefixModuleFactory" class="com.atlassian.plugin.module.ClassPrefixModuleFactory"/>
     <component key="speakeasyData" class="com.atlassian.labs.speakeasy.data.SpeakeasyData"/>
     <component key="pomProperties" class="com.atlassian.labs.speakeasy.util.PomProperties"/>
     <component key="userProfileRenderer" class="com.atlassian.labs.speakeasy.ui.UserProfileRenderer"/>
-    <component key="jsonHandler" class="com.atlassian.labs.speakeasy.install.convention.JsonManifestHandler" />
-    <component key="jsonParser" class="com.atlassian.labs.speakeasy.install.convention.JsonToElementParser" />
+    <component key="jsonHandler" class="com.atlassian.labs.speakeasy.manager.convention.JsonManifestHandler" />
+    <component key="jsonParser" class="com.atlassian.labs.speakeasy.manager.convention.JsonToElementParser" />
     <component key="gitRepositoryManager" class="com.atlassian.labs.speakeasy.git.GitRepositoryManager" />
     <component key="git-resolver" class="com.atlassian.labs.speakeasy.git.SpeakeasyRepositoryResolver" />
-    <component key="remotePluginBuilder" class="com.atlassian.labs.speakeasy.RemotePluginBuilder" />
+    <component key="remotePluginBuilder" class="com.atlassian.labs.speakeasy.manager.ExtensionBuilder" />
+    <component key="extensionManager" class="com.atlassian.labs.speakeasy.manager.ExtensionManager" />
+    <component key="extensionOperationManager" class="com.atlassian.labs.speakeasy.manager.ExtensionOperationManager" />
 
-    <component key="conventionDescriptorGenerator" class="com.atlassian.labs.speakeasy.install.convention.ConventionDescriptorGeneratorServiceFactory" public="true">
-        <interface>com.atlassian.labs.speakeasy.install.convention.external.ConventionDescriptorGenerator</interface>
+    <component key="conventionDescriptorGenerator" class="com.atlassian.labs.speakeasy.manager.convention.ConventionDescriptorGeneratorServiceFactory" public="true">
+        <interface>com.atlassian.labs.speakeasy.manager.convention.external.ConventionDescriptorGenerator</interface>
     </component>
 
     <component-import key="jsonMarshaller" interface="com.atlassian.plugins.rest.common.json.JaxbJsonMarshaller"/>

@@ -1,6 +1,5 @@
 package com.atlassian.labs.speakeasy.util;
 
-import com.atlassian.labs.speakeasy.RemotePluginBuilder;
 import com.atlassian.plugin.ModuleDescriptor;
 import com.atlassian.plugin.Plugin;
 import com.atlassian.plugin.osgi.factory.OsgiPlugin;

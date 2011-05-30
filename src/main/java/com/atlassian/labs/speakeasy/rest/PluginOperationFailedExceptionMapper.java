@@ -1,9 +1,8 @@
 package com.atlassian.labs.speakeasy.rest;
 
-import com.atlassian.labs.speakeasy.SpeakeasyManager;
-import com.atlassian.labs.speakeasy.install.PluginOperationFailedException;
+import com.atlassian.labs.speakeasy.SpeakeasyService;
+import com.atlassian.labs.speakeasy.manager.PluginOperationFailedException;
 import com.atlassian.sal.api.user.UserManager;
-import org.netbeans.lib.cvsclient.commandLine.command.log;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -17,13 +16,13 @@ import javax.ws.rs.ext.Provider;
 @Provider
 public class PluginOperationFailedExceptionMapper implements ExceptionMapper<PluginOperationFailedException>
 {
-    private final SpeakeasyManager speakeasyManager;
+    private final SpeakeasyService speakeasyService;
     private final UserManager userManager;
     private static final Logger log = LoggerFactory.getLogger(PluginOperationFailedExceptionMapper.class);
 
-    public PluginOperationFailedExceptionMapper(SpeakeasyManager speakeasyManager, UserManager userManager)
+    public PluginOperationFailedExceptionMapper(SpeakeasyService speakeasyService, UserManager userManager)
     {
-        this.speakeasyManager = speakeasyManager;
+        this.speakeasyService = speakeasyService;
         this.userManager = userManager;
     }
 
@@ -33,7 +32,7 @@ public class PluginOperationFailedExceptionMapper implements ExceptionMapper<Plu
         {
             try
             {
-                exception.setPlugin(speakeasyManager.getRemotePlugin(exception.getPluginKey(), userManager.getRemoteUsername()));
+                exception.setPlugin(speakeasyService.getRemotePlugin(exception.getPluginKey(), userManager.getRemoteUsername()));
             }
             catch (Throwable t)
             {

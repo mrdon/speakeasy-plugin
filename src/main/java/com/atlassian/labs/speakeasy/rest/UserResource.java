@@ -1,6 +1,6 @@
 package com.atlassian.labs.speakeasy.rest;
 
-import com.atlassian.labs.speakeasy.SpeakeasyManager;
+import com.atlassian.labs.speakeasy.SpeakeasyService;
 import com.atlassian.labs.speakeasy.UnauthorizedAccessException;
 import com.atlassian.labs.speakeasy.model.UserPlugins;
 import com.atlassian.sal.api.user.UserManager;
@@ -22,12 +22,12 @@ import static java.util.Arrays.asList;
 @Path("/user")
 public class UserResource
 {
-    private final SpeakeasyManager speakeasyManager;
+    private final SpeakeasyService speakeasyService;
     private final UserManager userManager;
 
-    public UserResource(SpeakeasyManager speakeasyManager, UserManager userManager)
+    public UserResource(SpeakeasyService speakeasyService, UserManager userManager)
     {
-        this.speakeasyManager = speakeasyManager;
+        this.speakeasyService = speakeasyService;
         this.userManager = userManager;
     }
 
@@ -36,7 +36,7 @@ public class UserResource
     @Produces("application/json")
     public Response getPlugins() throws UnauthorizedAccessException
     {
-        return Response.ok(speakeasyManager.getRemotePluginList(userManager.getRemoteUsername())).build();
+        return Response.ok(speakeasyService.getRemotePluginList(userManager.getRemoteUsername())).build();
     }
 
     @PUT
@@ -45,8 +45,8 @@ public class UserResource
     public Response enableAccess(@PathParam("pluginKey") String pluginKey) throws UnauthorizedAccessException
     {
         String user = userManager.getRemoteUsername();
-        List<String> affectedKeys = speakeasyManager.allowUserAccess(pluginKey, user);
-        UserPlugins entity = speakeasyManager.getRemotePluginList(user, pluginKey);
+        List<String> affectedKeys = speakeasyService.enableExtension(pluginKey, user);
+        UserPlugins entity = speakeasyService.getRemotePluginList(user, pluginKey);
         entity.setUpdated(affectedKeys);
         return Response.ok().entity(entity).build();
     }
@@ -57,9 +57,9 @@ public class UserResource
     public Response disableAccess(@PathParam("pluginKey") String pluginKey) throws UnauthorizedAccessException
     {
         String user = userManager.getRemoteUsername();
-        String affectedKey = speakeasyManager.disallowUserAccess(pluginKey, user);
+        String affectedKey = speakeasyService.disableExtension(pluginKey, user);
 
-        UserPlugins entity = speakeasyManager.getRemotePluginList(user, pluginKey);
+        UserPlugins entity = speakeasyService.getRemotePluginList(user, pluginKey);
         if (affectedKey != null)
         {
             entity.setUpdated(asList(affectedKey));

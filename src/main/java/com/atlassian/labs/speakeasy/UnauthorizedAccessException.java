@@ -8,7 +8,7 @@ import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlRootElement;
 
 @XmlRootElement
-public class UnauthorizedAccessException extends Exception
+public class UnauthorizedAccessException extends RuntimeException
 {
     @XmlAttribute
     private final String username;

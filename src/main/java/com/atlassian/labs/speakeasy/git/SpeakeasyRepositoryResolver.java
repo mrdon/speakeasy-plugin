@@ -1,7 +1,6 @@
 package com.atlassian.labs.speakeasy.git;
 
-import com.atlassian.labs.speakeasy.SpeakeasyManager;
-import com.atlassian.labs.speakeasy.UnauthorizedAccessException;
+import com.atlassian.labs.speakeasy.SpeakeasyService;
 import com.atlassian.sal.api.user.UserManager;
 import org.eclipse.jgit.errors.RepositoryNotFoundException;
 import org.eclipse.jgit.lib.Repository;
@@ -17,14 +16,14 @@ import javax.servlet.http.HttpServletRequest;
  */
 public class SpeakeasyRepositoryResolver implements RepositoryResolver<HttpServletRequest>
 {
-    private final SpeakeasyManager speakeasyManager;
+    private final SpeakeasyService speakeasyService;
     private final GitRepositoryManager gitRepositoryManager;
     private final FileResolver resolver;
     private final UserManager userManager;
 
-    public SpeakeasyRepositoryResolver(SpeakeasyManager speakeasyManager, UserManager userManager, GitRepositoryManager gitRepositoryManager)
+    public SpeakeasyRepositoryResolver(SpeakeasyService speakeasyService, UserManager userManager, GitRepositoryManager gitRepositoryManager)
     {
-        this.speakeasyManager = speakeasyManager;
+        this.speakeasyService = speakeasyService;
         this.userManager = userManager;
         this.gitRepositoryManager = gitRepositoryManager;
         this.resolver = new FileResolver(this.gitRepositoryManager.getRepositoriesDir(), true);
@@ -35,7 +34,7 @@ public class SpeakeasyRepositoryResolver implements RepositoryResolver<HttpServl
     {
         String pluginKey = name.endsWith(".git") ? name.substring(0, name.length() - 4) : name;
         String userName = userManager.getRemoteUsername(req);
-        if (speakeasyManager.canAuthorExtensions(userName))
+        if (speakeasyService.canAuthorExtensions(userName))
         {
             gitRepositoryManager.ensureRepository(pluginKey);
             return resolver.open(req, pluginKey);

@@ -1,11 +1,11 @@
 package com.atlassian.labs.speakeasy.rest;
 
 import com.atlassian.labs.speakeasy.PluginType;
-import com.atlassian.labs.speakeasy.SpeakeasyManager;
+import com.atlassian.labs.speakeasy.SpeakeasyService;
 import com.atlassian.labs.speakeasy.UnauthorizedAccessException;
-import com.atlassian.labs.speakeasy.install.PluginOperationFailedException;
+import com.atlassian.labs.speakeasy.manager.PluginOperationFailedException;
+import com.atlassian.labs.speakeasy.model.UserExtension;
 import com.atlassian.labs.speakeasy.model.PluginIndex;
-import com.atlassian.labs.speakeasy.model.RemotePlugin;
 import com.atlassian.labs.speakeasy.model.UserPlugins;
 import com.atlassian.plugins.rest.common.json.JaxbJsonMarshaller;
 import com.atlassian.plugins.rest.common.security.RequiresXsrfCheck;
@@ -44,17 +44,17 @@ import java.util.List;
 @Path("/plugins")
 public class PluginsResource
 {
-    private final SpeakeasyManager speakeasyManager;
+    private final SpeakeasyService speakeasyService;
     private final UserManager userManager;
     private final JaxbJsonMarshaller jaxbJsonMarshaller;
     private final XsrfTokenValidator xsrfTokenValidator;
     private static final Logger log = LoggerFactory.getLogger(PluginsResource.class);
 
-    public PluginsResource(UserManager userManager, JaxbJsonMarshaller jaxbJsonMarshaller, SpeakeasyManager speakeasyManager, XsrfTokenValidator xsrfTokenValidator)
+    public PluginsResource(UserManager userManager, JaxbJsonMarshaller jaxbJsonMarshaller, SpeakeasyService speakeasyService, XsrfTokenValidator xsrfTokenValidator)
     {
         this.userManager = userManager;
         this.jaxbJsonMarshaller = jaxbJsonMarshaller;
-        this.speakeasyManager = speakeasyManager;
+        this.speakeasyService = speakeasyService;
         this.xsrfTokenValidator = xsrfTokenValidator;
     }
 
@@ -64,7 +64,7 @@ public class PluginsResource
     public Response atom() throws UnauthorizedAccessException
     {
         String user = userManager.getRemoteUsername();
-        return Response.ok().entity(speakeasyManager.getPluginFeed(user)).build();
+        return Response.ok().entity(speakeasyService.getPluginFeed(user)).build();
     }
 
     @DELETE
@@ -73,7 +73,7 @@ public class PluginsResource
     public Response uninstallPlugin(@PathParam("pluginKey") String pluginKey) throws UnauthorizedAccessException
     {
         String user = userManager.getRemoteUsername();
-        UserPlugins entity = speakeasyManager.uninstallPlugin(pluginKey, user);
+        UserPlugins entity = speakeasyService.uninstallPlugin(pluginKey, user);
         return Response.ok().entity(entity).build();
     }
 
@@ -83,7 +83,7 @@ public class PluginsResource
     public Response getAsAmpsProject(@PathParam("pluginKey") String pluginKey) throws UnauthorizedAccessException
     {
         String user = userManager.getRemoteUsername();
-        File file = speakeasyManager.getPluginAsProject(pluginKey, user);
+        File file = speakeasyService.getPluginAsProject(pluginKey, user);
         return Response.ok().entity(file).build();
     }
 
@@ -93,7 +93,7 @@ public class PluginsResource
     public Response getScreenshot(@PathParam("pluginKey") String pluginKey) throws UnauthorizedAccessException, URISyntaxException
     {
         String user = userManager.getRemoteUsername();
-        String url = speakeasyManager.getScreenshotUrl(pluginKey, user);
+        String url = speakeasyService.getScreenshotUrl(pluginKey, user);
         return Response.status(301).location(new URI(url)).build();
     }
 
@@ -106,7 +106,7 @@ public class PluginsResource
         int pos = pluginKeyAndExtension.lastIndexOf('.');
         if (pos > 0)
         {
-            File file = speakeasyManager.getPluginArtifact(pluginKeyAndExtension.substring(0, pos), user);
+            File file = speakeasyService.getPluginArtifact(pluginKeyAndExtension.substring(0, pos), user);
             return Response.ok().entity(file).build();
         }
         else
@@ -121,7 +121,7 @@ public class PluginsResource
     @RequiresXsrfCheck
     public Response fork(@PathParam("pluginKey") String pluginKey, @FormParam("description") String description) throws UnauthorizedAccessException
     {
-        UserPlugins entity = speakeasyManager.fork(pluginKey, userManager.getRemoteUsername(), description);
+        UserPlugins entity = speakeasyService.fork(pluginKey, userManager.getRemoteUsername(), description);
         return Response.ok().entity(entity).build();
     }
 
@@ -131,7 +131,7 @@ public class PluginsResource
     @RequiresXsrfCheck
     public Response voteUp(@PathParam("pluginKey") String pluginKey) throws UnauthorizedAccessException
     {
-        UserPlugins entity = speakeasyManager.voteUp(pluginKey, userManager.getRemoteUsername());
+        UserPlugins entity = speakeasyService.voteUp(pluginKey, userManager.getRemoteUsername());
         return Response.ok().entity(entity).build();
     }
 
@@ -141,7 +141,7 @@ public class PluginsResource
     @RequiresXsrfCheck
     public Response create(@PathParam("pluginKey") String pluginKey, @FormParam("description") String description, @FormParam("name") String name) throws UnauthorizedAccessException
     {
-        UserPlugins entity = speakeasyManager.createExtension(pluginKey, PluginType.ZIP, userManager.getRemoteUsername(), description, name);
+        UserPlugins entity = speakeasyService.createExtension(pluginKey, PluginType.ZIP, userManager.getRemoteUsername(), description, name);
         return Response.ok().entity(entity).build();
     }
 
@@ -152,7 +152,7 @@ public class PluginsResource
     {
         String user = userManager.getRemoteUsername();
         PluginIndex index = new PluginIndex();
-        index.setFiles(speakeasyManager.getPluginFileNames(pluginKey, user));
+        index.setFiles(speakeasyService.getPluginFileNames(pluginKey, user));
         return Response.ok().entity(index).build();
     }
 
@@ -162,7 +162,7 @@ public class PluginsResource
     public Response getFileText(@PathParam("pluginKey") String pluginKey, @QueryParam("path") String fileName) throws UnauthorizedAccessException
     {
         String user = userManager.getRemoteUsername();
-        Object pluginFile = speakeasyManager.getPluginFile(pluginKey, fileName, user);
+        Object pluginFile = speakeasyService.getPluginFile(pluginKey, fileName, user);
         return Response.ok().entity(pluginFile).build();
     }
 
@@ -172,7 +172,7 @@ public class PluginsResource
     public Response getFileBinary(@PathParam("pluginKey") String pluginKey, @QueryParam("path") String fileName) throws UnauthorizedAccessException
     {
         String user = userManager.getRemoteUsername();
-        Object pluginFile = speakeasyManager.getPluginFile(pluginKey, fileName, user);
+        Object pluginFile = speakeasyService.getPluginFile(pluginKey, fileName, user);
         return Response.ok().entity(pluginFile).build();
     }
 
@@ -183,8 +183,8 @@ public class PluginsResource
     public Response saveAndRebuild(@PathParam("pluginKey") String pluginKey, @QueryParam("path") String fileName, String contents) throws UnauthorizedAccessException
     {
         String user = userManager.getRemoteUsername();
-        final RemotePlugin remotePlugin = speakeasyManager.saveAndRebuild(pluginKey, fileName, contents, user);
-        return Response.ok().entity(remotePlugin).build();
+        final UserExtension extension = speakeasyService.saveAndRebuild(pluginKey, fileName, contents, user);
+        return Response.ok().entity(extension).build();
     }
 
     @POST
@@ -197,7 +197,7 @@ public class PluginsResource
         {
             xsrfTokenValidator.validateFormEncodedToken(request);
             File uploadedFile = extractPluginFile(request);
-            UserPlugins plugins = speakeasyManager.installPlugin(uploadedFile, user);
+            UserPlugins plugins = speakeasyService.installPlugin(uploadedFile, user);
             return Response.ok().entity(wrapBodyInTextArea(jaxbJsonMarshaller.marshal(plugins))).build();
         }
         catch (PluginOperationFailedException e)
@@ -222,7 +222,7 @@ public class PluginsResource
         try
         {
             obj.put("error", e.toString());
-            obj.put("plugins", new JSONObject(jaxbJsonMarshaller.marshal(speakeasyManager.getRemotePluginList(user))));
+            obj.put("plugins", new JSONObject(jaxbJsonMarshaller.marshal(speakeasyService.getRemotePluginList(user))));
         }
         catch (JSONException e1)
         {

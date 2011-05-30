@@ -1,11 +1,10 @@
 package com.atlassian.labs.speakeasy.model;
 
-import com.atlassian.labs.speakeasy.install.convention.JsonVendor;
+import com.atlassian.labs.speakeasy.manager.convention.JsonVendor;
 
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
-import java.util.List;
 import java.util.Map;
 
 /**

@@ -9,6 +9,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+import static com.google.common.collect.Lists.newArrayList;
+
 /**
  *
  */
@@ -27,7 +29,6 @@ public class SpeakeasyData
     {
         return pluginSettingsFactory.createGlobalSettings();
     }
-
 
     public String getSpeakeasyVersion()
     {
@@ -51,22 +52,27 @@ public class SpeakeasyData
     public List<String> getUsersList(String pluginKey)
     {
         String key = createAccessKey(pluginKey, "users");
-         List<String> accessList = (List<String>) getPluginSettings().get(key);
-        if (accessList == null)
-        {
-            accessList = new ArrayList<String>();
-        }
+        List<String> accessList = getListCopy(key);
         return accessList;
+    }
+
+    private List<String> getListCopy(String key)
+    {
+        List<String> original = (List<String>) getPluginSettings().get(key);
+        if (original == null)
+        {
+            return new ArrayList<String>();
+        }
+        else
+        {
+            return newArrayList(original);
+        }
     }
 
     public List<String> getVotes(String pluginKey)
     {
         String key = createAccessKey(pluginKey, "votes");
-        List<String> votesList = (List<String>) getPluginSettings().get(key);
-        if (votesList == null)
-        {
-            votesList = new ArrayList<String>();
-        }
+        List<String> votesList = getListCopy(key);
         return votesList;
     }
 
@@ -104,7 +110,7 @@ public class SpeakeasyData
 
     public void voteUp(String pluginKey, String user)
     {
-        // todo: voting from two threads could miss a vote
+        // concurrent votes handled through lock higher up
         String key = createAccessKey(pluginKey, "votes");
         final List<String> votes = getVotes(pluginKey);
         if (votes.indexOf(user) == -1)

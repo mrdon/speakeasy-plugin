@@ -1,6 +1,6 @@
 package com.atlassian.labs.speakeasy.git;
 
-import com.atlassian.labs.speakeasy.SpeakeasyManager;
+import com.atlassian.labs.speakeasy.SpeakeasyService;
 import com.atlassian.labs.speakeasy.UnauthorizedAccessException;
 import com.atlassian.sal.api.user.UserManager;
 import org.eclipse.jgit.http.server.GitServlet;
@@ -24,15 +24,15 @@ import static org.eclipse.jgit.http.server.ServletUtils.ATTRIBUTE_REPOSITORY;
  */
 public class ExtensionGitServlet extends GitServlet
 {
-    private final SpeakeasyManager speakeasyManager;
+    private final SpeakeasyService speakeasyService;
     private final SpeakeasyRepositoryResolver speakeasyRepositoryResolver;
     private final GitRepositoryManager gitRepositoryManager;
     private final UserManager userManager;
 
-    public ExtensionGitServlet(UserManager userManager, SpeakeasyManager speakeasyManager, SpeakeasyRepositoryResolver speakeasyRepositoryResolver, GitRepositoryManager gitRepositoryManager)
+    public ExtensionGitServlet(UserManager userManager, SpeakeasyService speakeasyService, SpeakeasyRepositoryResolver speakeasyRepositoryResolver, GitRepositoryManager gitRepositoryManager)
     {
         this.userManager = userManager;
-        this.speakeasyManager = speakeasyManager;
+        this.speakeasyService = speakeasyService;
         this.speakeasyRepositoryResolver = speakeasyRepositoryResolver;
         this.gitRepositoryManager = gitRepositoryManager;
     }
@@ -77,7 +77,7 @@ public class ExtensionGitServlet extends GitServlet
         public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException
         {
             String user = userManager.getRemoteUsername((HttpServletRequest) request);
-            if (speakeasyManager.canAuthorExtensions(user))
+            if (speakeasyService.canAuthorExtensions(user))
             {
                 chain.doFilter(request, response);
             }
@@ -94,16 +94,17 @@ public class ExtensionGitServlet extends GitServlet
             if (repo != null)
             {
                 String pluginKey = repo.getWorkTree().getName();
-                if (speakeasyManager.canAuthorExtensions(user) &&
-                        (!speakeasyManager.doesPluginExist(pluginKey) || speakeasyManager.canEditPlugin(pluginKey, user)))
+                if (speakeasyService.canAuthorExtensions(user) &&
+                        (!speakeasyService.doesPluginExist(pluginKey) || speakeasyService.canEditPlugin(pluginKey, user)))
                 {
                     chain.doFilter(request, response);
                     if (req.getRequestURI().endsWith("receive-pack"))
                     {
                         try
                         {
-                            speakeasyManager.installPlugin(
+                            speakeasyService.installPlugin(
                                     gitRepositoryManager.buildJarFromRepository(pluginKey),
+                                    pluginKey,
                                     user);
                         }
                         catch (UnauthorizedAccessException e)

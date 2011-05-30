@@ -3,12 +3,13 @@ package com.atlassian.labs.speakeasy.git;
 import com.atlassian.event.api.EventListener;
 import com.atlassian.event.api.EventPublisher;
 import com.atlassian.labs.speakeasy.event.*;
-import com.atlassian.labs.speakeasy.install.PluginOperationFailedException;
-import com.atlassian.labs.speakeasy.install.ZipWriter;
+import com.atlassian.labs.speakeasy.manager.PluginOperationFailedException;
+import com.atlassian.labs.speakeasy.manager.ZipWriter;
 import com.atlassian.labs.speakeasy.util.BundleUtil;
 import com.atlassian.labs.speakeasy.util.ExtensionValidate;
+import com.atlassian.labs.speakeasy.util.exec.KeyedSyncExecutor;
+import com.atlassian.labs.speakeasy.util.exec.Operation;
 import com.atlassian.sal.api.ApplicationProperties;
-import com.google.common.base.Function;
 import com.google.common.collect.MapMaker;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
@@ -34,8 +35,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.locks.ReadWriteLock;
-import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import static com.atlassian.labs.speakeasy.util.BundleUtil.findBundleForPlugin;
 import static com.atlassian.labs.speakeasy.util.BundleUtil.getPublicBundlePathsRecursive;
@@ -50,16 +49,30 @@ public class GitRepositoryManager implements DisposableBean
     private static final String BUNDLELASTMODIFIED = "bundlelastmodified";
     private final File repositoriesDir;
     private final Map<String,Repository> repositories = new MapMaker().makeMap();
-    private final Map<String,ReadWriteLock> repositoryLocks = new MapMaker().makeComputingMap(new Function<String,ReadWriteLock>()
-    {
-        public ReadWriteLock apply(String from)
-        {
-            return new ReentrantReadWriteLock();
-        }
-    });
     private final BundleContext bundleContext;
     private final EventPublisher eventPublisher;
+    private final KeyedSyncExecutor<Repository,AbstractPluginEvent<?>> executor;
     private static final Logger log = LoggerFactory.getLogger(GitRepositoryManager.class);
+    private static final AbstractPluginEvent SYNC_EVENT = new AbstractPluginEvent("")
+        {
+            @Override
+            public String getMessage()
+            {
+                return "Auto-sync from deployed extension";
+            }
+
+            @Override
+            public String getUserEmail()
+            {
+                return "speakeasy@atlassian.com";
+            }
+
+            @Override
+            public String getUserName()
+            {
+                return "speakeasy";
+            }
+        };
 
     public GitRepositoryManager(BundleContext bundleContext, ApplicationProperties applicationProperties, EventPublisher eventPublisher)
     {
@@ -67,6 +80,20 @@ public class GitRepositoryManager implements DisposableBean
         this.eventPublisher = eventPublisher;
         repositoriesDir = new File(applicationProperties.getHomeDirectory(), "data/speakeasy/repositories");
         repositoriesDir.mkdirs();
+        executor = new KeyedSyncExecutor<Repository, AbstractPluginEvent<?>>()
+        {
+            @Override
+            protected Repository getTarget(String id, AbstractPluginEvent<?> targetContext) throws Exception
+            {
+                return getRepository(id, targetContext);
+            }
+
+            @Override
+            protected boolean allowKey(String id)
+            {
+                return isValidExtensionKey(id);
+            }
+        };
         eventPublisher.register(this);
     }
 
@@ -194,61 +221,9 @@ public class GitRepositoryManager implements DisposableBean
         return paths;
     }
 
-    private <T> T  forRepository(String id, RepositoryOperation<T> repositoryOperation)
-    {
-        return forRepository(id, new AbstractPluginEvent(id)
-        {
-            @Override
-            public String getMessage()
-            {
-                return "Auto-sync from deployed extension";
-            }
-
-            @Override
-            public String getUserEmail()
-            {
-                return "speakeasy@atlassian.com";
-            }
-
-            @Override
-            public String getUserName()
-            {
-                return "speakeasy";
-            }
-        }, repositoryOperation);
-    }
-
-    private <T> T  forRepository(String id, AbstractPluginEvent event, RepositoryOperation<T> repositoryOperation)
-    {
-        // only sync with git repo if a valid plugin key
-        if (isValidExtensionKey(id))
-        {
-            // todo: use read locks for read operations
-            ReadWriteLock lock = repositoryLocks.get(id);
-            lock.writeLock().lock();
-            try
-            {
-                Repository repository = getRepository(id, event);
-                return repositoryOperation.operateOn(repository);
-            }
-            catch (Exception e)
-            {
-                throw new RuntimeException(e);
-            }
-            finally
-            {
-                lock.writeLock().unlock();
-            }
-        }
-        else
-        {
-            return null;
-        }
-    }
-
     public void ensureRepository(String name)
     {
-        forRepository(name, new RepositoryOperation<Void>()
+        executor.forKey(name, SYNC_EVENT, new Operation<Repository, Void>()
         {
             public Void operateOn(Repository repo) throws Exception
             {
@@ -259,15 +234,12 @@ public class GitRepositoryManager implements DisposableBean
 
     public File buildJarFromRepository(String pluginKey)
     {
-        File jar = forRepository(pluginKey, new RepositoryOperation<File>()
+        File jar = executor.forKey(pluginKey, SYNC_EVENT, new Operation<Repository, File>()
         {
             public File operateOn(Repository repo) throws Exception
             {
                 Git git = new Git(repo);
-                git.reset()
-                        .setMode(ResetCommand.ResetType.HARD)
-                        .setRef("HEAD")
-                        .call();
+                git.reset().setMode(ResetCommand.ResetType.HARD).setRef("HEAD").call();
                 for (String path : git.status().call().getUntracked())
                 {
                     new File(repo.getWorkTree(), path).delete();
@@ -285,7 +257,7 @@ public class GitRepositoryManager implements DisposableBean
     @EventListener
     public void onPluginInstalledEvent(final PluginInstalledEvent event)
     {
-        forRepository(event.getPluginKey(), event, new RepositoryOperation<Void>()
+        executor.forKey(event.getPluginKey(), event, new Operation<Repository, Void>()
         {
             public Void operateOn(Repository repo) throws Exception
             {
@@ -299,7 +271,7 @@ public class GitRepositoryManager implements DisposableBean
     @EventListener
     public void onPluginUninstalledEvent(final PluginUninstalledEvent event)
     {
-        forRepository(event.getPluginKey(), event, new RepositoryOperation<Void>()
+        executor.forKey(event.getPluginKey(), event, new Operation<Repository, Void>()
         {
             public Void operateOn(Repository repo) throws Exception
             {
@@ -312,7 +284,7 @@ public class GitRepositoryManager implements DisposableBean
     @EventListener
     public void onPluginUpdatedEvent(final PluginUpdatedEvent event)
     {
-        forRepository(event.getPluginKey(), event, new RepositoryOperation<Void>()
+        executor.forKey(event.getPluginKey(), event, new Operation<Repository, Void>()
         {
             public Void operateOn(Repository repo) throws Exception
             {
@@ -325,7 +297,7 @@ public class GitRepositoryManager implements DisposableBean
     @EventListener
     public void onPluginForkedEvent(final PluginForkedEvent event)
     {
-        forRepository(event.getPluginKey(), event, new RepositoryOperation<Void>()
+        executor.forKey(event.getPluginKey(), event, new Operation<Repository, Void>()
         {
             public Void operateOn(Repository repo) throws Exception
             {
@@ -343,9 +315,9 @@ public class GitRepositoryManager implements DisposableBean
             .setDirectory(new File(repositoriesDir, forkedPluginKey))
             .setBare(false)
             .call();
-        forRepository(forkedPluginKey, new RepositoryOperation()
+        executor.forKey(forkedPluginKey, SYNC_EVENT, new Operation<Repository, Void>()
         {
-            public Object operateOn(Repository repo) throws Exception
+            public Void operateOn(Repository repo) throws Exception
             {
                 // do nothing, we just want to force a sync
                 return null;
@@ -368,11 +340,4 @@ public class GitRepositoryManager implements DisposableBean
     {
         eventPublisher.unregister(this);
     }
-
-    private static interface RepositoryOperation<T>
-    {
-        T operateOn(Repository repo) throws Exception;
-    }
-
-    private static interface ReadOnlyRepositoryOperation extends RepositoryOperation {}
 }

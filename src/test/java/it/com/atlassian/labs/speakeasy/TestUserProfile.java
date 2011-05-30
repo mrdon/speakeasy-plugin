@@ -573,7 +573,7 @@ public class TestUserProfile
         {
             if (!body.contains(toMatch))
             {
-                fail("Couldn't match " + toMatch);
+                fail("Couldn't match '" + toMatch + "' in:\n" + body);
             }
         }
 

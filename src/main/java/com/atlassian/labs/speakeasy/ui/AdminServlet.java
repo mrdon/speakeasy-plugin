@@ -1,11 +1,8 @@
 package com.atlassian.labs.speakeasy.ui;
 
-import com.atlassian.labs.speakeasy.SpeakeasyManager;
+import com.atlassian.labs.speakeasy.SpeakeasyService;
 import com.atlassian.labs.speakeasy.UnauthorizedAccessException;
-import com.atlassian.labs.speakeasy.commonjs.CommonJsModules;
 import com.atlassian.labs.speakeasy.model.Settings;
-import com.atlassian.labs.speakeasy.model.UserPlugins;
-import com.atlassian.plugin.Plugin;
 import com.atlassian.plugin.webresource.UrlMode;
 import com.atlassian.plugin.webresource.WebResourceManager;
 import com.atlassian.plugins.rest.common.json.JaxbJsonMarshaller;
@@ -13,35 +10,31 @@ import com.atlassian.sal.api.user.UserManager;
 import com.atlassian.templaterenderer.TemplateRenderer;
 import com.atlassian.templaterenderer.annotations.HtmlSafe;
 import com.google.common.collect.ImmutableMap;
-import com.samskivert.mustache.Template;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.io.StringReader;
 import java.io.Writer;
-import java.util.Collections;
 import java.util.Map;
 
 import static com.atlassian.labs.speakeasy.util.JavascriptEscaper.escape;
-import static java.util.Collections.singletonMap;
 
 /**
  *
  */
 public class AdminServlet extends HttpServlet
 {
-    private final SpeakeasyManager speakeasyManager;
+    private final SpeakeasyService speakeasyService;
     private final TemplateRenderer templateRenderer;
     private final UserManager userManager;
     private final WebResourceManager webResourceManager;
     private final JaxbJsonMarshaller jsonMarshaller;
 
-    public AdminServlet(SpeakeasyManager speakeasyManager, UserManager userManager, TemplateRenderer templateRenderer, WebResourceManager webResourceManager, JaxbJsonMarshaller jsonMarshaller)
+    public AdminServlet(SpeakeasyService speakeasyService, UserManager userManager, TemplateRenderer templateRenderer, WebResourceManager webResourceManager, JaxbJsonMarshaller jsonMarshaller)
     {
-        this.speakeasyManager = speakeasyManager;
+        this.speakeasyService = speakeasyService;
         this.userManager = userManager;
         this.templateRenderer = templateRenderer;
         this.webResourceManager = webResourceManager;
@@ -63,7 +56,7 @@ public class AdminServlet extends HttpServlet
 
         try
         {
-            final Settings settings = speakeasyManager.getSettings(user);
+            final Settings settings = speakeasyService.getSettings(user);
             resp.setContentType("text/html");
             render("templates/admin.vm", ImmutableMap.<String,Object>builder().
                     put("user", user).

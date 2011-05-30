@@ -1,16 +1,14 @@
 package com.atlassian.labs.speakeasy.ui;
 
-import com.atlassian.labs.speakeasy.SpeakeasyManager;
+import com.atlassian.labs.speakeasy.SpeakeasyService;
 import com.atlassian.labs.speakeasy.UnauthorizedAccessException;
 import com.atlassian.labs.speakeasy.commonjs.CommonJsModules;
 import com.atlassian.labs.speakeasy.commonjs.CommonJsModulesAccessor;
-import com.atlassian.labs.speakeasy.data.SpeakeasyData;
-import com.atlassian.labs.speakeasy.model.RemotePlugin;
+import com.atlassian.labs.speakeasy.model.UserExtension;
 import com.atlassian.labs.speakeasy.model.UserPlugins;
 import com.atlassian.labs.speakeasy.product.ProductAccessor;
 import com.atlassian.plugin.Plugin;
 import com.atlassian.plugin.PluginAccessor;
-import com.atlassian.plugin.servlet.filter.PluginFilterConfig;
 import com.atlassian.plugin.web.WebInterfaceManager;
 import com.atlassian.plugin.webresource.UrlMode;
 import com.atlassian.plugin.webresource.WebResourceManager;
@@ -20,7 +18,6 @@ import com.atlassian.sal.api.xsrf.XsrfTokenAccessor;
 import com.atlassian.sal.api.xsrf.XsrfTokenValidator;
 import com.atlassian.templaterenderer.TemplateRenderer;
 import com.atlassian.templaterenderer.annotations.HtmlSafe;
-import com.google.common.base.Function;
 import com.google.common.base.Predicate;
 import com.google.common.collect.ImmutableMap;
 import com.samskivert.mustache.Mustache;
@@ -47,7 +44,7 @@ public class UserProfileRenderer
 {
 
     private final TemplateRenderer templateRenderer;
-    private final SpeakeasyManager speakeasyManager;
+    private final SpeakeasyService speakeasyService;
     private final UserManager userManager;
     private final WebResourceManager webResourceManager;
     private final CommonJsModulesAccessor commonJsModulesAccessor;
@@ -59,7 +56,7 @@ public class UserProfileRenderer
     private final XsrfTokenValidator xsrfTokenValidator;
 
 
-    public UserProfileRenderer(PluginAccessor pluginAccessor, TemplateRenderer templateRenderer, SpeakeasyManager speakeasyManager, UserManager userManager, WebResourceManager webResourceManager, ProductAccessor productAccessor, CommonJsModulesAccessor commonJsModulesAccessor, WebInterfaceManager webInterfaceManager, XsrfTokenAccessor xsrfTokenAccessor, XsrfTokenValidator xsrfTokenValidator, ApplicationProperties applicationProperties)
+    public UserProfileRenderer(PluginAccessor pluginAccessor, TemplateRenderer templateRenderer, SpeakeasyService speakeasyService, UserManager userManager, WebResourceManager webResourceManager, ProductAccessor productAccessor, CommonJsModulesAccessor commonJsModulesAccessor, WebInterfaceManager webInterfaceManager, XsrfTokenAccessor xsrfTokenAccessor, XsrfTokenValidator xsrfTokenValidator, ApplicationProperties applicationProperties)
     {
         this.templateRenderer = templateRenderer;
         this.commonJsModulesAccessor = commonJsModulesAccessor;
@@ -68,7 +65,7 @@ public class UserProfileRenderer
         this.xsrfTokenValidator = xsrfTokenValidator;
         this.applicationProperties = applicationProperties;
         this.plugin = pluginAccessor.getPlugin("com.atlassian.labs.speakeasy-plugin");
-        this.speakeasyManager = speakeasyManager;
+        this.speakeasyService = speakeasyService;
         this.userManager = userManager;
         this.webResourceManager = webResourceManager;
         this.productAccessor = productAccessor;
@@ -76,7 +73,7 @@ public class UserProfileRenderer
 
     public boolean shouldRender(String userName)
     {
-        return speakeasyManager.canAccessSpeakeasy(userName);
+        return speakeasyService.canAccessSpeakeasy(userName);
     }
 
     public void render(HttpServletRequest req, HttpServletResponse resp, Writer output, boolean useUserProfileDecorator) throws IOException, UnauthorizedAccessException
@@ -89,15 +86,15 @@ public class UserProfileRenderer
 
         webResourceManager.requireResource("com.atlassian.auiplugin:ajs");
         webResourceManager.requireResourcesForContext("speakeasy.user-profile");
-        boolean devMode = speakeasyManager.canAuthorExtensions(user);
+        boolean devMode = speakeasyService.canAuthorExtensions(user);
         if (devMode)
         {
             webResourceManager.requireResource("com.atlassian.labs.speakeasy-plugin:ide");
         }
 
-        final UserPlugins plugins = speakeasyManager.getRemotePluginList(user);
+        final UserPlugins plugins = speakeasyService.getRemotePluginList(user);
         render("templates/user" + (useUserProfileDecorator ? "-with-decorator" : "") + ".vm", ImmutableMap.<String, Object>builder().
-                put("accessList", speakeasyManager.getRemotePluginList(user)).
+                put("accessList", speakeasyService.getRemotePluginList(user)).
                 put("user", user).
                 put("baseUrl", applicationProperties.getBaseUrl()).
                 put("contextPath", req.getContextPath()).
@@ -108,8 +105,8 @@ public class UserProfileRenderer
                 put("staticResourcesPrefix", webResourceManager.getStaticResourcePrefix(UrlMode.RELATIVE)).
                 put("product", productAccessor.getSdkName()).
                 put("devmode", devMode).
-                put("canAuthor", speakeasyManager.canAuthorExtensions(user)).
-                put("doesAnyGroupHaveAccess", speakeasyManager.doesAnyGroupHaveAccess()).
+                put("canAuthor", speakeasyService.canAuthorExtensions(user)).
+                put("doesAnyGroupHaveAccess", speakeasyService.doesAnyGroupHaveAccess()).
                 put("webInterfaceManager", webInterfaceManager).
                 put("webInterfaceContext", Collections.<String, Object>emptyMap()).
                 put("xsrfToken", xsrfTokenAccessor.getXsrfToken(req, resp, true)).
@@ -137,7 +134,7 @@ public class UserProfileRenderer
 
         @HtmlSafe
         @com.atlassian.velocity.htmlsafe.HtmlSafe
-        public String render(RemotePlugin plugin)
+        public String render(UserExtension plugin)
         {
             plugin.getParams().put("screenshotUrl", contextPath + "/rest/speakeasy/1/plugins/screenshot/" + plugin.getKey() + ".png");
             return rowTemplate.execute(plugin);
@@ -178,17 +175,17 @@ public class UserProfileRenderer
         }
     }
 
-    private static class EnabledPluginsFilter implements Predicate<RemotePlugin>
+    private static class EnabledPluginsFilter implements Predicate<UserExtension>
     {
-        public boolean apply(RemotePlugin input)
+        public boolean apply(UserExtension input)
         {
             return input.isEnabled();
         }
     }
 
-    private static class AvailablePluginsFilter implements Predicate<RemotePlugin>
+    private static class AvailablePluginsFilter implements Predicate<UserExtension>
     {
-        public boolean apply(RemotePlugin input)
+        public boolean apply(UserExtension input)
         {
             return !input.isEnabled();
         }

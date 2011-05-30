@@ -305,7 +305,7 @@
                             *;resolution:=optional
                         </Import-Package>
                         <Export-Package>
-                            com.atlassian.labs.speakeasy.install.convention.external
+                            com.atlassian.labs.speakeasy.manager.convention.external
                         </Export-Package>
                     </instructions>
                     <products>

@@ -1,6 +1,6 @@
 package com.atlassian.labs.speakeasy.ui;
 
-import com.atlassian.labs.speakeasy.SpeakeasyManager;
+import com.atlassian.labs.speakeasy.SpeakeasyService;
 import com.atlassian.labs.speakeasy.UnauthorizedAccessException;
 import com.atlassian.labs.speakeasy.product.ProductAccessor;
 import com.atlassian.sal.api.ApplicationProperties;
@@ -17,14 +17,14 @@ import java.io.IOException;
  */
 public class UserOptOutServlet extends HttpServlet
 {
-    private final SpeakeasyManager speakeasyManager;
+    private final SpeakeasyService speakeasyService;
     private final UserManager userManager;
     private final ProductAccessor productAccessor;
     private final ApplicationProperties applicationProperties;
 
-    public UserOptOutServlet(SpeakeasyManager speakeasyManager, UserManager userManager, ProductAccessor productAccessor, ApplicationProperties applicationProperties)
+    public UserOptOutServlet(SpeakeasyService speakeasyService, UserManager userManager, ProductAccessor productAccessor, ApplicationProperties applicationProperties)
     {
-        this.speakeasyManager = speakeasyManager;
+        this.speakeasyService = speakeasyService;
         this.userManager = userManager;
         this.productAccessor = productAccessor;
         this.applicationProperties = applicationProperties;
@@ -38,7 +38,7 @@ public class UserOptOutServlet extends HttpServlet
         {
             try
             {
-                speakeasyManager.disallowAllUserAccess(user);
+                speakeasyService.disableAllExtensions(user);
             }
             catch (UnauthorizedAccessException e)
             {

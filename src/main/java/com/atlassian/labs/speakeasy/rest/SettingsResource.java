@@ -1,17 +1,12 @@
 package com.atlassian.labs.speakeasy.rest;
 
-import com.atlassian.labs.speakeasy.SpeakeasyManager;
+import com.atlassian.labs.speakeasy.SpeakeasyService;
 import com.atlassian.labs.speakeasy.UnauthorizedAccessException;
 import com.atlassian.labs.speakeasy.model.Settings;
-import com.atlassian.labs.speakeasy.model.UserPlugins;
 import com.atlassian.sal.api.user.UserManager;
 
 import javax.ws.rs.*;
-import javax.ws.rs.core.CacheControl;
 import javax.ws.rs.core.Response;
-import java.util.List;
-
-import static java.util.Arrays.asList;
 
 /**
  *
@@ -19,12 +14,12 @@ import static java.util.Arrays.asList;
 @Path("/admin/settings")
 public class SettingsResource
 {
-    private final SpeakeasyManager speakeasyManager;
+    private final SpeakeasyService speakeasyService;
     private final UserManager userManager;
 
-    public SettingsResource(SpeakeasyManager speakeasyManager, UserManager userManager)
+    public SettingsResource(SpeakeasyService speakeasyService, UserManager userManager)
     {
-        this.speakeasyManager = speakeasyManager;
+        this.speakeasyService = speakeasyService;
         this.userManager = userManager;
     }
 
@@ -33,7 +28,7 @@ public class SettingsResource
     @Produces("application/json")
     public Response getSettings() throws UnauthorizedAccessException
     {
-        final Settings settings = speakeasyManager.getSettings(userManager.getRemoteUsername());
+        final Settings settings = speakeasyService.getSettings(userManager.getRemoteUsername());
         return Response.ok(settings).tag(String.valueOf(settings.hashCode())).build();
     }
 
@@ -42,6 +37,6 @@ public class SettingsResource
     @Produces("application/json")
     public Response save(Settings settings) throws UnauthorizedAccessException
     {
-        return Response.ok(speakeasyManager.saveSettings(settings, userManager.getRemoteUsername())).build();
+        return Response.ok(speakeasyService.saveSettings(settings, userManager.getRemoteUsername())).build();
     }
 }

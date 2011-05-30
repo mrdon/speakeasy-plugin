@@ -1,21 +1,17 @@
 package com.atlassian.labs.speakeasy.model;
 
-import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.SortedSetMultimap;
 import com.google.common.collect.TreeMultimap;
-import org.apache.commons.collections.MultiMap;
 
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.TreeSet;
 
-import static java.util.Arrays.asList;
+import static com.google.common.collect.Lists.newArrayList;
 
 /**
  *
@@ -24,30 +20,31 @@ import static java.util.Arrays.asList;
 public class UserPlugins
 {
     private List<String> updated = new ArrayList<String>();
-    private final Collection<RemotePlugin> plugins = new ArrayList<RemotePlugin>();
+    private final Collection<UserExtension> plugins = new ArrayList<UserExtension>();
 
     public UserPlugins()
     {
     }
 
-    public UserPlugins(Collection<RemotePlugin> plugins)
+    public UserPlugins(Iterable<UserExtension> plugins)
     {
-        setPlugins(plugins);
+        setPlugins(newArrayList(plugins));
     }
 
     @XmlElement
-    public Collection<RemotePlugin> getPlugins()
+    public Collection<UserExtension> getPlugins()
     {
         return plugins;
     }
 
-    public void setPlugins(Collection<RemotePlugin> plugins)
+    public void setPlugins(Collection<UserExtension> allPlugins)
     {
         this.plugins.clear();
-        SortedSetMultimap<String,RemotePlugin> pluginTrees = TreeMultimap.create();
-        TreeSet<RemotePlugin> roots = new TreeSet<RemotePlugin>();
-        HashMap<String, RemotePlugin> rootsByKey = new HashMap<String,RemotePlugin>();
-        for (RemotePlugin plugin : plugins)
+        List<UserExtension> plugins = newArrayList(allPlugins);
+        SortedSetMultimap<String,UserExtension> pluginTrees = TreeMultimap.create();
+        TreeSet<UserExtension> roots = new TreeSet<UserExtension>();
+        HashMap<String, UserExtension> rootsByKey = new HashMap<String,UserExtension>();
+        for (UserExtension plugin : plugins)
         {
             if (!plugin.isFork())
             {
@@ -59,7 +56,7 @@ public class UserPlugins
                 pluginTrees.get(plugin.getForkedPluginKey()).add(plugin);
             }
         }
-        for (RemotePlugin root : roots)
+        for (UserExtension root : roots)
         {
             this.plugins.add(root);
             this.plugins.addAll(pluginTrees.get(root.getKey()));
