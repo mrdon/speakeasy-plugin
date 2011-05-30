@@ -155,6 +155,7 @@ public class SpeakeasyService
         {
             public List<String> operateOn(UserExtension repo) throws Exception
             {
+                validateAccessType(repo, "enable", repo.isCanEnable(), user);
                 return extensionOperationManager.enable(repo, user);
             }
         });
@@ -170,6 +171,7 @@ public class SpeakeasyService
         {
             public String operateOn(UserExtension repo) throws Exception
             {
+                validateAccessType(repo, "disable", repo.isCanDisable(), user);
                 return extensionOperationManager.disable(repo, user);
             }
         });
@@ -188,15 +190,15 @@ public class SpeakeasyService
     {
         validateAuthor(user);
         validatePluginExists(pluginKey);
-        // validate is author?
         List<String> keysModified = exec.forKey(pluginKey, user, new Operation<UserExtension,List<String>>()
         {
-            public List<String> operateOn(UserExtension repo) throws Exception
+            public List<String> operateOn(final UserExtension repo) throws Exception
             {
                 return extensionOperationManager.uninstallExtension(repo, user, new Operation<String,Void>()
                 {
                     public Void operateOn(String enablePluginKey) throws Exception
                     {
+                        validateAccessType(repo, "uninstall", repo.isCanUninstall(), user);
                         enableExtension(enablePluginKey, user);
                         return null;
                     }
@@ -211,11 +213,11 @@ public class SpeakeasyService
     {
         validateAuthor(user);
         validatePluginExists(pluginKey);
-        // validate is not author?
         List<String> keysModified = exec.forKey(pluginKey, user, new Operation<UserExtension, List<String>>()
         {
             public List<String> operateOn(UserExtension repo) throws Exception
             {
+                validateAccessType(repo, "fork", repo.isCanFork(), user);
                 return extensionOperationManager.forkExtension(repo, user, description);
             }
         });
@@ -229,10 +231,7 @@ public class SpeakeasyService
         {
             validateAuthor(user);
             UserExtension plugin = getRemotePlugin(pluginKey, user);
-            if (!plugin.isCanDownload())
-            {
-                throw new PluginOperationFailedException("Not authorized to download " + pluginKey, pluginKey);
-            }
+            validateAccessType(plugin, "download", plugin.isCanDownload(), user);
             return pluginSystemManager.getPluginAsProject(pluginKey, plugin.getPluginType(), user);
         }
         catch (PluginOperationFailedException ex)
@@ -251,10 +250,7 @@ public class SpeakeasyService
         {
             validateAuthor(user);
             UserExtension plugin = getRemotePlugin(pluginKey, user);
-            if (!plugin.isCanDownload())
-            {
-                throw new PluginOperationFailedException("Not authorized to download " + pluginKey, pluginKey);
-            }
+            validateAccessType(plugin, "download", plugin.isCanDownload(), user);
             return pluginSystemManager.getPluginArtifact(pluginKey, plugin.getPluginType());
         }
         catch (PluginOperationFailedException ex)
@@ -274,10 +270,6 @@ public class SpeakeasyService
             validateAuthor(user);
             validatePluginExists(pluginKey);
             UserExtension plugin = getRemotePlugin(pluginKey, user);
-            if (!plugin.isCanEdit())
-            {
-                throw new PluginOperationFailedException("Not authorized to view " + pluginKey, pluginKey);
-            }
             return newArrayList(filter(pluginSystemManager.getPluginFileNames(pluginKey, plugin.getPluginType()), new Predicate<String>()
             {
                 public boolean apply(String input)
@@ -303,10 +295,6 @@ public class SpeakeasyService
             validateAuthor(user);
             validatePluginExists(pluginKey);
             UserExtension plugin = getRemotePlugin(pluginKey, user);
-            if (!plugin.isCanEdit())
-            {
-                throw new PluginOperationFailedException("Not authorized to view " + pluginKey, pluginKey);
-            }
             return pluginSystemManager.getPluginFile(pluginKey, plugin.getPluginType(), fileName);
         }
         catch (PluginOperationFailedException ex)
@@ -323,11 +311,11 @@ public class SpeakeasyService
     {
         validateAuthor(user);
         validatePluginExists(pluginKey);
-        // validate is not author?
         String installedKey = exec.forKey(pluginKey, user, new Operation<UserExtension, String>()
         {
             public String operateOn(UserExtension repo) throws Exception
             {
+                validateAccessType(repo, "edit", repo.isCanEdit(), user);
                 return extensionOperationManager.saveAndRebuild(repo, fileName, contents, user);
             }
         });
@@ -343,10 +331,7 @@ public class SpeakeasyService
         {
             public String operateOn(UserExtension repo) throws Exception
             {
-                if (user.equals(getRemotePlugin(pluginKey, user).getAuthor()))
-                {
-                    throw new PluginOperationFailedException("Cannot vote for your own extension.  Nice try though...", pluginKey);
-                }
+                validateAccessType(repo, "vote up", repo.isCanVoteUp(), user);
                 return extensionOperationManager.voteUp(repo, user);
             }
         });
@@ -366,9 +351,9 @@ public class SpeakeasyService
         {
             public String operateOn(UserExtension ext) throws Exception
             {
-                if (ext != null && !user.equals(ext.getAuthor()))
+                if (ext != null)
                 {
-                    throw new PluginOperationFailedException("Cannot install a new version of an extension that you didn't author", expectedPluginKey);
+                    validateAccessType(ext, "upgrade", ext.isCanEdit(), user);
                 }
                 return extensionOperationManager.install(ext, uploadedFile, user);
             }
@@ -465,6 +450,15 @@ public class SpeakeasyService
         }
     }
 
+    private void validateAccessType(Extension ext, String type, boolean allowed, String user) throws UnauthorizedAccessException
+    {
+        if (!allowed)
+        {
+            log.warn("Unauthorized Speakeasy " + type + " access by '" + user + "' for extension '" + ext.getKey() + "'");
+            throw new UnauthorizedAccessException(user, "Cannot " + type + " Speakeasy extension '" + ext.getName() + "' due to lack of permissions");
+        }
+    }
+
     private void validateAdmin(String userName) throws UnauthorizedAccessException
     {
         if (!userManager.isAdmin(userName))
@@ -516,5 +510,4 @@ public class SpeakeasyService
             return !input.isFork() || hasAuthorAccess;
         }
     }
-
 }

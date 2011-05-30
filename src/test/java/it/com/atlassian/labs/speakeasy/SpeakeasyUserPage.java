@@ -266,6 +266,12 @@ public class SpeakeasyUserPage implements Page
         return this;
     }
 
+    public boolean canVoteUp(String pluginKey)
+    {
+        WebElement pluginRow = getPluginRow(pluginKey);
+        return driver.elementIsVisibleAt(By.className("vote-up-icon"), pluginRow);
+    }
+
     public static class PluginRow
     {
         private String key;

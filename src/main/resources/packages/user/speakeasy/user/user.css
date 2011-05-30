@@ -105,6 +105,11 @@
     height: 20px;
     background: url("@modulePrefix/speakeasy/user/images/vote_up.png") no-repeat center;
 }
+
+#plugins-table div.voted{
+    width: 16px;
+    height: 20px;
+}
 #plugins-table div.broken-icon {
     width: 16px;
     height: 20px;

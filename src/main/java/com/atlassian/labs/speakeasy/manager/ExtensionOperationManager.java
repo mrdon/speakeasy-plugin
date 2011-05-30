@@ -62,7 +62,7 @@ public class ExtensionOperationManager
         this.extensionManager = extensionManager;
     }
 
-    public List<String> enable(UserExtension enabledPlugin, String user) throws UnauthorizedAccessException
+    public List<String> enable(Extension enabledPlugin, String user) throws UnauthorizedAccessException
     {
         List<String> affectedPluginKeys = new ArrayList<String>();
         String pluginKey = enabledPlugin.getKey();
@@ -81,7 +81,7 @@ public class ExtensionOperationManager
         for (Plugin plugin : getAllSpeakeasyPlugins())
         {
             if (!plugin.getKey().equals(enabledPlugin.getKey()) && (plugin.getKey().equals(parentKey)
-                    || parentKey.equals(UserExtension.getForkedPluginKey(plugin.getKey()))))
+                    || parentKey.equals(Extension.getForkedPluginKey(plugin.getKey()))))
             {
                 if (removeFromAccessList(plugin.getKey(), user) != null)
                 {
@@ -94,7 +94,7 @@ public class ExtensionOperationManager
         return affectedPluginKeys;
     }
 
-    public String disable(UserExtension repo, String user)
+    public String disable(Extension repo, String user)
     {
         return removeFromAccessList(repo.getKey(), user);
     }
@@ -111,41 +111,33 @@ public class ExtensionOperationManager
         }
     }
 
-    public List<String> uninstallExtension(UserExtension plugin, String user, Operation<String,Void> enableCallback) throws Exception
+    public List<String> uninstallExtension(Extension plugin, String user, Operation<String,Void> enableCallback) throws Exception
     {
         List<String> keysModified = new ArrayList<String>();
         String pluginKey = plugin.getKey();
-            if (plugin == null || !plugin.isCanUninstall())
+        String originalKey = plugin.getForkedPluginKey();
+        if (originalKey != null && pluginAccessor.getPlugin(originalKey) != null)
+        {
+            if (hasAccess(pluginKey, user))
             {
-                throw new UnauthorizedAccessException(user, "Not authorized to install " + plugin.getKey());
+                keysModified.add(originalKey);
+                enableCallback.operateOn(originalKey);
             }
-            String originalKey = plugin.getForkedPluginKey();
-            if (originalKey != null && pluginAccessor.getPlugin(originalKey) != null)
-            {
-                if (hasAccess(pluginKey, user))
-                {
-                    keysModified.add(originalKey);
-                    enableCallback.operateOn(originalKey);
-                }
-            }
-            disallowAllPluginAccess(pluginKey, user);
-            data.clearVotes(pluginKey);
-            pluginSystemManager.uninstall(pluginKey, user);
-            eventPublisher.publish(new PluginUninstalledEvent(pluginKey)
-                .setUserName(user)
-                .setUserEmail(plugin.getAuthorEmail())
-                .setMessage("Uninstalled from the UI"));
+        }
+        disallowAllPluginAccess(pluginKey);
+        data.clearVotes(pluginKey);
+        pluginSystemManager.uninstall(pluginKey, user);
+        eventPublisher.publish(new PluginUninstalledEvent(pluginKey)
+            .setUserName(user)
+            .setUserEmail(plugin.getAuthorEmail())
+            .setMessage("Uninstalled from the UI"));
 
-            return keysModified;
+        return keysModified;
     }
     
-    public List<String> forkExtension(UserExtension plugin, String user, String description) throws Exception
+    public List<String> forkExtension(Extension plugin, String user, String description) throws Exception
     {
         String pluginKey = plugin.getKey();
-        if (!plugin.isCanFork())
-        {
-            throw new UnauthorizedAccessException(user, "Not authorized to fork " + pluginKey);
-        }
         String forkedPluginKey = createForkPluginKey(pluginKey, user);
         pluginSystemManager.forkAndInstall(pluginKey, forkedPluginKey, plugin.getPluginType(), user, description);
         List<String> modifiedKeys = new ArrayList<String>();
@@ -153,7 +145,7 @@ public class ExtensionOperationManager
         if (hasAccess(pluginKey, user))
         {
             modifiedKeys.add(pluginKey);
-            enable(extensionManager.getUserExtension(forkedPluginKey, user), user);
+            enable(extensionManager.getExtension(forkedPluginKey), user);
         }
         if (forkedPluginKey != null)
         {
@@ -163,13 +155,9 @@ public class ExtensionOperationManager
         return modifiedKeys;
     }
 
-    public String saveAndRebuild(UserExtension plugin, String fileName, String contents, String user) throws UnauthorizedAccessException
+    public String saveAndRebuild(Extension plugin, String fileName, String contents, String user)
     {
         String pluginKey = plugin.getKey();
-        if (!plugin.isCanEdit())
-        {
-            throw new UnauthorizedAccessException(user, "Not authorized to edit " + pluginKey);
-        }
         String installedPluginKey = pluginSystemManager.saveAndRebuild(pluginKey, plugin.getPluginType(), fileName, contents, user);
         eventPublisher.publish(new PluginUpdatedEvent(pluginKey)
                 .setUserName(user)
@@ -179,7 +167,7 @@ public class ExtensionOperationManager
         return installedPluginKey;
     }
 
-    public String voteUp(UserExtension ex, String user)
+    public String voteUp(Extension ex, String user)
     {
         String pluginKey = ex.getKey();
         data.voteUp(pluginKey, user);
@@ -187,7 +175,7 @@ public class ExtensionOperationManager
         return pluginKey;
     }
 
-    public String install(UserExtension ext, File uploadedFile, String user)
+    public String install(Extension ext, File uploadedFile, String user)
     {
         String pluginKey = pluginSystemManager.install(uploadedFile, ext != null ? ext.getKey() : null, user);
         eventPublisher.publish(new PluginInstalledEvent(pluginKey)
@@ -197,16 +185,16 @@ public class ExtensionOperationManager
         return pluginKey;
     }
 
-    private void sendVoteUpEmail(final UserExtension extension, final String user) throws UnauthorizedAccessException
+    private void sendVoteUpEmail(final Extension extension, final String user)
     {
         final String userFullName = productAccessor.getUserFullName(user);
         final String pluginKey = extension.getKey();
         String pluginAuthor = extension.getAuthor();
         if (pluginAuthor != null && userManager.getUserProfile(pluginAuthor) != null)
         {
-            final Set<UserExtension> commonExtensions = new HashSet<UserExtension>();
-            final Set<UserExtension> suggestedExtensions = new HashSet<UserExtension>();
-            for (UserExtension plugin : getAllRemoteSpeakeasyPlugins(user))
+            final Set<Extension> commonExtensions = new HashSet<Extension>();
+            final Set<Extension> suggestedExtensions = new HashSet<Extension>();
+            for (Extension plugin : getAllRemoteSpeakeasyPlugins(user))
             {
                 if (plugin.getKey().equals(pluginKey))
                 {
@@ -235,14 +223,14 @@ public class ExtensionOperationManager
         }
     }
 
-    private void sendForkedEmail(final UserExtension extension, final String forkedPluginKey, final String user) throws UnauthorizedAccessException
+    private void sendForkedEmail(final Extension extension, final String forkedPluginKey, final String user)
     {
         final String userFullName = productAccessor.getUserFullName(user);
         String pluginAuthor = extension.getAuthor();
         if (pluginAuthor != null && !user.equals(pluginAuthor) && userManager.getUserProfile(pluginAuthor) != null)
         {
             final Set<Extension> otherForkedExtensions = new HashSet<Extension>();
-            for (UserExtension plugin : getAllRemoteSpeakeasyPlugins(user))
+            for (Extension plugin : getAllRemoteSpeakeasyPlugins(user))
             {
                 if (user.equals(plugin.getAuthor()) && plugin.getForkedPluginKey() != null && !forkedPluginKey.equals(plugin.getKey()))
                 {
@@ -253,7 +241,7 @@ public class ExtensionOperationManager
             productAccessor.sendEmail(pluginAuthor, "email/forked-subject.vm", "email/forked-body.vm", new HashMap<String,Object>() {{
                 put("plugin", extension);
                 put("productAccessor", productAccessor);
-                put("forkedPlugin", extensionManager.getUserExtension(forkedPluginKey, user));
+                put("forkedPlugin", extensionManager.getExtension(forkedPluginKey));
                 put("forkerFullName", userFullName);
                 put("forker", user);
                 put("otherForkedExtensions", otherForkedExtensions);
@@ -274,21 +262,21 @@ public class ExtensionOperationManager
         return pluginKey + "-fork-" + safeName;
     }
 
-    private void disallowAllPluginAccess(String pluginKey, String user)
+    private void disallowAllPluginAccess(String pluginKey)
     {
         List<String> accessList = data.getUsersList(pluginKey);
         accessList.clear();
         data.saveUsersList(pluginKey, accessList);
         descriptorGeneratorManager.refreshGeneratedDescriptorsForPlugin(pluginKey);
     }
-    private void sendEnabledEmail(final UserExtension enabledPlugin, final String user) throws UnauthorizedAccessException
+    private void sendEnabledEmail(final Extension enabledPlugin, final String user)
     {
         final String userFullName = productAccessor.getUserFullName(user);
         String pluginAuthor = enabledPlugin.getAuthor();
         if (pluginAuthor != null && !user.equals(pluginAuthor) && userManager.getUserProfile(pluginAuthor) != null)
         {
-            final Set<UserExtension> commonExtensions = new HashSet<UserExtension>();
-            final Set<UserExtension> suggestedExtensions = new HashSet<UserExtension>();
+            final Set<Extension> commonExtensions = new HashSet<Extension>();
+            final Set<Extension> suggestedExtensions = new HashSet<Extension>();
             for (UserExtension plugin : getAllRemoteSpeakeasyPlugins(user))
             {
                 if (plugin.isEnabled())
@@ -372,7 +360,7 @@ public class ExtensionOperationManager
         return plugins;
     }
 
-    private boolean hasAccess(String pluginKey, String remoteUser) throws UnauthorizedAccessException
+    private boolean hasAccess(String pluginKey, String remoteUser)
     {
         return data.getUsersList(pluginKey).contains(remoteUser);
     }

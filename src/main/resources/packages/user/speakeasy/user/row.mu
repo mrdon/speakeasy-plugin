@@ -16,7 +16,12 @@
         <div class="plugin-summary">
             <div>
                 <div class="plugin-feedback">
+                    {{#canVoteUp}}
                     <div class="vote-up-icon" data-href="/rest/speakeasy/1/plugins/voteup/{{key}}"></div>
+                    {{/canVoteUp}}
+                    {{^canVoteUp}}
+                    <div class="voted"></div>
+                    {{/canVoteUp}}
                     <a href="mailto:{{authorEmail}}?Subject=Speakeasy%20Extension%20Feedback">
                         <div class="broken-icon" data-href="/rest/speakeasy/1/plugins/broken/{{key}}"></div>
                     </a>

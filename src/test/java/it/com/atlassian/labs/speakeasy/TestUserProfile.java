@@ -305,15 +305,18 @@ public class TestUserProfile
 
         SpeakeasyUserPage page = product.visit(SpeakeasyUserPage.class)
                 .openInstallDialog()
-                .uploadPlugin(jar)
-                .voteUp("test");
-        assertTrue(page.getErrorMessages().get(0).contains("Cannot vote for"));
+                .uploadPlugin(jar);
+
+        assertFalse(page.canVoteUp("test"));
         assertEquals(0, page.getPlugins().get("test").getVotes());
         logout();
         page = product.visit(LoginPage.class)
                .login("barney", "barney", SpeakeasyUserPage.class)
-                .voteUp("plugin-tests")
                 .voteUp("test");
+        if (page.canVoteUp("plugin-tests"))
+        {
+            page.voteUp("plugin-tests");
+        }
 
         List<String> messages = page.getSuccessMessages();
         assertEquals(1, messages.size());

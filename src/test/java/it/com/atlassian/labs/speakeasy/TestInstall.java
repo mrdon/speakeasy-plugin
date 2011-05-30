@@ -6,6 +6,7 @@ import com.atlassian.pageobjects.page.LoginPage;
 import com.atlassian.webdriver.pageobjects.WebDriverTester;
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import java.io.File;
@@ -72,5 +73,17 @@ public class TestInstall
         assertEquals("Desc", row.getDescription());
         assertEquals("A. D. Ministrator (Sysadmin)", row.getAuthor());
         page.uninstallPlugin("test-2");
+    }
+
+    @Test
+    @Ignore
+    public void testInstallLotsOfPlugin() throws IOException
+    {
+        SpeakeasyUserPage page = product.visit(SpeakeasyUserPage.class);
+        for (int x=0; x < 100; x++)
+        {
+            File jar = buildSimplePluginFile("test-" + x, "Test " + x);
+            page = page.openInstallDialog().uploadPlugin(jar);
+        }
     }
 }

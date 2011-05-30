@@ -53,6 +53,7 @@ class ExtensionBuilder
         List<String> accessList = data.getUsersList(plugin.getKey());
 
         boolean isAuthor = userName.equals(extension.getAuthor());
+        boolean hasVoted = data.getVotes(plugin.getKey()).contains(userName);
         boolean pureSpeakeasy = ExtensionValidate.isPureSpeakeasyExtension(bundleContext, plugin);
 
         if (extension.isAvailable())
@@ -61,10 +62,12 @@ class ExtensionBuilder
             extension.setCanEnable(!extension.isEnabled());
             extension.setCanDisable(extension.isEnabled());
         }
-        boolean canUninstall = isAuthor && pureSpeakeasy && canAuthor;
-        extension.setCanUninstall(canUninstall);
-        extension.setCanEdit(isAuthor && pureSpeakeasy && canAuthor);
+
+        boolean canEdit = isAuthor && pureSpeakeasy && canAuthor;
+        extension.setCanEdit(canEdit);
+        extension.setCanUninstall(canEdit);
         extension.setCanFork(!extension.isFork() && pureSpeakeasy && !isAuthor && canAuthor);
+        extension.setCanVoteUp(!isAuthor && !hasVoted);
         extension.setCanDownload(pureSpeakeasy && canAuthor);
 
         // if the user has already forked this, don't let them fork again
@@ -72,7 +75,7 @@ class ExtensionBuilder
         {
             for (Plugin plug : speakeasyPlugins)
             {
-                if (extension.getKey().equals(UserExtension.getForkedPluginKey(plug.getKey())) && userName.equals(getPluginAuthor(plug)))
+                if (extension.getKey().equals(Extension.getForkedPluginKey(plug.getKey())) && userName.equals(getPluginAuthor(plug)))
                 {
                     extension.setCanFork(false);
                 }

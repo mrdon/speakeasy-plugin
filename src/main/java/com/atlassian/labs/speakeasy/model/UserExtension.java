@@ -22,6 +22,7 @@ public class UserExtension extends Extension implements Comparable
     private boolean canEnable;
     private boolean canDisable;
     private boolean canDownload;
+    private boolean canVoteUp;
 
     public UserExtension()
     {
@@ -103,4 +104,13 @@ public class UserExtension extends Extension implements Comparable
         this.canDownload = canDownload;
     }
 
+    public boolean isCanVoteUp()
+    {
+        return canVoteUp;
+    }
+
+    public void setCanVoteUp(boolean canVoteUp)
+    {
+        this.canVoteUp = canVoteUp;
+    }
 }
