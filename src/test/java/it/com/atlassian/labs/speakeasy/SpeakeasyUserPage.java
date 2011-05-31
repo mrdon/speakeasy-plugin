@@ -248,6 +248,13 @@ public class SpeakeasyUserPage implements Page
         return pageBinder.navigateToAndBind(SpeakeasyUserPage.class);
     }
 
+    public SpeakeasyUserPage restoreEnabledPlugins()
+    {
+        driver.findElement(By.id("restore-enabled")).click();
+        driver.waitUntilElementIsLocated(By.className("success"));
+        return pageBinder.navigateToAndBind(SpeakeasyUserPage.class);
+    }
+
     public IdeDialog openViewSourceDialog(String pluginKey)
     {
         clickActionLink(pluginKey, ExtensionOperations.VIEWSOURCE);

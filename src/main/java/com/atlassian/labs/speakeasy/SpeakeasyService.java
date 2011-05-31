@@ -149,6 +149,11 @@ public class SpeakeasyService
 
     public List<String> enableExtension(final String pluginKey, final String user) throws UnauthorizedAccessException
     {
+        return enableExtension(pluginKey, user, true);
+    }
+
+    private List<String> enableExtension(final String pluginKey, final String user, final boolean sendNotification) throws UnauthorizedAccessException
+    {
         validateAccess(user);
         validatePluginExists(pluginKey);
         List<String> keys = exec.forKey(pluginKey, user, new Operation<UserExtension,List<String>>()
@@ -156,7 +161,7 @@ public class SpeakeasyService
             public List<String> operateOn(UserExtension repo) throws Exception
             {
                 validateAccessType(repo, "enable", repo.isCanEnable(), user);
-                return extensionOperationManager.enable(repo, user);
+                return extensionOperationManager.enable(repo, user, sendNotification);
             }
         });
         log.info("Allowed '{}' to access Speakeasy extension '{}'", user, pluginKey);
@@ -179,11 +184,38 @@ public class SpeakeasyService
         return key;
     }
 
-    public void disableAllExtensions(String user) throws UnauthorizedAccessException
+    public void disableAllExtensions(final String user) throws UnauthorizedAccessException
     {
         validateAccess(user);
-        extensionOperationManager.disableAllExtensionsForUser(user);
+        List<String> enabledKeys = extensionOperationManager.findAllEnabledExtensions(user);
+        for (String key : enabledKeys)
+        {
+            exec.forKey(key, user, new Operation<UserExtension,Void>()
+            {
+                public Void operateOn(UserExtension repo) throws Exception
+                {
+                    extensionOperationManager.disable(repo, user);
+                    return null;
+                }
+            });
+        }
+        extensionOperationManager.saveEnabledPlugins(enabledKeys, user);
+
         log.info("Disallowed  '{}' to access all Speakeasy extensions", user);
+    }
+
+    public void restoreAllExtensions(final String user) throws UnauthorizedAccessException
+    {
+        validateAccess(user);
+
+        // do we care if they've enabled extensions since they unsubscribed?
+        List<String> keysToRestore = extensionOperationManager.getEnabledPlugins(user);
+        for (String key : keysToRestore)
+        {
+            enableExtension(key, user, false);
+        }
+
+        log.info("Restored '{}' access to all Speakeasy extensions", user);
     }
 
     public UserPlugins uninstallPlugin(String pluginKey, final String user) throws PluginOperationFailedException, UnauthorizedAccessException

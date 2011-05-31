@@ -42,36 +42,53 @@ function getAbsoluteHref($link) {
     return contextPath + href;
 }
 
+function getErrorMessage(xhr) {
+    return xhr.responseText.indexOf("{") == 0 ? $.parseJSON(xhr.responseText).message : xhr.responseText;
+}
+
+function replaceWithSpinner(e) {
+    var old = e.html();
+    e.html('<img alt="waiting" src="' + staticResourcesPrefix + '/download/resources/com.atlassian.labs.speakeasy-plugin:shared/images/wait.gif" />');
+    return old;
+}
 
 function enablePlugin(pluginKey, link, attachedRow) {
     var pluginName = $('.plugin-name', attachedRow).text();
-    link.html('<img alt="waiting" src="' + staticResourcesPrefix + '/download/resources/com.atlassian.labs.speakeasy-plugin:shared/images/wait.gif" />');
+    var oldLinkHtml = replaceWithSpinner(link);
     $.ajax({
               url: getAbsoluteHref(link),
               type: 'PUT',
               success: function(data) {
                   updateTable(data);
                   messages.add('success', {body: "<b>" + pluginName + "</b> was enabled successfully", shadowed: false});
+              },
+              error: function(xhr) {
+                  messages.add('error', {title: "Error enabling extension", body: getErrorMessage(xhr), shadowed: false});
+                  link.html(oldLinkHtml);
               }
             });
 }
 
 function disablePlugin(pluginKey, link, attachedRow) {
     var pluginName = $('.plugin-name', attachedRow).text();
-    link.html('<img alt="waiting" src="' + staticResourcesPrefix + '/download/resources/com.atlassian.labs.speakeasy-plugin:shared/images/wait.gif" />');
+    var oldLinkHtml = replaceWithSpinner(link);
     $.ajax({
               url: getAbsoluteHref(link),
               type: 'DELETE',
               success: function(data) {
                   updateTable(data);
                   messages.add('success', {body: "<b>" + pluginName + "</b> was disabled successfully", shadowed: false});
+              },
+              error: function(xhr) {
+                  messages.add('error', {title: "Error disabling extension", body: getErrorMessage(xhr), shadowed: false});
+                  link.html(oldLinkHtml);
               }
             });
 }
 
 function uninstallPlugin(pluginKey, link, attachedRow) {
-    link.html('<img alt="waiting" src="' + staticResourcesPrefix + '/download/resources/com.atlassian.labs.speakeasy-plugin:shared/images/wait.gif" />');
     var pluginName = $('.plugin-name', attachedRow).text();
+    var oldLinkHtml = replaceWithSpinner(link);
     $.ajax({
               url: getAbsoluteHref(link),
               type: 'DELETE',
@@ -82,8 +99,9 @@ function uninstallPlugin(pluginKey, link, attachedRow) {
                       messages.add('success', {body: "<b>" + pluginName + "</b> was uninstalled successfully", shadowed: false});
                   })
               },
-              error: function(data) {
-                  messages.add('error', {title: "Error uninstalling extension", body: data.responseText, shadowed: false});
+              error: function(xhr) {
+                  messages.add('error', {title: "Error uninstalling extension", body: getErrorMessage(xhr), shadowed: false});
+                  link.html(oldLinkHtml);
               }
             });
 }
@@ -96,7 +114,7 @@ function unfavorite($link) {
 }
 function updateFavorite($link, method, successActionText, failureActionText) {
     messages.clear();
-    $link.html('<img alt="waiting" src="' + staticResourcesPrefix + '/download/resources/com.atlassian.labs.speakeasy-plugin:shared/images/wait.gif" />');
+    replaceWithSpinner($link);
     var pluginName = $('.plugin-name', $link.closest('tr')).text();
     $.ajax({
               url: getAbsoluteHref($link),
@@ -110,7 +128,7 @@ function updateFavorite($link, method, successActionText, failureActionText) {
                   messages.add('success', {body: "<b>" + pluginName + "</b> was " + successActionText, shadowed: false});
               },
               error: function(xhr) {
-                  var data  = $.parseJSON(xhr.responseText)
+                  var data  = $.parseJSON(xhr.responseText);
                   updateTable(data.plugin);
                   messages.add('error', {title: "Error, unable to " + failureActionText, body: data.error, shadowed: false});
               }

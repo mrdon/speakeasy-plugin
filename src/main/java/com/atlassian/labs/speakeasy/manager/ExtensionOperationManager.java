@@ -58,7 +58,7 @@ public class ExtensionOperationManager
         this.extensionManager = extensionManager;
     }
 
-    public List<String> enable(Extension enabledPlugin, String user) throws UnauthorizedAccessException
+    public List<String> enable(Extension enabledPlugin, String user, boolean sendNotification) throws UnauthorizedAccessException
     {
         List<String> affectedPluginKeys = new ArrayList<String>();
         String pluginKey = enabledPlugin.getKey();
@@ -86,7 +86,10 @@ public class ExtensionOperationManager
             }
         }
 
-        sendEnabledEmail(enabledPlugin, user);
+        if (sendNotification)
+        {
+            sendEnabledEmail(enabledPlugin, user);
+        }
         return affectedPluginKeys;
     }
 
@@ -95,16 +98,17 @@ public class ExtensionOperationManager
         return removeFromAccessList(repo.getKey(), user);
     }
 
-    public void disableAllExtensionsForUser(String user)
+    public List<String> findAllEnabledExtensions(String user)
     {
+        List<String> result = newArrayList();
         for (Plugin plugin : pluginAccessor.getEnabledPlugins())
         {
             if (data.getUsersList(plugin.getKey()).contains(user))
             {
-                removeFromAccessList(plugin.getKey(), user);
+                result.add(plugin.getKey());
             }
-            descriptorGeneratorManager.refreshGeneratedDescriptorsForPlugin(plugin.getKey());
         }
+        return result;
     }
 
     public List<String> uninstallExtension(Extension plugin, String user, Operation<String,Void> enableCallback) throws Exception
@@ -141,7 +145,7 @@ public class ExtensionOperationManager
         if (hasAccess(pluginKey, user))
         {
             modifiedKeys.add(pluginKey);
-            enable(extensionManager.getExtension(forkedPluginKey), user);
+            enable(extensionManager.getExtension(forkedPluginKey), user, false);
         }
         if (forkedPluginKey != null)
         {
@@ -366,5 +370,15 @@ public class ExtensionOperationManager
     private boolean hasAccess(String pluginKey, String remoteUser)
     {
         return data.getUsersList(pluginKey).contains(remoteUser);
+    }
+
+    public void saveEnabledPlugins(List<String> enabledKeys, String user)
+    {
+        data.saveEnabledPlugins(enabledKeys, user);
+    }
+
+    public List<String> getEnabledPlugins(String user)
+    {
+        return data.getEnabledPlugins(user);
     }
 }

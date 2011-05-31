@@ -450,7 +450,13 @@ public class TestUserProfile
 
         assertFalse(page.isPluginEnabled("test-2"));
         assertFalse(page.isPluginEnabled("plugin-tests"));
-        page.uninstallPlugin("test-2");
+
+        page = page.restoreEnabledPlugins();
+
+        assertTrue(page.isPluginEnabled("test-2"));
+        assertTrue(page.isPluginEnabled("plugin-tests"));
+        page.uninstallPlugin("test-2")
+            .disablePlugin("plugin-tests");
     }
 
     @Test

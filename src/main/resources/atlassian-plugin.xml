@@ -17,6 +17,7 @@
     <servlet key="unsubscribe-servlet" name="Unsubscribe Page"
              class="com.atlassian.labs.speakeasy.ui.UserOptOutServlet">
         <url-pattern>/speakeasy/unsubscribe</url-pattern>
+        <url-pattern>/speakeasy/restore</url-pattern>
     </servlet>
 
     <servlet key="git-servlet" name="Git Repository Servlet"

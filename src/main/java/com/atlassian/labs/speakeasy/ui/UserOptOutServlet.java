@@ -34,21 +34,38 @@ public class UserOptOutServlet extends HttpServlet
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException
     {
         String user = userManager.getRemoteUsername();
-        if (user != null)
+        if (user == null)
         {
-            try
+            resp.sendError(403, "Must be logged in");
+            return;
+        }
+
+        String msg = null;
+        try
+        {
+            if (req.getRequestURI().endsWith("unsubscribe"))
             {
                 speakeasyService.disableAllExtensions(user);
+                msg = "Unsubscribed";
             }
-            catch (UnauthorizedAccessException e)
+            else if (req.getRequestURI().endsWith("restore"))
             {
-                resp.sendError(403, e.getMessage());
-                return;
+                speakeasyService.restoreAllExtensions(user);
+                msg = "Restored enabled extensions";
             }
         }
-        String userPage = applicationProperties.getBaseUrl() + productAccessor.getProfilePath();
+        catch (UnauthorizedAccessException e)
+        {
+            resp.sendError(403, e.getMessage());
+            return;
+        }
+        String userPage = req.getHeader("referer");
+        if (userPage == null)
+        {
+            userPage = applicationProperties.getBaseUrl() + productAccessor.getProfilePath();
+        }
         resp.setContentType("text/html");
-        resp.getWriter().append("<html><head><meta http-equiv=\"refresh\" content=\"2;url=" + userPage + "\"><body class=\"success\">Unsubscribed</body></html>");
+        resp.getWriter().append("<html><head><meta http-equiv=\"refresh\" content=\"2;url=" + userPage + "\"><body class=\"success\">" + msg + "</body></html>");
         resp.getWriter().close();
     }
 }

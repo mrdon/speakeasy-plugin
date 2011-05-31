@@ -38,10 +38,11 @@
     <div class="tabs-pane active-pane" id="horizontal-first">
         <p style="margin: 10px 0 15px 8px;">
             These are the <a href="http://confluence.atlassian.com/display/DEVNET/Speakeasy+Overview">Speakeasy extensions</a> installed on your server.
-            These user-created extensions may <b>change</b>, <b>break</b> or <b>disappear</b> at any time.  If (when) an extension breaks, and you're
-            having trouble loading this page, there's an escape hatch. Use
-            <a id="unsubscribe-all"
-              href="$contextPath/plugins/servlet/speakeasy/unsubscribe">$baseUrl/plugins/servlet/speakeasy/unsubscribe</a>
+            These user-created extensions may <b>change</b>, <b>break</b> or <b>disappear</b> at any time.  If (when) an extension breaks and you're
+            having trouble loading this page, or you are seeing an error in the application and think it may be due to a broken extension,
+            there's an escape hatch. Use the <a id="unsubscribe-all"
+              href="$contextPath/plugins/servlet/speakeasy/unsubscribe">unsubscribe</a> URL, then the <a id="restore-enabled"
+              href="$contextPath/plugins/servlet/speakeasy/restore">restore</a> URL to get your enabled plugins back.
             <br /><br />
             To use an extension, click <b>Enable</b>. <br />
         </p>

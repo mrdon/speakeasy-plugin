@@ -11,7 +11,7 @@
 
     <groupId>com.atlassian.labs</groupId>
     <artifactId>speakeasy-plugin</artifactId>
-    <version>0.11.1-SNAPSHOT</version>
+    <version>0.12-SNAPSHOT</version>
 
     <name>Speakeasy Plugin</name>
     <description>A plugin that provides per-user plugin module management</description>

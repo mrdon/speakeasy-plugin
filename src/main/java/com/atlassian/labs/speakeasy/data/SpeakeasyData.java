@@ -6,9 +6,11 @@ import com.atlassian.sal.api.pluginsettings.PluginSettingsFactory;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 
 import static com.google.common.collect.Lists.newArrayList;
+import static java.util.Collections.emptyList;
 
 /**
  *
@@ -91,6 +93,11 @@ public class SpeakeasyData
         return "speakeasy-" + propertyName;
     }
 
+    private String createUserAccessKey(String propertyName, String user)
+    {
+        return "speakeasy-" + propertyName + "-" + user;
+    }
+
     public String getSettings()
     {
         String result = (String) getPluginSettings().get(createAccessKey("settings"));
@@ -134,5 +141,16 @@ public class SpeakeasyData
     public void clearFavorites(String pluginKey)
     {
         getPluginSettings().remove(createAccessKey(pluginKey, "votes"));
+    }
+
+    public void saveEnabledPlugins(List<String> enabledKeys, String user)
+    {
+        getPluginSettings().put(createUserAccessKey("enabled-plugins", user), enabledKeys);
+    }
+
+    public List<String> getEnabledPlugins(String user)
+    {
+        List<String> result = (List<String>) getPluginSettings().get(createUserAccessKey("enabled-plugins", user));
+        return result != null ? newArrayList(result) : Collections.<String>emptyList();
     }
 }
