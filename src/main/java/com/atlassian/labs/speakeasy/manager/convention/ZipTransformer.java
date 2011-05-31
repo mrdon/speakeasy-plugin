@@ -1,7 +1,7 @@
 package com.atlassian.labs.speakeasy.manager.convention;
 
-import com.atlassian.labs.speakeasy.manager.PluginOperationFailedException;
 import com.atlassian.labs.speakeasy.manager.convention.external.ConventionDescriptorGenerator;
+import com.atlassian.labs.speakeasy.manager.PluginOperationFailedException;
 import com.atlassian.labs.speakeasy.model.JsonManifest;
 import com.atlassian.plugin.JarPluginArtifact;
 import com.atlassian.plugin.PluginArtifact;
