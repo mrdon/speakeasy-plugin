@@ -208,6 +208,8 @@ td .plugin-stats {
 #plugins-table .aui-dropdown li a.item-link {
     width: inherit;
     min-width: inherit;
+    text-align: left;
+    display: block;
 }
 
 td.plugin-actions .aui-toolbar {
