@@ -206,6 +206,7 @@ td .plugin-stats {
     min-width: inherit;
 }
 #plugins-table .aui-dropdown li a.item-link {
+    line-height: 16.6px;
     width: inherit;
     min-width: inherit;
     text-align: left;
