@@ -53,7 +53,12 @@ public class JsonToElementParser
                 }
                 if (hasLink(item))
                 {
-                    element.addElement("link").setText(getLink(item));
+                    Element link = element.addElement("link");
+                    link.setText(getLink(item));
+                    if (!item.isNull("cssId"))
+                    {
+                        link.addAttribute("linkId", item.getString("cssId"));
+                    }
                 }
                 if (!item.isNull("cssName"))
                 {
