@@ -127,12 +127,10 @@ public class GitRepositoryManager implements DisposableBean
 
 
             }
-            else
+            else if (ExtensionValidate.isValidExtensionKey(id) &&
+                    !repo.getDirectory().exists())
             {
-                if (ExtensionValidate.isValidExtensionKey(id))
-                {
-                    repo.create();
-                }
+                repo.create();
             }
             repositories.put(id, repo);
         }

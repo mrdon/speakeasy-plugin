@@ -54,7 +54,7 @@ public class PluginSystemManager
     public String install(File pluginFile, String expectedPluginKey, String user) throws PluginOperationFailedException
     {
         PluginArtifact pluginArtifact = null;
-        String pluginKey;
+        String pluginKey = null;
         for (PluginTypeHandler handler : typeHandlers.values())
         {
             pluginKey = handler.canInstall(pluginFile);
@@ -75,16 +75,16 @@ public class PluginSystemManager
                 break;
             }
         }
-        if (pluginArtifact == null)
+        if (pluginArtifact == null || pluginKey == null)
         {
             throw new PluginOperationFailedException("Unable to handle plugin file " + pluginFile.toString() + ", likely due to an invalid plugin key", null);
         }
 
+        data.setPluginAuthor(pluginKey, user);
         Set<String> pluginKeys = pluginController.installPlugins(pluginArtifact);
         if (pluginKeys.size() == 1)
         {
             final String installedKey = pluginKeys.iterator().next();
-            data.setPluginAuthor(installedKey, user);
             final Plugin plugin = pluginAccessor.getPlugin(installedKey);
             WaitUntil.invoke(new WaitUntil.WaitCondition()
             {

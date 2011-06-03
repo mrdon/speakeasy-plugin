@@ -41,7 +41,14 @@ public class ExtensionManager
     public UserExtension getUserExtension(String pluginKey, String user)
     {
         Plugin plugin = getPlugin(pluginKey);
-        return getUserExtension(plugin, user, getAllExtensionPlugins());
+        if (plugin == null)
+        {
+            return null;
+        }
+        else
+        {
+            return getUserExtension(plugin, user, getAllExtensionPlugins());
+        }
     }
 
     public Iterable<UserExtension> getAllUserExtensions(final String userName)
