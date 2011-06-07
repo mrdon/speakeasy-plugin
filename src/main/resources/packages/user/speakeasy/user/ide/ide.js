@@ -98,7 +98,7 @@ function handleBrowserFileClick(pluginKey, event) {
     }
 }
 function openDialog(pluginKey, href, extension, readOnly){
-    var dialog = new AJS.Dialog({width: $(window).width() * .95, height: 620, id:'ide-dialog'});
+    var dialog = new AJS.Dialog({width: $(window).width() * .95, height: $(window).height() * .95, id:'ide-dialog'});
 
     dialog.addHeader("Edit Extension : " + pluginKey);
 
