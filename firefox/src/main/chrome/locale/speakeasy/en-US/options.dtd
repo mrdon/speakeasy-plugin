@@ -1,0 +1,8 @@
+<!ENTITY speakeasy.window.speakeasy.opti0 "Speakeasy Options">
+<!ENTITY speakeasy.text.speakeasy "Speakeasy">
+<!ENTITY speakeasy.checkbox.turn.on.cop1 "Turn on copious debugging to Javacript Console.">
+<!ENTITY speakeasy.checkbox.use.tabs.wh2 "Use tabs where possible.">
+<!ENTITY speakeasy.checkbox.auto.hide.t3 "Auto-hide the Speakeasy toolbar.">
+<!ENTITY speakeasy.checkbox.highlight.w4 "Highlight with red outline.">
+<!ENTITY speakeasy.checkbox.highlight.w5 "Highlight with red fill.">
+<!ENTITY speakeasy.button.close "Close">

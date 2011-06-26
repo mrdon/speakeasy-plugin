@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-stylesheet href="chrome://speakeasy/skin/toolbar-button.css" type="text/css"?>
+
+<!DOCTYPE overlay SYSTEM "chrome://speakeasy/locale/speakeasyOverlay.dtd" >
+<overlay id="speakeasyOverlay" xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
+
+<!--
+  Copyright (c) 2005, Scott R. Turner
+  Released under the GPL license
+  http://www.gnu.org/copyleft/gpl.html
+-->
+
+
+  <script type="application/x-javascript" src="chrome://speakeasy/content/highlight.js" />
+  <script type="application/x-javascript" src="chrome://speakeasy/content/contextMenu.js" />
+  <script type="application/x-javascript" src="chrome://speakeasy/content/speakeasyCore.js" />
+  <script type="application/x-javascript" src="chrome://speakeasy/content/save.js" />
+  <script type="application/x-javascript" src="chrome://speakeasy/content/speakeasyOverlay.js" />
+  <script type="application/x-javascript" src="chrome://speakeasy/content/toolbar.js" />
+
+<script type="application/x-javascript">
+<![CDATA[
+  //
+  //  Stick all of this in an anonymous function so that
+  //  we don't have problems with other scripts using the same
+  //  function names.
+  //	 
+  //  when the browser window loads:
+  window.addEventListener("load", function() {
+    //
+    //  Set up the context menu
+    //
+    var menu = document.getElementById("contentAreaContextMenu");
+    menu.addEventListener("popupshowing", speakeasy_contextPopupshowing, false);
+    
+  }, false);
+ ]]>
+</script>
+
+// This is for the right click menu.
+
+<popup id="contentAreaContextMenu">
+  <menuitem id="speakeasy" label="&speakeasy.menuitem.speakeasy;" accesskey="P" insertafter="context-stop" oncommand="start_speakeasy_context_menu();" />
+  <menuitem id="speakeasy-save_script" label="&speakeasy.menuitem.save.and.ex0;" oncommand="do_speakeasy_context_menu(this);" hidden="true" />
+  <menuitem id="speakeasy-stop_speakeasy" label="&speakeasy.menuitem.quit.platyp1;" oncommand="do_speakeasy_context_menu(this);" hidden="true" />
+  <menuitem id="speakeasy-smart_remove" label="&speakeasy.menuitem.smart.remove;" oncommand="do_speakeasy_context_menu(this);" hidden="true" />
+  <menuitem id="speakeasy-remove" label="&speakeasy.menuitem.remove;" oncommand="do_speakeasy_context_menu(this);" hidden="true" />
+  <menuitem id="speakeasy-paste" label="&speakeasy.menuitem.paste;" oncommand="do_speakeasy_context_menu(this);" hidden="true" />
+  <menuitem id="speakeasy-erase" label="&speakeasy.menuitem.erase;" oncommand="do_speakeasy_context_menu(this);" hidden="true" />
+  <menuitem id="speakeasy-view_source" label="&speakeasy.menuitem.view.source;" oncommand="do_speakeasy_context_menu(this);" hidden="true" />
+  <menuitem id="speakeasy-isolate" label="&speakeasy.menuitem.isolate;" oncommand="do_speakeasy_context_menu(this);" hidden="true" />
+  <menuitem id="speakeasy-center" label="&speakeasy.menuitem.center;" oncommand="do_speakeasy_context_menu(this);" hidden="true" />
+  <menuitem id="speakeasy-make_bw" label="&speakeasy.menuitem.black.on.wh2;" oncommand="do_speakeasy_context_menu(this);" hidden="true" />
+  <menuitem id="speakeasy-relax" label="&speakeasy.menuitem.relax;" oncommand="do_speakeasy_context_menu(this);" hidden="true" />
+  <menuitem id="speakeasy-fix_page" label="&speakeasy.menuitem.fix.page.ba3;" oncommand="do_speakeasy_context_menu(this);" hidden="true" />
+  <menuitem id="speakeasy-set_style" label="&speakeasy.menuitem.set.style;" oncommand="do_speakeasy_context_menu(this);" hidden="true" />
+  <menuitem id="speakeasy-modify_url" label="&speakeasy.menuitem.modify.url.s;" oncommand="do_speakeasy_context_menu(this);" hidden="true" />
+  <menuitem id="speakeasy-modify_html" label="&speakeasy.menuitem.modify.html;" oncommand="do_speakeasy_context_menu(this);" hidden="true" />
+  <menuitem id="speakeasy-insert_html" label="&speakeasy.menuitem.insert.html;" oncommand="do_speakeasy_context_menu(this);" hidden="true" />
+</popup>
+
+// This is for the Tools menu.
+
+<menupopup id="menu_ToolsPopup">
+	<menuitem insertafter="devToolsSeparator" label="&speakeasy.menuitem.speakeasy;" accesskey="P" oncommand="start_speakeasy_toolbar();" />
+</menupopup>
+
+//
+//  Add a toolbar button
+//
+<toolbarpalette id="BrowserToolbarPalette">
+  <toolbarbutton id="speakeasy-button" class="toolbarbutton-1" label="&speakeasy.toolbarbutton.platyp4;" tooltiptext="&speakeasy.toolbarbutton.start.5;" oncommand="start_speakeasy_toolbar();" />
+  <toolbarbutton class="toolbarbutton-1" id="speakeasy-help-button" label="&speakeasy.toolbarbutton.help;" tooltiptext="&speakeasy.toolbarbutton.platyp6;" oncommand="speakeasy_help_button(event);" />
+  <toolbarbutton class="toolbarbutton-1" id="speakeasy-save_script-button" label="&speakeasy.toolbarbutton.save;" tooltiptext="&speakeasy.tooltip.save;" oncommand="speakeasy_handle_toolbar(event);" />
+  <toolbarbutton class="toolbarbutton-1" id="speakeasy-stop_speakeasy-button" label="&speakeasy.toolbarbutton.quit;" tooltiptext="&speakeasy.toolbarbutton.quit;" oncommand="speakeasy_handle_toolbar(event);" />
+  <toolbarbutton class="toolbarbutton-1" id="speakeasy-auto_repair-button" label="&speakeasy.toolbarbutton.repair;" tooltiptext="&speakeasy.tooltip.repair;" oncommand="speakeasy_handle_toolbar(event);" />
+  <toolbarbutton class="toolbarbutton-1" id="speakeasy-smart_remove-button" label="&speakeasy.toolbarbutton.cut;" tooltiptext="&speakeasy.tooltip.cut;" autoCheck="true" checked="true" oncommand="speakeasy_handle_toolbar(event);" />
+  <toolbarbutton class="toolbarbutton-1" id="speakeasy-paste-button" label="&speakeasy.toolbarbutton.paste;" tooltiptext="&speakeasy.tooltip.paste;" autoCheck="true" oncommand="speakeasy_handle_toolbar(event);" />
+  <toolbarbutton class="toolbarbutton-1" id="speakeasy-isolate-button" label="&speakeasy.toolbarbutton.isolate;" tooltiptext="&speakeasy.tooltip.isolate;" autoCheck="true" oncommand="speakeasy_handle_toolbar(event);" />
+  <toolbarbutton class="toolbarbutton-1" id="speakeasy-erase-button" label="&speakeasy.toolbarbutton.erase;" tooltiptext="&speakeasy.tooltip.erase;" autoCheck="true" oncommand="speakeasy_handle_toolbar(event);" />
+  <toolbarbutton class="toolbarbutton-1" id="speakeasy-relax-button" label="&speakeasy.toolbarbutton.relax;" tooltiptext="&speakeasy.tooltip.relax;" autoCheck="true" oncommand="speakeasy_handle_toolbar(event);" />
+  <toolbarbutton class="toolbarbutton-1" id="speakeasy-make_bw-button" label="&speakeasy.toolbarbutton.make.bw;" tooltiptext="&speakeasy.tooltip.make.bw;" autoCheck="true" oncommand="speakeasy_handle_toolbar(event);" />
+  <toolbarbutton class="toolbarbutton-1" id="speakeasy-center-button" label="&speakeasy.toolbarbutton.center;" tooltiptext="&speakeasy.tooltip.center;" autoCheck="true" oncommand="speakeasy_handle_toolbar(event);" />
+  <toolbarbutton class="toolbarbutton-1" id="speakeasy-fix_page-button" label="&speakeasy.toolbarbutton.fix.pa9;" tooltiptext="&speakeasy.tooltip.fix.page;" oncommand="speakeasy_handle_toolbar(event);" />
+  <toolbarbutton class="toolbarbutton-1" id="speakeasy-remove-button" label="&speakeasy.toolbarbutton.remove;" tooltiptext="&speakeasy.toolbarbutton.remove;" autoCheck="true" oncommand="speakeasy_handle_toolbar(event);" />
+  <toolbarbutton class="toolbarbutton-1" id="speakeasy-set_style-button" label="&speakeasy.toolbarbutton.set.s11;" tooltiptext="&speakeasy.toolbarbutton.set.s11;" autoCheck="true" oncommand="speakeasy_handle_toolbar(event);" />
+  <toolbarbutton class="toolbarbutton-1" id="speakeasy-modify_url-button" label="&speakeasy.toolbarbutton.modif13;" tooltiptext="&speakeasy.toolbarbutton.modif13;" autoCheck="true" oncommand="speakeasy_handle_toolbar(event);" />
+  <toolbarbutton class="toolbarbutton-1" id="speakeasy-modify_html-button" label="&speakeasy.toolbarbutton.modif15;" tooltiptext="&speakeasy.toolbarbutton.modif15;" autoCheck="true" oncommand="speakeasy_handle_toolbar(event);" />
+  <toolbarbutton class="toolbarbutton-1" id="speakeasy-insert_html-button" label="&speakeasy.toolbarbutton.inser17;" tooltiptext="&speakeasy.toolbarbutton.inser17;" autoCheck="true" oncommand="speakeasy_handle_toolbar(event);" />
+  <toolbarbutton class="toolbarbutton-1" id="speakeasy-view_source-button" label="&speakeasy.toolbarbutton.view.19;" tooltiptext="&speakeasy.toolbarbutton.view.19;" autoCheck="true" oncommand="speakeasy_handle_toolbar(event);" />
+</toolbarpalette>
+
+//
+//  The Speakeasy Toolbar
+//
+<toolbox id="navigator-toolbox">
+  <toolbar id="speakeasy_toolbar" class="chromeclass-toolbar" customizable="true" persist="collapsed" toolbarname="&speakeasy.toolbar.speakeasy.to21;" iconsize="small" defaultset="speakeasy-help-button,speakeasy-save_script-button,speakeasy-stop_speakeasy-button,speakeasy-auto_repair-button,separator,speakeasy-smart_remove-button,speakeasy-paste-button,speakeasy-isolate-button,speakeasy-erase-button,speakeasy-relax-button,speakeasy-make_bw-button,speakeasy-center-button,speakeasy-fix_page-button,speakeasy-remove-button,separator,speakeasy-set_style-button,speakeasy-modify_url-button,speakeasy-modify_html-button,speakeasy-insert_html-button,speakeasy-view_source-button">
+  </toolbar>
+</toolbox>
+</overlay>

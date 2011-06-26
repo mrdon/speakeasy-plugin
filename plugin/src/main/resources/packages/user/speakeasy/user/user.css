@@ -1,0 +1,254 @@
+/*#speakeasy-user-main {margin-left: 1em;}*/
+
+#aui-message-bar {
+    height:44px;
+    margin-top: 0 !important;
+    margin-left: 0 !important;
+    position: fixed;
+    width: 50%;
+    right: 5%;
+    top: 5%;
+}
+
+.aui-message {
+    -moz-border-radius: 6px;
+    -o-border-radius: 6px;
+    -webkit-border-radius: 6px;
+    border-radius: 6px;
+    -moz-box-shadow: 5px 5px 5px #999;
+    -o-box-shadow: 5px 5px 5px #999;
+    -webkit-box-shadow: 5px 5px 5px #999;
+    box-shadow: 5px 5px 5px #999;
+}
+
+#sp-top-bar {
+    float: right;
+}
+#sp-top-bar a:link{
+    text-decoration: none;
+}
+#sp-install {
+    padding-left: 24px;
+    background: url("@modulePrefix/speakeasy/user/images/add_20.png") no-repeat 0 50%;
+}
+#sp-updates {
+    margin-left: 2em;
+    padding-left: 24px;
+    background: url("@modulePrefix/speakeasy/user/images/rss_20.png") no-repeat 0 50%;
+}
+
+#sp-firefox-xpi {
+    margin-left: 2em;
+    padding-left: 24px;
+    background: url("@modulePrefix/speakeasy/user/images/firefox_18.png") no-repeat 0 50%;
+}
+
+#plugins-table td {
+    vertical-align: top;
+    white-space: nowrap;
+    border-top: 1px solid #DDD;
+    padding-top: 15px;
+    padding-bottom: 15px;
+}
+
+#plugins-table tr {
+    background-color: #fafafa;
+}
+
+#plugins-table tr.zebra {
+    /*background-color: #EAEAE9;*/
+}
+
+#plugins-table tr.enabled {
+    background: rgba(0,169,12, 0.1);
+}
+
+#plugins-table tr.disabled {
+    background: rgba(204, 0, 0, 0.1);
+}
+
+#plugins-table td h3,
+#plugins-table td p {
+    color: #333;
+}
+
+#plugins-table td h3 {
+    margin: 0;
+    padding: 0;
+    font-size: 18px;
+}
+
+#plugins-table td p {
+    margin: 0;
+    font-size: 11px;
+}
+
+#plugins-table td p.plugin-author-line {
+    margin: 0 0 5px 0;
+}
+
+#plugins-table td p.plugin-description {
+    margin: 10px 0;
+    font-size: 12px;
+}
+
+#plugins-table td.plugin-info {
+    white-space: normal;
+}
+
+#plugins-table div.plugin-feedback {
+    float:left;
+    width: 16px;
+    height: 100%;
+}
+
+#plugins-table div.plugin-title-info {
+   margin-left: 20px;
+}
+
+#plugins-table div.unfavorite-icon {
+    width: 16px;
+    height: 20px;
+    background: url("@modulePrefix/speakeasy/user/images/star_grey_16.png") no-repeat center;
+}
+
+#plugins-table div.favorite-icon{
+    width: 16px;
+    height: 20px;
+    background: url("@modulePrefix/speakeasy/user/images/star_yellow_16.png") no-repeat center;
+}
+#plugins-table div.broken-icon {
+    width: 16px;
+    height: 20px;
+    background: url("@modulePrefix/speakeasy/user/images/broken.png") no-repeat center;
+}
+
+div.plugin-enable-links {
+    -moz-border-radius: 3px;
+    border-radius: 3px;
+    width: 191px;
+}
+
+div.plugin-enable-links,
+div.plugin-enable-links .aui-dd-parent, 
+div.plugin-enable-links button {
+    position:relative;
+    float: right;
+}
+
+div.plugin-enable-links .aui-dd-parent {
+    width: auto;
+    position: relative;
+}
+
+div.plugin-enable-links button {
+    border-width: 1px 0;
+    border-color: #AAA;
+    border-style: solid;
+    font-size: 12px;
+    padding: 7px;
+    margin: 0;
+    display: block;
+    background: none;
+    background-color: #EEE; 
+    -webkit-transition: background-color 0.2s 0;   
+    -moz-transition: background-color 0.2s 0;  
+    -o-transition: background-color 0.2s 0;  
+    transition: background-color 0.2s 0;   
+}
+
+div.plugin-enable-links button:hover {
+    background-color: #69C;
+    color: #FFF;
+}
+
+div.plugin-enable-links button.first {
+    border-left: 1px solid #AAA;
+    border-right: 1px solid #DDD;
+    -moz-border-radius: 3px 0 0 3px;
+    border-radius: 3px 0 0 3px;
+}
+
+div.plugin-enable-links button.last {
+    border-right: 1px solid #AAA;
+    border-left: 1px solid #DDD;
+    -moz-border-radius: 0 3px 3px 0;
+    border-radius: 0px 3px 3px 0;
+}
+
+div.plugin-author-links {
+    margin-top: 1em;
+}
+
+#extension-wizard-cancel {
+    background: none;
+}
+td .plugin-name {
+    font-weight: bold;
+}
+
+td.plugin-screenshot {
+    width: 10%;
+}
+
+td.plugin-screenshot img {
+    border: 1px black solid;
+}
+
+td .plugin-stats {
+    font-size: 11px;
+    color: #555;
+}
+
+#plugins-table td.plugin-actions {
+    width: 20%;
+    text-align: right;
+}
+#plugins-table td.plugin-actions svg{
+    position: relative !important;
+}
+#plugins-table td.plugin-actions .aui-dropdown{
+    width: inherit;
+    min-width: inherit;
+}
+#plugins-table .aui-dropdown li a.item-link {
+    line-height: 16.6px;
+    width: inherit;
+    min-width: inherit;
+    text-align: left;
+    display: block;
+}
+
+td.plugin-actions .aui-toolbar {
+    background: transparent;
+    border: none;
+    width: auto;
+}
+
+#available-extensions-table {
+    display: none;
+}
+
+tr.forked-row td .plugin-summary {
+    background: url("@modulePrefix/speakeasy/user/images/arrow_045.png") no-repeat 0px 8px;
+    padding-left: 22px;
+}
+
+tr.unavailable-row {
+    opacity:0.50; /* firefox, opera, safari, chrome */
+    -ms-filter:"progid:DXImageTransform.Microsoft.Alpha(opacity=50)"; /* IE 8 */
+    filter:alpha(opacity=50); /* IE 4, 5, 6 and 7 */
+    zoom:1;
+}
+tr.unavailable-row .plugin-description {
+    background-color: #db7093;
+    color: black;
+}
+
+.fork-blue {
+    color: #4490cc;
+}
+
+#fork-form {
+    margin-top: 3em;
+}

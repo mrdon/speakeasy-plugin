@@ -1,0 +1,149 @@
+<div id="speakeasy-user-main">
+    <script type="text/javascript">
+        var staticResourcesPrefix = "$staticResourcesPrefix";
+        var contextPath = "$contextPath";
+        var currentUser = "$user";
+        var product = "$product";
+        var xsrfTokenName = "$xsrfTokenName";
+        var xsrfToken = "$xsrfToken";
+    </script>
+
+<div style="margin-top: -55px; margin-left: 350px;" id="aui-message-bar">
+    #if (!$doesAnyGroupHaveAccess)
+        <div class="aui-message warning closeable"><p class="title"><span class="aui-icon icon-warning"></span></p>
+            No one has access to this page.  Click <a href="$contextPath/plugins/servlet/speakeasy/admin">here</a> to change these settings.
+        </div>
+    #end
+</div>
+#if ($canAuthor)
+<div id="sp-top-bar">
+    <a id="sp-install" href="#">Install</a>
+    <a id="sp-updates" href="$contextPath/rest/speakeasy/latest/plugins/atom">Updates</a>
+    <a id="sp-firefox-xpi" data-hash="sha1:$firefoxXpi.hash" data-iconurl="$firefoxXpi.iconUrl" href="$firefoxXpi.xpiUrl">Firefox</a>
+</div>
+#end
+<div class="aui-tabs horizontal-tabs" id="horizontal">
+    <ul class="tabs-menu">
+        <li class="menu-item active-tab">
+            <a href="#horizontal-first"><strong>Installed Extensions</strong></a>
+        </li>
+        #if ($canAuthor)
+        <!--li class="menu-item">
+            <a href="#horizontal-second" id="available-extensions-tab"><strong>Available Extensions</strong></a>
+        </li-->
+        <li class="menu-item">
+            <a href="#horizontal-third" id="jsdoc-tab"><strong>CommonJS Modules</strong></a>
+        </li>
+        #end
+    </ul>
+    <div class="tabs-pane active-pane" id="horizontal-first">
+        <p style="margin: 10px 0 15px 8px;">
+            These are the <a href="http://confluence.atlassian.com/display/DEVNET/Speakeasy+Overview">Speakeasy extensions</a> installed on your server.
+            These user-created extensions may <b>change</b>, <b>break</b> or <b>disappear</b> at any time.  If (when) an extension breaks and you're
+            having trouble loading this page, or you are seeing an error in the application and think it may be due to a broken extension,
+            there's an escape hatch. Use the <a id="unsubscribe-all"
+              href="$contextPath/plugins/servlet/speakeasy/unsubscribe">unsubscribe</a> URL, then the <a id="restore-enabled"
+              href="$contextPath/plugins/servlet/speakeasy/restore">restore</a> URL to get your enabled plugins back.
+            <br /><br />
+            To use an extension, click <b>Enable</b>. <br />
+        </p>
+        #set ($topWebItems = $webInterfaceManager.getDisplayableItems("speakeasy.user-profile/top", $webInterfaceContext))
+        #if (!$topWebItems.empty)
+                <ul class="top-links">
+                #foreach ($item in $topWebItems)
+                    <li class="top-link">
+                        <a href="$item.link.getDisplayableUrl($req, $webInterfaceContext)"
+                            #if ($item.link.id) id="$item.link.id"#end
+                            #if ($item.styleClass) class="$item.styleClass"#end
+                            #if ($item.link.hasAccessKey()) accessKey="$item.link.getAccessKey($helper)"#end>
+                           $item.webLabel.getDisplayableLabel($req, $webInterfaceContext)
+                        </a>
+                    </li>
+                #end
+                </ul>
+            #end
+        <table class="aui" id="plugins-table">
+            <thead>
+                <tr>
+                    <th colspan="3">Enabled Extensions</th>
+                </tr>
+            </thead>
+            <tbody id="enabled-plugins-body">
+                #foreach ($plugin in $enabledPlugins)
+                    $rowRenderer.render($plugin)
+                #end
+                #if ($enabledPlugins.isEmpty())
+                <tr>
+                    <td colspan="3">No extensions</td>
+                </tr>
+                #end
+            </tbody>
+            <thead>
+                <tr>
+                    <th colspan="3">Available Extensions</th>
+                </tr>
+            </thead>
+            <tbody id="available-plugins-body">
+                #foreach ($plugin in $availablePlugins)
+                    $rowRenderer.render($plugin)
+                #end
+                #if ($availablePlugins.isEmpty())
+                <tr>
+                    <td colspan="3">No extensions</td>
+                </tr>
+                #end
+            </tbody>
+        </table>
+
+    </div>
+    #if ($canAuthor)
+    <!--div class="tabs-pane" id="horizontal-second">
+        <p style="margin: 10px 0 15px 0;">
+            These extensions are hosted on <a href="http://plugins.atlassian.com">http://plugins.atlassian.com</a>.<br />
+            To install an extension, <b>Download</b> it locally, then <b>Upload</b> it to Speakeasy. <br />
+            You should consult the extension's page before installing - click <b>Learn More</b>.<br />
+        </p>
+
+        <div class="aui-message warning">
+            <p class="title">These are not the extensions you're looking for!</p>
+            <p>
+                Yes - the items below are not extensions because extensions don't have a category on PAC yet.
+                This is a proof of concept of accessing PAC via Javascript + REST + DropBox + YQL from within the browser. It's all very shiny, new and cool.
+            </p>
+            <p>
+                When Speakeasy is released there will be a PAC extensions category per product. Those contents will show up
+                below. We will also indicate which ones you already have installed etc.
+            </p>
+            <p>
+                If you want to share extensions, for now please attach them to <a href="https://extranet.atlassian.com/x/pJrEbw">this EAC page</a>.
+            </p>
+        </div>
+        
+        <p id="loading"><img alt="waiting"
+align="absmiddle" src="$staticResourcesPrefix/download/resources/com.atlassian.labs.speakeasy-plugin:shared/images/wait.gif" /> Loading available extensions from plugins.atlassian.com ..</p>
+
+        <table class="aui" id="available-extensions-table">
+        <thead>
+            <tr>
+                <th id="plugin-name">Name</th>
+                <th id="plugin-author">Author</th>
+                <th id="plugin-version">Version</th>
+                <th id="action">Action</th>
+            </tr>
+        </thead>
+        <tbody id="available-extensions-tableBody">
+
+        </tbody>
+        </table>
+    </div-->
+    <div class="tabs-pane" id="horizontal-third">
+        $jsdocRenderer.render()
+    </div>
+    #end
+</div>
+    <div id="speakeasy-loaded">Loading...</div>
+<script type="text/javascript">
+        require.run('speakeasy/user/user').initSpeakeasy();
+</script>
+
+</div>

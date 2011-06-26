@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-stylesheet href="chrome://global/skin/" type="text/css"?>
+
+<!DOCTYPE window SYSTEM "chrome://speakeasy/locale/arbitrary-insert.dtd" >
+<!--
+  Copyright (c) 2005, Scott R. Turner
+  Released under the GPL license
+  http://www.gnu.org/copyleft/gpl.html
+-->
+<window id="arbitrary-insert" title="&speakeasy.window.insert.arbitr0;" orient="vertical" style="padding: 1em;" xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
+
+    <script type="application/x-javascript" src="chrome://speakeasy/content/arbitrary-insert.js" />
+
+    <vbox flex="1">
+        <description align="center">&speakeasy.description.enter.ar1;</description>
+        <description align="center">&speakeasy.description.if.you.w2;</description>
+        <textbox multiline="true" rows="15" cols="80" id="new_html" flex="1" />
+	<radiogroup>
+	  <radio id="insert_before" label="&speakeasy.radio.insert.before.3;" />
+	  <radio id="insert_after" selected="true" label="&speakeasy.radio.insert.after.s4;" />
+	</radiogroup>
+	<checkbox id="insert_as_block" label="&speakeasy.checkbox.check.to.in5;" />
+    </vbox>
+    <box pack="end">
+     <button id="get-button" label="&speakeasy.button.apply;" dlgtype="accept" oncommand="self.apply_insert_html();" />
+     <button id="close-button" label="&speakeasy.button.done;" dlgtype="cancel" oncommand="self.close();" />
+    </box>
+</window>

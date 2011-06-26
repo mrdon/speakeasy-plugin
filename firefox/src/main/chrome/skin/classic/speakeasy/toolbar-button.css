@@ -1,0 +1,154 @@
+/*  skin/toolbar-button.css  */
+
+#speakeasy-button {
+  list-style-image: url("chrome://speakeasy/skin/speakeasy_large_button.png");
+}
+
+toolbar[iconsize="small"] #speakeasy-button {
+  list-style-image: url("chrome://speakeasy/skin/speakeasy_small_button.png");
+}
+
+#speakeasy-smart_remove-button {
+  list-style-image: url("chrome://speakeasy/skin/speakeasy-smart_remove-button.png");
+}
+
+toolbar[iconsize="small"] #speakeasy-smart_remove-button {
+  list-style-image: url("chrome://speakeasy/skin/speakeasy-smart_remove-small-button.png");
+}
+
+#speakeasy-remove-button {
+  list-style-image: url("chrome://speakeasy/skin/speakeasy-remove-button.png");
+}
+
+toolbar[iconsize="small"] #speakeasy-remove-button {
+  list-style-image: url("chrome://speakeasy/skin/speakeasy-remove-small-button.png");
+}
+
+#speakeasy-relax-button {
+  list-style-image: url("chrome://speakeasy/skin/speakeasy-relax-button.png");
+}
+
+toolbar[iconsize="small"] #speakeasy-relax-button {
+  list-style-image: url("chrome://speakeasy/skin/speakeasy-relax-small-button.png");
+}
+
+#speakeasy-insert_html-button {
+  list-style-image: url("chrome://speakeasy/skin/speakeasy-insert_html-button.png");
+}
+
+toolbar[iconsize="small"] #speakeasy-insert_html-button {
+  list-style-image: url("chrome://speakeasy/skin/speakeasy-insert_html-small-button.png");
+}
+
+#speakeasy-modify_html-button {
+  list-style-image: url("chrome://speakeasy/skin/speakeasy-modify_html-button.png");
+}
+
+toolbar[iconsize="small"] #speakeasy-modify_html-button {
+  list-style-image: url("chrome://speakeasy/skin/speakeasy-modify_html-small-button.png");
+}
+
+#speakeasy-modify_url-button {
+  list-style-image: url("chrome://speakeasy/skin/speakeasy-modify_url-button.png");
+}
+
+toolbar[iconsize="small"] #speakeasy-modify_url-button {
+  list-style-image: url("chrome://speakeasy/skin/speakeasy-modify_url-small-button.png");
+}
+
+#speakeasy-set_style-button {
+  list-style-image: url("chrome://speakeasy/skin/speakeasy-set_style-button.png");
+}
+
+toolbar[iconsize="small"] #speakeasy-set_style-button {
+  list-style-image: url("chrome://speakeasy/skin/speakeasy-set_style-small-button.png");
+}
+
+#speakeasy-fix_page-button {
+  list-style-image: url("chrome://speakeasy/skin/speakeasy-fix_page-button.png");
+}
+
+toolbar[iconsize="small"] #speakeasy-fix_page-button {
+  list-style-image: url("chrome://speakeasy/skin/speakeasy-fix_page-small-button.png");
+}
+
+#speakeasy-center-button {
+  list-style-image: url("chrome://speakeasy/skin/speakeasy-center-button.png");
+}
+
+toolbar[iconsize="small"] #speakeasy-center-button {
+  list-style-image: url("chrome://speakeasy/skin/speakeasy-center-small-button.png");
+}
+
+#speakeasy-erase-button {
+  list-style-image: url("chrome://speakeasy/skin/speakeasy-erase-button.png");
+}
+
+toolbar[iconsize="small"] #speakeasy-erase-button {
+  list-style-image: url("chrome://speakeasy/skin/speakeasy-erase-small-button.png");
+}
+
+#speakeasy-isolate-button {
+  list-style-image: url("chrome://speakeasy/skin/speakeasy-isolate-button.png");
+}
+
+toolbar[iconsize="small"] #speakeasy-isolate-button {
+  list-style-image: url("chrome://speakeasy/skin/speakeasy-isolate-small-button.png");
+}
+
+#speakeasy-make_bw-button {
+  list-style-image: url("chrome://speakeasy/skin/speakeasy-make_bw-button.png");
+}
+
+toolbar[iconsize="small"] #speakeasy-make_bw-button {
+  list-style-image: url("chrome://speakeasy/skin/speakeasy-make_bw-small-button.png");
+}
+
+#speakeasy-paste-button {
+  list-style-image: url("chrome://speakeasy/skin/speakeasy-paste-button.png");
+}
+
+toolbar[iconsize="small"] #speakeasy-paste-button {
+  list-style-image: url("chrome://speakeasy/skin/speakeasy-paste-small-button.png");
+}
+
+#speakeasy-save_script-button {
+  list-style-image: url("chrome://speakeasy/skin/speakeasy-save_script-button.png");
+}
+
+toolbar[iconsize="small"] #speakeasy-save_script-button {
+  list-style-image: url("chrome://speakeasy/skin/speakeasy-save_script-small-button.png");
+}
+
+#speakeasy-stop_speakeasy-button {
+  list-style-image: url("chrome://speakeasy/skin/speakeasy-stop_speakeasy-button.png");
+}
+
+toolbar[iconsize="small"] #speakeasy-stop_speakeasy-button {
+  list-style-image: url("chrome://speakeasy/skin/speakeasy-stop_speakeasy-small-button.png");
+}
+
+#speakeasy-view_source-button {
+  list-style-image: url("chrome://speakeasy/skin/speakeasy-view_source-button.png");
+}
+
+toolbar[iconsize="small"] #speakeasy-view_source-button {
+  list-style-image: url("chrome://speakeasy/skin/speakeasy-view_source-small-button.png");
+}
+
+#speakeasy-help-button {
+  list-style-image: url("chrome://speakeasy/skin/speakeasy-help-button.png");
+}
+
+toolbar[iconsize="small"] #speakeasy-help-button {
+  list-style-image: url("chrome://speakeasy/skin/speakeasy-help-small-button.png");
+}
+
+#speakeasy-auto_repair-button {
+  list-style-image: url("chrome://speakeasy/skin/speakeasy-auto_repair-button.png");
+}
+
+toolbar[iconsize="small"] #speakeasy-auto_repair-button {
+  list-style-image: url("chrome://speakeasy/skin/speakeasy-auto_repair-small-button.png");
+}
+

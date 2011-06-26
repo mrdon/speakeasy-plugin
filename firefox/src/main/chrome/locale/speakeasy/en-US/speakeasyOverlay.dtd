@@ -1,0 +1,50 @@
+<!ENTITY speakeasy.menuitem.speakeasy "Speakeasy!">
+<!ENTITY speakeasy.menuitem.save.and.ex0 "Save and Exit Speakeasy">
+<!ENTITY speakeasy.menuitem.quit.platyp1 "Quit Speakeasy w/o Save ">
+<!ENTITY speakeasy.menuitem.smart.remove "Smart Remove">
+<!ENTITY speakeasy.menuitem.remove "Remove">
+<!ENTITY speakeasy.menuitem.paste "Paste">
+<!ENTITY speakeasy.menuitem.erase "Erase">
+<!ENTITY speakeasy.menuitem.view.source "View Source">
+<!ENTITY speakeasy.menuitem.isolate "Isolate">
+<!ENTITY speakeasy.menuitem.center "Center">
+<!ENTITY speakeasy.menuitem.black.on.wh2 "Black on White">
+<!ENTITY speakeasy.menuitem.relax "Relax">
+<!ENTITY speakeasy.menuitem.fix.page.ba3 "Fix Page Background">
+<!ENTITY speakeasy.menuitem.set.style "Set Style">
+<!ENTITY speakeasy.menuitem.modify.url.s "Modify URL(s)">
+<!ENTITY speakeasy.menuitem.modify.html "Modify HTML">
+<!ENTITY speakeasy.menuitem.insert.html "Insert HTML">
+<!ENTITY speakeasy.toolbarbutton.platyp4 "Speakeasy">
+<!ENTITY speakeasy.toolbarbutton.start.5 "Start Speakeasy">
+<!ENTITY speakeasy.toolbarbutton.help "Help">
+<!ENTITY speakeasy.toolbarbutton.platyp6 "Speakeasy Help">
+<!ENTITY speakeasy.toolbarbutton.save "Save">
+<!ENTITY speakeasy.toolbarbutton.quit "Quit">
+<!ENTITY speakeasy.toolbarbutton.repair "Repair">
+<!ENTITY speakeasy.toolbarbutton.cut "Cut">
+<!ENTITY speakeasy.toolbarbutton.paste "Paste">
+<!ENTITY speakeasy.toolbarbutton.isolate "Isolate">
+<!ENTITY speakeasy.toolbarbutton.erase "Erase">
+<!ENTITY speakeasy.toolbarbutton.relax "Relax">
+<!ENTITY speakeasy.toolbarbutton.make.bw "Make BW">
+<!ENTITY speakeasy.toolbarbutton.center "Center">
+<!ENTITY speakeasy.toolbarbutton.fix.pa9 "Fix Page">
+<!ENTITY speakeasy.toolbarbutton.remove "Remove">
+<!ENTITY speakeasy.toolbarbutton.set.s11 "Set Style">
+<!ENTITY speakeasy.toolbarbutton.modif13 "Modify URL">
+<!ENTITY speakeasy.toolbarbutton.modif15 "Modify HTML">
+<!ENTITY speakeasy.toolbarbutton.inser17 "Insert HTML">
+<!ENTITY speakeasy.toolbarbutton.view.19 "View Source">
+<!ENTITY speakeasy.toolbar.speakeasy.to21 "Speakeasy Toolbar">
+
+<!ENTITY speakeasy.tooltip.cut "Cuts the element or its parent if it is the only child">
+<!ENTITY speakeasy.tooltip.repair "Finds and isolates the content element">
+<!ENTITY speakeasy.tooltip.save "Save changes as a new Speakeasy extension">
+<!ENTITY speakeasy.tooltip.paste "Pastes cut elements">
+<!ENTITY speakeasy.tooltip.isolate "Isolate the element by removing the surrounding elements">
+<!ENTITY speakeasy.tooltip.erase "Erase element by replacing it with empty space">
+<!ENTITY speakeasy.tooltip.relax "Remove all width restrictions from this and child elements">
+<!ENTITY speakeasy.tooltip.make.bw "Make black text on a while background">
+<!ENTITY speakeasy.tooltip.center "Wrap element in a &lt;center&gt; element">
+<!ENTITY speakeasy.tooltip.fix.page "Turn off the page background">

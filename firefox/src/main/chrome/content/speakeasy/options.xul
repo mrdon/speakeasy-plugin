@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-stylesheet href="chrome://global/skin/" type="text/css"?>
+
+<!DOCTYPE window SYSTEM "chrome://speakeasy/locale/options.dtd" >
+<window title="&speakeasy.window.speakeasy.opti0;" orient="vertical" style="padding: 1em;" onload="reset()" xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
+	
+    <script type="application/x-javascript" src="chrome://speakeasy/content/options.js" />
+
+<!--
+  Copyright (c) 2005, Scott R. Turner
+  Released under the GPL license
+  http://www.gnu.org/copyleft/gpl.html
+-->
+
+
+<vbox>
+  <text value="&speakeasy.text.speakeasy;" style="font-weight: bold; font-size: x-large;" />
+  <separator class="thin" />
+  <checkbox id="debug" label="&speakeasy.checkbox.turn.on.cop1;" />
+  <checkbox id="tabwin" label="&speakeasy.checkbox.use.tabs.wh2;" />
+<!--
+  <checkbox id="auto-install" label="Auto-install scripts on Ctrl-S."/>
+-->
+  
+  <checkbox id="auto-hide" label="&speakeasy.checkbox.auto.hide.t3;" />
+  <checkbox id="highlight-boxes" label="&speakeasy.checkbox.highlight.w4;" />
+  <checkbox id="highlight-fill" label="&speakeasy.checkbox.highlight.w5;" />
+  <hbox>
+  <spacer flex="1" />
+   <button label="&speakeasy.button.close;" oncommand="do_close();" />
+  </hbox>
+</vbox>
+</window>

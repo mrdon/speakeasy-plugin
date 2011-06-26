@@ -1,0 +1,14 @@
+<!ENTITY speakeasy.window.modify.link.t0 "Modify Link Target">
+<!ENTITY speakeasy.description.use.this1 "Use this to match and modify (replace) a URL with regular expressions.">
+<!ENTITY speakeasy.caption.regular.expr2 "Regular expression to match">
+<!ENTITY speakeasy.caption.initial.url "Initial URL">
+<!ENTITY speakeasy.checkbox.replace.all3 "Replace all matches.">
+<!ENTITY speakeasy.checkbox.case.insens4 "Case insensitive.">
+<!ENTITY speakeasy.caption.replace.with5 "Replace with this regular expression">
+<!ENTITY speakeasy.caption.resulting.url "Resulting URL">
+<!ENTITY speakeasy.checkbox.check.here.6 "Check here to apply to all links on page.">
+<!ENTITY speakeasy.button.help "Help!">
+<!ENTITY speakeasy.button.try.it "Try it">
+<!ENTITY speakeasy.button.reset "Reset">
+<!ENTITY speakeasy.button.apply "Apply">
+<!ENTITY speakeasy.button.quit "Quit">

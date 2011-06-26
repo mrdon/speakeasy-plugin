@@ -1,0 +1,8 @@
+<!ENTITY speakeasy.window.insert.arbitr0 "Insert Arbitrary HTML">
+<!ENTITY speakeasy.description.enter.ar1 "Enter arbitrary HTML in the box below.">
+<!ENTITY speakeasy.description.if.you.w2 "(If you were trying to get Speakeasy Help, close this window and use the &apos;?&apos; key!)">
+<!ENTITY speakeasy.radio.insert.before.3 "Insert before selected element">
+<!ENTITY speakeasy.radio.insert.after.s4 "Insert after selected element">
+<!ENTITY speakeasy.checkbox.check.to.in5 "Check to insert as a block (DIV).">
+<!ENTITY speakeasy.button.apply "Apply">
+<!ENTITY speakeasy.button.done "Done">

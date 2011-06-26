@@ -1,0 +1,180 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-stylesheet href="chrome://global/skin/" type="text/css"?>
+
+<!DOCTYPE window SYSTEM "chrome://speakeasy/locale/style-editor.dtd" >
+<!--
+  Copyright (c) 2005, Scott R. Turner
+  Released under the GPL license
+  http://www.gnu.org/copyleft/gpl.html
+-->
+<window id="style-editor-window" title="&speakeasy.window.edit.content.0;" orient="vertical" style="padding: 1em;" onload="self.reset()" xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
+
+    <script type="application/x-javascript" src="chrome://speakeasy/content/style-editor.js" />
+
+    <vbox align="start" flex="1">
+        <description>&speakeasy.description.use.this1;</description>
+	<groupbox>
+	<caption label="&speakeasy.caption.general.prop2;" />
+	<vbox>
+	<hbox flex="1">
+	  <label flex="1" value="&speakeasy.menulist.color;"/>
+	  <menulist id="color" label="&speakeasy.menulist.color;">
+	    <menupopup>
+	        <menuitem label="&speakeasy.menuitem.no.change;" value="" />
+		<menuitem label="&speakeasy.menuitem.aqua;" value="aqua" />
+		<menuitem label="&speakeasy.menuitem.black;" value="black" />
+		<menuitem label="&speakeasy.menuitem.blue;" value="blue" />
+		<menuitem label="&speakeasy.menuitem.fuchsia;" value="fuchsia" />
+		<menuitem label="&speakeasy.menuitem.gray;" value="gray" />
+		<menuitem label="&speakeasy.menuitem.green;" value="green" />
+		<menuitem label="&speakeasy.menuitem.lime;" value="lime" />
+		<menuitem label="&speakeasy.menuitem.maroon;" value="maroon" />
+		<menuitem label="&speakeasy.menuitem.navy;" value="navy" />
+		<menuitem label="&speakeasy.menuitem.olive;" value="olive" />
+		<menuitem label="&speakeasy.menuitem.purple;" value="purple" />
+		<menuitem label="&speakeasy.menuitem.red;" value="red" />
+		<menuitem label="&speakeasy.menuitem.silver;" value="silver" />
+		<menuitem label="&speakeasy.menuitem.teal;" value="teal" />
+		<menuitem label="&speakeasy.menuitem.white;" value="white" />
+		<menuitem label="&speakeasy.menuitem.yellow;" value="yellow" />
+	    </menupopup>
+	  </menulist>
+	  <label flex="1" value="&speakeasy.menulist.background.3;" />
+	  <menulist id="background-color" label="&speakeasy.menulist.background.3;">
+	    <menupopup>
+	        <menuitem label="&speakeasy.menuitem.no.change;" value="" />
+		<menuitem label="&speakeasy.menuitem.aqua;" value="aqua" />
+		<menuitem label="&speakeasy.menuitem.black;" value="black" />
+		<menuitem label="&speakeasy.menuitem.blue;" value="blue" />
+		<menuitem label="&speakeasy.menuitem.fuchsia;" value="fuchsia" />
+		<menuitem label="&speakeasy.menuitem.gray;" value="gray" />
+		<menuitem label="&speakeasy.menuitem.green;" value="green" />
+		<menuitem label="&speakeasy.menuitem.lime;" value="lime" />
+		<menuitem label="&speakeasy.menuitem.maroon;" value="maroon" />
+		<menuitem label="&speakeasy.menuitem.navy;" value="navy" />
+		<menuitem label="&speakeasy.menuitem.olive;" value="olive" />
+		<menuitem label="&speakeasy.menuitem.purple;" value="purple" />
+		<menuitem label="&speakeasy.menuitem.red;" value="red" />
+		<menuitem label="&speakeasy.menuitem.silver;" value="silver" />
+		<menuitem label="&speakeasy.menuitem.teal;" value="teal" />
+		<menuitem label="&speakeasy.menuitem.white;" value="white" />
+		<menuitem label="&speakeasy.menuitem.yellow;" value="yellow" />
+	    </menupopup>
+	  </menulist>
+	  </hbox>
+	<hbox flex="1">
+	<label id="height-label" flex="1" value="&speakeasy.height.300.px;" />
+        <textbox cols="3" id="height" />
+	<label id="width-label" flex="1" value="&speakeasy.width.200.px;Width (e.g., 200px): " />
+        <textbox cols="3" id="width" />
+	</hbox>
+	</vbox>
+	</groupbox>
+	<groupbox>
+	<caption label="&speakeasy.caption.border.prope4;" />
+	<hbox>
+	  <label flex="1" value="Border: " />
+	  <menulist id="border-style" label="&speakeasy.menulist.border;">
+	    <menupopup>
+	        <menuitem label="&speakeasy.menuitem.no.change;" value="" />
+		<menuitem label="&speakeasy.menuitem.none;" value="none" />
+		<menuitem label="&speakeasy.menuitem.solid;" value="solid" />
+		<menuitem label="&speakeasy.menuitem.double;" value="double" />
+		<menuitem label="&speakeasy.menuitem.groove;" value="groove" />
+		<menuitem label="&speakeasy.menuitem.ridge;" value="ridge" />
+		<menuitem label="&speakeasy.menuitem.inset;" value="inset" />
+		<menuitem label="&speakeasy.menuitem.outset;" value="outset" />
+	    </menupopup>
+	  </menulist>
+	  <label flex="1" value="&speakeasy.menulist.border.width;" />
+	  <menulist id="border-width" label="&speakeasy.menulist.border.width;">
+	    <menupopup>
+	        <menuitem label="&speakeasy.menuitem.no.change;" value="" />
+		<menuitem label="&speakeasy.menuitem.none;" value="none" />
+		<menuitem label="&speakeasy.menuitem.thin;" value="thin" />
+		<menuitem label="&speakeasy.menuitem.medium;" value="medium" />
+		<menuitem label="&speakeasy.menuitem.thick;" value="thick" />
+	    </menupopup>
+	  </menulist>
+	  <label flex="1" value="&speakeasy.menulist.border.color;" />
+	  <menulist id="border-color" label="&speakeasy.menulist.border.color;">
+	    <menupopup>
+	        <menuitem label="&speakeasy.menuitem.no.change;" value="" />
+		<menuitem label="&speakeasy.menuitem.aqua;" value="aqua" />
+		<menuitem label="&speakeasy.menuitem.black;" value="black" />
+		<menuitem label="&speakeasy.menuitem.blue;" value="blue" />
+		<menuitem label="&speakeasy.menuitem.fuchsia;" value="fuchsia" />
+		<menuitem label="&speakeasy.menuitem.gray;" value="gray" />
+		<menuitem label="&speakeasy.menuitem.green;" value="green" />
+		<menuitem label="&speakeasy.menuitem.lime;" value="lime" />
+		<menuitem label="&speakeasy.menuitem.maroon;" value="maroon" />
+		<menuitem label="&speakeasy.menuitem.navy;" value="navy" />
+		<menuitem label="&speakeasy.menuitem.olive;" value="olive" />
+		<menuitem label="&speakeasy.menuitem.purple;" value="purple" />
+		<menuitem label="&speakeasy.menuitem.red;" value="red" />
+		<menuitem label="&speakeasy.menuitem.silver;" value="silver" />
+		<menuitem label="&speakeasy.menuitem.teal;" value="teal" />
+		<menuitem label="&speakeasy.menuitem.white;" value="white" />
+		<menuitem label="&speakeasy.menuitem.yellow;" value="yellow" />
+	    </menupopup>
+	  </menulist>
+	</hbox>
+	</groupbox>
+	<groupbox>
+	<caption label="&speakeasy.caption.font.propert5;" />
+	<vbox>
+	<hbox>
+	  <label flex="1" value="&speakeasy.menulist.text.align;" />
+	  <menulist id="text-align" label="&speakeasy.menulist.text.align;">
+	    <menupopup>
+	        <menuitem label="&speakeasy.menuitem.no.change;" value="" />
+		<menuitem label="&speakeasy.menuitem.left;" value="left" />
+		<menuitem label="&speakeasy.menuitem.right;" value="right" />
+		<menuitem label="&speakeasy.menuitem.center;" value="center" />
+		<menuitem label="&speakeasy.menuitem.justify;" value="justify" />
+	    </menupopup>
+	  </menulist>
+	  <label flex="1" value="&speakeasy.menulist.font.style;" />
+	  <menulist id="font-style" label="&speakeasy.menulist.font.style;">
+	    <menupopup>
+	        <menuitem label="&speakeasy.menuitem.no.change;" value="" />
+		<menuitem label="&speakeasy.menuitem.normal;" value="normal" />
+		<menuitem label="&speakeasy.menuitem.italic;" value="italic" />
+		<menuitem label="&speakeasy.menuitem.oblique;" value="oblique" />
+	    </menupopup>
+	  </menulist>
+	  </hbox>
+	  <hbox>
+	  <label flex="1" value="&speakeasy.menulist.font.weight;" />
+	  <menulist id="font-weight" label="&speakeasy.menulist.font.weight;">
+	    <menupopup>
+	        <menuitem label="&speakeasy.menuitem.no.change;" value="" />
+		<menuitem label="&speakeasy.menuitem.lighter;" value="lighter" />
+		<menuitem label="&speakeasy.menuitem.normal;" value="normal" />
+		<menuitem label="&speakeasy.menuitem.bold;" value="bold" />
+		<menuitem label="&speakeasy.menuitem.bolder;" value="bolder" />
+	    </menupopup>
+	  </menulist>
+	  <label flex="1" value="&speakeasy.menulist.font.size;" />
+	  <menulist id="font-size" label="&speakeasy.menulist.font.size;">
+	    <menupopup>
+	        <menuitem label="&speakeasy.menuitem.no.change;" value="" />
+		<menuitem label="&speakeasy.menuitem.xx.small;" value="xx-small" />
+		<menuitem label="&speakeasy.menuitem.x.small;" value="x-small" />
+		<menuitem label="&speakeasy.menuitem.small;" value="small" />
+		<menuitem label="&speakeasy.menuitem.medium;" value="medium" />
+		<menuitem label="&speakeasy.menuitem.large;" value="large" />
+		<menuitem label="&speakeasy.menuitem.x.large;" value="x-large" />
+		<menuitem label="&speakeasy.menuitem.xx.large;" value="xx-large" />
+	    </menupopup>
+	  </menulist>
+	</hbox>
+	</vbox>
+	</groupbox>
+    </vbox>
+    <box pack="end">
+     <button id="apply-button" label="&speakeasy.button.apply;" oncommand="self.opener.apply_style(self.opener.document.commandDispatcher.focusedWindow.document,collect_style());" />
+     <button id="get-button" label="&speakeasy.button.accept;" dlgtype="accept" oncommand="self.opener.accept_style(self.opener.document.commandDispatcher.focusedWindow.document, collect_style()); self.close();" />
+     <button id="close-button" label="&speakeasy.button.cancel;" dlgtype="cancel" oncommand="self.opener.cancel_style(self.opener.document.commandDispatcher.focusedWindow.document); self.close();" />
+    </box>
+</window>
