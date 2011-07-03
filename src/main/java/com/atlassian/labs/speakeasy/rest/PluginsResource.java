@@ -197,7 +197,6 @@ public class PluginsResource
     }
 
     @POST
-    @Path("")
     @Produces("text/html")
     public Response uploadPlugin(@Context HttpServletRequest request)
     {

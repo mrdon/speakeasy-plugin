@@ -24,7 +24,6 @@ public class SettingsResource
     }
 
     @GET
-    @Path("")
     @Produces("application/json")
     public Response getSettings() throws UnauthorizedAccessException
     {
@@ -33,7 +32,6 @@ public class SettingsResource
     }
 
     @PUT
-    @Path("")
     @Produces("application/json")
     public Response save(Settings settings) throws UnauthorizedAccessException
     {
