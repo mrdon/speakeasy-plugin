@@ -48,7 +48,7 @@ function validate(data) {
         errors.push("Invalid key, must be less than 20 characters and only include letters, dashes, and underscores");
     } else if (!data.name || data.name.length > 30) {
         errors.push("Invalid name, must be less than 30 characters");
-    } else if (!data.description || data.description.length > 120) {
+    } else if (data.description.length > 120) {
         errors.push("Invalid description, must be less than 200 characters");
     }
 

@@ -14,7 +14,7 @@
         <div class="description">A short name for your extension.</div>
     </div>
     <div class="field-group">
-        <label for="wizard-description" class="form-icon icon-required">Description</label>
+        <label for="wizard-description" class="form-icon">Description</label>
         <textarea id="wizard-description" name="wizard-description" title="Extension description" rows="5" cols="30"/>
         <div class="description">A short description for your extension.</div>
     </div>
