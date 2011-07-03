@@ -110,9 +110,9 @@ public class ZipTransformer
         mf.getMainAttributes().putValue(Constants.BUNDLE_MANIFESTVERSION, "2");
         mf.getMainAttributes().putValue(OsgiPlugin.ATLASSIAN_PLUGIN_KEY, descriptor.getKey());
         mf.getMainAttributes().putValue(Constants.BUNDLE_SYMBOLICNAME, descriptor.getKey());
-        mf.getMainAttributes().putValue(Constants.BUNDLE_VERSION, descriptor.getVersion());
-        mf.getMainAttributes().putValue(Constants.BUNDLE_NAME, descriptor.getName());
-        mf.getMainAttributes().putValue(Constants.BUNDLE_DESCRIPTION, descriptor.getDescription());
+        mf.getMainAttributes().putValue(Constants.BUNDLE_VERSION, cleanManifestValue(descriptor.getVersion()));
+        mf.getMainAttributes().putValue(Constants.BUNDLE_NAME, cleanManifestValue(descriptor.getName()));
+        mf.getMainAttributes().putValue(Constants.BUNDLE_DESCRIPTION, cleanManifestValue(descriptor.getDescription()));
         mf.getMainAttributes().putValue(Constants.IMPORT_PACKAGE, ConventionDescriptorGenerator.class.getPackage().getName());
         mf.getMainAttributes().putValue("Spring-Context", "*;timeout:=" + PluginUtils.getDefaultEnablingWaitPeriod());
 
@@ -131,6 +131,11 @@ public class ZipTransformer
             throw new RuntimeException("Should never happen", e);
         }
         return bout.toByteArray();
+    }
+
+    private String cleanManifestValue(String name)
+    {
+        return name == null ? null : name.replaceAll("\n|\r", " ");
     }
 
     /**

@@ -185,8 +185,8 @@ function renderRow(plugin) {
     data.user = currentUser;
     data.contextPath = contextPath;
     data.params.screenshotUrl = contextPath + "/rest/speakeasy/1/plugins/screenshot/" + plugin.key + ".png";
-
-    return $(require('./row').render(data));
+    var html = require('./row').render(data);
+    return $(html);
 }
 
 function getActionFromClass(link) {

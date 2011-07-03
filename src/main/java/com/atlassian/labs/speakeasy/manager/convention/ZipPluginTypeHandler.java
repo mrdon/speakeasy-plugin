@@ -4,6 +4,7 @@ import com.atlassian.labs.speakeasy.manager.AbstractOsgiPluginTypeHandler;
 import com.atlassian.labs.speakeasy.manager.PluginTypeHandler;
 import com.atlassian.labs.speakeasy.manager.ZipWriter;
 import com.atlassian.labs.speakeasy.model.JsonManifest;
+import com.atlassian.labs.speakeasy.util.JavascriptEscaper;
 import com.atlassian.plugin.PluginArtifact;
 import com.atlassian.templaterenderer.TemplateRenderer;
 import com.google.common.collect.ImmutableMap;
@@ -78,8 +79,8 @@ public class ZipPluginTypeHandler extends AbstractOsgiPluginTypeHandler implemen
             ZipWriter.addVelocityFileToZip(zout, "atlassian-extension.json", "atlassian-extension.vm", templateRenderer,
                     ImmutableMap.<String,Object>of(
                             "key", pluginKey,
-                            "description", description,
-                            "name", name));
+                            "description", JavascriptEscaper.escape(description),
+                            "name", JavascriptEscaper.escape(name)));
     }
 
     @Override

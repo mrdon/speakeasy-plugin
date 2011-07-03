@@ -350,7 +350,7 @@ public class TestUserProfile
                     .fork()
                 .enablePlugin("test-2")
                 .openForkDialog("test-2")
-                    .setDescription("Fork Description")
+                    .setDescription("Fork\' \"Description\"")
                     .fork();
 
         List<String> messages = page.getSuccessMessages();
@@ -367,7 +367,7 @@ public class TestUserProfile
 
         SpeakeasyUserPage.PluginRow row = page.getPlugins().get("test-2-fork-barney");
         assertEquals("test-2-fork-barney", row.getKey());
-        assertEquals("Fork Description", row.getDescription());
+        assertEquals("Fork\' \"Description\"", row.getDescription());
         assertFalse(page.isPluginEnabled("test-2"));
         assertTrue(page.isPluginEnabled("test-2-fork-barney"));
         assertTrue(page.canExecute("test-2-fork-barney", ExtensionOperations.UNINSTALL));
@@ -387,7 +387,7 @@ public class TestUserProfile
 
         row = page.getPlugins().get("test-2-fork-barney");
         assertEquals("test-2-fork-barney", row.getKey());
-        assertEquals("Fork Description", row.getDescription());
+        assertEquals("Fork\' \"Description\"", row.getDescription());
 
         page.uninstallPlugin("test-2-fork-barney");
         assertTrue(page.isPluginEnabled("test-2"));

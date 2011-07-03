@@ -1,9 +1,6 @@
 package com.atlassian.labs.speakeasy.util;
 
-import java.io.IOException;
-import java.io.Reader;
-import java.io.StringWriter;
-import java.io.Writer;
+import java.io.*;
 
 /**
  *
@@ -22,7 +19,6 @@ public class JavascriptEscaper
                 out.write('n');
             }
             else if (
-                c == '\'' ||
                 c == '\"' ||
                 c == '\\')
             {
@@ -41,5 +37,18 @@ public class JavascriptEscaper
         StringWriter writer = new StringWriter();
         escape(reader, writer);
         return writer.toString();
+    }
+
+    public static String escape(String text)
+    {
+        try
+        {
+            return escape(new StringReader(text));
+        }
+        catch (IOException e)
+        {
+            // should never happen
+            throw new RuntimeException(e);
+        }
     }
 }

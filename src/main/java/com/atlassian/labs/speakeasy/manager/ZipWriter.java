@@ -1,6 +1,8 @@
 package com.atlassian.labs.speakeasy.manager;
 
 import com.atlassian.templaterenderer.TemplateRenderer;
+import com.google.common.base.Function;
+import com.google.common.collect.Maps;
 import org.apache.commons.io.IOUtils;
 
 import java.io.File;
@@ -103,9 +105,35 @@ public class ZipWriter
     public static void addVelocityFileToZip(ZipOutputStream zout, String path, String archetypePath, TemplateRenderer templateRenderer, Map<String, Object> context) throws IOException
     {
         StringWriter writer = new StringWriter();
-        templateRenderer.render("/archetype/" + archetypePath, context, writer);
+        templateRenderer.render("/archetype/" + archetypePath, Maps.transformValues(context, new Function<Object, Object>()
+        {
+            public Object apply(Object from)
+            {
+                if (from instanceof String)
+                {
+                    return new UnescapeRenderer((String)from);
+                }
+                return from;
+            }
+        }), writer);
         ZipEntry entry = new ZipEntry(path);
         zout.putNextEntry(entry);
         IOUtils.copy(new StringReader(writer.toString()), zout);
+    }
+
+    public static class UnescapeRenderer
+    {
+        private final String value;
+        public UnescapeRenderer(String val)
+        {
+            this.value = val;
+        }
+
+        @com.atlassian.templaterenderer.annotations.HtmlSafe
+        @com.atlassian.velocity.htmlsafe.HtmlSafe
+        public String toString()
+        {
+            return value;
+        }
     }
 }

@@ -42,14 +42,14 @@ public class TestExtensionWizard
                 .openInstallDialog()
                 .openCreateExtensionDialog()
                     .key("myextension")
-                    .name("My Extension")
-                    .description("Foo")
+                    .name("My \"Dog's\" Extension")
+                    .description("Foo's \"Ext\"\n")
                     .create();
 
         SpeakeasyUserPage.PluginRow row = page.getPlugins().get("myextension");
         assertNotNull(row);
-        assertEquals("My Extension", row.getName());
-        assertEquals("Foo", row.getDescription());
+        assertEquals("My \"Dog's\" Extension", row.getName());
+        assertEquals("Foo's \"Ext\"", row.getDescription());
         assertEquals("myextension", row.getKey());
         page.uninstallPlugin("myextension");
     }
