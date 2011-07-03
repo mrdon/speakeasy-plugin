@@ -1,0 +1,2 @@
+This product uses the CodeMirror library, written by Marijn Haverbeke <marijnh@gmail.com>, made available under a
+MIT-like license found at http://codemirror.net/LICENSE
