@@ -1,0 +1,9 @@
+
+overlay	chrome://browser/content/browser.xul	chrome://speakeasy/content/speakeasyOverlay.xul
+overlay	chrome://navigator/content/navigator.xul	chrome://speakeasy/content/speakeasyOverlay.xul
+content	speakeasy	jar:chrome/speakeasy.jar!/content/speakeasy/
+
+skin	speakeasy	classic/1.0	jar:chrome/speakeasy.jar!/skin/classic/speakeasy/
+style	chrome://global/content/customizeToolbar.xul	chrome://speakeasy/skin/toolbar-button.css
+
+locale	speakeasy	en-US	jar:chrome/speakeasy.jar!/locale/speakeasy/en-US/

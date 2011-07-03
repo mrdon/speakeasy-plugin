@@ -1,0 +1,43 @@
+<?xml version="1.0"?>
+
+<RDF xmlns="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+	 xmlns:em="http://www.mozilla.org/2004/em-rdf#">
+
+	<Description about="urn:mozilla:install-manifest">
+		<em:id>{97ef1cc6-1992-4e5f-83aa-027ed88eef13}</em:id>
+		<em:name>${project.name}</em:name>
+		<em:version>${project.version}</em:version>
+		<em:description>${project.description}</em:description>
+		<em:creator>Don Brown</em:creator>
+		<em:homepageURL>${project.url}</em:homepageURL>
+		<em:iconURL>chrome://speakeasy/skin/speakeasy_small.png</em:iconURL>
+		<em:aboutURL>chrome://speakeasy/content/about.xul</em:aboutURL>
+		<em:optionsURL>chrome://speakeasy/content/options.xul</em:optionsURL>
+		<em:file>
+		  <Description about="urn:mozilla:extension:file:speakeasy.jar">
+			<em:package>content/speakeasy/</em:package>
+			<em:locale>locale/speakeasy/en-US/</em:locale>
+			<em:locale>locale/speakeasy/de-DE/</em:locale>
+			<em:locale>locale/speakeasy/el-GR/</em:locale>
+			<em:locale>locale/speakeasy/es-ES/</em:locale>
+			<em:locale>locale/speakeasy/fr-FR/</em:locale>
+			<em:locale>locale/speakeasy/it-IT/</em:locale>
+			<em:locale>locale/speakeasy/nl-NL/</em:locale>
+			<em:locale>locale/speakeasy/pt-BR/</em:locale>
+			<em:locale>locale/speakeasy/zh-CN/</em:locale>
+			<em:skin>skin/classic/speakeasy/</em:skin>
+		  </Description>
+		</em:file>
+
+		<!-- Target Application this extension can install into, 
+        	 with minimum and maximum supported versions. --> 
+		<em:targetApplication>
+		  <Description>
+			<em:id>{ec8030f7-c20a-464f-9b0e-13a3a9e97384}</em:id>
+			<em:minVersion>0.3</em:minVersion>
+			<em:maxVersion>5.0.*</em:maxVersion>
+		  </Description>
+		</em:targetApplication>
+		
+	</Description>
+</RDF>

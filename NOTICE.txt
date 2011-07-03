@@ -1,2 +1,8 @@
+This product's icon is created by Kendra Schaefer (http://www.kendraschaefer.com/), made available under the
+Creative Commons Attribution Non-commercial Share Alike (by-nc-sa) license
+
 This product uses the CodeMirror library, written by Marijn Haverbeke <marijnh@gmail.com>, made available under a
 MIT-like license found at http://codemirror.net/LICENSE
+
+This product contains a Firefox extension forked from Mozilla Platypus, written by Scott R. Turner and made available
+under the GPL license, assuming version 2 as it was licensed in 2005.

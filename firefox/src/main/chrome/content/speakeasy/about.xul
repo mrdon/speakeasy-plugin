@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-stylesheet href="chrome://global/skin/" type="text/css"?>
+
+<!DOCTYPE window SYSTEM "chrome://speakeasy/locale/about.dtd" >
+<window title="&speakeasy.window.speakeasy.about;" orient="vertical" autostretch="always" onload="sizeToContent()" xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
+
+<!--
+  Copyright (c) 2005, Scott R. Turner
+  Released under the GPL license
+  http://www.gnu.org/copyleft/gpl.html
+-->
+
+
+<!-- Original template by Jed Brown -->
+
+
+<hbox>
+<vbox>
+  <text value="&speakeasy.text.speakeasy;" style="font-weight: bold; font-size: x-large;" />
+  <text value="&speakeasy.text.ver;&#32;${project.version}" />
+  <separator class="thin" />
+  <text value="&speakeasy.text.created.by;" style="font-weight: bold;" />
+  <text value="Don Brown" class="url" />
+  <separator class="thin" />
+    <text value="&speakeasy.text.home.page;" style="font-weight: bold;" />
+    <text value="${project.url}" class="url" onclick="window.open('${project.url}'); window.close();" />
+  <separator class="thin" />
+</vbox>
+  <spring flex="1" />
+  <image src="chrome://speakeasy/skin/speakeasy_large.png" />
+</hbox>
+
+  <hbox>
+  <spacer flex="1" />
+   <button label="&speakeasy.button.close;" oncommand="window.close();" />
+  </hbox>
+
+</window>

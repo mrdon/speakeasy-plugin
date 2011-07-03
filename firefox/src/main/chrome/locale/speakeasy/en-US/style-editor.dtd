@@ -1,0 +1,62 @@
+<!ENTITY speakeasy.window.edit.content.0 "Edit Content Style">
+<!ENTITY speakeasy.description.use.this1 "Use this to specify the style for the selected element.">
+<!ENTITY speakeasy.caption.general.prop2 "General Properties">
+<!ENTITY speakeasy.menulist.color "Color: ">
+<!ENTITY speakeasy.menuitem.no.change "No change">
+<!ENTITY speakeasy.menuitem.aqua "Aqua">
+<!ENTITY speakeasy.menuitem.black "Black">
+<!ENTITY speakeasy.menuitem.blue "Blue">
+<!ENTITY speakeasy.menuitem.fuchsia "Fuchsia">
+<!ENTITY speakeasy.menuitem.gray "Gray">
+<!ENTITY speakeasy.menuitem.green "Green">
+<!ENTITY speakeasy.menuitem.lime "Lime">
+<!ENTITY speakeasy.menuitem.maroon "Maroon">
+<!ENTITY speakeasy.menuitem.navy "Navy">
+<!ENTITY speakeasy.menuitem.olive "Olive">
+<!ENTITY speakeasy.menuitem.purple "Purple">
+<!ENTITY speakeasy.menuitem.red "Red">
+<!ENTITY speakeasy.menuitem.silver "Silver">
+<!ENTITY speakeasy.menuitem.teal "Teal">
+<!ENTITY speakeasy.menuitem.white "White">
+<!ENTITY speakeasy.menuitem.yellow "Yellow">
+<!ENTITY speakeasy.menulist.background.3 "Background color: ">
+<!ENTITY speakeasy.caption.border.prope4 "Border Properties">
+<!ENTITY speakeasy.menulist.border "Border: ">
+<!ENTITY speakeasy.menuitem.none "None">
+<!ENTITY speakeasy.menuitem.solid "Solid">
+<!ENTITY speakeasy.menuitem.double "Double">
+<!ENTITY speakeasy.menuitem.groove "Groove">
+<!ENTITY speakeasy.menuitem.ridge "Ridge">
+<!ENTITY speakeasy.menuitem.inset "Inset">
+<!ENTITY speakeasy.menuitem.outset "Outset">
+<!ENTITY speakeasy.menulist.border.width "Border width: ">
+<!ENTITY speakeasy.menuitem.thin "Thin">
+<!ENTITY speakeasy.menuitem.medium "medium">
+<!ENTITY speakeasy.menuitem.thick "Thick">
+<!ENTITY speakeasy.menulist.border.color "Border color: ">
+<!ENTITY speakeasy.caption.font.propert5 "Font Properties">
+<!ENTITY speakeasy.menulist.text.align "Text align: ">
+<!ENTITY speakeasy.menuitem.left "Left">
+<!ENTITY speakeasy.menuitem.right "Right">
+<!ENTITY speakeasy.menuitem.center "Center">
+<!ENTITY speakeasy.menuitem.justify "Justify">
+<!ENTITY speakeasy.menulist.font.style "Font style: ">
+<!ENTITY speakeasy.menuitem.normal "Normal">
+<!ENTITY speakeasy.menuitem.italic "Italic">
+<!ENTITY speakeasy.menuitem.oblique "Oblique">
+<!ENTITY speakeasy.menulist.font.weight "Font weight: ">
+<!ENTITY speakeasy.menuitem.lighter "Lighter">
+<!ENTITY speakeasy.menuitem.bold "Bold">
+<!ENTITY speakeasy.menuitem.bolder "Bolder">
+<!ENTITY speakeasy.menulist.font.size "Font size: ">
+<!ENTITY speakeasy.menuitem.xx.small "xx-small">
+<!ENTITY speakeasy.menuitem.x.small "x-small">
+<!ENTITY speakeasy.menuitem.small "small">
+<!ENTITY speakeasy.menuitem.large "large">
+<!ENTITY speakeasy.menuitem.x.large "x-large">
+<!ENTITY speakeasy.menuitem.xx.large "xx-large">
+<!ENTITY speakeasy.button.apply "Apply">
+<!ENTITY speakeasy.button.accept "Accept">
+<!ENTITY speakeasy.button.cancel "Cancel">
+<!ENTITY speakeasy.height.300.px "Height (e.g., 300px): ">
+<!ENTITY speakeasy.width.200.px "Width (e.g., 200px):">

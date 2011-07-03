@@ -1,0 +1,13 @@
+<!ENTITY speakeasy.window.modify.target0 "Modify Target HTML">
+<!ENTITY speakeasy.description.use.this1 "Use this to match and modify (replace) the target&apos;s HTML with regular expressions.">
+<!ENTITY speakeasy.caption.regular.expr2 "Regular expression to match">
+<!ENTITY speakeasy.caption.initial.html "Initial HTML">
+<!ENTITY speakeasy.checkbox.replace.all3 "Replace all matches.">
+<!ENTITY speakeasy.checkbox.case.insens4 "Case insensitive.">
+<!ENTITY speakeasy.caption.replace.with5 "Replace with this regular expression">
+<!ENTITY speakeasy.caption.resulting.ht6 "Resulting HTML">
+<!ENTITY speakeasy.button.help "Help!">
+<!ENTITY speakeasy.button.try.it "Try it">
+<!ENTITY speakeasy.button.reset "Reset">
+<!ENTITY speakeasy.button.apply "Apply">
+<!ENTITY speakeasy.button.quit "Quit">

@@ -1,0 +1,38 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<HTML><HEAD>
+<META http-equiv=Content-Type content="text/html; charset=unicode">
+<META content="MSHTML 6.00.2800.1498" name=GENERATOR></HEAD>
+<BODY>
+<P align=center><FONT size=4><STRONG>Regular Expressions</STRONG></FONT></P>
+<P>Regular expressions are a pattern matching language.&nbsp; Using regular 
+expressions, you can perform amazingly powerful and complicated transformations 
+of text.&nbsp; Regular expressions are rather too complex to fully explain here, 
+so please consult one of these tutorials:</P>
+<P align=center><A href="http://wsabstract.com/javatutors/re.shtml">Introductory 
+Guide to Regular Expressions</A></P>
+<P align=center><A href="http://www.webreference.com/js/column5/">Pattern 
+Matching and Regular Expressions</A></P>
+<P>Or search the web for more information.</P>
+<P align=center><STRONG><FONT size=4>Common Problems</FONT></STRONG> 
+<TABLE cellSpacing=2 cellPadding=2 width="100%" border=1>
+  <TBODY>
+  <TR>
+    <TD vAlign=top bgColor=#ffffaa height=21>
+      <P><STRONG>Special Characters</STRONG></P>
+      <P>If your regular expression isn't working, or is doing something 
+      unexpected, you may be trying to use a special character:</P>
+      <P align=center>
+      <TABLE height=29 cellSpacing=0 width=153 border=1>
+        <TBODY>
+        <TR>
+          <TD vAlign=top width=143 bgColor=#ffffff height=23>
+            <P align=center>\^$*+?.()|{}[]</P></TD></TR></TBODY></TABLE></P>
+      <P>If you want to use one of those characters as part of what you're 
+      matching, you need to put a backslash (\) in front of it.&nbsp; So if you 
+      wanted to match "text.htm?pagewanted" you should write 
+      "text\.htm\?pagewanted".</P>
+      <P align=left>Except for the backslash, none of those characters are 
+      special in the replacement part of the regular expression, so you don't 
+      have to put a backslash in front of them in the replacement 
+  part.</P></TD></TR></TBODY></TABLE></P>
+</BODY></HTML>

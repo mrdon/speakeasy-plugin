@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-stylesheet href="chrome://global/skin/" type="text/css"?>
+
+<!DOCTYPE window SYSTEM "chrome://speakeasy/locale/url-regexp.dtd" >
+<!--
+  Copyright (c) 2005, Scott R. Turner
+  Released under the GPL license
+  http://www.gnu.org/copyleft/gpl.html
+-->
+<window id="style-editor-window" title="&speakeasy.window.modify.link.t0;" orient="vertical" style="padding: 1em;" onload="reset()" xmlns:html="http://www.w3.org/1999/xhtml" xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
+
+    <script type="application/x-javascript" src="chrome://speakeasy/content/url-regexp.js" />
+	
+    <vbox flex="1">
+        <description>&speakeasy.description.use.this1;</description>
+	<hbox flex="1">
+	<groupbox flex="1">
+	<caption label="&speakeasy.caption.regular.expr2;" flex="1" />
+        <textbox multiline="true" id="match" rows="2" cols="40" flex="1" />
+	</groupbox>
+	<groupbox flex="1">
+	<caption label="&speakeasy.caption.initial.url;" flex="1" />
+        <textbox multiline="true" id="initial_url" rows="2" cols="40" flex="1" />
+	</groupbox>
+	</hbox>
+	<checkbox id="global" label="&speakeasy.checkbox.replace.all3;" />
+	<checkbox id="insensitive" label="&speakeasy.checkbox.case.insens4;" />
+	<hbox flex="1">
+	<groupbox flex="1">
+	<caption label="&speakeasy.caption.replace.with5;" flex="1" />
+        <textbox multiline="true" id="replace" rows="2" cols="40" flex="1" />
+	</groupbox>
+	<groupbox flex="1">
+	<caption label="&speakeasy.caption.resulting.url;" flex="1" />
+        <textbox multiline="true" id="result_url" rows="2" cols="40" flex="1" />
+	</groupbox>
+	</hbox>
+	<checkbox id="apply_all" label="&speakeasy.checkbox.check.here.6;" />
+    </vbox>
+    <box pack="end">
+     <button id="help-button" label="&speakeasy.button.help;" oncommand="self.help();" />
+     <button id="apply-button" label="&speakeasy.button.try.it;" oncommand="self.try_it();" />
+     <button id="reset-button" label="&speakeasy.button.reset;" oncommand="self.reset();" />
+     <button id="accept-button" label="&speakeasy.button.apply;" dlgtype="accept" oncommand="self.do_modify_url();self.close();" />
+     <button id="close-button" label="&speakeasy.button.quit;" dlgtype="cancel" oncommand="self.close();" />
+    </box>
+</window>
