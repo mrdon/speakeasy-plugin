@@ -4,8 +4,7 @@
 <!DOCTYPE window SYSTEM "chrome://speakeasy/locale/url-regexp.dtd" >
 <!--
   Copyright (c) 2005, Scott R. Turner
-  Released under the GPL license
-  http://www.gnu.org/copyleft/gpl.html
+  Released under the GPL and APLv2 licenses
 -->
 <window id="style-editor-window" title="&speakeasy.window.modify.link.t0;" orient="vertical" style="padding: 1em;" onload="reset()" xmlns:html="http://www.w3.org/1999/xhtml" xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
 

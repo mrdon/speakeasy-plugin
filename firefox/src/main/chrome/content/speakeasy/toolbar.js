@@ -3,8 +3,7 @@ var mystrings = gspeakeasyBundle.createBundle("chrome://speakeasy/locale/toolbar
 var speakeasyframesdetected = mystrings.GetStringFromName("speakeasyframesdetected");
 //
 //  Copyright (c) 2005, Scott R. Turner
-//  Released under the GPL license
-//  http://www.gnu.org/copyleft/gpl.html
+//  Released under the GPL and APLv2 licenses
 //
 //  Mon May 30 21:45:51 2005 -- Scott R. Turner
 //

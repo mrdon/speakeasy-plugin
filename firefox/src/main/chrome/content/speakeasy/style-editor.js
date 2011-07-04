@@ -1,7 +1,6 @@
 //
 //  Copyright (c) 2005, Scott R. Turner
-//  Released under the GPL license
-//  http://www.gnu.org/copyleft/gpl.html
+//  Released under the GPL and APLv2 licenses
 //
 //  Thu May 05 13:58:28 2005 -- Scott R. Turner
 //

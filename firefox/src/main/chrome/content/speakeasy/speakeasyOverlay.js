@@ -18,8 +18,7 @@ var speakeasythiswebpageconta52 = mystrings.GetStringFromName("speakeasythiswebp
 //  before entering.  We hope you'll enjoy your stay.
 //
 //  Copyright (c) 2005, Scott R. Turner
-//  Released under the GPL license
-//  http://www.gnu.org/copyleft/gpl.html
+//  Released under the GPL and APLv2 licenses
 //
 //
 //  Function Dispatch Table

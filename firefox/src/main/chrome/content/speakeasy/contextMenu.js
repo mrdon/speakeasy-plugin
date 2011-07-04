@@ -6,8 +6,7 @@ var gspeakeasyBundle = Components.classes["@mozilla.org/intl/stringbundle;1"].ge
 var mystrings = gspeakeasyBundle.createBundle("chrome://speakeasy/locale/context-menu.properties");
 //
 //  Copyright (c) 2005, Scott R. Turner
-//  Released under the GPL license
-//  http://www.gnu.org/copyleft/gpl.html
+//  Released under the GPL and APLv2 licenses
 //
 //  Fri May 27 19:17:13 2005 -- Scott R. Turner
 //

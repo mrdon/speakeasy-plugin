@@ -3,8 +3,7 @@ var mystrings = gspeakeasyBundle.createBundle("chrome://speakeasy/locale/html-re
 var speakeasyhelpwithregularex1 = mystrings.GetStringFromName("speakeasyhelpwithregularex1");
 //
 //  Copyright (c) 2005, Scott R. Turner
-//  Released under the GPL license
-//  http://www.gnu.org/copyleft/gpl.html
+//  Released under the GPL and APLv2 licenses
 //
 //  Thu May 05 18:10:22 2005 -- Scott R. Turner
 //

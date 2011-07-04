@@ -4,8 +4,7 @@
 <!DOCTYPE window SYSTEM "chrome://speakeasy/locale/arbitrary-insert.dtd" >
 <!--
   Copyright (c) 2005, Scott R. Turner
-  Released under the GPL license
-  http://www.gnu.org/copyleft/gpl.html
+  Released under the GPL and APLv2 licenses
 -->
 <window id="arbitrary-insert" title="&speakeasy.window.insert.arbitr0;" orient="vertical" style="padding: 1em;" xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
 
