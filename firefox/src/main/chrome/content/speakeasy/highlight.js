@@ -145,7 +145,13 @@ function display_status(elem) {
   //  looks like it always works..?
   //
   var statusTextFld = document.getElementById("statusbar-display");
-  statusTextFld.label = elem.tagName;
+  var txt = "/HTML[1]";
+  if (elem.id != '') {
+    txt = "#" + elem.id;
+  } else {
+    txt = mybuildXPathForElement(elem);
+  }
+  statusTextFld.label = txt;
 }
 
 //
