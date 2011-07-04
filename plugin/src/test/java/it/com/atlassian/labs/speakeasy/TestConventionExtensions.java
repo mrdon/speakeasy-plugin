@@ -45,6 +45,7 @@ public class TestConventionExtensions
          File jar = new PluginJarBuilder("ConventionZip")
                 .addFormattedResource("atlassian-extension.json",
                         "{'key'         : 'test-convention',",
+                        " 'name'         : 'Test Convention',",
                         " 'version'      : '1'",
                         "}")
                 .addResource("js/", "")

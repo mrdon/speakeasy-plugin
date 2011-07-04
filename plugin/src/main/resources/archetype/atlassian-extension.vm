@@ -8,5 +8,6 @@
 			     "url": "http://example.com/extension-homepage.html",
 		       "email": "jane@example.com" },
 
-    "screenshot":   "screenshot.png"
+    "screenshot":   "screenshot.png",
+    "permissions":  []
 }

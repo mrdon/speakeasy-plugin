@@ -1,5 +1,6 @@
 package com.atlassian.labs.speakeasy.manager;
 
+import com.atlassian.labs.speakeasy.model.Permission;
 import com.atlassian.labs.speakeasy.model.Settings;
 import com.atlassian.sal.api.user.UserManager;
 
@@ -31,7 +32,7 @@ public class PermissionManager
     {
         Settings settings = settingsManager.getSettings();
         boolean isAdmin = isAdmin(user);
-        boolean adminsAllowed = settings.isAllowAdmins();
+        boolean adminsAllowed = settings.getPermissions().contains(Permission.ADMINS_ENABLE);
         return canAccessSpeakeasy(user) && !isAdmin || adminsAllowed;
     }
 

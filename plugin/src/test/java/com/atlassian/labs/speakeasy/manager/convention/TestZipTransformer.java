@@ -1,5 +1,6 @@
 package com.atlassian.labs.speakeasy.manager.convention;
 
+import com.atlassian.labs.speakeasy.model.JsonManifest;
 import com.atlassian.plugin.JarPluginArtifact;
 import com.atlassian.plugin.PluginArtifact;
 import com.atlassian.plugin.osgi.factory.OsgiPlugin;
@@ -95,7 +96,9 @@ public class TestZipTransformer
         File zip = new File(jar.getPath() + ".zip");
         FileUtils.moveFile(jar, zip);
 
-        PluginArtifact artifact = zipTransformer.convertConventionZipToPluginJar(new JarPluginArtifact(zip));
+        final JarPluginArtifact jarArtifact = new JarPluginArtifact(zip);
+        JsonManifest jsonMf = new JsonManifestHandler().read(jarArtifact);
+        PluginArtifact artifact = zipTransformer.convertConventionZipToPluginJar(jsonMf, jarArtifact);
         JarFile jarFile = new JarFile(artifact.toFile());
         Manifest mf = jarFile.getManifest();
         for (Map.Entry<String,String> entry : expectedHeaders.entrySet())

@@ -5,7 +5,14 @@ import com.atlassian.labs.speakeasy.manager.convention.JsonVendor;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
+import java.util.List;
 import java.util.Map;
+import java.util.Set;
+
+import static com.atlassian.labs.speakeasy.util.ExtensionValidate.isValidExtensionKey;
+import static com.google.common.collect.Lists.newArrayList;
+import static com.google.common.collect.Maps.newHashMap;
+import static com.google.common.collect.Sets.newHashSet;
 
 /**
  *
@@ -30,10 +37,13 @@ public class JsonManifest
     private JsonVendor vendor;
 
     @XmlElement
-    private Map<Integer, String> icons;
+    private Map<Integer, String> icons = newHashMap();
 
     @XmlElement
     private String screenshot;
+
+    @XmlElement
+    private Set<String> permissions = newHashSet();
 
     public String getKey()
     {
@@ -103,5 +113,38 @@ public class JsonManifest
     public void setScreenshot(String screenshot)
     {
         this.screenshot = screenshot;
+    }
+
+    public Set<String> getPermissions()
+    {
+        return permissions;
+    }
+
+    public void setPermissions(Set<String> permissions)
+    {
+        this.permissions = permissions;
+    }
+
+    public List<String> isValid(Settings settings)
+    {
+        List<String> errors = newArrayList();
+        ensure(isValidExtensionKey(key), "Extension key ", errors);
+        ensure(name != null && name.length()  < 30, "Name must be between 0 and 30 characters", errors);
+        ensure(version != null && version.length()  < 20, "Version must be between 0 and 20 characters", errors);
+        ensure(permissions != null, "Missing permissions", errors);
+
+        for (String perm : permissions)
+        {
+            ensure(settings.allowsPermission(perm), "Permission '" + perm + "' not allowed on this instance", errors);
+        }
+        return errors;
+    }
+
+    private void ensure(boolean test, String errorMessage, List<String> errors)
+    {
+        if (!test)
+        {
+            errors.add(errorMessage);
+        }
     }
 }

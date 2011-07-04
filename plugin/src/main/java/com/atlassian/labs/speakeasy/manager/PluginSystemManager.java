@@ -3,6 +3,7 @@ package com.atlassian.labs.speakeasy.manager;
 import com.atlassian.labs.speakeasy.PluginType;
 import com.atlassian.labs.speakeasy.commonjs.descriptor.CommonJsModulesDescriptor;
 import com.atlassian.labs.speakeasy.data.SpeakeasyData;
+import com.atlassian.labs.speakeasy.manager.convention.JsonManifestHandler;
 import com.atlassian.labs.speakeasy.manager.convention.ZipPluginTypeHandler;
 import com.atlassian.labs.speakeasy.manager.convention.ZipTransformer;
 import com.atlassian.labs.speakeasy.product.ProductAccessor;
@@ -38,7 +39,9 @@ public class PluginSystemManager
     private final Map<PluginType,PluginTypeHandler> typeHandlers;
 
 
-    public PluginSystemManager(PluginController pluginController, PluginAccessor pluginAccessor, SpeakeasyData data, BundleContext bundleContext, TemplateRenderer templateRenderer, UserManager userManager, ProductAccessor productAccessor, ZipTransformer zipTransformer)
+    public PluginSystemManager(PluginController pluginController, PluginAccessor pluginAccessor, SpeakeasyData data,
+                               BundleContext bundleContext, TemplateRenderer templateRenderer, SettingsManager settingsManager,
+                               ProductAccessor productAccessor, ZipTransformer zipTransformer, JsonManifestHandler jsonHandler)
     {
         this.pluginController = pluginController;
         this.pluginAccessor = pluginAccessor;
@@ -46,7 +49,7 @@ public class PluginSystemManager
         this.productAccessor = productAccessor;
         this.typeHandlers = ImmutableMap.of(
             PluginType.JAR, new JarPluginTypeHandler(bundleContext, templateRenderer),
-            PluginType.ZIP, new ZipPluginTypeHandler(bundleContext, zipTransformer, templateRenderer),
+            PluginType.ZIP, new ZipPluginTypeHandler(bundleContext, zipTransformer, templateRenderer, jsonHandler, settingsManager),
             PluginType.XML, new XmlPluginTypeHandler()
         );
     }

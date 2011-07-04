@@ -35,7 +35,7 @@ public class AdminPage implements Page
     public EditView edit()
     {
         driver.findElement(By.id("sp-edit")).click();
-        driver.waitUntilElementIsVisible(By.id("sp-allowadmins-edit"));
+        driver.waitUntilElementIsVisible(By.id("sp-ADMINS_ENABLE-edit"));
         return new EditView();
     }
 
@@ -53,7 +53,7 @@ public class AdminPage implements Page
     {
         public EditView allowAdmins(boolean val)
         {
-            toggle(By.id("sp-allowadmins-edit"), val);
+            toggle(By.id("sp-ADMINS_ENABLE-edit"), val);
             return this;
         }
 
