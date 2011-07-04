@@ -31,5 +31,4 @@
             <url>http://download.eclipse.org/jgit/maven</url>
         </repository>
     </repositories>
-
 </project>

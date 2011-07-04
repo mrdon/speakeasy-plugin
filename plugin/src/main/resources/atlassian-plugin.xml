@@ -25,6 +25,10 @@
         <url-pattern>/git/*</url-pattern>
      </servlet>
 
+    <servlet key="applinks-proxy" name="Applinks Proxy" class="com.atlassian.labs.speakeasy.rest.AppLinksProxyResource">
+        <url-pattern>/applinks/proxy</url-pattern>
+    </servlet>
+
     <commonjs key="sharedModules" location="packages/shared">
         <transformation extension="host">
             <transformer key="commonjs-module" fullModuleKey="${project.groupId}.${project.artifactId}:sharedModules"/>
@@ -133,6 +137,7 @@
     <component-import key="xsrfTokenAccessor" interface="com.atlassian.sal.api.xsrf.XsrfTokenAccessor" />
     <component-import key="xsrfTokenValidator" interface="com.atlassian.sal.api.xsrf.XsrfTokenValidator" />
     <component-import key="eventPublisher" interface="com.atlassian.event.api.EventPublisher" />
+    <component-import key="applicationLinkService" interface="com.atlassian.applinks.api.ApplicationLinkService" />
 
     <module-type key="scoped-web-resource" class="com.atlassian.labs.speakeasy.descriptor.SpeakeasyWebResourceModuleDescriptor"/>
 
