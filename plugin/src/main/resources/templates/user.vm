@@ -7,14 +7,11 @@
         var xsrfTokenName = "$xsrfTokenName";
         var xsrfToken = "$xsrfToken";
     </script>
-
-<div style="margin-top: -55px; margin-left: 350px;" id="aui-message-bar">
     #if (!$doesAnyGroupHaveAccess)
         <div class="aui-message warning closeable"><p class="title"><span class="aui-icon icon-warning"></span></p>
             No one has access to this page.  Click <a href="$contextPath/plugins/servlet/speakeasy/admin">here</a> to change these settings.
         </div>
     #end
-</div>
 #if ($canAuthor)
 <div id="sp-top-bar">
     <a id="sp-install" href="#">Install</a>
