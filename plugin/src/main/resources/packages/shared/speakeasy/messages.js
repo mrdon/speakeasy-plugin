@@ -18,12 +18,12 @@ function addMessage(type, params) {
         AJS.messages.error(params);
     }
 
-    var msg = $("#aui-message-bar").children(".aui-message");
-    window.setTimeout(function() { msg.fadeOut(1500) }, 5000);
+    var msg = $("#aui-message-bar");
+    window.setTimeout(function() { msg.fadeOut(1500, clear) }, 5000); // Check syntax of the callback for fadeOut
 }
 
 function clear() {
-    $("#aui-message-bar").children(".aui-message").remove();
+    $("#aui-message-bar").empty().remove();
 }
 
 /**
