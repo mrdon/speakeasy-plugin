@@ -8,6 +8,7 @@ var $ = require('./jquery').jQuery;
 function addMessage(type, params) {
     clear();
 
+    var msg = $('<div id="aui-message-bar" />').appendTo($(document.body));
     if (type == "success") {
         AJS.messages.success(params);
     }
@@ -18,7 +19,6 @@ function addMessage(type, params) {
         AJS.messages.error(params);
     }
 
-    var msg = $("#aui-message-bar");
     window.setTimeout(function() { msg.fadeOut(1500, clear) }, 5000); // Check syntax of the callback for fadeOut
 }
 

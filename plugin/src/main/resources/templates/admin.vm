@@ -22,7 +22,10 @@
     <fieldset>
         <h2>Extension Visibility and Features</h2>
         <div class="field-group" id="sp-access-groups">
-            <label for="sp-access-groups-edit" class="form-icon icon-required">Access groups</label>
+            <label for="sp-access-groups-edit">
+                Access groups
+                <span class="form-icon icon-required"></span>
+            </label>
             <div class="edit">
                 <textarea id="sp-access-groups-edit" name="sp-access-groups" title="Access Groups" cols="50" rows="10"></textarea>
                 <div class="description">Groups allowed to access Speakeasy, one per line</div>
@@ -33,7 +36,10 @@
         </div>
         #foreach ($perm in $permissions)
         <div class="field-group">
-            <label for="sp-${perm.key}-edit" class="form-icon icon-required">$perm.title</label>
+            <label for="sp-${perm.key}-edit">
+                $perm.title
+                <span class="form-icon icon-required"></span>
+            </label>
             <div class="edit">
                 <input class="checkbox" type="checkbox" id="sp-${perm.key}-edit" name="sp-${perm.key}" title="$perm.title" />
                 <div class="description">$perm.description</div>
@@ -47,7 +53,10 @@
     <fieldset>
         <h2>Extension Authoring</h2>
         <div class="field-group" id="sp-author-groups">
-            <label for="sp-author-groups-edit" class="form-icon icon-required">Author groups</label>
+            <label for="sp-author-groups-edit">
+                Author groups
+                <span class="form-icon icon-required"></span>
+            </label>
             <div class="edit">
                 <textarea id="sp-author-groups-edit" name="sp-author-groups" title="Author Groups" cols="50" rows="10"></textarea>
                 <div class="description">Groups allowed to author extensions, one per line.  For security reasons, only
