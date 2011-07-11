@@ -91,7 +91,7 @@
             You can search through the contents of the all extensions using a regular expression.  The name and key of all
             extensions that have at least one match are listed after a search.
         </p>
-        <form action="#" method="post" class="aui">
+        <form action="#" method="post" class="aui" id="sp-search-form">
           <label for="sp-search-field">Search</label>
           <input class="text" type="text" id="sp-search-field" name="sp-search-field" title="Regular expression for search">
           <button class="button" id="sp-search-submit" data-href="/rest/speakeasy/1/plugins/search">Search</button>

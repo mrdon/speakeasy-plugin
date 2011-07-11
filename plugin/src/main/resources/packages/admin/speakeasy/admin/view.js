@@ -84,7 +84,6 @@ var editArgs = {
 _.each(permissions, function(perm) {
    editArgs.events['click #sp-' + perm + '-edit'] = "toggle-" + perm;
    editArgs['toggle-' + perm] = function() {
-       debugger;
        var perms = this.model.get('permissions');
        if (_.indexOf(perms, perm) > -1) {
            this.model.set({'permissions': _.without(perms, perm)});

@@ -48,6 +48,7 @@ function executeSearch(button, text) {
 exports.init = function() {
     $('#sp-search-submit').click(function(e) {
         e.preventDefault();
+        $.data($('#sp-search-form')[0], AJS.DIRTY_FORM_VALUE, null);
         executeSearch($(e.target), $('#sp-search-field').val());
     });
 };
