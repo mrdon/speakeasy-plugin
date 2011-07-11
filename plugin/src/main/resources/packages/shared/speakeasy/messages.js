@@ -8,19 +8,19 @@ var $ = require('./jquery').jQuery;
 function addMessage(type, params) {
     clear();
 
-    var bar = $('#aui-message-bar');
-    if ($('#aui-message-bar').length == 0) {
-        bar = $('<div id="aui-message-bar" />').appendTo($(document.body));
+    var bar = $('#sp-message-bar');
+    if (bar.length == 0) {
+        bar = $('<div id="sp-message-bar" />').appendTo($(document.body));
     }
 
     if (type == "success") {
-        AJS.messages.success(params);
+        AJS.messages.success(bar, params);
     }
     else if (type == "warning") {
-        AJS.messages.warning(params);
+        AJS.messages.warning(bar, params);
     }
     else if (type == "error") {
-        AJS.messages.error(params);
+        AJS.messages.error(bar, params);
     }
 
     var msg = bar.children(".aui-message");
@@ -28,7 +28,7 @@ function addMessage(type, params) {
 }
 
 function clear() {
-    $("#aui-message-bar").empty();
+    $("#sp-message-bar").empty();
 }
 
 /**

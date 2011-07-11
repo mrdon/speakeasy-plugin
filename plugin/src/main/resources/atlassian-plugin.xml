@@ -113,6 +113,7 @@
     <component key="remotePluginBuilder" class="com.atlassian.labs.speakeasy.manager.ExtensionBuilder" />
     <component key="extensionManager" class="com.atlassian.labs.speakeasy.manager.ExtensionManager" />
     <component key="extensionOperationManager" class="com.atlassian.labs.speakeasy.manager.ExtensionOperationManager" />
+    <component key="searchManager" class="com.atlassian.labs.speakeasy.manager.SearchManager" />
     <component key="firefoxXpi" class="com.atlassian.labs.speakeasy.ui.FirefoxXpi" />
 
     <component key="conventionDescriptorGenerator" class="com.atlassian.labs.speakeasy.manager.convention.ConventionDescriptorGeneratorServiceFactory" public="true">

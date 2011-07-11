@@ -3,10 +3,7 @@ package com.atlassian.labs.speakeasy;
 import com.atlassian.event.api.EventPublisher;
 import com.atlassian.labs.speakeasy.event.PluginInstalledEvent;
 import com.atlassian.labs.speakeasy.manager.*;
-import com.atlassian.labs.speakeasy.model.Extension;
-import com.atlassian.labs.speakeasy.model.UserExtension;
-import com.atlassian.labs.speakeasy.model.Settings;
-import com.atlassian.labs.speakeasy.model.UserPlugins;
+import com.atlassian.labs.speakeasy.model.*;
 import com.atlassian.labs.speakeasy.product.ProductAccessor;
 import com.atlassian.labs.speakeasy.util.FeedBuilder;
 import com.atlassian.labs.speakeasy.util.exec.KeyedSyncExecutor;
@@ -53,8 +50,9 @@ public class SpeakeasyService
     private final KeyedSyncExecutor<UserExtension, String> exec;
     private final ExtensionManager extensionManager;
     private static final Logger log = LoggerFactory.getLogger(SpeakeasyService.class);
+    private final SearchManager searchManager;
 
-    public SpeakeasyService(PluginAccessor pluginAccessor, PluginSystemManager pluginSystemManager, ProductAccessor productAccessor, BundleContext bundleContext, PermissionManager permissionManager, UserManager userManager, SettingsManager settingsManager, ApplicationProperties applicationProperties, WebResourceManager webResourceManager, EventPublisher eventPublisher, ExtensionOperationManager extensionOperationManager, final ExtensionManager extensionManager)
+    public SpeakeasyService(PluginAccessor pluginAccessor, PluginSystemManager pluginSystemManager, ProductAccessor productAccessor, BundleContext bundleContext, PermissionManager permissionManager, UserManager userManager, SettingsManager settingsManager, ApplicationProperties applicationProperties, WebResourceManager webResourceManager, EventPublisher eventPublisher, ExtensionOperationManager extensionOperationManager, final ExtensionManager extensionManager, SearchManager searchManager)
     {
         this.pluginAccessor = pluginAccessor;
         this.pluginSystemManager = pluginSystemManager;
@@ -68,6 +66,7 @@ public class SpeakeasyService
         this.eventPublisher = eventPublisher;
         this.extensionManager = extensionManager;
         this.extensionOperationManager = extensionOperationManager;
+        this.searchManager = searchManager;
         this.exec = new KeyedSyncExecutor<UserExtension, String>()
         {
             @Override
@@ -436,6 +435,13 @@ public class SpeakeasyService
         {
             throw new PluginOperationFailedException(ex.getMessage(), ex, pluginKey);
         }
+    }
+
+    public SearchResults search(String searchQuery, String remoteUsername)
+    {
+        // restrict to admins due to very inefficient search implementation
+        validateAdmin(remoteUsername);
+        return searchManager.search(searchQuery);
     }
 
     public Settings getSettings(String userName) throws UnauthorizedAccessException

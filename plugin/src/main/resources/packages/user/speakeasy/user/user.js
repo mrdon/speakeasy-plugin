@@ -11,6 +11,7 @@ var fork = require('./fork/fork');
 var pac = require('./pac/pac');
 var git = require('./git/git');
 var install = require('./install/install');
+var spinner = require('speakeasy/spinner');
 
 var pluginActions = {
     'edit' : function (key, link, attachedRow) {
@@ -46,15 +47,9 @@ function getErrorMessage(xhr) {
     return xhr.responseText.indexOf("{") == 0 ? $.parseJSON(xhr.responseText).message : xhr.responseText;
 }
 
-function replaceWithSpinner(e) {
-    var old = e.html();
-    e.html('<img alt="waiting" src="' + staticResourcesPrefix + '/download/resources/com.atlassian.labs.speakeasy-plugin:shared/images/wait.gif" />');
-    return old;
-}
-
 function enablePlugin(pluginKey, link, attachedRow) {
     var pluginName = $('.plugin-name', attachedRow).text();
-    var oldLinkHtml = replaceWithSpinner(link);
+    var oldLinkHtml = spinner.replace(link);
     $.ajax({
               url: getAbsoluteHref(link),
               type: 'PUT',
@@ -71,7 +66,7 @@ function enablePlugin(pluginKey, link, attachedRow) {
 
 function disablePlugin(pluginKey, link, attachedRow) {
     var pluginName = $('.plugin-name', attachedRow).text();
-    var oldLinkHtml = replaceWithSpinner(link);
+    var oldLinkHtml = spinner.replace(link);
     $.ajax({
               url: getAbsoluteHref(link),
               type: 'DELETE',
@@ -88,7 +83,7 @@ function disablePlugin(pluginKey, link, attachedRow) {
 
 function uninstallPlugin(pluginKey, link, attachedRow) {
     var pluginName = $('.plugin-name', attachedRow).text();
-    var oldLinkHtml = replaceWithSpinner(link);
+    var oldLinkHtml = spinner.replace(link);
     $.ajax({
               url: getAbsoluteHref(link),
               type: 'DELETE',
@@ -114,7 +109,7 @@ function unfavorite($link) {
 }
 function updateFavorite($link, method, successActionText, failureActionText) {
     messages.clear();
-    replaceWithSpinner($link);
+    spinner.replace($link);
     var pluginName = $('.plugin-name', $link.closest('tr')).text();
     $.ajax({
               url: getAbsoluteHref($link),
@@ -251,7 +246,6 @@ function initSpeakeasy() {
                      toString: function () { return this.URL; }
             }
         };
-        debugger;
         InstallTrigger.install(params);
     });
 

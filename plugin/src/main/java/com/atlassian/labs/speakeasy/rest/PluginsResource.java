@@ -4,6 +4,7 @@ import com.atlassian.labs.speakeasy.PluginType;
 import com.atlassian.labs.speakeasy.SpeakeasyService;
 import com.atlassian.labs.speakeasy.UnauthorizedAccessException;
 import com.atlassian.labs.speakeasy.manager.PluginOperationFailedException;
+import com.atlassian.labs.speakeasy.model.SearchResults;
 import com.atlassian.labs.speakeasy.model.UserExtension;
 import com.atlassian.labs.speakeasy.model.PluginIndex;
 import com.atlassian.labs.speakeasy.model.UserPlugins;
@@ -113,6 +114,16 @@ public class PluginsResource
         {
             throw new PluginOperationFailedException("Missing extension on '" + pluginKeyAndExtension, null);
         }
+    }
+
+    @POST
+    @Path("search")
+    @Produces("application/json")
+    @RequiresXsrfCheck
+    public Response search(@FormParam("q") String searchQuery) throws UnauthorizedAccessException
+    {
+        SearchResults entity = speakeasyService.search(searchQuery, userManager.getRemoteUsername());
+        return Response.ok().entity(entity).build();
     }
 
     @POST

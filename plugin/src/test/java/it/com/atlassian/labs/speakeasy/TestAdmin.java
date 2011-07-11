@@ -154,4 +154,12 @@ public class TestAdmin
         logout();
         assertFalse(product.visit(LoginPage.class).login("barney", "barney", UnauthorizedUserPage.class).isAccessForbidden());
     }
+
+    @Test
+    public void testSearch()
+    {
+        final AdminPage page = product.visit(AdminPage.class);
+        assertTrue(page.search("tests").contains("plugin-tests"));
+        assertTrue(page.search("asdfweqasfdsdfweqasdf").isEmpty());
+    }
 }

@@ -1,0 +1,20 @@
+#sp-message-bar {
+    position: fixed;
+    width: 500px;
+    right: 50px;
+    top: 50px;
+    margin: 0;
+}
+
+#sp-message-bar .aui-message {
+    -moz-border-radius: 5px;
+    -ms-border-radius: 5px;
+    -o-border-radius: 5px;
+    -webkit-border-radius: 5px;
+    border-radius: 5px;
+    -moz-box-shadow: 5px 5px 5px #999;
+    -ms-box-shadow: 5px 5px 5px #999;
+    -o-box-shadow: 5px 5px 5px #999;
+    -webkit-box-shadow: 5px 5px 5px #999;
+    box-shadow: 5px 5px 5px #999;
+}

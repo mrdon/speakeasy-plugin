@@ -1,23 +1,25 @@
 package com.atlassian.labs.speakeasy.util;
 
-import com.atlassian.plugin.PluginParseException;
 import com.atlassian.plugin.osgi.factory.OsgiPlugin;
 import com.google.common.base.Predicate;
 import com.google.common.base.Predicates;
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.Validate;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.StringWriter;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-
-import static com.google.common.base.Predicates.notNull;
 
 /**
  *
@@ -59,6 +61,23 @@ public class BundleUtil
             }
         }
         return paths;
+    }
+
+    public static String readEntryToString(String path, Bundle bundle) throws IOException
+    {
+        URL url = bundle.getEntry(path);
+        InputStream in = null;
+        try
+        {
+            StringWriter writer = new StringWriter();
+            in = url.openStream();
+            IOUtils.copy(in, writer);
+            return writer.toString();
+        }
+        finally
+        {
+            IOUtils.closeQuietly(in);
+        }
     }
 
     private static Iterable<String> getDirContents(Bundle bundle, String startPath)

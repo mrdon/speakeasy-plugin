@@ -14,67 +14,92 @@
         var permissions = $permissionsJson.render();
     </script>
 <h1>Extension Administration</h1>
-<p>
-    The following settings configure who can access, enable, and author Speakeasy extensions.
-</p>
-<div id="aui-message-bar"></div>
-<form action="#" method="post" class="aui" id="sp-form">
-    <fieldset>
-        <h2>Extension Visibility and Features</h2>
-        <div class="field-group" id="sp-access-groups">
-            <label for="sp-access-groups-edit">
-                Access groups
-                <span class="form-icon icon-required"></span>
-            </label>
-            <div class="edit">
-                <textarea id="sp-access-groups-edit" name="sp-access-groups" title="Access Groups" cols="50" rows="10"></textarea>
-                <div class="description">Groups allowed to access Speakeasy, one per line</div>
-            </div>
-            <div class="view">
-                <div id="sp-access-groups-view"></div>
-            </div>
-        </div>
-        #foreach ($perm in $permissions)
-        <div class="field-group">
-            <label for="sp-${perm.key}-edit">
-                $perm.title
-                <span class="form-icon icon-required"></span>
-            </label>
-            <div class="edit">
-                <input class="checkbox" type="checkbox" id="sp-${perm.key}-edit" name="sp-${perm.key}" title="$perm.title" />
-                <div class="description">$perm.description</div>
-            </div>
-            <div class="view">
-                <div id="sp-${perm.key}-view"></div>
-            </div>
-        </div>
-        #end
-    </fieldset>
-    <fieldset>
-        <h2>Extension Authoring</h2>
-        <div class="field-group" id="sp-author-groups">
-            <label for="sp-author-groups-edit">
-                Author groups
-                <span class="form-icon icon-required"></span>
-            </label>
-            <div class="edit">
-                <textarea id="sp-author-groups-edit" name="sp-author-groups" title="Author Groups" cols="50" rows="10"></textarea>
-                <div class="description">Groups allowed to author extensions, one per line.  For security reasons, only
-                    add groups for which you trust all its users.</div>
-            </div>
-            <div class="view">
-                <div id="sp-author-groups-view"></div>
-            </div>
-        </div>
-    </fieldset>
+<div class="aui-tabs horizontal-tabs" id="horizontal">
+    <ul class="tabs-menu">
+        <li class="menu-item active-tab">
+            <a href="#sp-settings"><strong>Settings</strong></a>
+        </li>
+        <li class="menu-item">
+            <a href="#sp-search" id="sp-search-tab"><strong>Search</strong></a>
+        </li>
+    </ul>
+    <div class="tabs-pane active-pane" id="sp-settings">
+        <p>
+            The following settings configure who can access, enable, and author Speakeasy extensions.
+        </p>
+        <form action="#" method="post" class="aui" id="sp-form">
+            <fieldset>
+                <h2>Extension Visibility and Features</h2>
+                <div class="field-group" id="sp-access-groups">
+                    <label for="sp-access-groups-edit">
+                        Access groups
+                        <span class="form-icon icon-required"></span>
+                    </label>
+                    <div class="edit">
+                        <textarea id="sp-access-groups-edit" name="sp-access-groups" title="Access Groups" cols="50" rows="10"></textarea>
+                        <div class="description">Groups allowed to access Speakeasy, one per line</div>
+                    </div>
+                    <div class="view">
+                        <div id="sp-access-groups-view"></div>
+                    </div>
+                </div>
+                #foreach ($perm in $permissions)
+                <div class="field-group">
+                    <label for="sp-${perm.key}-edit">
+                        $perm.title
+                        <span class="form-icon icon-required"></span>
+                    </label>
+                    <div class="edit">
+                        <input class="checkbox" type="checkbox" id="sp-${perm.key}-edit" name="sp-${perm.key}" title="$perm.title" />
+                        <div class="description">$perm.description</div>
+                    </div>
+                    <div class="view">
+                        <div id="sp-${perm.key}-view"></div>
+                    </div>
+                </div>
+                #end
+            </fieldset>
+            <fieldset>
+                <h2>Extension Authoring</h2>
+                <div class="field-group" id="sp-author-groups">
+                    <label for="sp-author-groups-edit">
+                        Author groups
+                        <span class="form-icon icon-required"></span>
+                    </label>
+                    <div class="edit">
+                        <textarea id="sp-author-groups-edit" name="sp-author-groups" title="Author Groups" cols="50" rows="10"></textarea>
+                        <div class="description">Groups allowed to author extensions, one per line.  For security reasons, only
+                            add groups for which you trust all its users.</div>
+                    </div>
+                    <div class="view">
+                        <div id="sp-author-groups-view"></div>
+                    </div>
+                </div>
+            </fieldset>
 
-    <div class="buttons-container">
-        <div class="buttons">
-            <input id="sp-save" class="button submit edit" type="submit" value="Save" />
-            <a id="sp-edit" class="view" href="#edit">Edit</a>
-        </div>
+            <div class="buttons-container">
+                <div class="buttons">
+                    <input id="sp-save" class="button submit edit" type="submit" value="Save" />
+                    <a id="sp-edit" class="view" href="#edit">Edit</a>
+                </div>
+            </div>
+        </form>
     </div>
-</form>
+    <div class="tabs-pane" id="sp-search">
+        <h1>Search</h1>
+        <p>
+            You can search through the contents of the all extensions using a regular expression.  The name and key of all
+            extensions that have at least one match are listed after a search.
+        </p>
+        <form action="#" method="post" class="aui">
+          <label for="sp-search-field">Search</label>
+          <input class="text" type="text" id="sp-search-field" name="sp-search-field" title="Regular expression for search">
+          <button class="button" id="sp-search-submit" data-href="/rest/speakeasy/1/plugins/search">Search</button>
+        </form>
+        <div id="sp-search-results">
+
+        </div>
 </div>
+<div id="sp-message-bar"></div>
 </body>
 </html>
