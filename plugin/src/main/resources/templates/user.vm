@@ -144,3 +144,4 @@ align="absmiddle" src="$staticResourcesPrefix/download/resources/com.atlassian.l
 </script>
 
 </div>
+<div id="aui-message-bar" />

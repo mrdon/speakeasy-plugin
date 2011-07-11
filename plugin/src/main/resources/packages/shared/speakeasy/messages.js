@@ -8,7 +8,11 @@ var $ = require('./jquery').jQuery;
 function addMessage(type, params) {
     clear();
 
-    var msg = $('<div id="aui-message-bar" />').appendTo($(document.body));
+    var bar = $('#aui-message-bar');
+    if ($('#aui-message-bar').length == 0) {
+        bar = $('<div id="aui-message-bar" />').appendTo($(document.body));
+    }
+
     if (type == "success") {
         AJS.messages.success(params);
     }
@@ -19,11 +23,12 @@ function addMessage(type, params) {
         AJS.messages.error(params);
     }
 
-    window.setTimeout(function() { msg.fadeOut(1500, clear) }, 5000); // Check syntax of the callback for fadeOut
+    var msg = bar.children(".aui-message");
+    window.setTimeout(function() { msg.fadeOut(1500) }, 5000); // Check syntax of the callback for fadeOut
 }
 
 function clear() {
-    $("#aui-message-bar").empty().remove();
+    $("#aui-message-bar").empty();
 }
 
 /**

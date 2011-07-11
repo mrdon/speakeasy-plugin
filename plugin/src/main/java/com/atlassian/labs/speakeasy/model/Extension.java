@@ -8,6 +8,8 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlRootElement;
 import java.util.HashMap;
 
+import static org.apache.commons.lang.Validate.notNull;
+
 /**
  *
  */
@@ -43,6 +45,7 @@ public class Extension implements Comparable
 
     public Extension(Plugin plugin)
     {
+        notNull(plugin);
         this.key = plugin.getKey();
         this.name = plugin.getName();
         this.description = plugin.getPluginInformation().getDescription();
