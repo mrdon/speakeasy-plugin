@@ -3,11 +3,14 @@ package it.com.atlassian.labs.speakeasy;
 import com.atlassian.pageobjects.TestedProduct;
 import com.atlassian.pageobjects.page.HomePage;
 import com.atlassian.pageobjects.page.LoginPage;
+import com.atlassian.plugin.test.PluginJarBuilder;
 import com.atlassian.webdriver.pageobjects.WebDriverTester;
+import org.apache.commons.io.FileUtils;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
@@ -39,7 +42,7 @@ public class TestAdmin
     }
 
     @Test
-    public void testAllowAdminsToEnable()
+    public void testAllowAdminsToEnable() throws IOException
     {
         product.visit(AdminPage.class)
                 .edit()
@@ -52,14 +55,35 @@ public class TestAdmin
                .login("barney", "barney", SpeakeasyUserPage.class)
                     .canEnable("plugin-tests"));
 
+        File jar = new PluginJarBuilder("ConventionZip")
+                .addFormattedResource("atlassian-extension.json",
+                        "{'key'         : 'test-permission',",
+                        " 'name'         : 'Test Permission',",
+                        " 'version'      : '1',",
+                        " 'permissions'  : ['ADMINS_ENABLE']",
+                        "}")
+                .buildWithNoManifest();
+        File zip = new File(jar.getPath() + ".zip");
+        FileUtils.moveFile(jar, zip);
+
+
+        SpeakeasyUserPage page = product.visit(SpeakeasyUserPage.class)
+                    .openInstallDialog()
+                    .uploadPluginExpectingFailure(zip);
+        List<String> errors = page.getErrorMessages();
+        assertTrue(errors.size() == 1);
+        assertTrue(errors.get(0).contains("ADMINS_ENABLE"));
+        assertFalse(page.getPluginKeys().contains("test-permission"));
+
         logout();
         product.visit(LoginPage.class)
                 .loginAsSysAdmin(AdminPage.class)
                 .edit()
                     .allowAdmins(true)
                     .save();
-        assertTrue(product.visit(SpeakeasyUserPage.class)
-                    .canEnable("plugin-tests"));
+        page = product.visit(SpeakeasyUserPage.class);
+        assertFalse(page.getPluginKeys().contains("test-permission"));
+        assertTrue(page.canEnable("plugin-tests"));
     }
 
     @Test
@@ -129,5 +153,13 @@ public class TestAdmin
                     .save();
         logout();
         assertFalse(product.visit(LoginPage.class).login("barney", "barney", UnauthorizedUserPage.class).isAccessForbidden());
+    }
+
+    @Test
+    public void testSearch()
+    {
+        final AdminPage page = product.visit(AdminPage.class);
+        assertTrue(page.search("tests").contains("plugin-tests"));
+        assertTrue(page.search("asdfweqasfdsdfweqasdf").isEmpty());
     }
 }

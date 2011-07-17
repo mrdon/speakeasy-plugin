@@ -192,10 +192,10 @@
 				module = getModule(moduleId);
 
 			if (!module) {
-				throw "Module not loaded";
+				throw "Module not loaded: " + relModuleId;
 			}
 			else if (module.error) {
-				throw "Error loading module";
+				throw "Error loading module: " + relModuleId;
 			}
 			
 			if (!module.exports) {

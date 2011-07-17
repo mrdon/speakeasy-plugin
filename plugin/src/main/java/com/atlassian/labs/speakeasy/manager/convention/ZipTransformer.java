@@ -36,31 +36,23 @@ public class ZipTransformer
         this.jsonToElementParser = jsonToElementParser;
     }
 
-    public JarPluginArtifact convertConventionZipToPluginJar(PluginArtifact artifact)
+    public JarPluginArtifact convertConventionZipToPluginJar(JsonManifest descriptor, PluginArtifact artifact)
     {
         Map<String,byte[]> additions = newHashMap();
-        if (artifact.doesResourceExist(JsonManifest.ATLASSIAN_EXTENSION_PATH))
+
+        additions.put("META-INF/MANIFEST.MF", generateManifest(descriptor));
+        additions.put("META-INF/spring/speakeasy-context.xml", getResourceContents("speakeasy-context.xml"));
+
+        // this exists to force parse errors to happen earlier
+        jsonToElementParser.createWebItems(artifact.getResourceAsStream("ui/web-items.json"));
+
+        try
         {
-            JsonManifest descriptor = jsonHandler.read(artifact);
-
-            additions.put("META-INF/MANIFEST.MF", generateManifest(descriptor));
-            additions.put("META-INF/spring/speakeasy-context.xml", getResourceContents("speakeasy-context.xml"));
-
-            // this exists to force parse errors to happen earlier
-            jsonToElementParser.createWebItems(artifact.getResourceAsStream("ui/web-items.json"));
-
-            try
-            {
-                return new JarPluginArtifact(addFilesToExistingZip(artifact.toFile(), additions));
-            }
-            catch (IOException e)
-            {
-                throw new PluginOperationFailedException("Unable to transform zip", e, descriptor.getKey());
-            }
+            return new JarPluginArtifact(addFilesToExistingZip(artifact.toFile(), additions));
         }
-        else
+        catch (IOException e)
         {
-            throw new PluginOperationFailedException("File '" + JsonManifest.ATLASSIAN_EXTENSION_PATH + "' expected", null);
+            throw new PluginOperationFailedException("Unable to transform zip", e, descriptor.getKey());
         }
     }
 

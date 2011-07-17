@@ -9,8 +9,10 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 
 import javax.inject.Inject;
+import java.util.List;
 import java.util.Set;
 
+import static com.google.common.collect.Lists.newArrayList;
 import static com.google.common.collect.Sets.newHashSet;
 
 /**
@@ -35,7 +37,7 @@ public class AdminPage implements Page
     public EditView edit()
     {
         driver.findElement(By.id("sp-edit")).click();
-        driver.waitUntilElementIsVisible(By.id("sp-allowadmins-edit"));
+        driver.waitUntilElementIsVisible(By.id("sp-ADMINS_ENABLE-edit"));
         return new EditView();
     }
 
@@ -49,11 +51,28 @@ public class AdminPage implements Page
         return newHashSet(driver.findElement(By.id("sp-author-groups-view")).getText().split("\\s*,\\s*"));
     }
 
+    public List<String> search(String q)
+    {
+        driver.findElement(By.id("sp-search-tab")).click();
+        driver.findElement(By.id("sp-search-field")).sendKeys(q);
+        final WebElement submitButton = driver.findElement(By.id("sp-search-submit"));
+        submitButton.click();
+        driver.waitUntilElementIsNotLocatedAt(By.tagName("img"), submitButton);
+        List<String> keys = newArrayList();
+        for (WebElement e : driver.findElement(By.id("sp-search-results")).findElements(By.className("sp-result-key")))
+        {
+            keys.add(e.getText());
+        }
+        return keys;
+    }
+
+
+
     public class EditView
     {
         public EditView allowAdmins(boolean val)
         {
-            toggle(By.id("sp-allowadmins-edit"), val);
+            toggle(By.id("sp-ADMINS_ENABLE-edit"), val);
             return this;
         }
 

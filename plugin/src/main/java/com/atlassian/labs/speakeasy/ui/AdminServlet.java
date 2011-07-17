@@ -2,6 +2,7 @@ package com.atlassian.labs.speakeasy.ui;
 
 import com.atlassian.labs.speakeasy.SpeakeasyService;
 import com.atlassian.labs.speakeasy.UnauthorizedAccessException;
+import com.atlassian.labs.speakeasy.model.Permission;
 import com.atlassian.labs.speakeasy.model.Settings;
 import com.atlassian.plugin.webresource.UrlMode;
 import com.atlassian.plugin.webresource.WebResourceManager;
@@ -63,6 +64,8 @@ public class AdminServlet extends HttpServlet
                     put("contextPath", req.getContextPath()).
                     put("staticResourcesPrefix", webResourceManager.getStaticResourcePrefix(UrlMode.RELATIVE)).
                     put("settings", new JsRenderer(jsonMarshaller.marshal(settings))).
+                    put("permissionsJson", new JsRenderer(jsonMarshaller.marshal(Permission.ALL))).
+                    put("permissions", Permission.ALL).
                     build(),
                     resp.getWriter());
         }

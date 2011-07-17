@@ -2,6 +2,7 @@ package com.atlassian.labs.speakeasy.git;
 
 import com.atlassian.labs.speakeasy.SpeakeasyService;
 import com.atlassian.labs.speakeasy.UnauthorizedAccessException;
+import com.atlassian.labs.speakeasy.manager.PluginOperationFailedException;
 import com.atlassian.sal.api.user.UserManager;
 import org.eclipse.jgit.http.server.GitServlet;
 import org.eclipse.jgit.lib.Repository;
@@ -111,6 +112,10 @@ public class ExtensionGitServlet extends GitServlet
                         {
                             // should never happen
                             throw new ServletException(e);
+                        }
+                        catch (PluginOperationFailedException ex)
+                        {
+                            throw new ServletException(ex);
                         }
                     }
                 }

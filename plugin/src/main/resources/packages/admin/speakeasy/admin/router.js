@@ -5,7 +5,7 @@ var Backbone = require('backbone');
 
 var doc = new Settings(window.settings);
 
-var Controller = Backbone.Controller.extend({
+var Router = Backbone.Router.extend({
     routes: {
         "":                         "view",
         "edit":                     "edit"
@@ -20,4 +20,4 @@ var Controller = Backbone.Controller.extend({
     }
 });
 
-exports.Controller = Controller;
+exports.Router = Router;

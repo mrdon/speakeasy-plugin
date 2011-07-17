@@ -1,26 +1,5 @@
 /*#speakeasy-user-main {margin-left: 1em;}*/
 
-#aui-message-bar {
-    height:44px;
-    margin-top: 0 !important;
-    margin-left: 0 !important;
-    position: fixed;
-    width: 50%;
-    right: 5%;
-    top: 5%;
-}
-
-.aui-message {
-    -moz-border-radius: 6px;
-    -o-border-radius: 6px;
-    -webkit-border-radius: 6px;
-    border-radius: 6px;
-    -moz-box-shadow: 5px 5px 5px #999;
-    -o-box-shadow: 5px 5px 5px #999;
-    -webkit-box-shadow: 5px 5px 5px #999;
-    box-shadow: 5px 5px 5px #999;
-}
-
 #sp-top-bar {
     float: right;
 }

@@ -2,6 +2,7 @@ var $ = require('speakeasy/jquery').jQuery;
 var Backbone = require('backbone');
 var messages = require('speakeasy/messages');
 var _ = require('underscore');
+var permissions = window.permissions;
 var View = Backbone.View.extend({
     initialize: function() {
         $('#sp-main').removeClass("editing");
@@ -11,7 +12,10 @@ var View = Backbone.View.extend({
     },
 
     render: function() {
-        $('#sp-allowadmins-view').text(this.model.get('allowAdmins') ? "Yes" : "No");
+        var renderCtx = this;
+        _.each(permissions, function(perm) {
+            $('#sp-' + perm + '-view').text(renderCtx.model.get('permissions').indexOf(perm) > -1 ? "Yes" : "No");
+        });
         $('#sp-access-groups-view').text(this.model.get('accessGroups').join(', '));
         $('#sp-author-groups-view').text(this.model.get('authorGroups').join(', '));
     }
@@ -27,11 +31,10 @@ function toArray(val) {
     return result;
 }
 
-var Edit = Backbone.View.extend({
+var editArgs = {
     el: $('#sp-main'),
     events: {
         "submit form": "save",
-        "click #sp-allowadmins-edit" : "toggleAllowAdmins",
         "blur #sp-access-groups-edit" : "updateAccessGroups",
         "blur #sp-author-groups-edit" : "updateAuthorGroups"
     },
@@ -43,9 +46,6 @@ var Edit = Backbone.View.extend({
         this.render();
     },
 
-    toggleAllowAdmins: function() {
-        this.model.toggleAllowAdmins();
-    },
     updateAccessGroups: function() {
         this.model.set({'accessGroups' : toArray($('#sp-access-groups-edit').val())});
     },
@@ -56,7 +56,7 @@ var Edit = Backbone.View.extend({
         // just in case the onblur hasn't fired yet
         this.updateAccessGroups();
         this.updateAuthorGroups();
-        
+
         this.model.save(this.model, {
             success: function(model, resp) {
                 $.data($('#sp-form')[0], AJS.DIRTY_FORM_VALUE, null);
@@ -72,11 +72,28 @@ var Edit = Backbone.View.extend({
     },
 
     render: function() {
-        $('#sp-allowadmins-edit').attr('checked', this.model.get('allowAdmins'));
+        var renderCtx = this;
+        _.each(permissions, function(perm) {
+            $('#sp-' + perm + '-edit').attr('checked', _.indexOf(renderCtx.model.get('permissions'), perm) > -1);
+        });
         $('#sp-access-groups-edit').val(this.model.get('accessGroups').join('\n'));
         $('#sp-author-groups-edit').val(this.model.get('authorGroups').join('\n'));
     }
+};
+
+_.each(permissions, function(perm) {
+   editArgs.events['click #sp-' + perm + '-edit'] = "toggle-" + perm;
+   editArgs['toggle-' + perm] = function() {
+       var perms = this.model.get('permissions');
+       if (_.indexOf(perms, perm) > -1) {
+           this.model.set({'permissions': _.without(perms, perm)});
+       } else {
+           perms.push(perm);
+           this.model.set({'permissions': perms});
+       }
+   };
 });
+var Edit = Backbone.View.extend(editArgs);
 exports.Edit = Edit;
 exports.View = View;
 

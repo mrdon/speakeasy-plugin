@@ -17,23 +17,23 @@ public class Settings
 {
     public static final ImmutableSet<String> ALL_USER_GROUPS = ImmutableSet.of("confluence-users", "jira-users", "users",
             "bamboo-users", "system_administrators", "adminstrators");
-    private boolean allowAdmins;
 
     private Set<String> authorGroups = newHashSet();
 
     private Set<String> accessGroups = newHashSet();
+    private Set<Permission> permissions;
 
     public Settings()
     {
         if (Boolean.getBoolean("atlassian.dev.mode"))
         {
-            allowAdmins = true;
+            permissions = Permission.ALL;
             authorGroups = ALL_USER_GROUPS;
             accessGroups = ALL_USER_GROUPS;
         }
         else
         {
-            allowAdmins = false;
+            permissions = newHashSet();
         }
     }
 
@@ -75,22 +75,19 @@ public class Settings
     {
     }
 
-    public boolean isAllowAdmins()
+    public Set<Permission> getPermissions()
     {
-        return allowAdmins;
+        return permissions;
     }
 
-    public void setAllowAdmins(boolean allowAdmins)
+    public void setPermissions(Set<Permission> permissions)
     {
-        this.allowAdmins = allowAdmins;
+        this.permissions = permissions;
     }
 
-    public boolean isNoAdmins()
+    public boolean allowsPermission(String perm)
     {
-        return !this.allowAdmins;
-    }
-
-    public void setNoAdmins(boolean val)
-    {
+        Permission p = Permission.valueOf(perm);
+        return p != null && permissions.contains(p);
     }
 }

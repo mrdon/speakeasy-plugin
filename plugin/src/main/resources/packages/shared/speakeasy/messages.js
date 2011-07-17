@@ -8,22 +8,27 @@ var $ = require('./jquery').jQuery;
 function addMessage(type, params) {
     clear();
 
-    if (type == "success") {
-        AJS.messages.success(params);
-    }
-    else if (type == "warning") {
-        AJS.messages.warning(params);
-    }
-    else if (type == "error") {
-        AJS.messages.error(params);
+    var bar = $('#sp-message-bar');
+    if (bar.length == 0) {
+        bar = $('<div id="sp-message-bar" />').appendTo($(document.body));
     }
 
-    var msg = $("#aui-message-bar").children(".aui-message");
-    window.setTimeout(function() { msg.fadeOut(1500) }, 5000);
+    if (type == "success") {
+        AJS.messages.success(bar, params);
+    }
+    else if (type == "warning") {
+        AJS.messages.warning(bar, params);
+    }
+    else if (type == "error") {
+        AJS.messages.error(bar, params);
+    }
+
+    var msg = bar.children(".aui-message");
+    window.setTimeout(function() { msg.fadeOut(1500) }, 5000); // Check syntax of the callback for fadeOut
 }
 
 function clear() {
-    $("#aui-message-bar").children(".aui-message").remove();
+    $("#sp-message-bar").empty();
 }
 
 /**

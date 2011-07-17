@@ -1,8 +1,6 @@
 package com.atlassian.labs.speakeasy.manager.convention;
 
-import com.atlassian.labs.speakeasy.manager.AbstractOsgiPluginTypeHandler;
-import com.atlassian.labs.speakeasy.manager.PluginTypeHandler;
-import com.atlassian.labs.speakeasy.manager.ZipWriter;
+import com.atlassian.labs.speakeasy.manager.*;
 import com.atlassian.labs.speakeasy.model.JsonManifest;
 import com.atlassian.labs.speakeasy.util.JavascriptEscaper;
 import com.atlassian.plugin.PluginArtifact;
@@ -11,6 +9,7 @@ import com.google.common.collect.ImmutableMap;
 import org.osgi.framework.BundleContext;
 
 import java.io.*;
+import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
 import java.util.zip.ZipOutputStream;
@@ -28,12 +27,16 @@ public class ZipPluginTypeHandler extends AbstractOsgiPluginTypeHandler implemen
 
     private final TemplateRenderer templateRenderer;
     private final ZipTransformer zipTransformer;
+    private final JsonManifestHandler jsonHandler;
+    private final SettingsManager settingsManager;
 
-    public ZipPluginTypeHandler(BundleContext bundleContext, ZipTransformer zipTransformer, TemplateRenderer templateRenderer)
+    public ZipPluginTypeHandler(BundleContext bundleContext, ZipTransformer zipTransformer, TemplateRenderer templateRenderer, JsonManifestHandler jsonHandler, SettingsManager settingsManager)
     {
         super(bundleContext, templateRenderer);
         this.templateRenderer = templateRenderer;
         this.zipTransformer = zipTransformer;
+        this.jsonHandler = jsonHandler;
+        this.settingsManager = settingsManager;
     }
 
 
@@ -98,6 +101,20 @@ public class ZipPluginTypeHandler extends AbstractOsgiPluginTypeHandler implemen
     @Override
     protected PluginArtifact validatePluginArtifact(PluginArtifact pluginArtifact)
     {
-        return zipTransformer.convertConventionZipToPluginJar(pluginArtifact);
+        if (pluginArtifact.doesResourceExist(JsonManifest.ATLASSIAN_EXTENSION_PATH))
+        {
+            JsonManifest descriptor = jsonHandler.read(pluginArtifact);
+            final List<String> errors = descriptor.isValid(settingsManager.getSettings());
+            if (!errors.isEmpty())
+            {
+                throw new PluginOperationFailedException("Error validating '" + JsonManifest.ATLASSIAN_EXTENSION_PATH + "': " + errors, descriptor.getKey());
+            }
+            return zipTransformer.convertConventionZipToPluginJar(descriptor, pluginArtifact);
+        }
+        else
+        {
+            throw new PluginOperationFailedException("File '" + JsonManifest.ATLASSIAN_EXTENSION_PATH + "' expected", null);
+        }
+
     }
 }

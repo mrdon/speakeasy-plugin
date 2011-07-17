@@ -15,8 +15,8 @@
     <packaging>pom</packaging>
     <url>http://atlassian.com/speakeasy</url>
     <modules>
-        <module>plugin</module>
         <module>firefox</module>
+        <module>plugin</module>
     </modules>
 
     <scm>

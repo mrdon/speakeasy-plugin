@@ -15,9 +15,6 @@ import java.util.List;
  */
 public class MessagesBar
 {
-    @FindBy(id = "aui-message-bar")
-    private WebElement messageBar;
-
     @Inject
     protected AtlassianWebDriver driver;
 
@@ -27,7 +24,7 @@ public class MessagesBar
     private List<String> getMessages(String className)
     {
         List<String> messages = new ArrayList<String>();
-        for (WebElement msg : messageBar.findElements(By.className("aui-message")))
+        for (WebElement msg : driver.findElements(By.className("aui-message")))
         {
             if (msg.getAttribute("class").contains(className))
             {
@@ -39,7 +36,7 @@ public class MessagesBar
 
     public SpeakeasyUserPage waitForMessages()
     {
-        driver.waitUntilElementIsVisibleAt(By.className("aui-message"), messageBar);
+        driver.waitUntilElementIsVisible(By.className("aui-message"));
         return pageBinder.bind(SpeakeasyUserPage.class);
     }
 
