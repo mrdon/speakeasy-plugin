@@ -6,7 +6,7 @@
 var $ = require('speakeasy/jquery').jQuery;
 
 /**
- * Makes a request through the proxy. Parameters:
+ * Makes an ajax request through the proxy. Parameters:
  * <ul>
  *     <li><code>options</code> - An options map to be passed through to jQuery.ajax(). Extra required arguments are:<ul>
  *         <li><code>appId<code> - The application links id or name (required if appType not specified)</li>
@@ -16,7 +16,7 @@ var $ = require('speakeasy/jquery').jQuery;
  *     </li>
  * </ul>
  */
-exports.makeRequest = function(options){
+exports.ajax = function(options){
     var context = contextPath || AJS.params.contextPath || BAMBOO.contextPath || fishEyePageContext;
     if (options.appId){
         options.data = $.extend(options.data || {}, {
@@ -37,7 +37,7 @@ exports.makeRequest = function(options){
 };
 
 /**
- * Creates a GET url to access a proxied application. Parameters:
+ * Creates a url to access a proxied application. Parameters:
  * <ul>
  *     <li><code>options</code> - An options map containing:<ul>
  *         <li><code>appId<code> - The application links id or name (required if appType not specified)</li>
@@ -47,7 +47,7 @@ exports.makeRequest = function(options){
  *     </li>
  * </ul>
  */
-exports.createProxyGetUrl = function(options){
+exports.createUrl = function(options){
     var context = contextPath || AJS.params.contextPath || BAMBOO.contextPath || fishEyePageContext;
 
     var url = context + '/rest/speakeasy/latest/proxy';
