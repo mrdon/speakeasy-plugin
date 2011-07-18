@@ -6,7 +6,7 @@
     <parent>
         <groupId>com.atlassian.labs</groupId>
         <artifactId>speakeasy-parent</artifactId>
-        <version>1.1-SNAPSHOT</version>
+        <version>1.1</version>
     </parent>
 
     <artifactId>speakeasy-plugin</artifactId>
@@ -484,7 +484,7 @@
                         <phase>process-sources</phase>
                         <configuration>
                             <tasks>
-                                <checksum file="${project.build.outputDirectory}/speakeasy.xpi" algorithm="SHA" fileext=".sha1"/>
+                                <checksum file="${project.build.outputDirectory}/speakeasy.xpi" algorithm="SHA" fileext=".sha1" />
                             </tasks>
                         </configuration>
                         <goals>

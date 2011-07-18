@@ -1,13 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>com.atlassian.labs</groupId>
         <artifactId>speakeasy-parent</artifactId>
-        <version>1.1-SNAPSHOT</version>
+        <version>1.1</version>
     </parent>
 
     <artifactId>speakeasy-firefox-extension</artifactId>
@@ -35,12 +34,9 @@
                         <phase>process-sources</phase>
                         <configuration>
                             <tasks>
-                                <mkdir dir="${basedir}/target"/>
-                                <zip update="true" compress="true"
-                                     destfile="${basedir}/target/speakeasy.jar"
-                                     basedir="${basedir}/target/chrome"/>
-                                <copy file="${basedir}/target/chrome/content/speakeasy/speakeasyCore.js"
-                                      tofile="${basedir}/target/speakeasyCore-${project.version}.js" />
+                                <mkdir dir="${basedir}/target" />
+                                <zip update="true" compress="true" destfile="${basedir}/target/speakeasy.jar" basedir="${basedir}/target/chrome" />
+                                <copy file="${basedir}/target/chrome/content/speakeasy/speakeasyCore.js" tofile="${basedir}/target/speakeasyCore-${project.version}.js" />
                             </tasks>
                         </configuration>
                         <goals>
@@ -52,12 +48,10 @@
                         <phase>package</phase>
                         <configuration>
                             <tasks>
-                                <mkdir dir="${basedir}/target"/>
-                                <zip update="true" compress="true"
-                                     comment="MyExtension development build"
-                                     destfile="${basedir}/target/speakeasy-${project.version}.xpi">
-                                    <zipfileset dir="${basedir}/target" includes="speakeasy.jar" prefix="chrome/"/>
-                                    <fileset dir="${basedir}/target/classes"/>
+                                <mkdir dir="${basedir}/target" />
+                                <zip update="true" compress="true" comment="MyExtension development build" destfile="${basedir}/target/speakeasy-${project.version}.xpi">
+                                    <zipfileset dir="${basedir}/target" includes="speakeasy.jar" prefix="chrome/" />
+                                    <fileset dir="${basedir}/target/classes" />
                                 </zip>
                             </tasks>
                         </configuration>
