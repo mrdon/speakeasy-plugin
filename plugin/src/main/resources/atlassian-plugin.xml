@@ -119,6 +119,7 @@
     <component key="extensionOperationManager" class="com.atlassian.labs.speakeasy.manager.ExtensionOperationManager" />
     <component key="searchManager" class="com.atlassian.labs.speakeasy.manager.SearchManager" />
     <component key="firefoxXpi" class="com.atlassian.labs.speakeasy.ui.FirefoxXpi" />
+    <component key="proxy" class="com.atlassian.labs.speakeasy.proxy.ProxyService" />
 
     <component key="conventionDescriptorGenerator" class="com.atlassian.labs.speakeasy.manager.convention.ConventionDescriptorGeneratorServiceFactory" public="true">
         <interface>com.atlassian.labs.speakeasy.install.convention.external.ConventionDescriptorGenerator</interface>

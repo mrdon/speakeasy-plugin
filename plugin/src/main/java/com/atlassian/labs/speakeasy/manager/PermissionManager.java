@@ -58,4 +58,9 @@ public class PermissionManager
         }
         return false;
     }
+
+    public boolean allowsPermission(Permission permission)
+    {
+        return settingsManager.getSettings().getPermissions().contains(permission);
+    }
 }

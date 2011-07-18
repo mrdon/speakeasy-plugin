@@ -11,12 +11,11 @@ public enum Permission
 {
     ADMINS_ENABLE("Allow administrators to enable extensions",
                  "Allow administrators to enable extensions.  Should only be checked if this application is private " +
-                 "and the entire user base is trusted.");
-    /*,
-
+                 "and the entire user base is trusted."),
     APPLINKS_PROXY("Enable application links proxy",
                  "Expose a web proxy using application links to make trusted calls.  Should only be checked if all " +
-                 "those with the 'enable' access group are trusted."),
+                 "those with the 'enable' access group are trusted.");
+    /*
 
     SERVERJS_SCRIPTS("Allow sandboxed server-side scripts",
                  "Allow extensions that have server-side components such as REST resources.  This feature is " +

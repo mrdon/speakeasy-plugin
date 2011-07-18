@@ -1,54 +1,80 @@
 package com.atlassian.labs.speakeasy.proxy;
 
 import com.atlassian.applinks.api.*;
+import com.atlassian.applinks.api.application.bamboo.BambooApplicationType;
+import com.atlassian.applinks.api.application.confluence.ConfluenceApplicationType;
+import com.atlassian.applinks.api.application.fecru.FishEyeCrucibleApplicationType;
+import com.atlassian.applinks.api.application.jira.JiraApplicationType;
+import com.atlassian.applinks.api.application.refapp.RefAppApplicationType;
 import com.atlassian.labs.speakeasy.SpeakeasyService;
 import com.atlassian.labs.speakeasy.UnauthorizedAccessException;
+import com.atlassian.labs.speakeasy.manager.PermissionManager;
+import com.atlassian.labs.speakeasy.model.Permission;
 import com.atlassian.sal.api.net.Request;
 import com.atlassian.sal.api.net.Response;
 import com.atlassian.sal.api.net.ResponseException;
 import com.atlassian.sal.api.net.ResponseHandler;
 import com.atlassian.sal.api.user.UserManager;
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableSet;
 import org.apache.commons.io.IOUtils;
+import org.eclipse.jgit.transport.ReceivePack;
 
-import javax.servlet.ServletException;
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintWriter;
+import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.*;
 
+import static org.apache.commons.lang.Validate.notNull;
+
 /**
- *
+ * Proxies requests to an application link
  */
 public class ProxyService
 {
     private static final String APP_TYPE = "appType";
     private static final String APP_ID = "appId";
-    private static final String JSON_STRING = "jsonString";
     private static final String FORMAT_ERRORS = "formatErrors";
     private static final String PATH = "path";
-    private static Set<String> reserved = new HashSet<String>(Arrays.asList(PATH, JSON_STRING, APP_ID, APP_TYPE, FORMAT_ERRORS));
+    private final static Set<String> RESERVED_PARAMS = ImmutableSet.of(PATH, APP_ID, APP_TYPE, FORMAT_ERRORS);
+    private final static Map<String,Class<? extends ApplicationType>> APPLINKS_TYPE_ALIASES = ImmutableMap.<String,Class<? extends ApplicationType>>builder().
+            put("jira", JiraApplicationType.class).
+            put("confluence", ConfluenceApplicationType.class).
+            put("fecru", FishEyeCrucibleApplicationType.class).
+            put("fisheye", FishEyeCrucibleApplicationType.class).
+            put("crucible", FishEyeCrucibleApplicationType.class).
+            put("bamboo", BambooApplicationType.class).
+            put("refapp", RefAppApplicationType.class).
+            build();
     private final ApplicationLinkService appLinkService;
     private final SpeakeasyService speakeasyService;
     private final UserManager userManager;
+    private final PermissionManager permissionManager;
 
-    public ProxyService(ApplicationLinkService appLinkService, SpeakeasyService speakeasyService, UserManager userManager)
+    public ProxyService(ApplicationLinkService appLinkService, SpeakeasyService speakeasyService, UserManager userManager, PermissionManager permissionManager)
     {
         this.appLinkService = appLinkService;
         this.speakeasyService = speakeasyService;
         this.userManager = userManager;
+        this.permissionManager = permissionManager;
     }
 
     @SuppressWarnings("unchecked")
-    private void proxy(final HttpServletRequest req, final HttpServletResponse resp, final Request.MethodType methodType) throws UnauthorizedAccessException, IOException
+    public void proxy(final HttpServletRequest req, final HttpServletResponse resp, final Request.MethodType methodType) throws UnauthorizedAccessException, IOException
     {
         String user = userManager.getRemoteUsername(req);
         if (!speakeasyService.canAccessSpeakeasy(user))
         {
             throw new UnauthorizedAccessException(user, "Must be able to access Speakeasy to proxy requests");
+        }
+        if (!permissionManager.allowsPermission(Permission.APPLINKS_PROXY))
+        {
+            throw new UnauthorizedAccessException(user, "Permission to use Application Links proxy not enabled on this instance");
         }
 
         try
@@ -57,23 +83,61 @@ public class ProxyService
         }
         catch (IOException e)
         {
-            resp.sendError(400, "Exception during proxy");
-        }
-        catch (ServletException e)
-        {
-            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+            resp.sendError(400, "Exception during proxy: " + e.getMessage());
         }
     }
 
-    private void doProxy(HttpServletRequest req, final HttpServletResponse resp, Request.MethodType methodType) throws IOException, ServletException
+    private void doProxy(HttpServletRequest req, final HttpServletResponse resp, Request.MethodType methodType) throws IOException
     {
         String url = req.getParameter(PATH);
-        final Map parameters = req.getParameterMap();
-
-        String queryString = "";
-        for (Object name : parameters.keySet())
+        String finalQueryString = buildProxyQueryString(req);
+        String finalPath = buildUrlPath(methodType, url, finalQueryString, resp);
+        if (finalPath == null)
         {
-            if (reserved.contains(name))
+            return;
+        }
+
+        String appId = req.getParameter(APP_ID);
+        String appType = req.getParameter(APP_TYPE);
+        ApplicationLink appLink = getApplicationLink(resp, appId, appType);
+        try
+        {
+            final ApplicationLinkRequestFactory requestFactory = appLink.createAuthenticatedRequestFactory();
+            Request request = prepareRequest(req, methodType, finalPath, requestFactory);
+            request.execute(new ProxyResponseHandler(resp));
+        }
+        catch(ResponseException re)
+        {
+            final String finalUrl = appLink.getRpcUrl() + finalPath;
+            handleProxyingException(finalUrl, req, resp, re);
+        }
+        catch (CredentialsRequiredException e)
+        {
+            oauthChallenge(resp, e);
+        }
+    }
+
+    private String buildUrlPath(Request.MethodType methodType, String url, String queryString, HttpServletResponse resp) throws IOException
+    {
+        if (url == null)
+        {
+            resp.sendError(400, "Target url not specified via 'path' query parameter");
+            return null;
+        }
+        if (methodType == Request.MethodType.GET && queryString .length() > 0)
+        {
+            url = url + (url.contains("?") ? '&' : '?') + queryString;
+        }
+        return url;
+    }
+
+    private String buildProxyQueryString(HttpServletRequest req)
+    {
+        String queryString = "";
+        Map<String,String[]> parameters = req.getParameterMap();
+        for (String name : parameters.keySet())
+        {
+            if (RESERVED_PARAMS.contains(name))
             {
                 continue;
             }
@@ -84,22 +148,20 @@ public class ProxyService
                 String[] params = (String[])val;
                 for (String param : params)
                 {
-                    queryString = queryString + (queryString.length() > 0 ? "&" : "") + URLEncoder.encode(name.toString(), "UTF-8") + "=" + URLEncoder.encode(param, "UTF-8");;
+                    queryString = queryString + (queryString.length() > 0 ? "&" : "") + encode(name) + "=" + encode(param);;
                 }
             }
             else
             {
-                queryString = queryString + (queryString.length() > 0 ? "&" : "") + URLEncoder.encode(name.toString(), "UTF-8") + "=" + URLEncoder.encode(req.getParameter(name.toString()), "UTF-8");;
+                queryString = queryString + (queryString.length() > 0 ? "&" : "") + encode(name) + "=" + encode(req.getParameter(name));
             }
 
         }
-        if (methodType == Request.MethodType.GET && queryString .length() > 0)
-        {
-            url = url + (url.contains("?") ? '&' : '?') + queryString;
-        }
+        return queryString;
+    }
 
-        String appId = req.getParameter(APP_ID);
-        String appType = req.getParameter(APP_TYPE);
+    private ApplicationLink getApplicationLink(HttpServletResponse resp, String appId, String appType) throws IOException
+    {
         if (appType == null && appId == null)
         {
             resp.sendError(400, "You must specify an appId or appType request parameter");
@@ -109,7 +171,7 @@ public class ProxyService
         {
             try
             {
-                appLink = getApplicationLinkById(appId);
+                appLink = getApplicationLinkByIdOrName(appId);
                 if (appLink == null)
                 {
                     resp.sendError(404, "No Application Link found for the id " + appId);
@@ -117,7 +179,7 @@ public class ProxyService
             }
             catch (TypeNotInstalledException e)
             {
-                throw new ServletException(e);
+                resp.sendError(404, "No Application Link found for the id " + appId);
             }
         }
         else if (appType != null)
@@ -132,74 +194,26 @@ public class ProxyService
             }
             catch (ClassNotFoundException e)
             {
-                throw new ServletException(e);
+                resp.sendError(404, "Application Link type not found " + appType);
             }
         }
+        else
+        {
+            resp.sendError(400, "Application Link type 'appType' or id 'appId' not specified as a query parameter");
+        }
+        return appLink;
+    }
 
-        //used for error reporting
-        final String finalUrl = appLink.getRpcUrl() + url;
-        final ApplicationId finalAppId = appLink.getId();
-        final boolean formatErrors = Boolean.parseBoolean(req.getParameter(FORMAT_ERRORS));
+    private String encode(String value)
+    {
         try
         {
-            final ApplicationLinkRequestFactory requestFactory = appLink.createAuthenticatedRequestFactory();
-            Request request = prepareRequest(req, methodType, url, parameters,
-                    requestFactory);
-            //request.setFollowRedirects(false);
-
-            request.execute(new ResponseHandler<Response>()
-            {
-                public void handle(Response response) throws ResponseException
-                {
-                    if (response.isSuccessful())
-                    {
-                        InputStream responseStream = response.getResponseBodyAsStream();
-                        Map<String, String> headers = response.getHeaders();
-                        for (String key : headers.keySet())
-                        {
-                            // don't pass on cookies set by linked application.
-                            if (key.equalsIgnoreCase("Set-Cookie"))
-                            {
-                                continue;
-                            }
-                            resp.setHeader(key, headers.get(key));
-                        }
-                        try
-                        {
-                            if (responseStream != null)
-                            {
-                                ServletOutputStream outputStream = resp.getOutputStream();
-                                IOUtils.copy(responseStream, outputStream);
-                                outputStream.flush();
-                                outputStream.close();
-                            }
-                        }
-                        catch (IOException e)
-                        {
-                            throw new RuntimeException(e);
-                        }
-                    }
-                    else
-                    {
-                        try
-                        {
-                            formatError(resp, "Request failed, check your configuration.");
-                        }
-                        catch (IOException e)
-                        {
-                            throw new RuntimeException(e);
-                        }
-                    }
-                }
-            });
+            return URLEncoder.encode(value, "UTF-8");
         }
-        catch(ResponseException re)
+        catch (UnsupportedEncodingException ex)
         {
-            handleProxyingException(formatErrors, finalUrl, resp, re);
-        }
-        catch (CredentialsRequiredException e)
-        {
-            oauthChallenge(resp, e);
+            // should never happen
+            throw new RuntimeException(ex);
         }
     }
 
@@ -209,8 +223,10 @@ public class ProxyService
         resp.setHeader("WWW-Authenticate", "OAuth realm=\"" + e.getAuthorisationURI().toString() + "\"");
     }
 
-    private final void handleProxyingException(boolean format, String finalUrl, HttpServletResponse resp, Exception e) throws IOException
+    private void handleProxyingException(String finalUrl, HttpServletRequest req, HttpServletResponse resp, Exception e) throws IOException
     {
+        final boolean format = Boolean.parseBoolean(req.getParameter(FORMAT_ERRORS));
+
         String errorMsg = "There was an error proxying your request to " + finalUrl + " because of " + e.getMessage();
         if (format)
         {
@@ -231,7 +247,7 @@ public class ProxyService
     }
 
     private Request prepareRequest(HttpServletRequest req,
-            Request.MethodType methodType, String url, Map parameters,
+            Request.MethodType methodType, String url,
             final ApplicationLinkRequestFactory requestFactory)
             throws CredentialsRequiredException, IOException
     {
@@ -251,25 +267,26 @@ public class ProxyService
                request.setHeader("Content-Type", ctHeader);
            }
 
-           if (ctHeader != null && ctHeader.contains("multipart/form-data"))
+           if (ctHeader != null && ctHeader.contains("application/x-www-form-urlencoded"))
+           {
+               List<String> params = new ArrayList<String>();
+               final Map<String, String[]> parameterMap = (Map<String, String[]>) req.getParameterMap();
+               for (String name : parameterMap.keySet())
+               {
+                   if (RESERVED_PARAMS.contains(name))
+                   {
+                       continue;
+                   }
+                   params.add(name);
+                   params.add(req.getParameter(name));
+               }
+               request.addRequestParameters((String[]) params.toArray(new String[params.size()]));
+           }
+           else
            {
                String enc = req.getCharacterEncoding();
                String str = IOUtils.toString(req.getInputStream(), (enc == null ? "ISO8859_1" : enc));
                request.setRequestBody(str);
-           }
-           else
-           {
-               List<String> params = new ArrayList<String>();
-               for (Object name : parameters.keySet())
-               {
-                   if (reserved.contains(name))
-                   {
-                       continue;
-                   }
-                   params.add(name.toString());
-                   params.add(req.getParameter(name.toString()));
-               }
-               request.addRequestParameters((String[])params.toArray(new String[0]));
            }
         }
         return request;
@@ -278,15 +295,88 @@ public class ProxyService
     @SuppressWarnings("unchecked")
     private ApplicationLink getPrimaryAppLinkByType(String type) throws ClassNotFoundException
     {
-        Class<? extends ApplicationType> clazz = (Class<? extends ApplicationType>) Class.forName(type);
-        ApplicationLink primaryLink = appLinkService.getPrimaryApplicationLink(clazz);
-        return primaryLink;
+
+        Class<? extends ApplicationType> clazz = APPLINKS_TYPE_ALIASES.get(type.toLowerCase(Locale.US));
+        if (clazz == null)
+        {
+            clazz = (Class<? extends ApplicationType>) getClass().getClassLoader().loadClass(type);
+        }
+        return appLinkService.getPrimaryApplicationLink(clazz);
     }
 
-    private ApplicationLink getApplicationLinkById(String id) throws TypeNotInstalledException
+    private ApplicationLink getApplicationLinkByIdOrName(String id) throws TypeNotInstalledException
     {
-        ApplicationLink appLink = appLinkService.getApplicationLink(new ApplicationId(id));
-        return appLink;
+        ApplicationId appId = null;
+        try
+        {
+            appId = new ApplicationId(id);
+        }
+        catch (IllegalArgumentException ex)
+        {
+            // not a valid id, try for name;
+        }
+
+        for (ApplicationLink link : appLinkService.getApplicationLinks())
+        {
+            if ((appId == null && link.getName().equals(id)) ||
+                 (appId != null && link.getId().equals(appId)))
+            {
+                return link;
+            }
+        }
+        return null;
     }
 
+    private class ProxyResponseHandler implements ResponseHandler<Response>
+    {
+        private final HttpServletResponse resp;
+
+        public ProxyResponseHandler(HttpServletResponse resp)
+        {
+            this.resp = resp;
+        }
+
+        public void handle(Response response) throws ResponseException
+        {
+            if (response.isSuccessful())
+            {
+                InputStream responseStream = response.getResponseBodyAsStream();
+                Map<String, String> headers = response.getHeaders();
+                for (String key : headers.keySet())
+                {
+                    // don't pass on cookies set by linked application.
+                    if (key.equalsIgnoreCase("Set-Cookie"))
+                    {
+                        continue;
+                    }
+                    resp.setHeader(key, headers.get(key));
+                }
+                try
+                {
+                    if (responseStream != null)
+                    {
+                        ServletOutputStream outputStream = resp.getOutputStream();
+                        IOUtils.copy(responseStream, outputStream);
+                        outputStream.flush();
+                        outputStream.close();
+                    }
+                }
+                catch (IOException e)
+                {
+                    throw new RuntimeException(e);
+                }
+            }
+            else
+            {
+                try
+                {
+                    formatError(resp, "Request failed, check your configuration.");
+                }
+                catch (IOException e)
+                {
+                    throw new RuntimeException(e);
+                }
+            }
+        }
+    }
 }
