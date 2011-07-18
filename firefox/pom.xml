@@ -14,7 +14,7 @@
 
     <name>Atlassian Speakeasy</name>
     <url>http://atlassian.com/speakeasy</url>
-    <description>A Firefox extension to help assist Speakeasy extension development forked from Mozilla Platypus
+    <description>A experimental Firefox extension to help assist Speakeasy extension development.  Originally forked from Mozilla Platypus.
     </description>
 
     <build>

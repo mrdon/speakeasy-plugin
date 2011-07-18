@@ -710,7 +710,7 @@ function save_script(doc, node) {
     //  GM tends to break Firefox if you're too liberal in changing
     //  the DOM before the load has finished.
     //
-    script += "\n$(document).ready(main);";
+    script += "\nif ('" + doc.location.pathname + "' == document.location.pathname) $(document).ready(main);";
 
     saveInSpeakeasy(doc, script, function(profileUrl) {
         gBrowser.addTab(profileUrl);
