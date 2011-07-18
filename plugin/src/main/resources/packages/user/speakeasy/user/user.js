@@ -27,14 +27,8 @@ var pluginActions = {
     'download' : function(key, link, attachedRow) {
         require('./download/download').openDialog(key, product, getAbsoluteHref(link), link.attr("data-extension"));
     },
-    'gitclone' : function (key, link, attachedRow) {
-        git.gitclone(key, getAbsoluteHref(link), link.attr("data-extension"));
-    },
-    'gitpush' : function (key, link, attachedRow) {
-        git.gitpush(key, getAbsoluteHref(link));
-    },
-    'gitpull' : function (key, link, attachedRow) {
-        git.gitpull(key, getAbsoluteHref(link), link);
+    'gitcommands' : function (key, link, attachedRow) {
+        git.viewCommands(key, getAbsoluteHref(link), link.attr("data-extension"), attachedRow);
     }
 };
 

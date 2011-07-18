@@ -8,3 +8,7 @@
     padding-left: .3em;
     background-color: #f5f5dc;
 }
+
+#gitcommands-dialog .dialog-page-menu{
+    width : 6em;
+}

@@ -1,6 +1,6 @@
 <p>
     You can <a href="http://www.kernel.org/pub/software/scm/git/docs/git-pull.html">pull</a> changes from this extension
-    into your extension.  This is particularly useful for tracking forks and
+    into your local extension.  This is particularly useful for tracking forks and
     pulling in improvements others have made to your extensions.
 </p>
 <p>
