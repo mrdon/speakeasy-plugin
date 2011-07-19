@@ -2,10 +2,13 @@ package com.atlassian.labs.speakeasy.model;
 
 import com.cenqua.fisheye.config1.Admins;
 import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Sets;
 
 import javax.xml.bind.annotation.*;
+import java.util.Arrays;
 import java.util.Set;
 
+import static com.google.common.collect.Iterables.concat;
 import static com.google.common.collect.Sets.newHashSet;
 
 /**
@@ -83,6 +86,27 @@ public class Settings
     public void setPermissions(Set<Permission> permissions)
     {
         this.permissions = permissions;
+    }
+
+    // These next two properties are here for backwards compatibility with 1.0
+    public boolean isAllowAdmins()
+    {
+        return false;
+    }
+
+    public void setAllowAdmins(boolean allowAdmins)
+    {
+        // deprecated
+    }
+
+    public boolean isNoAdmins()
+    {
+        return false;
+    }
+
+    public void setNoAdmins(boolean val)
+    {
+        // deprecated
     }
 
     public boolean allowsPermission(String perm)
