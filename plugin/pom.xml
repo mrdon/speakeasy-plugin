@@ -506,8 +506,8 @@
         <confluence.data.version>3.0</confluence.data.version>
         <jira.version>4.3.3</jira.version>
         <jira.data.version>4.1.1</jira.data.version>
-        <fecru.version>2.6.0-M2-20110329050339</fecru.version>
-        <fecru.data.version>2.5.2-20110307050326</fecru.data.version>
+        <fecru.version>2.7.0-M3-20110719025103</fecru.version>
+        <fecru.data.version>2.7.0-M3-20110719025103</fecru.data.version>
         <bamboo.version>3.1-m2</bamboo.version>
         <bamboo.data.version>2.6.1</bamboo.data.version>
     </properties>
