@@ -17,19 +17,20 @@ import java.util.Map;
 
 public class FecruProductAccessor implements ProductAccessor {
 
+    private final Logger log = LoggerFactory.getLogger(FecruProductAccessor.class);
+
     private final PomProperties pomProperties;
     private final UserManager userManager;
-    private final Logger log = LoggerFactory.getLogger(FecruProductAccessor.class);
     private final TemplateRenderer templateRenderer;
     private final RootConfig rootConfig;
 
-    public FecruProductAccessor(PomProperties pomProperties, TemplateRenderer templateRenderer) {
+    public FecruProductAccessor(PomProperties pomProperties, TemplateRenderer templateRenderer, UserManager userManager) {
         this.pomProperties = pomProperties;
         this.templateRenderer = templateRenderer;
 
-        // RootConfig and UserManager arent't exposed to plugins.
+        // RootConfig isn't exposed to plugins.
+        this.userManager = userManager;
         this.rootConfig = AppConfig.getsConfig();
-        this.userManager = rootConfig.getUserManager();
     }
 
     public String getSdkName() {
