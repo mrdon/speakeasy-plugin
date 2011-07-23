@@ -13,7 +13,12 @@ public class JavascriptEscaper
         while ((r = reader.read()) > -1)
         {
             char c = (char) r;
-            if (c == '\n')
+		    if (c == '\r')
+			{
+			    out.write('\\');
+                out.write('r');
+			}
+            else if (c == '\n')
             {
                 out.write('\\');
                 out.write('n');

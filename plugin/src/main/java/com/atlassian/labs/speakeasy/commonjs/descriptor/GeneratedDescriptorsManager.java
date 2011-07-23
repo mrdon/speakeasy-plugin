@@ -141,7 +141,6 @@ class GeneratedDescriptorsManager
             Element dep = root.addElement("dependency");
             dep.setText(descriptor.getCompleteKey() + "-modules");
             JsDoc jsDoc = modules.getModule(id).getJsDoc();
-            addAnnotatedDependencies(root, descriptor.getPluginKey(), jsDoc);
             addAnnotatedContext(root, jsDoc);
             Element jsTransform = getJsTransformation(root);
             Element trans = jsTransform.addElement("transformer");
@@ -254,6 +253,8 @@ class GeneratedDescriptorsManager
             res.addAttribute("type", "download");
             res.addAttribute("name", id + ".js");
             res.addAttribute("location", modules.getModulePath(id));
+            JsDoc jsDoc = modules.getModule(id).getJsDoc();
+            addAnnotatedDependencies(root, descriptor.getPluginKey(), jsDoc);
         }
 
 
@@ -262,7 +263,7 @@ class GeneratedDescriptorsManager
             Element extDep = root.addElement("dependency");
             extDep.setText(dep);
         }
-
+        
         for (String resourcePath : modules.getResources())
         {
             Element res = root.addElement("resource");

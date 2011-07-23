@@ -1,8 +1,10 @@
 /**
  * Proxies requests through application linked urls
  * @public
+ * @dependency com.atlassian.applinks.applinks-plugin:applinks-util-js,com.atlassian.applinks.applinks-plugin:applinks-oauth-ui
  */
 
+ 
 var $ = require('speakeasy/jquery').jQuery;
 
 /**
