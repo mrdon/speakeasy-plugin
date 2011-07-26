@@ -75,17 +75,6 @@
         <resource type="download" name="css/" location="codemirror/css/"/>
     </web-resource>
 
-    <web-resource key="treeview">
-        <resource type="download" name="jquery.treeview.js" location="treeview/jquery.treeview.js"/>
-        <resource type="download" name="jquery.treeview.css" location="treeview/jquery.treeview.css"/>
-        <resource type="download" name="images/" location="treeview/images/"/>
-    </web-resource>
-
-    <web-resource key="ide">
-        <dependency>${project.groupId}.${project.artifactId}:treeview</dependency>
-        <!--resource type="download" name="ideDialog.js" location="ide/dialog.mu"/-->
-    </web-resource>
-
     <web-resource-transformer key="template" class="com.atlassian.labs.speakeasy.ui.mustache.TemplateTransformer"/>
     <web-resource-transformer key="cssVariables" class="com.atlassian.labs.speakeasy.ui.CssVariableTransformer"/>
 

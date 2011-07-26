@@ -146,6 +146,7 @@ class GeneratedDescriptorsManager
             Element trans = jsTransform.addElement("transformer");
             trans.addAttribute("key", "commonjs-module-entry");
             trans.addAttribute("moduleId", id);
+            trans.addAttribute("fullModuleKey", descriptor.getCompleteKey());
 
             Element res = root.addElement("resource");
             res.addAttribute("type", "download");

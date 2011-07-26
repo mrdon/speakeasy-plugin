@@ -74,7 +74,7 @@ public class ExtensionOperationManager
         // clear other allowed forks
         String parentKey = enabledPlugin.getForkedPluginKey() != null ? enabledPlugin.getForkedPluginKey() : enabledPlugin.getKey();
 
-        for (Plugin plugin : getAllSpeakeasyPlugins())
+        for (Plugin plugin : extensionManager.getAllExtensionPlugins())
         {
             if (!plugin.getKey().equals(enabledPlugin.getKey()) && (plugin.getKey().equals(parentKey)
                     || parentKey.equals(Extension.getForkedPluginKey(plugin.getKey()))))
@@ -333,7 +333,7 @@ public class ExtensionOperationManager
 
     private List<UserExtension> getAllRemoteSpeakeasyPlugins(final String userName)
     {
-        final List<Plugin> rawPlugins = getAllSpeakeasyPlugins();
+        final List<Plugin> rawPlugins = extensionManager.getAllExtensionPlugins();
         return newArrayList(transform(rawPlugins, new Function<Plugin, UserExtension>()
         {
             public UserExtension apply(Plugin from)
@@ -351,23 +351,6 @@ public class ExtensionOperationManager
                 }
             }
         }));
-    }
-
-    private List<Plugin> getAllSpeakeasyPlugins()
-    {
-        List<Plugin> plugins = new ArrayList<Plugin>();
-        for (Plugin plugin : pluginAccessor.getPlugins())
-        {
-            for (ModuleDescriptor moduleDescriptor : plugin.getModuleDescriptors())
-            {
-                if (moduleDescriptor instanceof DescriptorGenerator)
-                {
-                    plugins.add(plugin);
-                    break;
-                }
-            }
-        }
-        return plugins;
     }
 
     private boolean hasAccess(String pluginKey, String remoteUser)

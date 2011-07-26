@@ -1,4 +1,4 @@
-/*
+/**
  * Treeview 1.4 - jQuery plugin to hide and show branches of a tree
  * 
  * http://bassistance.de/jquery-plugins/jquery-plugin-treeview/
@@ -11,7 +11,7 @@
  *   http://www.gnu.org/licenses/gpl.html
  *
  * Revision: $Id: jquery.treeview.js 4684 2008-02-07 19:08:06Z joern.zaefferer $
- *
+ * @public
  */
 
 ;(function($) {
@@ -248,4 +248,4 @@
 	// provide backwards compability
 	$.fn.Treeview = $.fn.treeview;
 	
-})(jQuery);
+})(require('speakeasy/jquery').jQuery);

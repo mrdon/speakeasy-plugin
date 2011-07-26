@@ -1,9 +1,8 @@
 /**
  * Manages the in-browser ide for the Speakeasy user page
- *
- * @dependency treeview
  */
 var $ = require('../../jquery').jQuery;
+require('treeview/jquery-treeview');
 
 var editor;
 

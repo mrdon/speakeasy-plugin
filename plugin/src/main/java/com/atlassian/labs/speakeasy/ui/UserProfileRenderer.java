@@ -54,6 +54,7 @@ public class UserProfileRenderer
     private final XsrfTokenAccessor xsrfTokenAccessor;
     private final XsrfTokenValidator xsrfTokenValidator;
     private final FirefoxXpi firefoxXpi;
+    private PluginAccessor pluginAccessor;
 
     public UserProfileRenderer(PluginAccessor pluginAccessor, TemplateRenderer templateRenderer, SpeakeasyService speakeasyService, UserManager userManager, WebResourceManager webResourceManager, ProductAccessor productAccessor, CommonJsModulesAccessor commonJsModulesAccessor, WebInterfaceManager webInterfaceManager, XsrfTokenAccessor xsrfTokenAccessor, XsrfTokenValidator xsrfTokenValidator, ApplicationProperties applicationProperties, FirefoxXpi firefoxXpi)
     {
@@ -69,6 +70,7 @@ public class UserProfileRenderer
         this.userManager = userManager;
         this.webResourceManager = webResourceManager;
         this.productAccessor = productAccessor;
+        this.pluginAccessor = pluginAccessor;
 
     }
 
@@ -88,10 +90,6 @@ public class UserProfileRenderer
         webResourceManager.requireResource("com.atlassian.auiplugin:ajs");
         webResourceManager.requireResourcesForContext("speakeasy.user-profile");
         boolean devMode = speakeasyService.canAuthorExtensions(user);
-        if (devMode)
-        {
-            webResourceManager.requireResource("com.atlassian.labs.speakeasy-plugin:ide");
-        }
 
         final UserPlugins plugins = speakeasyService.getRemotePluginList(user);
         render("templates/user" + (useUserProfileDecorator ? "-with-decorator" : "") + ".vm", ImmutableMap.<String, Object>builder().

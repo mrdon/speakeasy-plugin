@@ -9,6 +9,8 @@ import com.atlassian.plugin.servlet.DownloadableResource;
 import com.atlassian.plugin.webresource.WebResourceManager;
 import com.atlassian.plugin.webresource.transformer.WebResourceTransformer;
 import org.dom4j.Element;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.DisposableBean;
 
 import javax.servlet.http.HttpServletRequest;
@@ -21,14 +23,27 @@ import java.io.OutputStream;
  */
 public class CommonJsModuleEntryTransformer implements WebResourceTransformer
 {
-    public CommonJsModuleEntryTransformer()
+    private final PluginAccessor pluginAccessor;
+    private static final Logger log = LoggerFactory.getLogger(CommonJsModuleEntryTransformer.class);
+    public CommonJsModuleEntryTransformer(PluginAccessor pluginAccessor)
     {
+        this.pluginAccessor = pluginAccessor;
     }
 
     public DownloadableResource transform(Element element, ResourceLocation resourceLocation, String extraPath, DownloadableResource downloadableResource)
     {
-
-        return new StringDownloadableResource("require.run('" + element.attributeValue("moduleId") + "');");
+        String completeKey = element.attributeValue("fullModuleKey");
+        if (!pluginAccessor.isPluginModuleEnabled(completeKey))
+        {
+            CommonJsModulesDescriptor descriptor = (CommonJsModulesDescriptor) pluginAccessor.getPluginModule(completeKey);
+            final String errorMessage = "Required module cannot be resolved due to missing dependencies: " + descriptor.getUnresolvedExternalModuleDependencies();
+            log.error(errorMessage);
+            return new StringDownloadableResource("throw '" + errorMessage + "';");
+        }
+        else
+        {
+            return new StringDownloadableResource("require.run('" + element.attributeValue("moduleId") + "');");
+        }
     }
 
     private class StringDownloadableResource implements DownloadableResource

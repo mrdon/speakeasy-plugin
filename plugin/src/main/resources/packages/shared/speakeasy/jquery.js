@@ -8,6 +8,7 @@
 // This is all a massive hack due to JIRA being broken in dev mode, as it sends out the batch again for ajax-loaded
 // panels.  This does not happen in production...
 if (!jQuery.dropDown) {
+  var oldjQuery = AJS.$;
   AJS.$ = jQuery;
   jQuery.fn.dropDown = function (type, options) {
       type = (type || "Standard").replace(/^([a-z])/, function (match) {

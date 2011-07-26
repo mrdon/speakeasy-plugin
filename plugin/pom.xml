@@ -118,7 +118,7 @@
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
-            <version>4.6</version>
+            <version>4.8</version>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -504,7 +504,7 @@
         <confluence.version>3.5.2</confluence.version>
         <confluence.4.0.version>4.0-m18</confluence.4.0.version>
         <confluence.data.version>3.0</confluence.data.version>
-        <jira.version>4.3.3</jira.version>
+        <jira.version>4.3.4</jira.version>
         <jira.data.version>4.1.1</jira.data.version>
         <fecru.version>2.7.0-M3-20110719025103</fecru.version>
         <fecru.data.version>2.7.0-M3-20110719025103</fecru.data.version>
