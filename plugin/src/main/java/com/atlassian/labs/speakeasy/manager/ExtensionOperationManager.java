@@ -209,13 +209,16 @@ public class ExtensionOperationManager
                 }
 
                 List<String> favoritedKeys = data.getFavorites(plugin.getKey());
-                if (favoritedKeys.contains(pluginAuthor))
+                if (favoritedKeys.contains(user))
                 {
-                    commonExtensions.add(plugin);
-                }
-                else
-                {
-                    suggestedExtensions.add(plugin);
+                    if (favoritedKeys.contains(pluginAuthor))
+                    {
+                        commonExtensions.add(plugin);
+                    }
+                    else
+                    {
+                        suggestedExtensions.add(plugin);
+                    }
                 }
             }
             productAccessor.sendEmail(pluginAuthor, "email/favorited-subject.vm", "email/favorited-body.vm", new HashMap<String, Object>()

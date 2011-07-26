@@ -305,7 +305,9 @@ public class TestUserProfile
 
         SpeakeasyUserPage page = product.visit(SpeakeasyUserPage.class)
                 .openInstallDialog()
-                .uploadPlugin(jar);
+                    .uploadPlugin(jar)
+                .openInstallDialog()
+                    .uploadPlugin(buildSimplePluginFile("not-fav", "Not favourited"));
 
         assertFalse(page.isFavorite("test"));
         assertEquals(0, page.getPlugins().get("test").getFavorites());
@@ -319,15 +321,17 @@ public class TestUserProfile
         assertEquals(1, messages.size());
         assertTrue(messages.get(0).contains("was marked as"));
         assertEquals(1, page.getPlugins().get("test").getFavorites());
-        assertEmailExists("admin@example.com", "Barney User has marked", asList(
+        String body = assertEmailExists("admin@example.com", "Barney User has marked", asList(
                 "you may want to try",
                 "plugin-tests"
         ));
+        assertTrue(!body.contains("Not favourited"));
         page.unfavorite("plugin-tests");
         logout();
         product.visit(LoginPage.class)
            .loginAsSysAdmin(SpeakeasyUserPage.class)
-           .uninstallPlugin("test");
+           .uninstallPlugin("test")
+           .uninstallPlugin("not-fav");
     }
 
     @Test
@@ -546,7 +550,7 @@ public class TestUserProfile
         assertFalse(page.canExecute("plugin-tests", ExtensionOperations.FORK));
     }
 
-    private void assertEmailExists(String to, String title, List<String> bodyStrings) throws MessagingException, IOException
+    private String assertEmailExists(String to, String title, List<String> bodyStrings) throws MessagingException, IOException
     {
 
         final AtomicReference<SmtpMessage> ref = new AtomicReference<SmtpMessage>();
@@ -585,6 +589,7 @@ public class TestUserProfile
         }
 
         assertTrue(lastMessage.getHeaderValue("To").contains(to));
+        return body;
     }
 
 
