@@ -54,7 +54,6 @@ public class UserProfileRenderer
     private final XsrfTokenAccessor xsrfTokenAccessor;
     private final XsrfTokenValidator xsrfTokenValidator;
     private final FirefoxXpi firefoxXpi;
-    private PluginAccessor pluginAccessor;
 
     public UserProfileRenderer(PluginAccessor pluginAccessor, TemplateRenderer templateRenderer, SpeakeasyService speakeasyService, UserManager userManager, WebResourceManager webResourceManager, ProductAccessor productAccessor, CommonJsModulesAccessor commonJsModulesAccessor, WebInterfaceManager webInterfaceManager, XsrfTokenAccessor xsrfTokenAccessor, XsrfTokenValidator xsrfTokenValidator, ApplicationProperties applicationProperties, FirefoxXpi firefoxXpi)
     {
@@ -70,8 +69,6 @@ public class UserProfileRenderer
         this.userManager = userManager;
         this.webResourceManager = webResourceManager;
         this.productAccessor = productAccessor;
-        this.pluginAccessor = pluginAccessor;
-
     }
 
     public boolean shouldRender(String userName)
