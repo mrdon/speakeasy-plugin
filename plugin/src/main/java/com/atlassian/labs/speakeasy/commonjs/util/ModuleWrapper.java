@@ -11,7 +11,7 @@ public class ModuleWrapper
     {
         StringBuffer wrappedJs = new StringBuffer();
         // require.def("alpha", ["require", "exports", "beta"], function (require, exports, beta) {
-        wrappedJs.append("require.def('").append(moduleName).append("', ['require','exports','module',");
+        wrappedJs.append("speakeasyRequire.def('").append(moduleName).append("', ['require','exports','module',");
         for (String requiredModule : requiredModules)
         {
             wrappedJs.append("'").append(requiredModule).append("',");

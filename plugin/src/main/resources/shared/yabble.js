@@ -572,7 +572,7 @@
 	Yabble.reset();
 	
 	// Export to the require global
-	window.require = Yabble;
+	window.speakeasyRequire = Yabble;
 })(function(code) {
 	return (window.eval || eval)(code, null);
 });

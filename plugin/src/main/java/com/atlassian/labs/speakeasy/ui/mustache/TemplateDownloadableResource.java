@@ -53,7 +53,7 @@ public class TemplateDownloadableResource implements DownloadableResource
 
         OutputStreamWriter out = new OutputStreamWriter(outputStream);
         try {
-            out.write("require.def('" + variableName + "', ['require', 'exports'], function(require, exports) {exports.render = function(data) {return require('speakeasy/mustache').to_html(\"");
+            out.write("speakeasyRequire.def('" + variableName + "', ['require', 'exports'], function(require, exports) {exports.render = function(data) {return require('speakeasy/mustache').to_html(\"");
 
             InputStreamReader reader = new InputStreamReader(new ByteArrayInputStream(buffer.toByteArray()));
 
