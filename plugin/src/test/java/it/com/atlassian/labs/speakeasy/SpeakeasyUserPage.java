@@ -8,6 +8,7 @@ import com.atlassian.pageobjects.binder.Init;
 import com.atlassian.pageobjects.binder.WaitUntil;
 import com.atlassian.webdriver.AtlassianWebDriver;
 import com.google.common.base.Function;
+import it.com.atlassian.labs.speakeasy.proxy.ApplinksTab;
 import org.openqa.selenium.By;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebElement;
@@ -41,6 +42,9 @@ public class SpeakeasyUserPage implements Page
 
     @FindBy(id = "jsdoc-tab")
     private WebElement jsdocTab;
+
+    @FindBy(id = "applinks-tab")
+    private WebElement applinksTab;
 
     @Inject
     private TestedProduct testedProduct;
@@ -284,6 +288,12 @@ public class SpeakeasyUserPage implements Page
     {
         WebElement pluginRow = getPluginRow(pluginKey);
         return driver.elementIsVisible(By.className("favorite-icon"));
+    }
+
+    public ApplinksTab viewApplinksTab()
+    {
+        applinksTab.click();
+        return pageBinder.bind(ApplinksTab.class);
     }
 
     public static class PluginRow

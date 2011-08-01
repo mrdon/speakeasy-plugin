@@ -7,6 +7,7 @@ import com.atlassian.labs.speakeasy.commonjs.CommonJsModulesAccessor;
 import com.atlassian.labs.speakeasy.model.UserExtension;
 import com.atlassian.labs.speakeasy.model.UserPlugins;
 import com.atlassian.labs.speakeasy.product.ProductAccessor;
+import com.atlassian.labs.speakeasy.proxy.ApplinkPanelRenderer;
 import com.atlassian.plugin.Plugin;
 import com.atlassian.plugin.PluginAccessor;
 import com.atlassian.plugin.web.WebInterfaceManager;
@@ -53,9 +54,10 @@ public class UserProfileRenderer
     private final WebInterfaceManager webInterfaceManager;
     private final XsrfTokenAccessor xsrfTokenAccessor;
     private final XsrfTokenValidator xsrfTokenValidator;
+    private final ApplinkPanelRenderer applinkPanelRenderer;
     private final FirefoxXpi firefoxXpi;
 
-    public UserProfileRenderer(PluginAccessor pluginAccessor, TemplateRenderer templateRenderer, SpeakeasyService speakeasyService, UserManager userManager, WebResourceManager webResourceManager, ProductAccessor productAccessor, CommonJsModulesAccessor commonJsModulesAccessor, WebInterfaceManager webInterfaceManager, XsrfTokenAccessor xsrfTokenAccessor, XsrfTokenValidator xsrfTokenValidator, ApplicationProperties applicationProperties, FirefoxXpi firefoxXpi)
+    public UserProfileRenderer(PluginAccessor pluginAccessor, TemplateRenderer templateRenderer, SpeakeasyService speakeasyService, UserManager userManager, WebResourceManager webResourceManager, ProductAccessor productAccessor, CommonJsModulesAccessor commonJsModulesAccessor, WebInterfaceManager webInterfaceManager, XsrfTokenAccessor xsrfTokenAccessor, XsrfTokenValidator xsrfTokenValidator, ApplicationProperties applicationProperties, FirefoxXpi firefoxXpi, ApplinkPanelRenderer applinkPanelRenderer)
     {
         this.templateRenderer = templateRenderer;
         this.commonJsModulesAccessor = commonJsModulesAccessor;
@@ -64,6 +66,7 @@ public class UserProfileRenderer
         this.xsrfTokenValidator = xsrfTokenValidator;
         this.applicationProperties = applicationProperties;
         this.firefoxXpi = firefoxXpi;
+        this.applinkPanelRenderer = applinkPanelRenderer;
         this.plugin = pluginAccessor.getPlugin("com.atlassian.labs.speakeasy-plugin");
         this.speakeasyService = speakeasyService;
         this.userManager = userManager;
@@ -107,6 +110,7 @@ public class UserProfileRenderer
                 put("webInterfaceContext", Collections.<String, Object>emptyMap()).
                 put("xsrfToken", xsrfTokenAccessor.getXsrfToken(req, resp, true)).
                 put("xsrfTokenName", xsrfTokenValidator.getXsrfParameterName()).
+                put("applinksRenderer", applinkPanelRenderer).
                 put("firefoxXpi", firefoxXpi).
                 build(), output);
     }

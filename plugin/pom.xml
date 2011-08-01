@@ -210,6 +210,12 @@
             <scope>provided</scope>
         </dependency>
         <dependency>
+            <groupId>com.atlassian.plugins</groupId>
+            <artifactId>atlassian-plugins-osgi-bridge</artifactId>
+            <version>2.7.0</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
             <groupId>com.atlassian.templaterenderer</groupId>
             <artifactId>atlassian-template-renderer-api</artifactId>
             <scope>provided</scope>
@@ -331,6 +337,13 @@
                                     <version>1.4.1</version>
                                 </libArtifact>
                             </libArtifacts>
+                            <bundledArtifacts>
+                                <bundledArtifact>
+                                    <groupId>com.atlassian.aui</groupId>
+                                    <artifactId>auiplugin</artifactId>
+                                    <version>3.5-m2</version>
+                                </bundledArtifact>
+                            </bundledArtifacts>
                         </product>
                         <product>
                             <id>confluence</id>
@@ -504,7 +517,7 @@
     <properties>
         <xvfb.enable>true</xvfb.enable>
         <platform.version>2.10.0</platform.version>
-        <refapp.version>2.10.0</refapp.version>
+        <refapp.version>2.12.0-alpha1</refapp.version>
         <confluence.version>3.5.2</confluence.version>
         <confluence.4.0.version>4.0-m18</confluence.4.0.version>
         <confluence.data.version>3.0</confluence.data.version>

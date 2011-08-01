@@ -42,7 +42,7 @@ public class CommonJsModuleEntryTransformer implements WebResourceTransformer
         }
         else
         {
-            return new StringDownloadableResource("require.run('" + element.attributeValue("moduleId") + "');");
+            return new StringDownloadableResource("speakeasyRequire.run('" + element.attributeValue("moduleId") + "');");
         }
     }
 

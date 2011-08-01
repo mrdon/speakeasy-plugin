@@ -31,6 +31,9 @@
         <li class="menu-item">
             <a href="#horizontal-third" id="jsdoc-tab"><strong>CommonJS Modules</strong></a>
         </li>
+        <li class="menu-item">
+            <a href="#applinks-panel" id="applinks-tab"><strong>Application Links</strong></a>
+        </li>
         #end
     </ul>
     <div class="tabs-pane active-pane" id="horizontal-first">
@@ -136,11 +139,14 @@ align="absmiddle" src="$staticResourcesPrefix/download/resources/com.atlassian.l
     <div class="tabs-pane" id="horizontal-third">
         $jsdocRenderer.render()
     </div>
+    <div class="tabs-pane" id="applinks-panel">
+        $applinksRenderer.render()
+    </div>
     #end
 </div>
     <div id="speakeasy-loaded">Loading...</div>
 <script type="text/javascript">
-        require.run('speakeasy/user/user').initSpeakeasy();
+        speakeasyRequire.run('speakeasy/user/user').initSpeakeasy();
 </script>
 
 </div>

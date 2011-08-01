@@ -5,6 +5,7 @@ import com.atlassian.pageobjects.page.HomePage;
 import com.atlassian.pageobjects.page.LoginPage;
 import com.atlassian.webdriver.pageobjects.WebDriverTester;
 import it.com.atlassian.labs.speakeasy.OwnerOfTestedProduct;
+import it.com.atlassian.labs.speakeasy.SpeakeasyUserPage;
 import org.apache.commons.io.IOUtils;
 import org.eclipse.jetty.server.Handler;
 import org.eclipse.jetty.server.Request;
@@ -19,7 +20,9 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.net.ServerSocket;
 
+import static com.google.common.collect.Lists.newArrayList;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 /**
  *
@@ -28,6 +31,8 @@ public class TestProxy
 {
     private static TestedProduct<?> product = OwnerOfTestedProduct.INSTANCE;
     private static Server server;
+    private static String applinkId;
+    private static ApplinksRest rest;
 
     @Before
     public void login()
@@ -59,23 +64,32 @@ public class TestProxy
         server = new Server(pickFreePort());
         server.setHandler(handler);
         server.start();
+        rest = product.getPageBinder().bind(ApplinksRest.class);
+        applinkId = rest.addGenericApplicationLink("local", "http://localhost:" + server.getConnectors()[0].getPort());
     }
 
     @AfterClass
     public static void stopServer() throws Exception
     {
         server.stop();
+        rest.removeApplicationLink(applinkId);
     }
 
     @Test
     public void testProxy() throws IOException, JSONException
     {
-        ApplinksRest rest = product.getPageBinder().bind(ApplinksRest.class);
-        String linkId = rest.addGenericApplicationLink("local", "http://localhost:" + server.getConnectors()[0].getPort());
+
         SpeakeasyProxy proxy = product.getPageBinder().bind(SpeakeasyProxy.class);
         String result = proxy.proxyPost("local", "/foo", "bob");
         assertEquals("Hello bob on /foo", result);
-        rest.removeApplicationLink(linkId);
+    }
+
+    @Test
+    public void testApplinkLists() throws IOException, JSONException
+    {
+        ApplinksTab tab = product.visit(SpeakeasyUserPage.class)
+                .viewApplinksTab();
+        assertTrue(tab.getApplinkNames().contains("local"));
     }
 
     private static int pickFreePort()

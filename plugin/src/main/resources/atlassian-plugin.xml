@@ -78,6 +78,11 @@
     <web-resource-transformer key="template" class="com.atlassian.labs.speakeasy.ui.mustache.TemplateTransformer"/>
     <web-resource-transformer key="cssVariables" class="com.atlassian.labs.speakeasy.ui.CssVariableTransformer"/>
 
+    <!-- crappy workaround for sitemesh always processing rest resources -->
+    <servlet-filter key="rest-no-sitemesh" class="com.atlassian.labs.speakeasy.rest.NoSitemeshFilter" location="before-decoration">
+        <url-pattern>/rest/speakeasy/*</url-pattern>
+    </servlet-filter>
+
     <rest key="rest" path="/speakeasy" version="1" package="com.atlassian.labs.speakeasy.rest">
         <dispatcher>REQUEST</dispatcher>
         <dispatcher>INCLUDE</dispatcher>
@@ -109,6 +114,7 @@
     <component key="searchManager" class="com.atlassian.labs.speakeasy.manager.SearchManager" />
     <component key="firefoxXpi" class="com.atlassian.labs.speakeasy.ui.FirefoxXpi" />
     <component key="proxy" class="com.atlassian.labs.speakeasy.proxy.ProxyService" />
+    <component key="applinksRenderer" class="com.atlassian.labs.speakeasy.proxy.ApplinkPanelRenderer" />
 
     <component key="conventionDescriptorGenerator" class="com.atlassian.labs.speakeasy.manager.convention.ConventionDescriptorGeneratorServiceFactory" public="true">
         <interface>com.atlassian.labs.speakeasy.install.convention.external.ConventionDescriptorGenerator</interface>
@@ -129,6 +135,8 @@
     <component-import key="xsrfTokenValidator" interface="com.atlassian.sal.api.xsrf.XsrfTokenValidator" />
     <component-import key="eventPublisher" interface="com.atlassian.event.api.EventPublisher" />
     <component-import key="applicationLinkService" interface="com.atlassian.applinks.api.ApplicationLinkService" />
+    <component-import key="pluginRetrievalService" interface="com.atlassian.plugin.osgi.bridge.external.PluginRetrievalService" />
+    <component-import key="i18nResolver" interface="com.atlassian.sal.api.message.I18nResolver" />
 
     <module-type key="scoped-web-resource" class="com.atlassian.labs.speakeasy.descriptor.SpeakeasyWebResourceModuleDescriptor"/>
 

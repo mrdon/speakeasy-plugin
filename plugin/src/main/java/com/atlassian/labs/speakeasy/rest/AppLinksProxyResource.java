@@ -26,8 +26,8 @@ public class AppLinksProxyResource
     @Produces("*/*")
     public Response doGet(@Context HttpServletRequest req, @Context HttpServletResponse resp) throws ServletException, IOException
     {
-        proxyService.proxy(req, resp, MethodType.GET);
-        return Response.ok().build();
+        int status = proxyService.proxy(req, resp, MethodType.GET);
+        return Response.status(status).build();
     }
 
     @POST
@@ -35,8 +35,8 @@ public class AppLinksProxyResource
     @Produces("*/*")
     public Response doPost(@Context HttpServletRequest req, @Context HttpServletResponse resp) throws ServletException, IOException
     {
-        proxyService.proxy(req, resp, MethodType.POST);
-        return Response.ok().build();
+        int status = proxyService.proxy(req, resp, MethodType.POST);
+        return Response.status(status).build();
     }
 
 }

@@ -62,4 +62,10 @@ public class JsonObjectMapper
     {
         new JacksonJsonProviderFactory().create().writeTo(object, object.getClass(), object.getClass(), null, MediaType.APPLICATION_JSON_TYPE, null, out);
     }
+
+    public static void write(Object object, Writer writer) throws IOException
+    {
+        String result = write(object);
+        writer.write(result);
+    }
 }

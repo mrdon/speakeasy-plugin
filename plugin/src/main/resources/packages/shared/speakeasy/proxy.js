@@ -1,10 +1,10 @@
 /**
  * Proxies requests through application linked urls
  * @public
- * @dependency com.atlassian.applinks.applinks-plugin:applinks-util-js,com.atlassian.applinks.applinks-plugin:applinks-oauth-ui
+ * @dependency com.atlassian.applinks.applinks-plugin:applinks-public
  */
 
- 
+
 var $ = require('speakeasy/jquery').jQuery;
 
 /**
@@ -14,9 +14,24 @@ var $ = require('speakeasy/jquery').jQuery;
  *         <li><code>appId<code> - The application links id or name (required if appType not specified)</li>
  *         <li><code>appType<code> - The application link type: confluence,jira,bamboo,fecru,TYPE_CLASS (required if appId not specified)</li>
  *         <li><code>path<code> - The path of the remote url to execute, relative to its base url</li>
+ *         <li><code>authContainer</code> - The container element to attach the authentication message to (required for OAuth support)</li>
+ *         <li><code>authMessage</code> - The message to include in the inline authentication message (required for OAuth support)</li>
  *         </ul>
  *     </li>
  * </ul>
+ *
+ * <p>Example:</p>
+ * <pre>
+ * proxy.ajax({
+ *   appId : "myAppName",
+ *   path : "/rest/prototype/1/content/1212418.json",
+ *   authContainer: $('#my-container'),
+ *   authMessage : 'Remote data',
+ *   success : function(data) {
+ *       alert('page: ' + data.title);
+ *   }
+ * });
+ * </pre>
  */
 exports.ajax = function(options){
     var context = contextPath || AJS.params.contextPath || BAMBOO.contextPath || fishEyePageContext;
@@ -34,7 +49,22 @@ exports.ajax = function(options){
         path: options.path
     });
 
-    options = $.extend(options, {url: context + '/rest/speakeasy/latest/proxy'});
+    options = $.extend(options, {
+        url: context + '/rest/speakeasy/latest/proxy',
+        error: function(xhr, status, err) {
+            if (xhr.status == 401 && window.ApplinksUtils && options.authContainer && options.authMessage) {
+                var oauthUrl = xhr.getResponseHeader("WWW-Authenticate");
+                if (oauthUrl.indexOf("OAuth") == 0) {
+                    var appLink = JSON.parse(xhr.responseText);
+                    var oauthHtml = window.ApplinksUtils.createAuthRequestInline(options.authMessage, appLink);
+                    $(options.authContainer).append(oauthHtml);
+                    return;
+                }
+            }
+            options.error || options.error();
+        }
+    });
+
     $.ajax(options);
 };
 

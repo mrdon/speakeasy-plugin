@@ -10,6 +10,7 @@ import com.atlassian.labs.speakeasy.SpeakeasyService;
 import com.atlassian.labs.speakeasy.UnauthorizedAccessException;
 import com.atlassian.labs.speakeasy.manager.PermissionManager;
 import com.atlassian.labs.speakeasy.model.Permission;
+import com.atlassian.labs.speakeasy.util.JsonObjectMapper;
 import com.atlassian.sal.api.net.Request;
 import com.atlassian.sal.api.net.Response;
 import com.atlassian.sal.api.net.ResponseException;
@@ -21,6 +22,7 @@ import org.apache.commons.io.IOUtils;
 import org.eclipse.jgit.transport.ReceivePack;
 
 import javax.servlet.ServletOutputStream;
+import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
@@ -65,7 +67,7 @@ public class ProxyService
     }
 
     @SuppressWarnings("unchecked")
-    public void proxy(final HttpServletRequest req, final HttpServletResponse resp, final Request.MethodType methodType) throws UnauthorizedAccessException, IOException
+    public int proxy(final HttpServletRequest req, final HttpServletResponse resp, final Request.MethodType methodType) throws UnauthorizedAccessException, IOException
     {
         String user = userManager.getRemoteUsername(req);
         if (!speakeasyService.canAccessSpeakeasy(user))
@@ -79,22 +81,23 @@ public class ProxyService
 
         try
         {
-            doProxy(req, resp, methodType);
+            return doProxy(req, resp, methodType);
         }
         catch (IOException e)
         {
             resp.sendError(400, "Exception during proxy: " + e.getMessage());
+            return 400;
         }
     }
 
-    private void doProxy(HttpServletRequest req, final HttpServletResponse resp, Request.MethodType methodType) throws IOException
+    private int doProxy(HttpServletRequest req, final HttpServletResponse resp, Request.MethodType methodType) throws IOException
     {
         String url = req.getParameter(PATH);
         String finalQueryString = buildProxyQueryString(req);
         String finalPath = buildUrlPath(methodType, url, finalQueryString, resp);
         if (finalPath == null)
         {
-            return;
+            return 400;
         }
 
         String appId = req.getParameter(APP_ID);
@@ -109,12 +112,13 @@ public class ProxyService
         catch(ResponseException re)
         {
             final String finalUrl = appLink.getRpcUrl() + finalPath;
-            handleProxyingException(finalUrl, req, resp, re);
+            return handleProxyingException(finalUrl, req, resp, re);
         }
         catch (CredentialsRequiredException e)
         {
-            oauthChallenge(resp, e);
+            return oauthChallenge(appLink, resp, e);
         }
+        return 200;
     }
 
     private String buildUrlPath(Request.MethodType methodType, String url, String queryString, HttpServletResponse resp) throws IOException
@@ -217,13 +221,16 @@ public class ProxyService
         }
     }
 
-    private void oauthChallenge(HttpServletResponse resp, CredentialsRequiredException e)
+    private int oauthChallenge(ApplicationLink appLink, HttpServletResponse resp, CredentialsRequiredException e) throws IOException
     {
         resp.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-        resp.setHeader("WWW-Authenticate", "OAuth realm=\"" + e.getAuthorisationURI().toString() + "\"");
+        final String authUri = e.getAuthorisationURI().toString();
+        resp.setHeader("WWW-Authenticate", "OAuth realm=\"" + authUri + "\"");
+        JsonObjectMapper.write(new OAuthAuthenticateResponse(appLink, authUri), resp.getWriter());
+        return HttpServletResponse.SC_UNAUTHORIZED;
     }
 
-    private void handleProxyingException(String finalUrl, HttpServletRequest req, HttpServletResponse resp, Exception e) throws IOException
+    private int handleProxyingException(String finalUrl, HttpServletRequest req, HttpServletResponse resp, Exception e) throws IOException
     {
         final boolean format = Boolean.parseBoolean(req.getParameter(FORMAT_ERRORS));
 
@@ -235,7 +242,9 @@ public class ProxyService
         else
         {
             resp.sendError(504, errorMsg);
+            return 504;
         }
+        return 400;
     }
 
     private void formatError(HttpServletResponse resp, String errorMsg)
