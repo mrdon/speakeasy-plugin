@@ -279,7 +279,7 @@
                     <compressResources>false</compressResources>
                     <systemPropertyVariables>
                         <xvfb.enable>${xvfb.enable}</xvfb.enable>
-                        <webdriver.browser>firefox-3.6</webdriver.browser>
+                        <webdriver.browser>${webdriver.browser}</webdriver.browser>
                         <atlassian.mail.senddisabled>false</atlassian.mail.senddisabled>
                         <!--atlassian.dev.mode>false</atlassian.dev.mode-->
                     </systemPropertyVariables>
@@ -507,6 +507,7 @@
         <fecru.data.version>2.7.0-M3-20110719025103</fecru.data.version>
         <bamboo.version>3.1-m2</bamboo.version>
         <bamboo.data.version>2.6.1</bamboo.data.version>
+        <webdriver.browser>firefox-3.6</webdriver.browser>
     </properties>
 
 </project>
