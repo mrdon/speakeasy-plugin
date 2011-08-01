@@ -17,7 +17,6 @@ public class JiraSpeakeasyUserPage extends SpeakeasyUserPage
         return "/secure/ViewProfile.jspa";
     }
 
-    @WaitUntil
     public void initBySelectingTab()
     {
         WebElement tab = driver.findElement(By.id("up_speakeasy-plugins_li"));
@@ -25,5 +24,12 @@ public class JiraSpeakeasyUserPage extends SpeakeasyUserPage
         {
             tab.findElement(By.tagName("a")).click();
         }
+    }
+
+    @Override
+    public void waitForSpeakeasyInit()
+    {
+        initBySelectingTab();
+        super.waitForSpeakeasyInit();
     }
 }

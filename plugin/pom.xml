@@ -25,24 +25,9 @@
                 <scope>import</scope>
             </dependency>
             <dependency>
-                <groupId>atlassian-browsers</groupId>
-                <artifactId>atlassian-browsers-auto</artifactId>
-                <version>1.1-beta4</version>
-            </dependency>
-            <dependency>
-                <groupId>atlassian-browsers</groupId>
-                <artifactId>atlassian-browsers-linux</artifactId>
-                <version>1.1-beta4</version>
-            </dependency>
-            <dependency>
-                <groupId>atlassian-browsers</groupId>
-                <artifactId>atlassian-browsers-osx</artifactId>
-                <version>1.1-beta4</version>
-            </dependency>
-            <dependency>
-                <groupId>atlassian-browsers</groupId>
-                <artifactId>atlassian-browsers-windows</artifactId>
-                <version>1.1-beta4</version>
+                <groupId>commons-lang</groupId>
+                <artifactId>commons-lang</artifactId>
+                <version>2.5</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
@@ -252,25 +237,19 @@
         <dependency>
             <groupId>com.atlassian.selenium</groupId>
             <artifactId>atlassian-webdriver-refapp</artifactId>
-            <version>2.0.0-m16</version>
+            <version>2.0</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>com.atlassian.selenium</groupId>
             <artifactId>atlassian-webdriver-confluence</artifactId>
-            <version>2.0.0-m16</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>atlassian-browsers</groupId>
-            <artifactId>atlassian-browsers-auto</artifactId>
-            <version>1.1-beta4</version>
+            <version>2.0</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>com.atlassian.selenium</groupId>
             <artifactId>atlassian-webdriver-jira</artifactId>
-            <version>2.0.0-m16</version>
+            <version>2.0</version>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -313,6 +292,7 @@
                             com.atlassian.jira;resolution:=optional,
                             com.atlassian.plugins.rest.common.security,
                             com.atlassian.sal.api.*;version="(2.4,3.0]",
+                            org.apache.commons.lang.*;version="2.4",
                             *;resolution:=optional
                         </Import-Package>
                         <Export-Package>
