@@ -25,10 +25,6 @@
         <url-pattern>/git/*</url-pattern>
      </servlet>
 
-    <servlet key="applinks-proxy" name="Applinks Proxy" class="com.atlassian.labs.speakeasy.rest.AppLinksProxyResource">
-        <url-pattern>/applinks/proxy</url-pattern>
-    </servlet>
-
     <commonjs key="sharedModules" location="packages/shared">
         <transformation extension="host">
             <transformer key="commonjs-module" fullModuleKey="${project.groupId}.${project.artifactId}:sharedModules"/>
