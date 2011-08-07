@@ -9,6 +9,8 @@ import com.atlassian.plugin.PluginAccessor;
 import com.google.common.base.Function;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -20,12 +22,14 @@ import static com.google.common.collect.Lists.transform;
 /**
  *
  */
+@Component
 public class ExtensionManager
 {
     private final PluginAccessor pluginAccessor;
     private final ExtensionBuilder extensionBuilder;
     private static final Logger log = LoggerFactory.getLogger(ExtensionManager.class);
 
+    @Autowired
     public ExtensionManager(ExtensionBuilder extensionBuilder, PluginAccessor pluginAccessor)
     {
         this.extensionBuilder = extensionBuilder;

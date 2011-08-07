@@ -3,6 +3,8 @@ package com.atlassian.labs.speakeasy.ui;
 import com.atlassian.plugin.webresource.UrlMode;
 import com.atlassian.plugin.webresource.WebResourceManager;
 import org.apache.commons.io.IOUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -10,6 +12,7 @@ import java.io.InputStream;
 /**
  *
  */
+@Component
 public class FirefoxXpi
 {
     private final String hash;
@@ -17,6 +20,7 @@ public class FirefoxXpi
     private String iconUrl;
     private final WebResourceManager webResourceManager;
 
+    @Autowired
     public FirefoxXpi(WebResourceManager webResourceManager)
     {
         this.webResourceManager = webResourceManager;

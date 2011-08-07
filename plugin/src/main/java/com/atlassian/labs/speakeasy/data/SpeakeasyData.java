@@ -3,6 +3,8 @@ package com.atlassian.labs.speakeasy.data;
 import com.atlassian.labs.speakeasy.util.PomProperties;
 import com.atlassian.sal.api.pluginsettings.PluginSettings;
 import com.atlassian.sal.api.pluginsettings.PluginSettingsFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -10,16 +12,17 @@ import java.util.Collections;
 import java.util.List;
 
 import static com.google.common.collect.Lists.newArrayList;
-import static java.util.Collections.emptyList;
 
 /**
  *
  */
+@Component
 public class SpeakeasyData
 {
     private final PluginSettingsFactory pluginSettingsFactory;
     private final PomProperties pomProperties;
 
+    @Autowired
     public SpeakeasyData(PluginSettingsFactory pluginSettingsFactory, PomProperties pomProperties)
     {
         this.pluginSettingsFactory = pluginSettingsFactory;

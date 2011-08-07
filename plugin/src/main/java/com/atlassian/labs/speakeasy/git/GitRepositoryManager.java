@@ -29,6 +29,8 @@ import org.osgi.framework.BundleContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.DisposableBean;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -44,6 +46,7 @@ import static com.google.common.collect.Sets.newHashSet;
 /**
  *
  */
+@Component
 public class GitRepositoryManager implements DisposableBean
 {
     private static final String BUNDLELASTMODIFIED = "bundlelastmodified";
@@ -74,6 +77,7 @@ public class GitRepositoryManager implements DisposableBean
             }
         };
 
+    @Autowired
     public GitRepositoryManager(BundleContext bundleContext, ApplicationProperties applicationProperties, EventPublisher eventPublisher)
     {
         this.bundleContext = bundleContext;

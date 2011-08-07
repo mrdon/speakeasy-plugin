@@ -6,14 +6,18 @@ import com.atlassian.labs.speakeasy.util.PluginModuleTracker;
 import com.atlassian.plugin.PluginAccessor;
 import com.atlassian.plugin.event.PluginEventManager;
 import org.springframework.beans.factory.DisposableBean;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 /**
  *
  */
+@Component
 public class CommonJsModulesAccessor implements DisposableBean
 {
     private final PluginModuleTracker<CommonJsModules, CommonJsModulesDescriptor> tracker;
 
+    @Autowired
     public CommonJsModulesAccessor(PluginAccessor pluginAccessor, PluginEventManager pluginEventManager)
     {
         this.tracker = new DefaultPluginModuleTracker<CommonJsModules, CommonJsModulesDescriptor>(

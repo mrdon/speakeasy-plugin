@@ -8,6 +8,7 @@ import org.dom4j.Element;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -19,12 +20,9 @@ import static java.util.Collections.emptyList;
 /**
  *
  */
+@Component
 public class JsonToElementParser
 {
-
-    public JsonToElementParser()
-    {
-    }
 
     public List<Element> createWebItems(InputStream in)
     {

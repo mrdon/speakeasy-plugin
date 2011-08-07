@@ -3,15 +3,19 @@ package com.atlassian.labs.speakeasy.manager;
 import com.atlassian.labs.speakeasy.model.Permission;
 import com.atlassian.labs.speakeasy.model.Settings;
 import com.atlassian.sal.api.user.UserManager;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 /**
  *
  */
+@Component
 public class PermissionManager
 {
     private final UserManager userManager;
     private final SettingsManager settingsManager;
 
+    @Autowired
     public PermissionManager(UserManager userManager, SettingsManager settingsManager)
     {
         this.userManager = userManager;

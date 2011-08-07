@@ -4,6 +4,7 @@ import org.dom4j.Document;
 import org.dom4j.DocumentException;
 import org.dom4j.Element;
 import org.dom4j.io.SAXReader;
+import org.springframework.stereotype.Component;
 
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -13,6 +14,7 @@ import java.util.Map;
 /**
  *
  */
+@Component
 public class PomProperties
 {
     private final Map<String,String> pomProperties;

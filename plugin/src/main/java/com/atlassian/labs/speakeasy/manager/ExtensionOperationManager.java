@@ -21,6 +21,8 @@ import com.atlassian.sal.api.user.UserManager;
 import com.google.common.base.Function;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 import java.io.File;
 import java.util.*;
@@ -32,6 +34,7 @@ import static com.google.common.collect.Lists.transform;
 /**
  *
  */
+@Component
 public class ExtensionOperationManager
 {
     private final PluginAccessor pluginAccessor;
@@ -45,6 +48,7 @@ public class ExtensionOperationManager
     private final ExtensionManager extensionManager;
     private static final Logger log = LoggerFactory.getLogger(SpeakeasyService.class);
 
+    @Autowired
     public ExtensionOperationManager(PluginAccessor pluginAccessor, SpeakeasyData data, PluginSystemManager pluginSystemManager, ProductAccessor productAccessor, DescriptorGeneratorManager descriptorGeneratorManager, UserManager userManager, EventPublisher eventPublisher, ExtensionBuilder extensionBuilder, ExtensionManager extensionManager)
     {
         this.pluginAccessor = pluginAccessor;

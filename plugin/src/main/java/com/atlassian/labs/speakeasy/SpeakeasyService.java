@@ -19,6 +19,8 @@ import com.google.common.base.Predicate;
 import org.osgi.framework.BundleContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -26,13 +28,12 @@ import java.util.List;
 
 import static com.google.common.collect.Iterables.filter;
 import static com.google.common.collect.Lists.newArrayList;
-import static com.google.common.collect.Sets.newHashSet;
 import static java.util.Arrays.asList;
-import static java.util.Arrays.hashCode;
 
 /**
  *
  */
+@Component
 public class SpeakeasyService
 {
     private final ApplicationProperties applicationProperties;
@@ -52,6 +53,7 @@ public class SpeakeasyService
     private static final Logger log = LoggerFactory.getLogger(SpeakeasyService.class);
     private final SearchManager searchManager;
 
+    @Autowired
     public SpeakeasyService(PluginAccessor pluginAccessor, PluginSystemManager pluginSystemManager, ProductAccessor productAccessor, BundleContext bundleContext, PermissionManager permissionManager, UserManager userManager, SettingsManager settingsManager, ApplicationProperties applicationProperties, WebResourceManager webResourceManager, EventPublisher eventPublisher, ExtensionOperationManager extensionOperationManager, final ExtensionManager extensionManager, SearchManager searchManager)
     {
         this.pluginAccessor = pluginAccessor;

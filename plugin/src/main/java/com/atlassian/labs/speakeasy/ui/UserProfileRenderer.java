@@ -24,6 +24,8 @@ import com.google.common.collect.ImmutableMap;
 import com.samskivert.mustache.Mustache;
 import com.samskivert.mustache.Template;
 import org.apache.commons.io.IOUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -40,6 +42,7 @@ import static java.util.Collections.singletonMap;
 /**
  *
  */
+@Component
 public class UserProfileRenderer
 {
 
@@ -57,6 +60,7 @@ public class UserProfileRenderer
     private final ApplinkPanelRenderer applinkPanelRenderer;
     private final FirefoxXpi firefoxXpi;
 
+    @Autowired
     public UserProfileRenderer(PluginAccessor pluginAccessor, TemplateRenderer templateRenderer, SpeakeasyService speakeasyService, UserManager userManager, WebResourceManager webResourceManager, ProductAccessor productAccessor, CommonJsModulesAccessor commonJsModulesAccessor, WebInterfaceManager webInterfaceManager, XsrfTokenAccessor xsrfTokenAccessor, XsrfTokenValidator xsrfTokenValidator, ApplicationProperties applicationProperties, FirefoxXpi firefoxXpi, ApplinkPanelRenderer applinkPanelRenderer)
     {
         this.templateRenderer = templateRenderer;

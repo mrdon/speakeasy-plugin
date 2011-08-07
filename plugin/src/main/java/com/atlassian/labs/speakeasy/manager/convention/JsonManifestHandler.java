@@ -6,6 +6,7 @@ import com.atlassian.labs.speakeasy.util.JsonObjectMapper;
 import com.atlassian.plugin.Plugin;
 import com.atlassian.plugin.PluginArtifact;
 import org.apache.commons.io.IOUtils;
+import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -15,6 +16,7 @@ import java.io.StringReader;
 /**
  *
  */
+@Component
 public class JsonManifestHandler
 {
     public JsonManifest read(PluginArtifact artifact)

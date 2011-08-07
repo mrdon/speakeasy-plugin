@@ -13,6 +13,8 @@ import com.google.common.collect.Lists;
 import com.samskivert.mustache.Mustache;
 import com.samskivert.mustache.Template;
 import org.apache.commons.io.IOUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -25,12 +27,14 @@ import static java.util.Collections.singletonMap;
 /**
  *
  */
+@Component
 public class ApplinkPanelRenderer
 {
     private final ApplicationLinkService applicationLinkService;
     private final I18nResolver i18nResolver;
     private final Template template;
 
+    @Autowired
     public ApplinkPanelRenderer(ApplicationLinkService applicationLinkService, PluginRetrievalService pluginRetrievalService, I18nResolver i18nResolver)
     {
         this.applicationLinkService = applicationLinkService;

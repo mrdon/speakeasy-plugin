@@ -19,10 +19,10 @@ import com.atlassian.sal.api.user.UserManager;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import org.apache.commons.io.IOUtils;
-import org.eclipse.jgit.transport.ReceivePack;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 import javax.servlet.ServletOutputStream;
-import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
@@ -32,11 +32,10 @@ import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.*;
 
-import static org.apache.commons.lang.Validate.notNull;
-
 /**
  * Proxies requests to an application link
  */
+@Component
 public class ProxyService
 {
     private static final String APP_TYPE = "appType";
@@ -58,6 +57,7 @@ public class ProxyService
     private final UserManager userManager;
     private final PermissionManager permissionManager;
 
+    @Autowired
     public ProxyService(ApplicationLinkService appLinkService, SpeakeasyService speakeasyService, UserManager userManager, PermissionManager permissionManager)
     {
         this.appLinkService = appLinkService;

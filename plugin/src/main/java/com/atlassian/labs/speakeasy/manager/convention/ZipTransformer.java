@@ -9,6 +9,8 @@ import com.atlassian.plugin.osgi.factory.OsgiPlugin;
 import com.atlassian.plugin.util.PluginUtils;
 import org.apache.commons.io.IOUtils;
 import org.osgi.framework.Constants;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 import java.io.*;
 import java.util.Map;
@@ -24,12 +26,14 @@ import static com.google.common.collect.Maps.newHashMap;
 /**
  *
  */
+@Component
 public class ZipTransformer
 {
 
     private final JsonManifestHandler jsonHandler;
     private final JsonToElementParser jsonToElementParser;
 
+    @Autowired
     public ZipTransformer(JsonManifestHandler jsonHandler, JsonToElementParser jsonToElementParser)
     {
         this.jsonHandler = jsonHandler;

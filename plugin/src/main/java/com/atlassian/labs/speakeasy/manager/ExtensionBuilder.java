@@ -14,6 +14,8 @@ import com.atlassian.plugin.impl.UnloadablePlugin;
 import com.atlassian.sal.api.user.UserManager;
 import com.atlassian.sal.api.user.UserProfile;
 import org.osgi.framework.BundleContext;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 import java.util.List;
 import java.util.Set;
@@ -23,6 +25,7 @@ import static com.google.common.collect.Sets.newHashSet;
 /**
  *
  */
+@Component
 class ExtensionBuilder
 {
     private final PermissionManager permissionManager;
@@ -32,6 +35,7 @@ class ExtensionBuilder
     private final PluginAccessor pluginAccessor;
     private final BundleContext bundleContext;
 
+    @Autowired
     public ExtensionBuilder(PermissionManager permissionManager, UserManager userManager, SpeakeasyData data, JsonManifestHandler jsonManifestHandler, PluginAccessor pluginAccessor, BundleContext bundleContext)
     {
         this.permissionManager = permissionManager;

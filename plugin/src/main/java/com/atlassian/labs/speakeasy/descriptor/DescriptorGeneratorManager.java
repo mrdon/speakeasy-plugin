@@ -8,6 +8,8 @@ import com.atlassian.plugin.util.WaitUntil;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceRegistration;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -20,6 +22,7 @@ import static com.google.common.collect.Lists.newArrayList;
 /**
  *
  */
+@Component
 public class DescriptorGeneratorManager
 {
     private final SpeakeasyData data;
@@ -29,6 +32,7 @@ public class DescriptorGeneratorManager
     private final PluginController pluginController;
 
 
+    @Autowired
     public DescriptorGeneratorManager(SpeakeasyData data, PluginAccessor pluginAccessor, BundleContext bundleContext, PluginController pluginController)
     {
         this.data = data;

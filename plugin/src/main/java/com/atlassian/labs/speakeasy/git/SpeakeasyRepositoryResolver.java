@@ -8,12 +8,15 @@ import org.eclipse.jgit.transport.resolver.FileResolver;
 import org.eclipse.jgit.transport.resolver.RepositoryResolver;
 import org.eclipse.jgit.transport.resolver.ServiceNotAuthorizedException;
 import org.eclipse.jgit.transport.resolver.ServiceNotEnabledException;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 import javax.servlet.http.HttpServletRequest;
 
 /**
  *
  */
+@Component
 public class SpeakeasyRepositoryResolver implements RepositoryResolver<HttpServletRequest>
 {
     private final SpeakeasyService speakeasyService;
@@ -21,6 +24,7 @@ public class SpeakeasyRepositoryResolver implements RepositoryResolver<HttpServl
     private final FileResolver resolver;
     private final UserManager userManager;
 
+    @Autowired
     public SpeakeasyRepositoryResolver(SpeakeasyService speakeasyService, UserManager userManager, GitRepositoryManager gitRepositoryManager)
     {
         this.speakeasyService = speakeasyService;

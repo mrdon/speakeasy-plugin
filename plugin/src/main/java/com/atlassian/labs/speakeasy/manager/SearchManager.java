@@ -9,6 +9,8 @@ import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 import java.util.List;
@@ -20,12 +22,14 @@ import static com.google.common.collect.Lists.newArrayList;
 /**
  * Searches an extension for a regular expression
  */
+@Component
 public class SearchManager
 {
     private final ExtensionManager extensionManager;
     private final BundleContext bundleContext;
     private static final Logger log = LoggerFactory.getLogger(SearchManager.class);
 
+    @Autowired
     public SearchManager(ExtensionManager extensionManager, BundleContext bundleContext)
     {
         this.extensionManager = extensionManager;
