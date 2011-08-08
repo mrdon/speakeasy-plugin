@@ -3,7 +3,7 @@ var messages = require('speakeasy/messages');
 var _ = require('underscore');
 var tmpl = require('./result');
 var host = require('speakeasy/host');
-var spinner = require('speakeasy/spinner');
+var spinMaker = require('speakeasy/spinner');
 
 function getAbsoluteHref($link) {
     var href = $link.attr('href') || $link.attr('data-href');
@@ -25,7 +25,7 @@ function getErrorMessage(xhr) {
 }
 
 function executeSearch(button, text) {
-    var oldButtonHtml = spinner.replace(button);
+    var spinner = spinMaker.start(button);
     $.ajax({
               url: getAbsoluteHref(button),
               data: {'q' : text },
@@ -35,11 +35,11 @@ function executeSearch(button, text) {
               },
               success: function(data) {
                   updateSearchResults(data);
-                  button.html(oldButtonHtml);
+                  spinner.finish();
               },
               error: function(xhr) {
                   messages.add('error', {title: "Error searching", body: getErrorMessage(xhr), shadowed: false});
-                  button.html(oldButtonHtml);
+                  spinner.finish();
               }
             });
 }

@@ -11,7 +11,7 @@ var fork = require('./fork/fork');
 var pac = require('./pac/pac');
 var git = require('./git/git');
 var install = require('./install/install');
-var spinner = require('speakeasy/spinner');
+var spinMaker = require('speakeasy/spinner');
 
 var pluginActions = {
     'edit' : function (key, link, attachedRow) {
@@ -24,6 +24,9 @@ var pluginActions = {
     'fork' : fork.openDialog,
     'enable' : enablePlugin,
     'disable' : disablePlugin,
+    'feedback' : function (key, link, attachedRow) {
+        require('./feedback/feedback').openDialog(key);
+    },
     'download' : function(key, link, attachedRow) {
         require('./download/download').openDialog(key, product, getAbsoluteHref(link), link.attr("data-extension"));
     },
@@ -43,7 +46,7 @@ function getErrorMessage(xhr) {
 
 function enablePlugin(pluginKey, link, attachedRow) {
     var pluginName = $('.plugin-name', attachedRow).text();
-    var oldLinkHtml = spinner.replace(link);
+    var spinner = spinMaker.start(link);
     $.ajax({
               url: getAbsoluteHref(link),
               type: 'PUT',
@@ -53,14 +56,14 @@ function enablePlugin(pluginKey, link, attachedRow) {
               },
               error: function(xhr) {
                   messages.add('error', {title: "Error enabling extension", body: getErrorMessage(xhr), shadowed: false});
-                  link.html(oldLinkHtml);
+                  spinner.finish();
               }
             });
 }
 
 function disablePlugin(pluginKey, link, attachedRow) {
     var pluginName = $('.plugin-name', attachedRow).text();
-    var oldLinkHtml = spinner.replace(link);
+    var spinner = spinMaker.start(link);
     $.ajax({
               url: getAbsoluteHref(link),
               type: 'DELETE',
@@ -70,14 +73,14 @@ function disablePlugin(pluginKey, link, attachedRow) {
               },
               error: function(xhr) {
                   messages.add('error', {title: "Error disabling extension", body: getErrorMessage(xhr), shadowed: false});
-                  link.html(oldLinkHtml);
+                  spinner.finish();
               }
             });
 }
 
 function uninstallPlugin(pluginKey, link, attachedRow) {
     var pluginName = $('.plugin-name', attachedRow).text();
-    var oldLinkHtml = spinner.replace(link);
+    var spinner = spinMaker.start(link);
     $.ajax({
               url: getAbsoluteHref(link),
               type: 'DELETE',
@@ -90,7 +93,7 @@ function uninstallPlugin(pluginKey, link, attachedRow) {
               },
               error: function(xhr) {
                   messages.add('error', {title: "Error uninstalling extension", body: getErrorMessage(xhr), shadowed: false});
-                  link.html(oldLinkHtml);
+                  spinner.finish();
               }
             });
 }
@@ -103,7 +106,7 @@ function unfavorite($link) {
 }
 function updateFavorite($link, method, successActionText, failureActionText) {
     messages.clear();
-    spinner.replace($link);
+    spinMaker.replace($link);
     var pluginName = $('.plugin-name', $link.closest('tr')).text();
     $.ajax({
               url: getAbsoluteHref($link),
@@ -197,7 +200,6 @@ function initSpeakeasy() {
     var pluginsTable = $("#plugins-table");
     var eventDelegate = function(e) {
         var $link = $(e.target);
-        if ($link.attr('href') && $link.attr('href').indexOf('mailto:') == 0) return;
         e.preventDefault();
         var $row = $link.closest('tr');
         var action = pluginActions[getActionFromClass($link)];

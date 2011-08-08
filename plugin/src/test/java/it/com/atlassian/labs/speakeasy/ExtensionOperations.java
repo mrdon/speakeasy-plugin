@@ -11,5 +11,5 @@ public enum ExtensionOperations
     DOWNLOAD,
     UNINSTALL,
     VIEWSOURCE,
-    FORK
+    FEEDBACK, FORK
 }

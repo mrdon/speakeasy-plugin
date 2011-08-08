@@ -234,6 +234,13 @@ public class SpeakeasyUserPage implements Page
         return pageBinder.bind(ForkDialog.class, pluginKey);
     }
 
+    public FeedbackDialog openFeedbackDialog(String pluginKey)
+    {
+        clickActionLink(pluginKey, ExtensionOperations.FEEDBACK);
+
+        return pageBinder.bind(FeedbackDialog.class, pluginKey);
+    }
+
     public CommonJsModulesTab viewCommonJsModulesTab()
     {
         jsdocTab.click();

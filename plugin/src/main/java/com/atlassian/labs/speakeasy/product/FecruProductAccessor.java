@@ -1,5 +1,6 @@
 package com.atlassian.labs.speakeasy.product;
 
+import com.atlassian.core.user.UserUtils;
 import com.atlassian.fecru.user.User;
 import com.atlassian.labs.speakeasy.util.PomProperties;
 import com.atlassian.templaterenderer.TemplateRenderer;
@@ -13,6 +14,7 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.io.StringWriter;
+import java.util.Arrays;
 import java.util.Map;
 
 public class FecruProductAccessor implements ProductAccessor {
@@ -58,14 +60,21 @@ public class FecruProductAccessor implements ProductAccessor {
         return user.getDisplayName() != null ? user.getDisplayName() : username;
     }
 
-    public void sendEmail(String toUsername, String subjectTemplate, String bodyTemplate, Map<String, Object> context) {
-        final User user = getUser(toUsername);
-        if (user == null) {
-            return;
-        }
-        if (user.getEmail() == null) {
-            log.warn("No email found for username: " + toUsername);
-            return;
+    public void sendEmail(EmailOptions options) {
+        String toName = options.getToName();
+        String toEmail = options.getToEmail();
+        if (options.getToUsername() != null)
+        {
+            final User user = getUser(options.getToUsername());
+            if (user == null) {
+                return;
+            }
+            if (user.getEmail() == null) {
+                log.warn("No email found for username: " + options.getToUsername());
+                return;
+            }
+            toName = user.getDisplayName();
+            toEmail = user.getEmail();
         }
 
         try {
@@ -73,13 +82,17 @@ public class FecruProductAccessor implements ProductAccessor {
 
             final MailMessage message = new MailMessage();
 
-            message.setFrom("noreply@atlassian.com");
-            message.overrideFromDisplayName("Speakeasy");
+            message.setFrom(options.getFromEmail());
+            message.overrideFromDisplayName(options.getFromName());
 
-            message.addRecipient(user.getEmail());
+            message.addRecipient(toEmail);
+            if (options.getReplyToEmail() != null)
+            {
+                // todo: api doesn't seem to support this?
+            }
 
-            message.setSubject(render(subjectTemplate, context));
-            message.setBodyText(MailMessage.CONTENT_TYPE_TEXT, render(bodyTemplate, context));
+            message.setSubject(render(options.getSubjectTemplate(), options.getContext()));
+            message.setBodyText(MailMessage.CONTENT_TYPE_TEXT, render(options.getBodyTemplate(), options.getContext()));
 
             mailer.sendMessage(message);
         } catch (IOException e) {

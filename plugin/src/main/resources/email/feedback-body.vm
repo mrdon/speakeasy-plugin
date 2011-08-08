@@ -1,0 +1,9 @@
+$senderFullName ($sender) has feedback for your Speakeasy extension '$plugin.name':
+
+---
+
+$message
+
+---
+
+To respond, simply reply to this message.

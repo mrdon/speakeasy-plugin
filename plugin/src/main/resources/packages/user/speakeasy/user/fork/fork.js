@@ -1,30 +1,30 @@
 var $ = require('speakeasy/jquery').jQuery;
 var addMessage = require('speakeasy/messages').add;
+var dialog = require('speakeasy/dialog');
 
 exports.openDialog = function(pluginKey, link, attachedRow) {
     var desc = $.trim($('.plugin-description', attachedRow).text());
-    var dialog = new AJS.Dialog({width:500, height:450, id:'fork-dialog'});
     var pluginName = $('td[headers=plugin-name] .plugin-name', attachedRow).text();
-    dialog.addHeader("Fork '" + pluginName + "'");
-    var forkDialogContents = require('./dialog').render({
+    dialog.openOnePanelDialog({
+        id : 'fork-dialog',
+        width : 500,
+        height : 450,
+        header : "Fork '" + pluginName + "'",
+        content : require('./dialog').render({
                                     pluginKey : pluginKey,
                                     description : desc
-                                   });
-    dialog.addPanel("Fork", forkDialogContents, "panel-body");
-    dialog.addButton("Fork", function (dialog) {
-        var description = $('#fork-description').val();
-        forkPlugin(link, attachedRow, description);
-        dialog.remove();
-    }, "fork-submit");
-    dialog.addButton("Cancel", function (dialog) {
-        dialog.remove();
-    }, "fork-cancel");
-    dialog.show();
+                                   }),
+        submit : function(dialog, callbacks) {
+            var description = $('#fork-description').val();
+            forkPlugin(link, attachedRow, description, callbacks);
+        },
+        submitClass : 'fork-submit',
+        cancelClass : 'fork-cancel'
+    });
+    return dialog;
 };
 
-function forkPlugin(link, attachedRow, description) {
-    //var enabled = ("Disable" == link.text());
-    link.append('<img class="waiting" alt="waiting" src="' + staticResourcesPrefix + '/download/resources/com.atlassian.labs.speakeasy-plugin:shared/images/wait.gif" />');
+function forkPlugin(link, attachedRow, description, callbacks) {
     var pluginName = $('.plugin-name', attachedRow).text();
     $.ajax({
               url: contextPath + link.attr('href'),
@@ -36,11 +36,11 @@ function forkPlugin(link, attachedRow, description) {
               success: function(data) {
                 $('#plugins-table').trigger('pluginsUpdated', data);
                 addMessage('success', {body: "<b>" + pluginName + "</b> was forked successfully", shadowed: false});
-                $('.waiting', link).remove();
+                callbacks.success();
               },
               error: function(data) {
                   addMessage('error', {title: "Error forking extension", body: data.responseText, shadowed: false});
-                  $('.waiting', link).remove();
+                  callbacks.success();
               }
             });
 }

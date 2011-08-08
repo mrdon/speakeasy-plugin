@@ -32,13 +32,13 @@ public class ExtensionWizard
     @FindBy(id="wizard-description")
     WebElement descriptionInput;
 
-    @FindBy(id="extension-wizard-create")
+    @FindBy(className="extension-wizard-create")
     WebElement createButton;
     
     @WaitUntil
     public void waitForDialog()
     {
-        driver.waitUntilElementIsVisibleAt(By.id("extension-wizard-create"), dialogElement);
+        driver.waitUntilElementIsVisibleAt(By.className("extension-wizard-create"), dialogElement);
     }
 
 

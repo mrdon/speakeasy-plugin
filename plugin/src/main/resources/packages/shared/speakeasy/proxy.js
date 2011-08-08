@@ -34,7 +34,7 @@ var $ = require('speakeasy/jquery').jQuery;
  * </pre>
  */
 exports.ajax = function(options){
-    var context = contextPath || AJS.params.contextPath || BAMBOO.contextPath || fishEyePageContext;
+    var context = require('speakeasy/host').contextPath;
     if (options.appId){
         options.data = $.extend(options.data || {}, {
             appId: options.appId

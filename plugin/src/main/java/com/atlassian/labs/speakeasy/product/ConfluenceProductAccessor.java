@@ -6,6 +6,7 @@ import com.atlassian.mail.Email;
 import com.atlassian.mail.MailException;
 import com.atlassian.mail.MailFactory;
 import com.atlassian.mail.server.SMTPMailServer;
+import com.atlassian.sal.api.user.UserProfile;
 import com.atlassian.templaterenderer.TemplateRenderer;
 import com.atlassian.user.EntityException;
 import com.atlassian.user.User;
@@ -65,21 +66,41 @@ public class ConfluenceProductAccessor implements ProductAccessor
         }
     }
 
-    public void sendEmail(String toUsername, String subjectTemplate, String bodyTemplate, Map<String,Object> origContext)
+    public void sendEmail(EmailOptions options)
     {
         try
         {
-            User to = userManager.getUser(toUsername);
+            String toName = options.getToName();
+            String toEmail = options.getToEmail();
+            if (options.getToUsername() != null)
+            {
+                User to = userManager.getUser(options.getToUsername());
+                if (to != null)
+                {
+                    toName = to.getFullName();
+                    toEmail = to.getEmail();
+                }
+                else
+                {
+                    log.warn("Cannot find profile for user '" + options.getToUsername());
+                    return;
+                }
 
-            Map<String,Object> context = newHashMap(origContext);
-            context.put("toFullName", to.getFullName());
+            }
+
+            Map<String,Object> context = newHashMap(options.getContext());
+            context.put("toFullName", toName);
 
             SMTPMailServer server = MailFactory.getServerManager().getDefaultSMTPMailServer();
-            Email email = new Email(to.getEmail());
-            email.setFrom("noreply@atlassian.com");
-            email.setFromName("Speakeasy");
-            email.setSubject(render(subjectTemplate, context));
-            email.setBody(render(bodyTemplate, context));
+            Email email = new Email(toEmail);
+            email.setFrom(options.getFromEmail());
+            email.setFromName(options.getFromName());
+            email.setSubject(render(options.getSubjectTemplate(), context));
+            email.setBody(render(options.getBodyTemplate(), context));
+            if (options.getReplyToEmail() != null)
+            {
+                email.setReplyTo(options.getReplyToEmail());
+            }
             server.send(email);
 
         }

@@ -19,13 +19,7 @@
     </div>
     <div class="field-group">
         <label for="wizard-description">Description</label>
-        <textarea id="wizard-description" name="wizard-description" title="Extension description" rows="5" cols="30"/>
+        <textarea id="wizard-description" name="wizard-description" title="Extension description" rows="5" cols="30"></textarea>
         <div class="description">A short description for your extension.</div>
-    </div>
-    <div class="buttons-container">
-        <div class="buttons">
-            <input id="extension-wizard-create" class="button submit" type="submit" value="submit">
-            <a id="extension-wizard-cancel" class="cancel" href="javascript:void(0)">Cancel</a>
-        </div>
     </div>
 </form>

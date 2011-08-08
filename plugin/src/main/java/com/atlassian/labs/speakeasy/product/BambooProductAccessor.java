@@ -44,7 +44,7 @@ public class BambooProductAccessor implements ProductAccessor {
         }
     }
 
-    public void sendEmail(String toUsername, String subjectTemplate, String bodyTemplate, Map<String, Object> context) {
+    public void sendEmail(EmailOptions options) {
         // implement later
     }
 

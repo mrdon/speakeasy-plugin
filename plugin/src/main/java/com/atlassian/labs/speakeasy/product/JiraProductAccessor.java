@@ -5,6 +5,7 @@ import com.atlassian.jira.ManagerFactory;
 import com.atlassian.jira.mail.Email;
 import com.atlassian.labs.speakeasy.util.PomProperties;
 import com.atlassian.mail.queue.SingleMailQueueItem;
+import com.atlassian.sal.api.user.UserProfile;
 import com.atlassian.templaterenderer.TemplateRenderer;
 import com.opensymphony.user.EntityNotFoundException;
 import com.opensymphony.user.User;
@@ -13,6 +14,7 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.io.StringWriter;
+import java.util.Arrays;
 import java.util.Map;
 
 import static com.google.common.collect.Maps.newHashMap;
@@ -60,20 +62,42 @@ public class JiraProductAccessor implements ProductAccessor
         }
     }
 
-    public void sendEmail(String toUsername, String subjectTemplate, String bodyTemplate, Map<String,Object> origContext)
+    public void sendEmail(EmailOptions options)
     {
         try
         {
-            User toUser = UserUtils.getUser(toUsername);
+            String toName = options.getToName();
+            String toEmail = options.getToEmail();
+            if (options.getToUsername() != null)
+            {
+                User toUser = UserUtils.getUser(options.getToUsername());
+                if (toUser != null)
+                {
+                    toName = toUser.getDisplayName();
+                    toEmail = toUser.getEmailAddress();
+                }
+                else
+                {
+                    log.warn("Cannot find profile for user '" + options.getToUsername());
+                    return;
+                }
+            }
 
-            Map<String,Object> context = newHashMap(origContext);
-            context.put("toFullName", toUser.getFullName());
 
-            Email email = new Email(toUser.getEmail());
-            email.setFromName("Speakeasy");
-            email.setFrom("noreply@atlassian.com");
-            email.setSubject(render(subjectTemplate, context));
-            email.setBody(render(bodyTemplate, context));
+            Map<String,Object> context = newHashMap(options.getContext());
+            context.put("toFullName", toName);
+
+            Email email = new Email(toEmail);
+            email.setFromName(options.getFromName());
+            email.setFrom(options.getFromEmail());
+            email.setSubject(render(options.getSubjectTemplate(), context));
+            email.setBody(render(options.getBodyTemplate(), context));
+
+            if (options.getReplyToEmail() != null)
+            {
+                email.setReplyTo(options.getReplyToEmail());
+            }
+
             SingleMailQueueItem item = new SingleMailQueueItem(email);
             item.setMailThreader(null);
             ManagerFactory.getMailQueue().addItem(item);

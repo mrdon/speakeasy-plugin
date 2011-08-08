@@ -137,6 +137,16 @@ public class PluginsResource
     }
 
     @POST
+    @Path("feedback/{pluginKey}")
+    @Produces("application/json")
+    @RequiresXsrfCheck
+    public Response feedback(@PathParam("pluginKey") String pluginKey, @FormParam("message") String message) throws UnauthorizedAccessException
+    {
+        speakeasyService.sendFeedback(pluginKey, message, userManager.getRemoteUsername());
+        return Response.ok().build();
+    }
+
+    @POST
     @Path("favorite/{pluginKey}")
     @Produces("application/json")
     @RequiresXsrfCheck

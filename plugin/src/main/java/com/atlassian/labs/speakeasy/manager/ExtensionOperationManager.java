@@ -12,12 +12,14 @@ import com.atlassian.labs.speakeasy.event.PluginUninstalledEvent;
 import com.atlassian.labs.speakeasy.event.PluginUpdatedEvent;
 import com.atlassian.labs.speakeasy.model.Extension;
 import com.atlassian.labs.speakeasy.model.UserExtension;
+import com.atlassian.labs.speakeasy.product.EmailOptions;
 import com.atlassian.labs.speakeasy.product.ProductAccessor;
 import com.atlassian.labs.speakeasy.util.exec.Operation;
 import com.atlassian.plugin.ModuleDescriptor;
 import com.atlassian.plugin.Plugin;
 import com.atlassian.plugin.PluginAccessor;
 import com.atlassian.sal.api.user.UserManager;
+import com.atlassian.sal.api.user.UserProfile;
 import com.google.common.base.Function;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -186,6 +188,32 @@ public class ExtensionOperationManager
         return pluginKey;
     }
 
+    public void sendFeedback(final Extension extension, final String message, final String user)
+    {
+        final UserProfile sender = userManager.getUserProfile(user);
+        if (sender == null)
+        {
+            log.warn("Unable to send feedback from '" + user + "' due to no profile found");
+            return;
+        }
+        String pluginAuthor = extension.getAuthor();
+        if (pluginAuthor != null && !user.equals(pluginAuthor) && userManager.getUserProfile(pluginAuthor) != null)
+        {
+            productAccessor.sendEmail(new EmailOptions()
+                    .toUsername(pluginAuthor)
+                    .subjectTemplate("email/feedback-subject.vm")
+                    .bodyTemplate("email/feedback-body.vm")
+                    .replyToEmail(sender.getEmail())
+                    .context(new HashMap<String, Object>()
+            {{
+                    put("plugin", extension);
+                    put("sender", sender.getUsername());
+                    put("senderFullName", sender.getFullName());
+                    put("message", message);
+                }}));
+        }
+    }
+
     public String install(Extension ext, File uploadedFile, String user)
     {
         String pluginKey = pluginSystemManager.install(uploadedFile, ext != null ? ext.getKey() : null, user);
@@ -225,15 +253,19 @@ public class ExtensionOperationManager
                     }
                 }
             }
-            productAccessor.sendEmail(pluginAuthor, "email/favorited-subject.vm", "email/favorited-body.vm", new HashMap<String, Object>()
-            {{
-                    put("plugin", extension);
-                    put("favoriteMarkerFullName", userFullName);
-                    put("favoriteMarker", user);
-                    put("commonExtensions", commonExtensions);
-                    put("suggestedExtensions", suggestedExtensions);
-                    put("favoriteTotal", data.getFavorites(pluginKey).size());
-                }});
+            productAccessor.sendEmail(new EmailOptions()
+                    .toUsername(pluginAuthor)
+                    .subjectTemplate("email/favorited-subject.vm")
+                    .bodyTemplate("email/favorited-body.vm")
+                    .context(new HashMap<String, Object>()
+                    {{
+                            put("plugin", extension);
+                            put("favoriteMarkerFullName", userFullName);
+                            put("favoriteMarker", user);
+                            put("commonExtensions", commonExtensions);
+                            put("suggestedExtensions", suggestedExtensions);
+                            put("favoriteTotal", data.getFavorites(pluginKey).size());
+                        }}));
         }
     }
 
@@ -252,14 +284,15 @@ public class ExtensionOperationManager
                 }
 
             }
-            productAccessor.sendEmail(pluginAuthor, "email/forked-subject.vm", "email/forked-body.vm", new HashMap<String,Object>() {{
-                put("plugin", extension);
-                put("productAccessor", productAccessor);
-                put("forkedPlugin", extensionManager.getExtension(forkedPluginKey));
-                put("forkerFullName", userFullName);
-                put("forker", user);
-                put("otherForkedExtensions", otherForkedExtensions);
-            }});
+            productAccessor.sendEmail(new EmailOptions().toUsername(pluginAuthor).subjectTemplate("email/forked-subject.vm").bodyTemplate("email/forked-body.vm").context(new HashMap<String, Object>()
+            {{
+                    put("plugin", extension);
+                    put("productAccessor", productAccessor);
+                    put("forkedPlugin", extensionManager.getExtension(forkedPluginKey));
+                    put("forkerFullName", userFullName);
+                    put("forker", user);
+                    put("otherForkedExtensions", otherForkedExtensions);
+                }}));
         }
     }
 
@@ -307,15 +340,19 @@ public class ExtensionOperationManager
                 }
 
             }
-            productAccessor.sendEmail(pluginAuthor, "email/enabled-subject.vm", "email/enabled-body.vm", new HashMap<String, Object>()
-            {{
-                    put("plugin", enabledPlugin);
-                    put("enablerFullName", userFullName);
-                    put("enabler", user);
-                    put("commonExtensions", commonExtensions);
-                    put("suggestedExtensions", suggestedExtensions);
-                    put("enabledTotal", data.getUsersList(enabledPlugin.getKey()).size());
-                }});
+            productAccessor.sendEmail(new EmailOptions()
+                    .toUsername(pluginAuthor)
+                    .subjectTemplate("email/enabled-subject.vm")
+                    .bodyTemplate("email/enabled-body.vm")
+                    .context(new HashMap<String, Object>()
+                    {{
+                        put("plugin", enabledPlugin);
+                        put("enablerFullName", userFullName);
+                        put("enabler", user);
+                        put("commonExtensions", commonExtensions);
+                        put("suggestedExtensions", suggestedExtensions);
+                        put("enabledTotal", data.getUsersList(enabledPlugin.getKey()).size());
+                    }}));
         }
     }
 

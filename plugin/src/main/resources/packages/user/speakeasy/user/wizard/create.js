@@ -4,12 +4,9 @@
 var $ = require('speakeasy/jquery').jQuery;
 var addMessage = require('speakeasy/messages').add;
 var staticResourcesPrefix = require('speakeasy/host').staticResourcesPrefix;
+var dialog = require('speakeasy/dialog');
 
-function sendCreateData(params, callback) {
-    var createButton = $('#extension-wizard-create');
-    $('#extension-wizard-create').attr('disabled', 'true');
-    createButton.parent().append('<img class="waiting" alt="waiting" src="' + staticResourcesPrefix + '/com.atlassian.labs.speakeasy-plugin:shared/images/wait.gif">');
-
+function sendCreateData(params, callbacks) {
     $.ajax({
       url: contextPath + "/rest/speakeasy/1/plugins/create/" + params.key,
       type: 'POST',
@@ -20,15 +17,12 @@ function sendCreateData(params, callback) {
       success: function(data) {
         $('#plugins-table').trigger('pluginsUpdated', data);
         addMessage('success', {body: "<b>" + params.name + "</b> was created successfully", shadowed: false});
-        $('.waiting', createButton).remove();
-          $('#extension-wizard-create').removeAttr('disabled');
-        callback();
+        callbacks.success();
       },
       error: function(data) {
           var err = JSON.parse(data.responseText).error;
           AJS.messages.error('#wizard-errors', {body:err});
-          $('.waiting', createButton.parent()).remove();
-          $('#extension-wizard-create').removeAttr('disabled');
+          callbacks.failure();
       }
     });
 }
@@ -64,22 +58,21 @@ function validate(data) {
 
 
 exports.openDialog = function() {
-    var dialog = new AJS.Dialog({width:470, height:450, id:'extension-wizard'});
-    dialog.addHeader("Create Extension");
-    var wizardContents = require('./wizard').render({});
-    dialog.addPanel("Info", wizardContents, "panel-body");
-    dialog.show();
-    $('#extension-wizard-cancel').click(function(e) {
-        e.preventDefault();
-        dialog.remove();
-    });
-    $('#extension-wizard-create').click(function(e) {
-        e.preventDefault();
-        var data = getFormData();
-        if (validate(data)) {
-            sendCreateData(data, function() {
-                dialog.remove();
-            });
-        }
+    dialog.openOnePanelDialog({
+        id : 'extension-wizard',
+        width : 470,
+        height : 450,
+        header : "Create Extension",
+        content : require('./wizard').render({}),
+        submit : function(dialog, callbacks) {
+            var data = getFormData();
+            if (validate(data)) {
+                sendCreateData(data, callbacks);
+            } else {
+                callbacks.failure();
+            }
+        },
+        submitClass : 'extension-wizard-create',
+        cancelClass : 'extension-wizard-cancel'
     });
 };

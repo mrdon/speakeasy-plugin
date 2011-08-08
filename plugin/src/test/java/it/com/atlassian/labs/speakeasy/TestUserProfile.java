@@ -4,11 +4,9 @@ import com.atlassian.pageobjects.TestedProduct;
 import com.atlassian.pageobjects.page.HomePage;
 import com.atlassian.pageobjects.page.LoginPage;
 import com.atlassian.plugin.test.PluginJarBuilder;
-import com.atlassian.plugin.util.WaitUntil;
 import com.atlassian.plugin.util.zip.FileUnzipper;
 import com.atlassian.webdriver.pageobjects.WebDriverTester;
 import com.dumbster.smtp.SimpleSmtpServer;
-import com.dumbster.smtp.SmtpMessage;
 import com.google.common.collect.Sets;
 import it.com.atlassian.labs.speakeasy.util.TempHelp;
 import org.apache.commons.io.FileUtils;
@@ -22,7 +20,6 @@ import javax.mail.MessagingException;
 import java.io.File;
 import java.io.IOException;
 import java.util.*;
-import java.util.concurrent.atomic.AtomicReference;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
@@ -30,6 +27,7 @@ import static com.google.common.collect.Lists.newArrayList;
 import static com.google.common.collect.Sets.newHashSet;
 import static it.com.atlassian.labs.speakeasy.ExtensionBuilder.buildSimplePluginFile;
 import static it.com.atlassian.labs.speakeasy.ExtensionBuilder.startSimpleBuilder;
+import static it.com.atlassian.labs.speakeasy.MailUtils.assertEmailExists;
 import static java.util.Arrays.asList;
 import static org.junit.Assert.*;
 import static org.junit.Assert.assertEquals;
@@ -271,10 +269,7 @@ public class TestUserProfile
                .login("barney", "barney", SpeakeasyUserPage.class)
                .enablePlugin("test-2");
 
-        assertEmailExists("admin@example.com", "Barney User has enabled ", asList(
-                "you may want to try",
-                "Test Plugin"
-        ));
+        assertEmailExists(mailServer, "admin@example.com", "Barney User has enabled ", asList("you may want to try", "Test Plugin"));
 
         page.disablePlugin("test-2");
         logout();
@@ -287,10 +282,7 @@ public class TestUserProfile
                .login("barney", "barney", SpeakeasyUserPage.class)
                .enablePlugin("test-2");
 
-        assertEmailExists("admin@example.com", "Barney User has enabled your Speakeasy extension!", asList(
-                "extensions in common",
-                "Test Plugin"
-        ));
+        assertEmailExists(mailServer, "admin@example.com", "Barney User has enabled your Speakeasy extension!", asList("extensions in common", "Test Plugin"));
         page.disablePlugin("test-2");
         logout();
         product.visit(LoginPage.class)
@@ -321,10 +313,7 @@ public class TestUserProfile
         assertEquals(1, messages.size());
         assertTrue(messages.get(0).contains("was marked as"));
         assertEquals(1, page.getPlugins().get("test").getFavorites());
-        String body = assertEmailExists("admin@example.com", "Barney User has marked", asList(
-                "you may want to try",
-                "plugin-tests"
-        ));
+        String body = assertEmailExists(mailServer, "admin@example.com", "Barney User has marked", asList("you may want to try", "plugin-tests"));
         assertTrue(!body.contains("Not favourited"));
         page.unfavorite("plugin-tests");
         logout();
@@ -361,10 +350,9 @@ public class TestUserProfile
         assertEquals(1, messages.size());
         assertTrue(messages.get(0).contains("was forked successfully"));
         assertTrue(page.getPluginKeys().contains("test-2-fork-barney"));
-        assertEmailExists("admin@example.com", "Barney User has forked your Speakeasy extension!", asList(
+        assertEmailExists(mailServer, "admin@example.com", "Barney User has forked your Speakeasy extension!", asList(
                 "'Second Plugin'",
-                "First Plugin by A. D. Ministrator (Sysadmin)"
-        ));
+                "First Plugin by A. D. Ministrator (Sysadmin)"));
 
         assertFalse(page.canExecute("test", ExtensionOperations.FORK));
         assertFalse(page.canExecute("test-2", ExtensionOperations.FORK));
@@ -549,50 +537,6 @@ public class TestUserProfile
         assertFalse(page.canExecute("plugin-tests", ExtensionOperations.DOWNLOAD));
         assertFalse(page.canExecute("plugin-tests", ExtensionOperations.FORK));
     }
-
-    private String assertEmailExists(String to, String title, List<String> bodyStrings) throws MessagingException, IOException
-    {
-
-        final AtomicReference<SmtpMessage> ref = new AtomicReference<SmtpMessage>();
-        WaitUntil.invoke(new WaitUntil.WaitCondition()
-        {
-            public boolean isFinished()
-            {
-                Iterator itr = mailServer.getReceivedEmail();
-                while(itr.hasNext())
-                {
-                    ref.set((SmtpMessage) itr.next());
-                }
-                return ref.get() != null;
-            }
-
-            public String getWaitMessage()
-            {
-                return null;  //To change body of implemented methods use File | Settings | File Templates.
-            }
-        });
-        assertTrue(ref.get() != null);
-
-        SmtpMessage lastMessage = ref.get();
-        log.error("msg: " + lastMessage.toString());
-        String subject = lastMessage.getHeaderValue("Subject");
-        assertTrue(subject.startsWith("[test] " + title));
-        assertFalse(subject.contains("$"));
-        String body = lastMessage.getBody();
-        assertFalse(body.contains("$"));
-        for (String toMatch : bodyStrings)
-        {
-            if (!body.contains(toMatch))
-            {
-                fail("Couldn't match '" + toMatch + "' in:\n" + body);
-            }
-        }
-
-        assertTrue(lastMessage.getHeaderValue("To").contains(to));
-        return body;
-    }
-
-
 
     private Set<String> getZipEntries(File artifact) throws IOException
     {

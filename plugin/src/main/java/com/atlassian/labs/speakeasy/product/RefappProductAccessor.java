@@ -5,6 +5,7 @@ import com.atlassian.sal.api.user.UserManager;
 import com.atlassian.sal.api.user.UserProfile;
 import com.atlassian.templaterenderer.TemplateRenderer;
 import com.google.common.collect.Maps;
+import com.opensymphony.user.test.RemoteTestRunner;
 import org.apache.axis.utils.Admin;
 import org.apache.commons.mail.Email;
 import org.apache.commons.mail.EmailException;
@@ -12,8 +13,11 @@ import org.apache.commons.mail.SimpleEmail;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.mail.internet.AddressException;
+import javax.mail.internet.InternetAddress;
 import java.io.IOException;
 import java.io.StringWriter;
+import java.util.Arrays;
 import java.util.Map;
 
 import static com.google.common.collect.Maps.newHashMap;
@@ -60,20 +64,40 @@ public class RefappProductAccessor implements ProductAccessor
         return userManager.getUserProfile(username).getFullName();
     }
 
-    public void sendEmail(String toUsername, String subjectTemplate, String bodyTemplate, Map<String,Object> origContext)
+    public void sendEmail(EmailOptions options)
     {
-        UserProfile to = userManager.getUserProfile(toUsername);
-        Map<String,Object> context = newHashMap(origContext);
-        context.put("toFullName", to.getFullName());
+        String toName = options.getToName();
+        String toEmail = options.getToEmail();
+        if (options.getToUsername() != null)
+        {
+            UserProfile to = userManager.getUserProfile(options.getToUsername());
+            if (to != null)
+            {
+                toName = to.getFullName();
+                toEmail = to.getEmail();
+            }
+            else
+            {
+                log.warn("Cannot find profile for user '" + options.getToUsername());
+                return;
+            }
+        }
+
+        Map<String,Object> context = newHashMap(options.getContext());
+        context.put("toFullName", toName);
         try
         {
             Email email = new SimpleEmail();
             email.setHostName("localhost");
             email.setSmtpPort(2525);
-            email.setFrom("noreply@atlassian.com", "Speakeasy");
-            email.setSubject("[test] " + render(subjectTemplate, context));
-            email.setMsg(render(bodyTemplate, context));
-            email.addTo(to.getEmail());
+            email.setFrom(options.getFromEmail(), options.getFromName());
+            email.setSubject("[test] " + render(options.getSubjectTemplate(), context));
+            email.setMsg(render(options.getBodyTemplate(), context));
+            email.addTo(toEmail);
+            if (options.getReplyToEmail() != null)
+            {
+                email.setReplyTo(Arrays.asList(new InternetAddress(options.getReplyToEmail())));
+            }
             email.send();
         }
         catch (EmailException e)
@@ -83,6 +107,10 @@ public class RefappProductAccessor implements ProductAccessor
         catch (IOException e)
         {
             log.error("Unable to send email", e);
+        }
+        catch (AddressException e)
+        {
+            log.error("Invalid reply to address: " + options.getReplyToEmail(), e);
         }
     }
 
