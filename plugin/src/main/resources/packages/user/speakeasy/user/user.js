@@ -196,6 +196,11 @@ function bindOptionsDropdown(ctx) {
   $(".options-menu", ctx).dropDown("Standard", {alignment: "right"});
 }
 
+function reportBroken($link) {
+    var key = $link.closest('tr').attr("data-pluginkey");
+    require('./broken/broken').openDialog(key);
+}
+
 function initSpeakeasy() {
     var pluginsTable = $("#plugins-table");
     var eventDelegate = function(e) {
@@ -216,13 +221,15 @@ function initSpeakeasy() {
 
     pluginsTable.delegate("div.unfavorite-icon", 'click', function(e) {
         e.preventDefault();
-        var $link = $(e.target);
-        favorite($link);
+        favorite($(e.target));
     });
     pluginsTable.delegate("div.favorite-icon", 'click', function(e) {
         e.preventDefault();
-        var $link = $(e.target);
-        unfavorite($link);
+        unfavorite($(e.target));
+    });
+    pluginsTable.delegate("div.broken-icon", 'click', function(e) {
+        e.preventDefault();
+        reportBroken($(e.target));
     });
     pluginsTable.bind('pluginsUpdated', function(e, data) {
        updateTable(data.plugin || data);

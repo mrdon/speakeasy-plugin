@@ -403,6 +403,21 @@ public class SpeakeasyService
         log.info("Sent feedback for '{}' by user '{}'", pluginKey, user);
     }
 
+    public void reportBroken(final String pluginKey, final String message, final String user) throws UnauthorizedAccessException
+    {
+        validateAccess(user);
+        validatePluginExists(pluginKey);
+        exec.forKey(pluginKey, user, new Operation<UserExtension, String>()
+        {
+            public String operateOn(UserExtension repo) throws Exception
+            {
+                extensionOperationManager.reportBroken(repo, message, user);
+                return null;
+            }
+        });
+        log.info("Send broken report for '{}' by user '{}'", pluginKey, user);
+    }
+
     public UserPlugins installPlugin(File uploadedFile, String user) throws UnauthorizedAccessException
     {
         return installPlugin(uploadedFile, null, user);

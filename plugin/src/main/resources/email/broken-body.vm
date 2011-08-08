@@ -1,0 +1,9 @@
+$senderFullName ($sender) has reported your Speakeasy extension '$plugin.name' as broken saying:
+
+---
+
+$message
+
+---
+
+To respond, simply reply to this message.

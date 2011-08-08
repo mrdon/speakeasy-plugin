@@ -214,6 +214,32 @@ public class ExtensionOperationManager
         }
     }
 
+    public void reportBroken(final Extension extension, final String message, final String user)
+    {
+        final UserProfile sender = userManager.getUserProfile(user);
+        if (sender == null)
+        {
+            log.warn("Unable to report broken extension from '" + user + "' due to no profile found");
+            return;
+        }
+        String pluginAuthor = extension.getAuthor();
+        if (pluginAuthor != null && !user.equals(pluginAuthor) && userManager.getUserProfile(pluginAuthor) != null)
+        {
+            productAccessor.sendEmail(new EmailOptions()
+                    .toUsername(pluginAuthor)
+                    .subjectTemplate("email/broken-subject.vm")
+                    .bodyTemplate("email/broken-body.vm")
+                    .replyToEmail(sender.getEmail())
+                    .context(new HashMap<String, Object>()
+            {{
+                    put("plugin", extension);
+                    put("sender", sender.getUsername());
+                    put("senderFullName", sender.getFullName());
+                    put("message", message);
+                }}));
+        }
+    }
+
     public String install(Extension ext, File uploadedFile, String user)
     {
         String pluginKey = pluginSystemManager.install(uploadedFile, ext != null ? ext.getKey() : null, user);

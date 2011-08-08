@@ -78,4 +78,30 @@ public class TestFeedback
                 .loginAsSysAdmin(SpeakeasyUserPage.class)
                 .uninstallPlugin("feedback");
     }
+
+    @Test
+    public void testReportBroken() throws IOException, MessagingException
+    {
+        product.visit(SpeakeasyUserPage.class)
+                .openInstallDialog()
+                .uploadPlugin(buildSimplePluginFile("broken", "Broken extension"));
+        logout();
+        List<String> messages = product.visit(LoginPage.class)
+                .login("barney", "barney", SpeakeasyUserPage.class)
+                .reportBroken("broken")
+                    .message("Good stuff")
+                    .send(SpeakeasyUserPage.class)
+                .getSuccessMessages();
+        assertEquals(1, messages.size());
+        assertTrue(messages.get(0).contains("as broken"));
+
+        assertEmailExists(mailServer, "admin@example.com", "Barney User has reported your Speakeasy extension as broken", asList(
+                "'Broken extension'",
+                "Good stuff"));
+
+        logout();
+        product.visit(LoginPage.class)
+                .loginAsSysAdmin(SpeakeasyUserPage.class)
+                .uninstallPlugin("broken");
+    }
 }
