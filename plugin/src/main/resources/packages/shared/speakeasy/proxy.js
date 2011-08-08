@@ -8,18 +8,7 @@
 var $ = require('speakeasy/jquery').jQuery;
 
 /**
- * Makes an ajax request through the proxy. Parameters:
- * <ul>
- *     <li><code>options</code> - An options map to be passed through to jQuery.ajax(). Extra required arguments are:<ul>
- *         <li><code>appId<code> - The application links id or name (required if appType not specified)</li>
- *         <li><code>appType<code> - The application link type: confluence,jira,bamboo,fecru,TYPE_CLASS (required if appId not specified)</li>
- *         <li><code>path<code> - The path of the remote url to execute, relative to its base url</li>
- *         <li><code>authContainer</code> - The container element to attach the authentication message to (required for OAuth support)</li>
- *         <li><code>authMessage</code> - The message to include in the inline authentication message (required for OAuth support)</li>
- *         </ul>
- *     </li>
- * </ul>
- *
+ * Makes an ajax request through the proxy.
  * <p>Example:</p>
  * <pre>
  * proxy.ajax({
@@ -32,6 +21,14 @@ var $ = require('speakeasy/jquery').jQuery;
  *   }
  * });
  * </pre>
+ * @param options An options map to be passed through to jQuery.ajax(). Extra required arguments are:<ul>
+ *         <li><code>appId<code> - The application links id or name (required if appType not specified)</li>
+ *         <li><code>appType<code> - The application link type: confluence,jira,bamboo,fecru,TYPE_CLASS (required if appId not specified)</li>
+ *         <li><code>path<code> - The path of the remote url to execute, relative to its base url</li>
+ *         <li><code>authContainer</code> - The container element to attach the authentication message to (required for OAuth support)</li>
+ *         <li><code>authMessage</code> - The message to include in the inline authentication message (required for OAuth support)</li>
+ *         </ul>
+ *
  */
 exports.ajax = function(options){
     var context = require('speakeasy/host').contextPath;

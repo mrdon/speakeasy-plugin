@@ -77,9 +77,8 @@ function openOnePanelDialog(options) {
 }
 
 /**
- * Opens a single panel dialog with submit and cancel buttons.  Returns the opened, shown dialog.  Parameters:
- * <ul>
- *     <li><code>options</code> - An options map to be passed through to AJS.Dialog. Extra arguments are:<ul>
+ * Opens a single panel dialog with submit and cancel buttons.  Returns the opened, shown dialog.
+ * @param options An options map to be passed through to AJS.Dialog. Extra arguments are:<ul>
  *         <li><code>width<code> - The width of the dialog in pixels.  Defaults to half the screen.</li>
  *         <li><code>height<code> - The height of the dialog in pixels.  Defaults to half the screen.</li>
  *         <li><code>id<code> - The id of the dialog element.  Defaults to 'speakeasy-dialog'</li>
@@ -92,8 +91,5 @@ function openOnePanelDialog(options) {
  *         <li><code>submitClass</code> - The class of the submit button.  Defaults to 'speakeasy-dialog-submit'</li>
  *         <li><code>cancelClass</code> - The class of the cancel button.  Defaults to 'speakeasy-dialog-cancel'</li>
  *         </ul>
- *     </li>
- * </ul>
- *
  */
 exports.openOnePanelDialog = openOnePanelDialog;

@@ -1,10 +1,14 @@
 package com.atlassian.labs.speakeasy.commonjs.util;
 
 import com.google.common.base.Predicate;
+import com.google.common.collect.ArrayListMultimap;
+import com.google.common.collect.ListMultimap;
 import org.netbeans.lib.cvsclient.commandLine.command.log;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
 
@@ -38,7 +42,7 @@ public class JsDocParser
                 }
             });
 
-            Map<String,String> tags = newHashMap();
+            ListMultimap<String,String> tags = ArrayListMultimap.create();
             int x = 0;
             for (String token : tokens)
             {
@@ -65,9 +69,9 @@ public class JsDocParser
                     }
                 }
             }
-            Map<String,String> attributes = newHashMap(tags);
-            attributes.remove(DESCRIPTION);
-            return new JsDoc(tags.get(DESCRIPTION), tags);
+            Map<String,Collection<String>> attributes = tags.asMap();
+            Collection<String> descriptions = attributes.remove(DESCRIPTION);
+            return new JsDoc(descriptions != null ? descriptions.iterator().next() : null, attributes);
         }
         else
         {

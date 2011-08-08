@@ -5,6 +5,7 @@ import com.atlassian.pageobjects.page.HomePage;
 import com.atlassian.pageobjects.page.LoginPage;
 import com.atlassian.webdriver.pageobjects.WebDriverTester;
 import com.dumbster.smtp.SimpleSmtpServer;
+import com.dumbster.smtp.SmtpMessage;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Ignore;
@@ -13,6 +14,7 @@ import org.junit.Test;
 import javax.mail.MessagingException;
 import java.io.File;
 import java.io.IOException;
+import java.util.Iterator;
 import java.util.List;
 
 import static it.com.atlassian.labs.speakeasy.ExtensionBuilder.buildSimplePluginFile;
@@ -44,7 +46,9 @@ public class TestFeedback
     @Before
     public void startMailServer() throws IOException
     {
+        mailServer = SimpleSmtpServer.start(2525);
         flushMailQueue(product.getProductInstance());
+        mailServer.stop();
         mailServer = SimpleSmtpServer.start(2525);
     }
     @After

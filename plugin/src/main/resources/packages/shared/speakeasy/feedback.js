@@ -68,8 +68,8 @@ function send(pluginKey, type, data, callbacks) {
 
 /**
  * Opens a dialog to allow the user to give feedback to the extension author
- * @param pluginKey
- * @param context
+ * @param pluginKey The plugin key
+ * @param context A map of values to include in the feedback email
  */
 exports.giveFeedback = function(pluginKey, context) {
     openDialog(pluginKey, {
@@ -80,8 +80,8 @@ exports.giveFeedback = function(pluginKey, context) {
 
 /**
  * Opens a dialog to allow the user to report a broken extension
- * @param pluginKey
- * @param context
+ * @param pluginKey The plugin key
+ * @param context A map of values to include in the broken report
  */
 exports.reportBroken = function(pluginKey, context) {
     openDialog(pluginKey, {

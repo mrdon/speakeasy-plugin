@@ -1047,6 +1047,8 @@ rpc.zeroPad = function(value, width){
         onSuccess : function(result) { alert('result:' + result); }
     });
  * </pre>
+ * @param path The service url
+ * @param options Options to pass to the proxy
  */
 exports.ServiceProxy = rpc.ServiceProxy;
 

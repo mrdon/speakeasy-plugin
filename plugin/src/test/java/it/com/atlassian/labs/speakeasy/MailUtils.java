@@ -39,24 +39,34 @@ public class MailUtils
                 return null;  //To change body of implemented methods use File | Settings | File Templates.
             }
         });
-        Assert.assertTrue(ref.get() != null);
-
-        SmtpMessage lastMessage = ref.get();
-        log.error("msg: " + lastMessage.toString());
-        String subject = lastMessage.getHeaderValue("Subject");
-        Assert.assertTrue(subject.startsWith("[test] " + title));
-        Assert.assertFalse(subject.contains("$"));
-        String body = lastMessage.getBody();
-        Assert.assertFalse(body.contains("$"));
-        for (String toMatch : bodyStrings)
+        try
         {
-            if (!body.contains(toMatch))
-            {
-                Assert.fail("Couldn't match '" + toMatch + "' in:\n" + body);
-            }
-        }
+            Assert.assertTrue(ref.get() != null);
 
-        Assert.assertTrue(lastMessage.getHeaderValue("To").contains(to));
-        return body;
+            SmtpMessage lastMessage = ref.get();
+            String subject = lastMessage.getHeaderValue("Subject");
+            Assert.assertTrue(subject.startsWith("[test] " + title));
+            Assert.assertFalse(subject.contains("$"));
+            String body = lastMessage.getBody();
+            Assert.assertFalse(body.contains("$"));
+            for (String toMatch : bodyStrings)
+            {
+                if (!body.contains(toMatch))
+                {
+                    Assert.fail("Couldn't match '" + toMatch + "' in:\n" + body);
+                }
+            }
+
+            Assert.assertTrue(lastMessage.getHeaderValue("To").contains(to));
+            return body;
+        }
+        catch (AssertionError error)
+        {
+            if (ref.get() != null)
+            {
+                log.error("Error asserting on message: " + ref.get().toString());
+            }
+            throw error;
+        }
     }
 }

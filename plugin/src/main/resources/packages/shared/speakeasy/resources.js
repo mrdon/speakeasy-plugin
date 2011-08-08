@@ -11,8 +11,8 @@ var stateKeyExp = /.*-(\d+)/;
  * Gets the relative image URL for the given path, including context path.  Assumes the web resource key will be
  * 'images' and be within the requesting plugin.  Parameters:
  * <ul>
- *     <li><code>modules</code> - The 'modules' variable available to every module</li>
- *     <li><code>imagePath</code> - The path to the image relative to the "images" directory without the leading slash.</li>
+ * @param modules The 'modules' variable available to every module
+ * @param imagePath The path to the image relative to the "images" directory without the leading slash.
  * </ul>
  */
 exports.getImageUrl = function(module, path) {

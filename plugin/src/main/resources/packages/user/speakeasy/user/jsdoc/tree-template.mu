@@ -44,7 +44,15 @@ var exportedFunctionOrProperty = require('some/module');
                 <td>
                 <ul>
                     {{#exports}}
-                    <li><code class="export-name">{{name}}</code> {{#jsDoc}}- <span class="export-description">{{&description}}</span>{{/jsDoc}}</li>
+                    <li><code class="export-name">{{name}}</code>
+                        {{#jsDoc}}- <span class="export-description">{{&description}}</span>
+                        <ul>
+                            {{#params}}
+                            <li><code>{{name}}</code> - {{&description}}</li>
+                            {{/params}}
+                        {{/jsDoc}}
+                        </ul>
+                    </li>
                     {{/exports}}
                 </ul>
                 </td>

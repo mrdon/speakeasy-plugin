@@ -33,6 +33,8 @@ function clear() {
 
 /**
  * Adds a message to #aui-message-bar, clearing the previous and fading it out after 5 seconds
+ * @param type The type of the error, one of 'success', 'error', or 'warning'
+ * @param params Parameters passed to AJS.messages, usually 'title' and 'body'
  */
 exports.add = addMessage;
 

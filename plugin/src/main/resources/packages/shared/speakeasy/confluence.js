@@ -94,40 +94,31 @@ function fetchForList(list, callbacks) {
 
 /**
  * Gets a list of <a href="http://confluence.atlassian.com/display/CONFDEV/Remote+API+Specification#RemoteAPISpecification-BlogEntrySummary">BlogEntrySummaries</a>
- * entries in the space. Parameters:
- * <ul>
- *     <li><code>spaceKey</code> - The space key</li>
- *     <li><code>callback</code> - The function to call when the data is read</li>
- * </ul>
+ * entries in the space. 
+ * @param spaceKey The space key
+ * @param callback The function to call when the data is read
  */
 exports.getBlogSummaries = getBlogSummaries;
 /**
  * Gets a <a href="http://confluence.atlassian.com/display/CONFDEV/Remote+API+Specification#RemoteAPISpecification-BlogEntry">BlogEntry</a>. Only
  * works for Confluence 3.5 or earlier as the API has changed for Confluence 4.
- * Parameters:
- * <ul>
- *     <li><code>pageId</code> - The blog (page) id</li>
- *     <li><code>callback</code> - The function to call when the data is read</li>
- * </ul>
+ * @param pageId The blog (page) id
+ * @param callback The function to call when the data is read
  */
 exports.getBlogEntry = getBlogEntry;
 /**
  * Gets a list of <a href="http://confluence.atlassian.com/display/CONFDEV/Remote+API+Specification#RemoteAPISpecification-BlogEntry">BlogEntry</a>
  * entries in the space with labels. Only works for Confluence 3.5 or earlier as the API has changed for Confluence 4.  Parameters:
- * <ul>
- *     <li><code>spaceKey</code> - The space key</li>
- *     <li><code>start</code> - The start date</li>
- *     <li><code>end</code> - The end date</li>
- *     <li><code>callback</code> - The function to call when the data is read</li>
- * </ul>
+ * @param spaceKey The space key
+ * @param start The start date
+ * @param end The end date
+ * @param callback The function to call when the data is read
  */
 exports.getBlogsInPeriod = getBlogsInPeriod;
 /**
  * Gets a list of <a href="http://confluence.atlassian.com/display/CONFDEV/Remote+API+Specification#RemoteAPISpecification-Label">Label</a>
  * entries for the content id. Parameters:
- * <ul>
- *     <li><code>contentId</code> - The content id</li>
- *     <li><code>callback</code> - The function to call when the data is read</li>
- * </ul>
+ * @param contentId The content id
+ * @param callback The function to call when the data is read
  */
 exports.getLabelsById = getLabelsById;
