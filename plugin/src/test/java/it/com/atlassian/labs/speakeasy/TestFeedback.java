@@ -67,10 +67,11 @@ public class TestFeedback
                     .send(SpeakeasyUserPage.class)
                 .getSuccessMessages();
         assertEquals(1, messages.size());
-        assertTrue(messages.get(0).contains("sent successfully"));
+        assertTrue(messages.get(0).contains("notified successfully"));
 
         assertEmailExists(mailServer, "admin@example.com", "Barney User has feedback for your Speakeasy extension", asList(
                 "'Feedback collector'",
+                "location : ",
                 "Good stuff"));
 
         logout();
@@ -93,10 +94,11 @@ public class TestFeedback
                     .send(SpeakeasyUserPage.class)
                 .getSuccessMessages();
         assertEquals(1, messages.size());
-        assertTrue(messages.get(0).contains("as broken"));
+        assertTrue(messages.get(0).contains("notified successfully"));
 
         assertEmailExists(mailServer, "admin@example.com", "Barney User has reported your Speakeasy extension as broken", asList(
                 "'Broken extension'",
+                "location : ",
                 "Good stuff"));
 
         logout();

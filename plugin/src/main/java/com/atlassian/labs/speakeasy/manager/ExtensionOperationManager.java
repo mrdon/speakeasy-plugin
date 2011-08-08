@@ -4,18 +4,17 @@ import com.atlassian.event.api.EventPublisher;
 import com.atlassian.labs.speakeasy.SpeakeasyService;
 import com.atlassian.labs.speakeasy.UnauthorizedAccessException;
 import com.atlassian.labs.speakeasy.data.SpeakeasyData;
-import com.atlassian.labs.speakeasy.descriptor.DescriptorGenerator;
 import com.atlassian.labs.speakeasy.descriptor.DescriptorGeneratorManager;
 import com.atlassian.labs.speakeasy.event.PluginForkedEvent;
 import com.atlassian.labs.speakeasy.event.PluginInstalledEvent;
 import com.atlassian.labs.speakeasy.event.PluginUninstalledEvent;
 import com.atlassian.labs.speakeasy.event.PluginUpdatedEvent;
 import com.atlassian.labs.speakeasy.model.Extension;
+import com.atlassian.labs.speakeasy.model.Feedback;
 import com.atlassian.labs.speakeasy.model.UserExtension;
 import com.atlassian.labs.speakeasy.product.EmailOptions;
 import com.atlassian.labs.speakeasy.product.ProductAccessor;
 import com.atlassian.labs.speakeasy.util.exec.Operation;
-import com.atlassian.plugin.ModuleDescriptor;
 import com.atlassian.plugin.Plugin;
 import com.atlassian.plugin.PluginAccessor;
 import com.atlassian.sal.api.user.UserManager;
@@ -188,7 +187,17 @@ public class ExtensionOperationManager
         return pluginKey;
     }
 
-    public void sendFeedback(final Extension extension, final String message, final String user)
+    public void sendFeedback(final Extension extension, final Feedback feedback, final String user)
+    {
+        sendFeedbackType(extension, feedback, "feedback", user);
+    }
+
+    public void reportBroken(final Extension extension, final Feedback feedback, final String user)
+    {
+        sendFeedbackType(extension, feedback, "broken", user);
+    }
+
+    private void sendFeedbackType(final Extension extension, final Feedback feedback, final String feedbackType, final String user)
     {
         final UserProfile sender = userManager.getUserProfile(user);
         if (sender == null)
@@ -197,46 +206,21 @@ public class ExtensionOperationManager
             return;
         }
         String pluginAuthor = extension.getAuthor();
-        if (pluginAuthor != null && !user.equals(pluginAuthor) && userManager.getUserProfile(pluginAuthor) != null)
+        if (pluginAuthor != null && userManager.getUserProfile(pluginAuthor) != null)
         {
             productAccessor.sendEmail(new EmailOptions()
                     .toUsername(pluginAuthor)
-                    .subjectTemplate("email/feedback-subject.vm")
-                    .bodyTemplate("email/feedback-body.vm")
+                    .subjectTemplate("email/" + feedbackType + "-subject.vm")
+                    .bodyTemplate("email/" + feedbackType + "-body.vm")
                     .replyToEmail(sender.getEmail())
                     .context(new HashMap<String, Object>()
-            {{
-                    put("plugin", extension);
-                    put("sender", sender.getUsername());
-                    put("senderFullName", sender.getFullName());
-                    put("message", message);
-                }}));
-        }
-    }
-
-    public void reportBroken(final Extension extension, final String message, final String user)
-    {
-        final UserProfile sender = userManager.getUserProfile(user);
-        if (sender == null)
-        {
-            log.warn("Unable to report broken extension from '" + user + "' due to no profile found");
-            return;
-        }
-        String pluginAuthor = extension.getAuthor();
-        if (pluginAuthor != null && !user.equals(pluginAuthor) && userManager.getUserProfile(pluginAuthor) != null)
-        {
-            productAccessor.sendEmail(new EmailOptions()
-                    .toUsername(pluginAuthor)
-                    .subjectTemplate("email/broken-subject.vm")
-                    .bodyTemplate("email/broken-body.vm")
-                    .replyToEmail(sender.getEmail())
-                    .context(new HashMap<String, Object>()
-            {{
-                    put("plugin", extension);
-                    put("sender", sender.getUsername());
-                    put("senderFullName", sender.getFullName());
-                    put("message", message);
-                }}));
+                    {{
+                            put("plugin", extension);
+                            put("sender", sender.getUsername());
+                            put("senderFullName", sender.getFullName());
+                            put("feedback", feedback);
+                            put("nl", "\n");
+                        }}));
         }
     }
 

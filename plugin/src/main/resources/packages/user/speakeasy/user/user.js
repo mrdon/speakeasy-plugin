@@ -25,7 +25,7 @@ var pluginActions = {
     'enable' : enablePlugin,
     'disable' : disablePlugin,
     'feedback' : function (key, link, attachedRow) {
-        require('./feedback/feedback').openDialog(key);
+        require('speakeasy/feedback').giveFeedback(key);
     },
     'download' : function(key, link, attachedRow) {
         require('./download/download').openDialog(key, product, getAbsoluteHref(link), link.attr("data-extension"));
@@ -198,7 +198,7 @@ function bindOptionsDropdown(ctx) {
 
 function reportBroken($link) {
     var key = $link.closest('tr').attr("data-pluginkey");
-    require('./broken/broken').openDialog(key);
+    require('speakeasy/feedback').reportBroken(key);
 }
 
 function initSpeakeasy() {

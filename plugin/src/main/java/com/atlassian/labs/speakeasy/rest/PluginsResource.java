@@ -4,10 +4,7 @@ import com.atlassian.labs.speakeasy.PluginType;
 import com.atlassian.labs.speakeasy.SpeakeasyService;
 import com.atlassian.labs.speakeasy.UnauthorizedAccessException;
 import com.atlassian.labs.speakeasy.manager.PluginOperationFailedException;
-import com.atlassian.labs.speakeasy.model.SearchResults;
-import com.atlassian.labs.speakeasy.model.UserExtension;
-import com.atlassian.labs.speakeasy.model.PluginIndex;
-import com.atlassian.labs.speakeasy.model.UserPlugins;
+import com.atlassian.labs.speakeasy.model.*;
 import com.atlassian.plugins.rest.common.json.JaxbJsonMarshaller;
 import com.atlassian.plugins.rest.common.security.RequiresXsrfCheck;
 import com.atlassian.sal.api.user.UserManager;
@@ -140,9 +137,9 @@ public class PluginsResource
     @Path("feedback/{pluginKey}")
     @Produces("application/json")
     @RequiresXsrfCheck
-    public Response feedback(@PathParam("pluginKey") String pluginKey, @FormParam("message") String message) throws UnauthorizedAccessException
+    public Response feedback(@PathParam("pluginKey") String pluginKey, Feedback feedback) throws UnauthorizedAccessException
     {
-        speakeasyService.sendFeedback(pluginKey, message, userManager.getRemoteUsername());
+        speakeasyService.sendFeedback(pluginKey, feedback, userManager.getRemoteUsername());
         return Response.ok().build();
     }
 
@@ -150,9 +147,9 @@ public class PluginsResource
     @Path("broken/{pluginKey}")
     @Produces("application/json")
     @RequiresXsrfCheck
-    public Response broken(@PathParam("pluginKey") String pluginKey, @FormParam("message") String message) throws UnauthorizedAccessException
+    public Response broken(@PathParam("pluginKey") String pluginKey, Feedback feedback) throws UnauthorizedAccessException
     {
-        speakeasyService.reportBroken(pluginKey, message, userManager.getRemoteUsername());
+        speakeasyService.reportBroken(pluginKey, feedback, userManager.getRemoteUsername());
         return Response.ok().build();
     }
 

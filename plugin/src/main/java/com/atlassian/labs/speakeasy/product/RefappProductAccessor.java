@@ -13,8 +13,10 @@ import org.apache.commons.mail.SimpleEmail;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.mail.MessagingException;
 import javax.mail.internet.AddressException;
 import javax.mail.internet.InternetAddress;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.util.Arrays;
@@ -85,9 +87,9 @@ public class RefappProductAccessor implements ProductAccessor
 
         Map<String,Object> context = newHashMap(options.getContext());
         context.put("toFullName", toName);
+        Email email = new SimpleEmail();
         try
         {
-            Email email = new SimpleEmail();
             email.setHostName("localhost");
             email.setSmtpPort(2525);
             email.setFrom(options.getFromEmail(), options.getFromName());
@@ -98,11 +100,29 @@ public class RefappProductAccessor implements ProductAccessor
             {
                 email.setReplyTo(Arrays.asList(new InternetAddress(options.getReplyToEmail())));
             }
+
             email.send();
         }
         catch (EmailException e)
         {
             log.error("Unable to send email", e);
+            if (log.isDebugEnabled())
+            {
+                ByteArrayOutputStream bout = new ByteArrayOutputStream();
+                try
+                {
+                    email.getMimeMessage().writeTo(bout);
+                    log.debug("Sent email:\n" + new String(bout.toByteArray()));
+                }
+                catch (MessagingException ex)
+                {
+                    throw new RuntimeException(ex);
+                }
+                catch (IOException e1)
+                {
+                    throw new RuntimeException(e1);
+                }
+            }
         }
         catch (IOException e)
         {

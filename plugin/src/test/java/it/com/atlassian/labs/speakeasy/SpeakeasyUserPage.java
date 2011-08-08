@@ -241,12 +241,12 @@ public class SpeakeasyUserPage implements Page
         return pageBinder.bind(FeedbackDialog.class, pluginKey);
     }
 
-    public BrokenDialog reportBroken(String pluginKey)
+    public FeedbackDialog reportBroken(String pluginKey)
     {
         WebElement pluginRow = getPluginRow(pluginKey);
         WebElement link = pluginRow.findElement(By.className("broken-icon"));
         link.click();
-        return pageBinder.bind(BrokenDialog.class, pluginKey);
+        return pageBinder.bind(FeedbackDialog.class, pluginKey);
     }
 
     public CommonJsModulesTab viewCommonJsModulesTab()

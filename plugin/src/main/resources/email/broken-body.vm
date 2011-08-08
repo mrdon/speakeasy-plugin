@@ -1,9 +1,15 @@
 $senderFullName ($sender) has reported your Speakeasy extension '$plugin.name' as broken saying:
-
+$nl
 ---
 
-$message
+$feedback.message
 
 ---
+$nl
+Extra context for this report:
+$nl
+#foreach ($entry in $feedback.context.entrySet())
+$entry.key : $entry.value $nl
+#end
 
 To respond, simply reply to this message.

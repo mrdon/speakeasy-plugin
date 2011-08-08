@@ -388,7 +388,7 @@ public class SpeakeasyService
         return getRemotePluginList(user, unfavoritedPluginkey);
     }
 
-    public void sendFeedback(final String pluginKey, final String message, final String user) throws UnauthorizedAccessException
+    public void sendFeedback(final String pluginKey, final Feedback feedback, final String user) throws UnauthorizedAccessException
     {
         validateAccess(user);
         validatePluginExists(pluginKey);
@@ -396,14 +396,14 @@ public class SpeakeasyService
         {
             public String operateOn(UserExtension repo) throws Exception
             {
-                extensionOperationManager.sendFeedback(repo, message, user);
+                extensionOperationManager.sendFeedback(repo, feedback, user);
                 return null;
             }
         });
         log.info("Sent feedback for '{}' by user '{}'", pluginKey, user);
     }
 
-    public void reportBroken(final String pluginKey, final String message, final String user) throws UnauthorizedAccessException
+    public void reportBroken(final String pluginKey, final Feedback feedback, final String user) throws UnauthorizedAccessException
     {
         validateAccess(user);
         validatePluginExists(pluginKey);
@@ -411,7 +411,7 @@ public class SpeakeasyService
         {
             public String operateOn(UserExtension repo) throws Exception
             {
-                extensionOperationManager.reportBroken(repo, message, user);
+                extensionOperationManager.reportBroken(repo, feedback, user);
                 return null;
             }
         });
