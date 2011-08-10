@@ -53,7 +53,7 @@ public class AdminPage implements Page
 
     public List<String> search(String q)
     {
-        driver.findElement(By.id("sp-search-tab")).click();
+        //driver.findElement(By.id("sp-search-tab")).click();
         driver.findElement(By.id("sp-search-field")).sendKeys(q);
         final WebElement submitButton = driver.findElement(By.id("sp-search-submit"));
         submitButton.click();

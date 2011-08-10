@@ -14,7 +14,7 @@
         var permissions = $permissionsJson.render();
     </script>
 <h1>Extension Administration</h1>
-<div class="aui-tabs horizontal-tabs" id="horizontal">
+<!--<div class="aui-tabs horizontal-tabs" id="horizontal">
     <ul class="tabs-menu">
         <li class="menu-item active-tab">
             <a href="#sp-settings"><strong>Settings</strong></a>
@@ -23,7 +23,8 @@
             <a href="#sp-search" id="sp-search-tab"><strong>Search</strong></a>
         </li>
     </ul>
-    <div class="tabs-pane active-pane" id="sp-settings">
+    -->
+    <div id="sp-settings">
         <p>
             The following settings configure who can access, enable, and author Speakeasy extensions.
         </p>
@@ -85,8 +86,8 @@
             </div>
         </form>
     </div>
-    <div class="tabs-pane" id="sp-search">
-        <h1>Search</h1>
+    <div id="sp-search">
+        <h2>Search</h2>
         <p>
             You can search through the contents of the all extensions using a regular expression.  The name and key of all
             extensions that have at least one match are listed after a search.
