@@ -29,20 +29,22 @@ public class ExtensionGitServlet extends GitServlet
     private final SpeakeasyRepositoryResolver speakeasyRepositoryResolver;
     private final GitRepositoryManager gitRepositoryManager;
     private final UserManager userManager;
+    private final Receive receive;
 
-    public ExtensionGitServlet(UserManager userManager, SpeakeasyService speakeasyService, SpeakeasyRepositoryResolver speakeasyRepositoryResolver, GitRepositoryManager gitRepositoryManager)
+    public ExtensionGitServlet(UserManager userManager, SpeakeasyService speakeasyService, SpeakeasyRepositoryResolver speakeasyRepositoryResolver, GitRepositoryManager gitRepositoryManager, Receive receive)
     {
         this.userManager = userManager;
         this.speakeasyService = speakeasyService;
         this.speakeasyRepositoryResolver = speakeasyRepositoryResolver;
         this.gitRepositoryManager = gitRepositoryManager;
+        this.receive = receive;
     }
 
     @Override
     public void init(ServletConfig config) throws ServletException
     {
         addUploadPackFilter(new UploadPackFilter());
-        addReceivePackFilter(new ReceivePackFilter());
+        setReceivePackFactory(receive);
         setRepositoryResolver(speakeasyRepositoryResolver);
         super.init(config);
     }

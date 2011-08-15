@@ -1,5 +1,6 @@
 package com.atlassian.labs.speakeasy.manager.convention;
 
+import com.atlassian.labs.speakeasy.git.GitRepositoryManager;
 import com.atlassian.labs.speakeasy.manager.SettingsManager;
 import com.atlassian.templaterenderer.TemplateRenderer;
 import org.junit.Before;
@@ -20,8 +21,8 @@ public class TestZipPluginTypeHandler
     @Before
     public void setUp()
     {
-        handler = new ZipPluginTypeHandler(mock(BundleContext.class), mock(ZipTransformer.class), mock(TemplateRenderer.class),
-                mock(JsonManifestHandler.class), mock(SettingsManager.class));
+        handler = new ZipPluginTypeHandler(mock(ZipTransformer.class), mock(TemplateRenderer.class),
+                mock(JsonManifestHandler.class), mock(SettingsManager.class), mock(GitRepositoryManager.class));
     }
     @Test
     public void testOSXPatterns()

@@ -43,17 +43,17 @@ public class PluginSystemManager
 
     @Autowired
     public PluginSystemManager(PluginController pluginController, PluginAccessor pluginAccessor, SpeakeasyData data,
-                               BundleContext bundleContext, TemplateRenderer templateRenderer, SettingsManager settingsManager,
-                               ProductAccessor productAccessor, ZipTransformer zipTransformer, JsonManifestHandler jsonHandler)
+                               ProductAccessor productAccessor,
+                               JarPluginTypeHandler jarPluginTypeHandler, ZipPluginTypeHandler zipPluginTypeHandler, XmlPluginTypeHandler xmlPluginTypeHandler)
     {
         this.pluginController = pluginController;
         this.pluginAccessor = pluginAccessor;
         this.data = data;
         this.productAccessor = productAccessor;
         this.typeHandlers = ImmutableMap.of(
-            PluginType.JAR, new JarPluginTypeHandler(bundleContext, templateRenderer),
-            PluginType.ZIP, new ZipPluginTypeHandler(bundleContext, zipTransformer, templateRenderer, jsonHandler, settingsManager),
-            PluginType.XML, new XmlPluginTypeHandler()
+            PluginType.JAR, jarPluginTypeHandler,
+            PluginType.ZIP, zipPluginTypeHandler,
+            PluginType.XML, xmlPluginTypeHandler
         );
     }
 

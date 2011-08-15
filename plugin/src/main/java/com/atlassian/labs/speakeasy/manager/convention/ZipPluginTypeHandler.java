@@ -1,5 +1,6 @@
 package com.atlassian.labs.speakeasy.manager.convention;
 
+import com.atlassian.labs.speakeasy.git.GitRepositoryManager;
 import com.atlassian.labs.speakeasy.manager.*;
 import com.atlassian.labs.speakeasy.model.JsonManifest;
 import com.atlassian.labs.speakeasy.util.JavascriptEscaper;
@@ -7,6 +8,8 @@ import com.atlassian.plugin.PluginArtifact;
 import com.atlassian.templaterenderer.TemplateRenderer;
 import com.google.common.collect.ImmutableMap;
 import org.osgi.framework.BundleContext;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 import java.io.*;
 import java.util.List;
@@ -20,6 +23,7 @@ import static java.util.Arrays.asList;
 /**
  *
  */
+@Component
 public class ZipPluginTypeHandler extends AbstractOsgiPluginTypeHandler implements PluginTypeHandler
 {
     private static final Iterable<Pattern> zipWhitelist = concat(CORE_WHITELIST, asList(
@@ -30,9 +34,11 @@ public class ZipPluginTypeHandler extends AbstractOsgiPluginTypeHandler implemen
     private final JsonManifestHandler jsonHandler;
     private final SettingsManager settingsManager;
 
-    public ZipPluginTypeHandler(BundleContext bundleContext, ZipTransformer zipTransformer, TemplateRenderer templateRenderer, JsonManifestHandler jsonHandler, SettingsManager settingsManager)
+    @Autowired
+    public ZipPluginTypeHandler(ZipTransformer zipTransformer, TemplateRenderer templateRenderer,
+                                JsonManifestHandler jsonHandler, SettingsManager settingsManager, GitRepositoryManager gitRepositoryManager)
     {
-        super(bundleContext, templateRenderer);
+        super(templateRenderer, gitRepositoryManager);
         this.templateRenderer = templateRenderer;
         this.zipTransformer = zipTransformer;
         this.jsonHandler = jsonHandler;

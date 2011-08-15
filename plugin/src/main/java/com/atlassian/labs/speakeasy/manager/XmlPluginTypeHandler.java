@@ -6,6 +6,7 @@ import org.apache.commons.io.IOUtils;
 import org.dom4j.Document;
 import org.dom4j.DocumentException;
 import org.dom4j.io.SAXReader;
+import org.springframework.stereotype.Component;
 
 import java.io.*;
 import java.util.List;
@@ -14,6 +15,7 @@ import java.util.Map;
 /**
  *
  */
+@Component
 public class XmlPluginTypeHandler implements PluginTypeHandler
 {
 

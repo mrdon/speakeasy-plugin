@@ -77,7 +77,14 @@ public abstract class KeyedSyncExecutor<T, D>
 
     protected void handleException(String id, Exception ex)
     {
-        throw new RuntimeException(ex);
+        if (ex instanceof RuntimeException)
+        {
+            throw (RuntimeException)ex;
+        }
+        else
+        {
+            throw new RuntimeException(ex);
+        }
     }
 
     protected abstract T getTarget(String id, D targetContext) throws Exception;

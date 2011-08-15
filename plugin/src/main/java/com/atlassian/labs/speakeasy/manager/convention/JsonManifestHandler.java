@@ -8,10 +8,7 @@ import com.atlassian.plugin.PluginArtifact;
 import org.apache.commons.io.IOUtils;
 import org.springframework.stereotype.Component;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.io.StringReader;
+import java.io.*;
 
 /**
  *
@@ -23,7 +20,8 @@ public class JsonManifestHandler
     {
         try
         {
-            return JsonObjectMapper.read(JsonManifest.class, artifact.getResourceAsStream(JsonManifest.ATLASSIAN_EXTENSION_PATH));
+            return JsonObjectMapper.read(JsonManifest.class,
+                    new NamedBufferedInputStream(artifact.getResourceAsStream(JsonManifest.ATLASSIAN_EXTENSION_PATH)));
         }
         catch (IOException e)
         {
@@ -35,7 +33,8 @@ public class JsonManifestHandler
     {
         try
         {
-            return JsonObjectMapper.read(JsonManifest.class, in);
+            return JsonObjectMapper.read(JsonManifest.class,
+                    new NamedBufferedInputStream(in));
         }
         catch (IOException e)
         {
@@ -47,7 +46,8 @@ public class JsonManifestHandler
     {
         try
         {
-            return JsonObjectMapper.read(JsonManifest.class, plugin.getResourceAsStream(JsonManifest.ATLASSIAN_EXTENSION_PATH));
+            return JsonObjectMapper.read(JsonManifest.class,
+                    new NamedBufferedInputStream(plugin.getResourceAsStream(JsonManifest.ATLASSIAN_EXTENSION_PATH)));
         }
         catch (IOException e)
         {
@@ -59,5 +59,20 @@ public class JsonManifestHandler
     {
         String serialized = JsonObjectMapper.write(manifest);
         IOUtils.copy(new StringReader(serialized), out);
+    }
+
+    private static class NamedBufferedInputStream extends BufferedInputStream
+    {
+
+        public NamedBufferedInputStream(InputStream in)
+        {
+            super(in);
+        }
+
+        @Override
+        public String toString()
+        {
+            return JsonManifest.ATLASSIAN_EXTENSION_PATH;
+        }
     }
 }

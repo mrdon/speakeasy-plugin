@@ -32,7 +32,7 @@ public class PluginOperationFailedException extends RuntimeException
         {
             message.replaceAll("<br>", "\n");
         }
-        this.error = message;
+        this.error = message + (cause != null ? ".  Caused by: " + cause.getMessage() : "");
         this.pluginKey = pluginKey;
     }
 

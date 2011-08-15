@@ -1,5 +1,6 @@
 package com.atlassian.labs.speakeasy.manager;
 
+import com.atlassian.labs.speakeasy.git.GitRepositoryManager;
 import com.atlassian.plugin.PluginArtifact;
 import com.atlassian.templaterenderer.TemplateRenderer;
 import org.apache.commons.io.IOUtils;
@@ -10,6 +11,8 @@ import org.dom4j.io.OutputFormat;
 import org.dom4j.io.SAXReader;
 import org.dom4j.io.XMLWriter;
 import org.osgi.framework.BundleContext;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 import java.io.*;
 import java.util.Collection;
@@ -23,6 +26,7 @@ import static java.util.Arrays.asList;
 /**
  *
  */
+@Component
 public class JarPluginTypeHandler extends AbstractOsgiPluginTypeHandler implements PluginTypeHandler
 {
     private static final Iterable<Pattern> jarWhitelist = concat(CORE_WHITELIST, asList(
@@ -35,9 +39,10 @@ public class JarPluginTypeHandler extends AbstractOsgiPluginTypeHandler implemen
             "scoped-web-section",
             "scoped-modules");
 
-    public JarPluginTypeHandler(BundleContext bundleContext, TemplateRenderer templateRenderer)
+    @Autowired
+    public JarPluginTypeHandler(TemplateRenderer templateRenderer, GitRepositoryManager gitRepositoryManager)
     {
-        super(bundleContext, templateRenderer);
+        super(templateRenderer,  gitRepositoryManager);
     }
 
     protected String getExtension()
