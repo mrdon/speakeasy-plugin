@@ -10,6 +10,7 @@ import com.atlassian.plugin.PluginParseException;
 import com.atlassian.plugin.descriptors.AbstractModuleDescriptor;
 import com.atlassian.plugin.event.PluginEventManager;
 import com.atlassian.plugin.hostcontainer.HostContainer;
+import com.atlassian.plugin.module.ModuleFactory;
 import com.atlassian.plugin.osgi.factory.OsgiPlugin;
 import com.atlassian.util.concurrent.NotNull;
 import org.dom4j.Element;
@@ -41,8 +42,9 @@ public class CommonJsModulesDescriptor extends AbstractModuleDescriptor<CommonJs
     private volatile Set<String> explicitPublicModules;
 
 
-    public CommonJsModulesDescriptor(BundleContext bundleContext, HostContainer hostContainer, PluginAccessor pluginAccessor)
+    public CommonJsModulesDescriptor(ModuleFactory moduleFactory, BundleContext bundleContext, HostContainer hostContainer, PluginAccessor pluginAccessor)
     {
+        super(moduleFactory);
         this.bundleContext = bundleContext;
         this.hostContainer = hostContainer;
         this.pluginEventManager = (PluginEventManager) bundleContext.getService(bundleContext.getServiceReference(PluginEventManager.class.getName()));
@@ -68,7 +70,6 @@ public class CommonJsModulesDescriptor extends AbstractModuleDescriptor<CommonJs
             explicitPublicModules.add(e.getTextTrim());
         }
         pluginBundle = BundleUtil.findBundleForPlugin(bundleContext, plugin.getKey());
-        modules = new CommonJsModules(this, pluginBundle, location);
     }
 
     @Override
@@ -93,6 +94,11 @@ public class CommonJsModulesDescriptor extends AbstractModuleDescriptor<CommonJs
         super.enabled();
         if (generatedDescriptorsManager == null)
         {
+            modules = new CommonJsModules(plugin, pluginBundle, location, getExplicitPublicModules());
+            modules.setPluginKey(plugin.getKey());
+            modules.setPluginName(plugin.getName());
+            modules.setModuleKey(getKey());
+            modules.setDescription(getDescription() != null ? getDescription() : "");
             generatedDescriptorsManager = new GeneratedDescriptorsManager(pluginBundle, modules, pluginAccessor, pluginEventManager, this);
         }
     }

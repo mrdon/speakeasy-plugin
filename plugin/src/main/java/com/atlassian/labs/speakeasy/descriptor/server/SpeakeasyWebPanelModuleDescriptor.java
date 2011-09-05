@@ -66,7 +66,7 @@ public class SpeakeasyWebPanelModuleDescriptor extends AbstractModuleDescriptor<
         modulePath = element.attributeValue("modulePath");
         if (modulePath == null)
         {
-            modulePath = "/js";
+            modulePath = "/server";
         }
     }
 

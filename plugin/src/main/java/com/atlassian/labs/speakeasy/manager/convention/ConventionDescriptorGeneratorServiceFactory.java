@@ -1,6 +1,7 @@
 package com.atlassian.labs.speakeasy.manager.convention;
 
 import com.atlassian.jira.permission.PermissionSchemeManager;
+import com.atlassian.labs.speakeasy.commonjs.CommonJsModules;
 import com.atlassian.labs.speakeasy.commonjs.Module;
 import com.atlassian.labs.speakeasy.commonjs.util.JsDoc;
 import com.atlassian.labs.speakeasy.descriptor.DescriptorGeneratorManager;
@@ -18,6 +19,7 @@ import com.atlassian.plugin.*;
 import com.atlassian.plugin.descriptors.UnloadableModuleDescriptorFactory;
 import com.atlassian.plugin.event.PluginEventManager;
 import com.atlassian.plugin.hostcontainer.HostContainer;
+import com.atlassian.plugin.module.ModuleFactory;
 import com.atlassian.plugin.osgi.util.OsgiHeaderUtil;
 import com.atlassian.plugin.webresource.WebResourceManager;
 import com.atlassian.plugin.webresource.WebResourceModuleDescriptor;
@@ -34,13 +36,17 @@ import sun.security.krb5.internal.crypto.Des;
 
 import javax.xml.stream.Location;
 
+import java.util.Collections;
+
 import static com.google.common.collect.Sets.newHashSet;
+import static java.util.Collections.emptySet;
 
 /**
  *
  */
 public class ConventionDescriptorGeneratorServiceFactory implements ServiceFactory
 {
+    private final ModuleFactory moduleFactory;
     private final BundleContext bundleContext;
     private final PluginAccessor pluginAccessor;
     private final HostContainer hostContainer;
@@ -51,8 +57,9 @@ public class ConventionDescriptorGeneratorServiceFactory implements ServiceFacto
 
     //private final Set<String> trackedPlugins = new CopyOnWriteArraySet<String>();
 
-    public ConventionDescriptorGeneratorServiceFactory(final BundleContext bundleContext, final PluginAccessor pluginAccessor, HostContainer hostContainer, DescriptorGeneratorManager descriptorGeneratorManager, JsonToElementParser jsonToElementParser, WebResourceManager webResourceManager, JsonManifestHandler jsonManifestHandler)
+    public ConventionDescriptorGeneratorServiceFactory(ModuleFactory moduleFactory, final BundleContext bundleContext, final PluginAccessor pluginAccessor, HostContainer hostContainer, DescriptorGeneratorManager descriptorGeneratorManager, JsonToElementParser jsonToElementParser, WebResourceManager webResourceManager, JsonManifestHandler jsonManifestHandler)
     {
+        this.moduleFactory = moduleFactory;
         this.bundleContext = bundleContext;
         this.pluginAccessor = pluginAccessor;
         this.hostContainer = hostContainer;
@@ -79,8 +86,7 @@ public class ConventionDescriptorGeneratorServiceFactory implements ServiceFacto
 
         if (bundle.getEntry("js/") != null)
         {
-            SpeakeasyCommonJsModulesDescriptor descriptor = new SpeakeasyCommonJsModulesDescriptor(
-                    bundleContext, hostContainer, descriptorGeneratorManager, pluginAccessor);
+            SpeakeasyCommonJsModulesDescriptor descriptor = new SpeakeasyCommonJsModulesDescriptor(moduleFactory, bundleContext, hostContainer, descriptorGeneratorManager, pluginAccessor);
 
             Element modules = factory.createElement("scoped-modules")
                 .addAttribute("key", "modules")
@@ -91,9 +97,12 @@ public class ConventionDescriptorGeneratorServiceFactory implements ServiceFacto
             }
 
             descriptor.init(plugin, modules);
-
-            registerSpeakeasyWebPanels(factory, bundle, plugin, descriptor);
             bundle.getBundleContext().registerService(ModuleDescriptor.class.getName(), descriptor, null);
+        }
+
+        if (bundle.getEntry("server/") != null)
+        {
+            registerSpeakeasyWebPanels(factory, bundle, plugin);
         }
 
         if (bundle.getEntry("images/") != null)
@@ -118,10 +127,10 @@ public class ConventionDescriptorGeneratorServiceFactory implements ServiceFacto
         };
     }
 
-    private void registerSpeakeasyWebPanels(DocumentFactory factory, Bundle bundle, Plugin plugin, SpeakeasyCommonJsModulesDescriptor modulesDescriptor)
+    private void registerSpeakeasyWebPanels(DocumentFactory factory, Bundle bundle, Plugin plugin)
     {
-        
-        for (Module module : modulesDescriptor.getModule().getIterableModules())
+        CommonJsModules modules = new CommonJsModules(plugin, bundle, "server/", Collections.<String>emptySet());
+        for (Module module : modules.getIterableModules())
         {
             final JsDoc jsDoc = module.getJsDoc();
             if (jsDoc.getAttribute("web-panel") != null)

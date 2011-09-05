@@ -43,26 +43,22 @@ public class CommonJsModules
     private final Set<String> resources = Sets.newHashSet();
 
     @XmlAttribute
-    private final String moduleKey;
+    private String moduleKey;
     @XmlAttribute
-    private final String description;
+    private String description;
 
     @XmlAttribute
-    private final String pluginKey;
+    private String pluginKey;
     @XmlAttribute
-    private final String pluginName;
+    private String pluginName;
 
-    public CommonJsModules(CommonJsModulesDescriptor descriptor, Bundle pluginBundle, String location)
+    public CommonJsModules(Plugin plugin, Bundle pluginBundle, String location, Set<String> explicitPublicModules)
     {
+        this.plugin = plugin;
         this.pluginBundle = pluginBundle;
         this.location = location.endsWith("/") ? location : location + "/";
-        this.plugin = descriptor.getPlugin();
-        this.pluginKey = plugin.getKey();
-        this.pluginName = plugin.getName();
-        this.moduleKey = descriptor.getKey();
-        this.description = descriptor.getDescription() != null ? descriptor.getDescription() : "";
         this.externalModuleDependencies = unmodifiableSet(scan());
-        this.publicModuleIds.addAll(descriptor.getExplicitPublicModules());
+        this.publicModuleIds.addAll(explicitPublicModules);
     }
 
 
@@ -225,5 +221,25 @@ public class CommonJsModules
     public String getPluginKey()
     {
         return pluginKey;
+    }
+
+    public void setModuleKey(String moduleKey)
+    {
+        this.moduleKey = moduleKey;
+    }
+
+    public void setDescription(String description)
+    {
+        this.description = description;
+    }
+
+    public void setPluginKey(String pluginKey)
+    {
+        this.pluginKey = pluginKey;
+    }
+
+    public void setPluginName(String pluginName)
+    {
+        this.pluginName = pluginName;
     }
 }

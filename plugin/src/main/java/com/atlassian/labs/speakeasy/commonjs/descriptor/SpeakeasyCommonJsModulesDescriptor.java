@@ -6,6 +6,7 @@ import com.atlassian.labs.speakeasy.descriptor.SpeakeasyWebResourceModuleDescrip
 import com.atlassian.plugin.ModuleDescriptor;
 import com.atlassian.plugin.PluginAccessor;
 import com.atlassian.plugin.hostcontainer.HostContainer;
+import com.atlassian.plugin.module.ModuleFactory;
 import org.osgi.framework.BundleContext;
 
 import java.util.List;
@@ -22,10 +23,10 @@ public class SpeakeasyCommonJsModulesDescriptor extends CommonJsModulesDescripto
     private final BundleContext bundleContext;
     private final DescriptorGeneratorManager descriptorGeneratorManager;
 
-    public SpeakeasyCommonJsModulesDescriptor(BundleContext bundleContext, HostContainer hostContainer, DescriptorGeneratorManager descriptorGeneratorManager,
+    public SpeakeasyCommonJsModulesDescriptor(ModuleFactory moduleFactory, BundleContext bundleContext, HostContainer hostContainer, DescriptorGeneratorManager descriptorGeneratorManager,
                                               PluginAccessor pluginAccessor)
     {
-        super(bundleContext, hostContainer, pluginAccessor);
+        super(moduleFactory, bundleContext, hostContainer, pluginAccessor);
         this.bundleContext = bundleContext;
         this.hostContainer = hostContainer;
         this.descriptorGeneratorManager = descriptorGeneratorManager;

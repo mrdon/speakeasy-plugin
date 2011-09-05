@@ -5,11 +5,13 @@ import com.atlassian.plugin.PluginAccessor;
 import com.atlassian.plugin.elements.ResourceDescriptor;
 import com.atlassian.plugin.osgi.container.OsgiContainerManager;
 import com.atlassian.plugin.webresource.WebResourceModuleDescriptor;
+import org.mozilla.javascript.Scriptable;
 import org.osgi.framework.*;
 import org.osgi.util.tracker.ServiceTracker;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.BeanFactory;
+import sun.org.mozilla.javascript.internal.ScriptableObject;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -47,6 +49,7 @@ public class PluginContext
         beanFactoryTracker.open();
     }
 
+
     public Bundle getRingoBundle()
     {
         return ringoBundle;
@@ -57,6 +60,7 @@ public class PluginContext
         return pluginBundle;
     }
 
+    /*
     public List<CommonJsPackage> getAllPackages()
     {
         List<CommonJsPackage> packages = new ArrayList<CommonJsPackage>();
@@ -100,6 +104,7 @@ public class PluginContext
         return beanFactory.getBean(beanName);
     }
 
+
     public Object getHostComponent(String name) {
         BundleContext bundleContext = pluginBundle.getBundleContext();
         try {
@@ -117,8 +122,27 @@ public class PluginContext
         }
         return null;
     }
+    */
 
-    public Object getService(String className) {
+    public Scriptable getJsService(String serviceName)
+    {
+        BundleContext bundleContext = pluginBundle.getBundleContext();
+        try {
+            ServiceReference[] refs = bundleContext.getServiceReferences(ScriptableObject.class.getName(), "(js-name=" + serviceName + ")");
+            if (refs != null) {
+                if (refs.length > 1) {
+                    log.warn("More than one match for service name  " + serviceName + ", returning first");
+                }
+                return (Scriptable) bundleContext.getService(refs[0]);
+            }
+        }
+        catch (InvalidSyntaxException e) {
+            log.error("Invalid syntax when searching for service with service name of " + serviceName, e);
+        }
+        return null;
+    }
+    
+    public Object getJavaService(String className) {
         BundleContext bundleContext = pluginBundle.getBundleContext();
         try {
             ServiceReference[] refs = bundleContext.getServiceReferences(className, null);

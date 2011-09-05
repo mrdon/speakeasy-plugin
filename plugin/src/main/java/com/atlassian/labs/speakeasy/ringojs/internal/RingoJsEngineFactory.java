@@ -6,10 +6,14 @@ import com.atlassian.labs.speakeasy.ringojs.external.CommonJsEngine;
 import com.atlassian.labs.speakeasy.ringojs.external.CommonJsEngineFactory;
 import com.atlassian.labs.speakeasy.ringojs.external.ServerSideJsNotEnabledException;
 import com.atlassian.labs.speakeasy.ringojs.internal.js.PluginContext;
+import com.atlassian.labs.speakeasy.ringojs.internal.sandbox.DefaultSandboxShutter;
+import com.atlassian.labs.speakeasy.ringojs.internal.sandbox.SandboxClassShutter;
+import com.atlassian.labs.speakeasy.ringojs.internal.sandbox.SandboxWrapFactory;
 import com.atlassian.plugin.PluginAccessor;
 import com.google.common.base.Function;
 import com.google.common.collect.ComputationException;
 import com.google.common.collect.MapMaker;
+import org.mozilla.javascript.ClassShutter;
 import org.osgi.framework.Bundle;
 import org.ringojs.engine.RhinoEngine;
 import org.ringojs.repository.Repository;
@@ -42,7 +46,13 @@ public class RingoJsEngineFactory implements CommonJsEngineFactory
                     RingoConfiguration ringoConfig = new RingoConfiguration(home, null, null);
                     ringoConfig.addModuleRepository(home);
                     ringoConfig.addModuleRepository(new BundleRepository(frameworkBundle, "/packages/common"));
-                    ringoConfig.addModuleRepository(new BundleRepository(bundle, "/js"));
+                    ringoConfig.addModuleRepository(new BundleRepository(bundle, from));
+
+                    ringoConfig.setSealed(true);
+                    //DefaultSandboxShutter shutter = new DefaultSandboxShutter();
+                    //ringoConfig.setClassShutter(new SandboxClassShutter(shutter));
+                    //ringoConfig.setWrapFactory(new SandboxWrapFactory(shutter));
+                    ringoConfig.setOptLevel(-1);
 
                     //System.setProperty("java.awt.headless", "false");
                     //ringoConfig.setDebug(true);
@@ -68,7 +78,7 @@ public class RingoJsEngineFactory implements CommonJsEngineFactory
         }
         catch (ComputationException ex)
         {
-            throw (ServerSideJsNotEnabledException)ex.getCause();
+            throw (RuntimeException) ex.getCause();
         }
     }
 }
