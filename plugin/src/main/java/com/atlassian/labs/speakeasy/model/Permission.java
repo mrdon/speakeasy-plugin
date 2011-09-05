@@ -14,13 +14,10 @@ public enum Permission
                  "and the entire user base is trusted."),
     APPLINKS_PROXY("Enable application links proxy",
                  "Expose a web proxy using application links to make trusted calls.  Should only be checked if all " +
-                 "those with the 'enable' access group are trusted.");
-    /*
-
+                 "those with the 'enable' access group are trusted."),
     SERVERJS_SCRIPTS("Allow sandboxed server-side scripts",
                  "Allow extensions that have server-side components such as REST resources.  This feature is " +
                  "experimental and should only be enabled if extension authors are fully trusted.");
-                 */
 
     private final String title;
     private final String description;

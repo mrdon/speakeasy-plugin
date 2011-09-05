@@ -1,10 +1,14 @@
 package com.atlassian.labs.speakeasy.ringojs.internal;
 
+import com.atlassian.labs.speakeasy.manager.PermissionManager;
+import com.atlassian.labs.speakeasy.model.Permission;
 import com.atlassian.labs.speakeasy.ringojs.external.CommonJsEngine;
 import com.atlassian.labs.speakeasy.ringojs.external.CommonJsEngineFactory;
+import com.atlassian.labs.speakeasy.ringojs.external.ServerSideJsNotEnabledException;
 import com.atlassian.labs.speakeasy.ringojs.internal.js.PluginContext;
 import com.atlassian.plugin.PluginAccessor;
 import com.google.common.base.Function;
+import com.google.common.collect.ComputationException;
 import com.google.common.collect.MapMaker;
 import org.osgi.framework.Bundle;
 import org.ringojs.engine.RhinoEngine;
@@ -22,12 +26,16 @@ public class RingoJsEngineFactory implements CommonJsEngineFactory
 {
     private final Map<String,CommonJsEngine> enginesByModulePath;
 
-    public RingoJsEngineFactory(final PluginAccessor pluginAccessor, final Bundle frameworkBundle, final Bundle bundle)
+    public RingoJsEngineFactory(final PluginAccessor pluginAccessor, final PermissionManager permissionManager, final Bundle frameworkBundle, final Bundle bundle)
     {
        enginesByModulePath = new MapMaker().makeComputingMap(new Function<String, CommonJsEngine>()
         {
             public CommonJsEngine apply(String from)
             {
+                if (!permissionManager.allowsPermission(Permission.SERVERJS_SCRIPTS))
+                {
+                    throw new ServerSideJsNotEnabledException();
+                }
                 Repository home = new BundleRepository(frameworkBundle, "/packages/server");
                 try
                 {
@@ -42,7 +50,7 @@ public class RingoJsEngineFactory implements CommonJsEngineFactory
                     {{
                             put("pluginContext", new PluginContext(pluginAccessor, frameworkBundle, bundle));
                         }});
-                    return new RingoJsEngine(engine);
+                    return new RingoJsEngine(engine, permissionManager);
                 }
                 catch (Exception x)
                 {
@@ -52,8 +60,15 @@ public class RingoJsEngineFactory implements CommonJsEngineFactory
         });
     }
 
-    public CommonJsEngine getEngine(String modulePath)
+    public CommonJsEngine getEngine(String modulePath) throws ServerSideJsNotEnabledException
     {
-        return enginesByModulePath.get(modulePath);
+        try
+        {
+            return enginesByModulePath.get(modulePath);
+        }
+        catch (ComputationException ex)
+        {
+            throw (ServerSideJsNotEnabledException)ex.getCause();
+        }
     }
 }

@@ -32,11 +32,9 @@
         </transformation>
         <dependency>${project.groupId}.${project.artifactId}:mustache</dependency>
         <public-module>backbone</public-module>
-        <public-module>underscore</public-module>
     </commonjs>
 
     <commonjs key="commonModules" location="packages/common">
-        <public-module>backbone</public-module>
         <public-module>underscore</public-module>
     </commonjs>
 

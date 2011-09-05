@@ -41,6 +41,7 @@ public class SpeakeasyWebPanelModuleDescriptor extends AbstractModuleDescriptor<
     private final WebInterfaceManager webInterfaceManager;
     private final CommonJsEngineFactory commonJsEngineFactory;
     private CommonJsEngine commonJsEngine;
+    private String modulePath;
 
     public SpeakeasyWebPanelModuleDescriptor(BundleContext bundleContext, DescriptorGeneratorManager descriptorGeneratorManager, HostContainer hostContainer)
     {
@@ -62,12 +63,11 @@ public class SpeakeasyWebPanelModuleDescriptor extends AbstractModuleDescriptor<
     {
         super.init(plugin, element);
         this.originalElement = element;
-        String modulePath = element.attributeValue("modulePath");
+        modulePath = element.attributeValue("modulePath");
         if (modulePath == null)
         {
             modulePath = "/js";
         }
-        this.commonJsEngine = commonJsEngineFactory.getEngine(modulePath);
     }
 
     @Override
@@ -80,6 +80,7 @@ public class SpeakeasyWebPanelModuleDescriptor extends AbstractModuleDescriptor<
     public void enabled()
     {
         super.enabled();
+        this.commonJsEngine = commonJsEngineFactory.getEngine(modulePath);
         descriptorGeneratorManager.registerGenerator(getPluginKey(), getKey(), this);
     }
 
@@ -87,6 +88,7 @@ public class SpeakeasyWebPanelModuleDescriptor extends AbstractModuleDescriptor<
     public void disabled()
     {
         super.disabled();
+        this.commonJsEngine = null;
         descriptorGeneratorManager.unregisterGenerator(getPluginKey(), getKey());
     }
 

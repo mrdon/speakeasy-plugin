@@ -67,4 +67,12 @@ public class PermissionManager
     {
         return settingsManager.getSettings().getPermissions().contains(permission);
     }
+
+    public void assertPermission(Permission permission)
+    {
+        if (!allowsPermission(permission))
+        {
+            throw new AssertionError("Permission " + permission.getKey() + " not allowed");
+        }
+    }
 }
