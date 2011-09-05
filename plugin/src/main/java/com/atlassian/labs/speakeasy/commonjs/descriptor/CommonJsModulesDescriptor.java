@@ -67,6 +67,8 @@ public class CommonJsModulesDescriptor extends AbstractModuleDescriptor<CommonJs
         {
             explicitPublicModules.add(e.getTextTrim());
         }
+        pluginBundle = BundleUtil.findBundleForPlugin(bundleContext, plugin.getKey());
+        modules = new CommonJsModules(this, pluginBundle, location);
     }
 
     @Override
@@ -91,8 +93,6 @@ public class CommonJsModulesDescriptor extends AbstractModuleDescriptor<CommonJs
         super.enabled();
         if (generatedDescriptorsManager == null)
         {
-            pluginBundle = BundleUtil.findBundleForPlugin(bundleContext, plugin.getKey());
-            modules = new CommonJsModules(this, pluginBundle, location);
             generatedDescriptorsManager = new GeneratedDescriptorsManager(pluginBundle, modules, pluginAccessor, pluginEventManager, this);
         }
     }

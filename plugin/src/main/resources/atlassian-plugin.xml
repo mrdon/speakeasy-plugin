@@ -25,12 +25,17 @@
         <url-pattern>/git/*</url-pattern>
      </servlet>
 
-    <commonjs key="sharedModules" location="packages/shared">
+    <commonjs key="sharedModules" location="packages/client">
         <transformation extension="host">
             <transformer key="commonjs-module" fullModuleKey="${project.groupId}.${project.artifactId}:sharedModules"/>
             <transformer key="cssVariables" fullModuleKey="${project.groupId}.${project.artifactId}:sharedModules"/>
         </transformation>
         <dependency>${project.groupId}.${project.artifactId}:mustache</dependency>
+        <public-module>backbone</public-module>
+        <public-module>underscore</public-module>
+    </commonjs>
+
+    <commonjs key="commonModules" location="packages/common">
         <public-module>backbone</public-module>
         <public-module>underscore</public-module>
     </commonjs>
@@ -233,4 +238,10 @@
 
     <!-- JIRA 5 Compatiblity -->
     <module-type key="compat-view-profile-panel" class="com.atlassian.labs.jira4compat.CompatViewProfilePanelModuleDescriptor" application="jira"/>
+
+    <!-- ringojs -->
+    <component key="commonJsEngine" class="com.atlassian.labs.speakeasy.ringojs.internal.RingoJsEngineFactoryServiceFactory" public="true">
+        <interface>com.atlassian.labs.speakeasy.ringojs.external.CommonJsEngineFactory</interface>
+    </component>
+    <module-type key="scoped-web-panel" class="com.atlassian.labs.speakeasy.descriptor.server.SpeakeasyWebPanelModuleDescriptor" />
 </atlassian-plugin>

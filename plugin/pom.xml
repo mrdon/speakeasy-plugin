@@ -169,6 +169,41 @@
             <version>20080701</version>
         </dependency>
         <dependency>
+            <groupId>org.twdata.org.ringojs</groupId>
+            <artifactId>ringojs</artifactId>
+            <version>0.8.0</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.slf4j</groupId>
+                    <artifactId>slf4j-api</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.slf4j</groupId>
+                    <artifactId>slf4j-log4j12</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>log4j</groupId>
+                    <artifactId>log4j</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.jruby.ext.posix</groupId>
+                    <artifactId>jnr-posix</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.jruby.extras</groupId>
+                    <artifactId>constantine</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.jruby.extras</groupId>
+                    <artifactId>jffi</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.jruby.extras</groupId>
+                    <artifactId>jaffl</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
             <groupId>javax.servlet</groupId>
             <artifactId>servlet-api</artifactId>
             <version>2.4</version>
@@ -203,7 +238,7 @@
         <dependency>
             <groupId>com.atlassian.plugins</groupId>
             <artifactId>atlassian-plugins-osgi-spring-extender</artifactId>
-            <version>2.7.0</version>
+            <version>${plugins.version}</version>
             <scope>provided</scope>
         </dependency>
 
@@ -215,7 +250,7 @@
         <dependency>
             <groupId>com.atlassian.plugins</groupId>
             <artifactId>atlassian-plugins-osgi-bridge</artifactId>
-            <version>2.7.0</version>
+            <version>${plugins.version}</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
@@ -534,8 +569,9 @@
 
     <properties>
         <xvfb.enable>true</xvfb.enable>
-        <platform.version>2.10.0</platform.version>
-        <refapp.version>2.12.0-alpha1</refapp.version>
+        <platform.version>2.11.0</platform.version>
+        <refapp.version>2.11.0</refapp.version>
+        <plugins.version>2.8.0</plugins.version>
         <confluence.version>3.5.2</confluence.version>
         <confluence.4.0.version>4.0-m18</confluence.4.0.version>
         <confluence.data.version>3.0</confluence.data.version>

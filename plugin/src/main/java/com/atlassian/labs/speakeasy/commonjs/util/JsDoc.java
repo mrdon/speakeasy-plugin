@@ -59,6 +59,18 @@ public class JsDoc
         return description;
     }
 
+    public String getAttribute(String key, String defaultValue)
+    {
+        String val = getAttribute(key);
+        if (val == null)
+        {
+            return defaultValue;
+        }
+        else
+        {
+            return val;
+        }
+    }
     public String getAttribute(String key)
     {
         final Collection<String> values = attributes.get(key);

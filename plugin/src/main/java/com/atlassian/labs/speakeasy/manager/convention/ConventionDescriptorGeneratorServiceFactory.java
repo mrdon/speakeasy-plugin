@@ -1,10 +1,13 @@
 package com.atlassian.labs.speakeasy.manager.convention;
 
+import com.atlassian.labs.speakeasy.commonjs.Module;
+import com.atlassian.labs.speakeasy.commonjs.util.JsDoc;
 import com.atlassian.labs.speakeasy.descriptor.DescriptorGeneratorManager;
 import com.atlassian.labs.speakeasy.descriptor.SpeakeasyWebResourceModuleDescriptor;
 import com.atlassian.labs.speakeasy.commonjs.descriptor.SpeakeasyCommonJsModulesDescriptor;
-import com.atlassian.labs.speakeasy.manager.PluginOperationFailedException;
+import com.atlassian.labs.speakeasy.descriptor.server.SpeakeasyWebPanelModuleDescriptor;
 import com.atlassian.labs.speakeasy.descriptor.webfragment.SpeakeasyWebItemModuleDescriptor;
+import com.atlassian.labs.speakeasy.manager.PluginOperationFailedException;
 import com.atlassian.labs.speakeasy.manager.convention.external.ConventionDescriptorGenerator;
 import com.atlassian.labs.speakeasy.model.JsonManifest;
 import com.atlassian.plugin.*;
@@ -13,12 +16,16 @@ import com.atlassian.plugin.hostcontainer.HostContainer;
 import com.atlassian.plugin.osgi.util.OsgiHeaderUtil;
 import com.atlassian.plugin.webresource.WebResourceManager;
 import com.atlassian.plugin.webresource.WebResourceModuleDescriptor;
+import org.apache.commons.lang.Validate;
+import org.apache.velocity.test.IntrospectorTestCase2;
 import org.dom4j.DocumentFactory;
 import org.dom4j.Element;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceFactory;
 import org.osgi.framework.ServiceRegistration;
+
+import javax.xml.stream.Location;
 
 import static com.google.common.collect.Sets.newHashSet;
 
@@ -81,6 +88,7 @@ public class ConventionDescriptorGeneratorServiceFactory implements ServiceFacto
             }
 
             descriptor.init(plugin, modules);
+            registerSpeakeasyWebPanels(factory, bundle, plugin, descriptor);
             bundle.getBundleContext().registerService(ModuleDescriptor.class.getName(), descriptor, null);
         }
 
@@ -104,6 +112,31 @@ public class ConventionDescriptorGeneratorServiceFactory implements ServiceFacto
         return new ConventionDescriptorGenerator()
         {
         };
+    }
+
+    private void registerSpeakeasyWebPanels(DocumentFactory factory, Bundle bundle, Plugin plugin, SpeakeasyCommonJsModulesDescriptor modulesDescriptor)
+    {
+        
+        for (Module module : modulesDescriptor.getModule().getIterableModules())
+        {
+            final JsDoc jsDoc = module.getJsDoc();
+            if (jsDoc.getAttribute("web-panel") != null)
+            {
+                String location = jsDoc.getAttribute("location");
+                Validate.notNull(location, "@location is required");
+                String weight = jsDoc.getAttribute("weight", "1000");
+                SpeakeasyWebPanelModuleDescriptor descriptor = new SpeakeasyWebPanelModuleDescriptor(bundle.getBundleContext(), descriptorGeneratorManager, hostContainer);
+
+                Element element = factory.createElement("web-panel")
+                        .addAttribute("key", "web-panel-" + module.getId())
+                        .addAttribute("weight", weight)
+                        .addAttribute("location", location)
+                        .addAttribute("class", module.getId());
+
+                descriptor.init(plugin, element);
+                bundle.getBundleContext().registerService(ModuleDescriptor.class.getName(), descriptor, null);
+            }
+        }
     }
 
     private void registerSpeakeasyWebItems(Bundle bundle, Plugin plugin)
