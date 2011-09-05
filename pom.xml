@@ -16,6 +16,7 @@
     <url>http://atlassian.com/speakeasy</url>
     <modules>
         <module>firefox</module>
+        <module>jira5-compat</module>
         <module>plugin</module>
     </modules>
 

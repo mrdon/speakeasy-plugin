@@ -49,6 +49,11 @@
             <version>0.12.1</version>
         </dependency>
         <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>jira5-compat</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
             <groupId>com.atlassian.applinks</groupId>
             <artifactId>applinks-api</artifactId>
             <scope>provided</scope>
@@ -283,6 +288,7 @@
                         <atlassian.mail.senddisabled>false</atlassian.mail.senddisabled>
                         <!--atlassian.dev.mode>false</atlassian.dev.mode-->
                     </systemPropertyVariables>
+                    <extractDependencies>true</extractDependencies>
                     <instructions>
                         <Import-Package>
                             com.atlassian.confluence.plugin.descriptor.web.descriptors;resolution:=optional,
@@ -293,11 +299,13 @@
                             com.atlassian.plugins.rest.common.security,
                             com.atlassian.sal.api.*;version="(2.4,3.0]",
                             org.apache.commons.lang.*;version="2.4",
+                            com.atlassian.jira.config;resolution:=optional,
                             *;resolution:=optional
                         </Import-Package>
                         <Export-Package>
                             com.atlassian.labs.speakeasy.install.convention.external,
-                            com.atlassian.labs.speakeasy.manager.convention.external
+                            com.atlassian.labs.speakeasy.manager.convention.external,
+                            com.atlassian.crowd.*
                         </Export-Package>
                     </instructions>
                     <products>

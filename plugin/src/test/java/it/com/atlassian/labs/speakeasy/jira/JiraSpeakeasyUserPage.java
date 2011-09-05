@@ -19,7 +19,7 @@ public class JiraSpeakeasyUserPage extends SpeakeasyUserPage
 
     public void initBySelectingTab()
     {
-        WebElement tab = driver.findElement(By.id("up_speakeasy-plugins_li"));
+        WebElement tab = driver.findElement(By.id("up_jira5compat-speakeasy-plugins_li"));
         if (!tab.getAttribute("class").contains("active"))
         {
             tab.findElement(By.tagName("a")).click();

@@ -1,6 +1,5 @@
 package com.atlassian.labs.speakeasy.product;
 
-import com.atlassian.core.user.UserUtils;
 import com.atlassian.fecru.user.User;
 import com.atlassian.labs.speakeasy.util.PomProperties;
 import com.atlassian.templaterenderer.TemplateRenderer;
@@ -50,14 +49,6 @@ public class FecruProductAccessor implements ProductAccessor {
 
     public String getDataVersion() {
         return pomProperties.get("fecru.data.version");
-    }
-
-    public String getUserFullName(String username) {
-        final User user = getUser(username);
-        if (user == null) {
-            return username;
-        }
-        return user.getDisplayName() != null ? user.getDisplayName() : username;
     }
 
     public void sendEmail(EmailOptions options) {

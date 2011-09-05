@@ -1,11 +1,10 @@
 package com.atlassian.labs.speakeasy.ui.jira;
 
-import com.atlassian.jira.plugin.profile.OptionalUserProfilePanel;
-import com.atlassian.jira.plugin.profile.ViewProfilePanel;
-import com.atlassian.jira.plugin.profile.ViewProfilePanelModuleDescriptor;
+import com.atlassian.crowd.embedded.api.User;
 import com.atlassian.labs.speakeasy.UnauthorizedAccessException;
+import com.atlassian.labs.speakeasy.jira5.CompatViewProfilePanel;
 import com.atlassian.labs.speakeasy.ui.UserProfileRenderer;
-import com.opensymphony.user.User;
+import com.atlassian.plugin.ModuleDescriptor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import webwork.action.ServletActionContext;
@@ -18,7 +17,7 @@ import java.io.StringWriter;
 /**
  *
  */
-public class SpeakeasyViewProfilePanel implements ViewProfilePanel, OptionalUserProfilePanel
+public class SpeakeasyViewProfilePanel implements CompatViewProfilePanel
 {
     private final UserProfileRenderer renderer;
     private final static Logger log = LoggerFactory.getLogger(SpeakeasyViewProfilePanel.class);
@@ -28,7 +27,7 @@ public class SpeakeasyViewProfilePanel implements ViewProfilePanel, OptionalUser
         this.renderer = renderer;
     }
 
-    public void init(ViewProfilePanelModuleDescriptor viewProfilePanelModuleDescriptor)
+    public void init(ModuleDescriptor moduleDescriptor)
     {
     }
 

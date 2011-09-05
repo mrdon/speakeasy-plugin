@@ -61,11 +61,6 @@ public class RefappProductAccessor implements ProductAccessor
         return "";
     }
 
-    public String getUserFullName(String username)
-    {
-        return userManager.getUserProfile(username).getFullName();
-    }
-
     public void sendEmail(EmailOptions options)
     {
         String toName = options.getToName();

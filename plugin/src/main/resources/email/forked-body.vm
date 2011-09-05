@@ -8,6 +8,6 @@ $forkerFullName has also forked:
 
 #foreach ($ext in $otherForkedExtensions)
 
- * $ext.name by $productAccessor.getUserFullName($ext.author)
+ * $ext.name by $userResolver.getFullName($ext.author)
 #end
 #end

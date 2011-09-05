@@ -236,7 +236,7 @@ public class ExtensionOperationManager
 
     private void sendFavoritedEmail(final Extension extension, final String user)
     {
-        final String userFullName = productAccessor.getUserFullName(user);
+        final String userFullName = userManager.getUserProfile(user).getFullName();
         final String pluginKey = extension.getKey();
         String pluginAuthor = extension.getAuthor();
         if (pluginAuthor != null && !user.equals(pluginAuthor) && userManager.getUserProfile(pluginAuthor) != null)
@@ -281,7 +281,7 @@ public class ExtensionOperationManager
 
     private void sendForkedEmail(final Extension extension, final String forkedPluginKey, final String user)
     {
-        final String userFullName = productAccessor.getUserFullName(user);
+        final String userFullName = userManager.getUserProfile(user).getFullName();
         String pluginAuthor = extension.getAuthor();
         if (pluginAuthor != null && !user.equals(pluginAuthor) && userManager.getUserProfile(pluginAuthor) != null)
         {
@@ -294,10 +294,19 @@ public class ExtensionOperationManager
                 }
 
             }
+
+            final FullNameResolver resolver = new FullNameResolver()
+            {
+                public String getFullName(String userName)
+                {
+                    UserProfile profile = userManager.getUserProfile(userName);
+                    return profile != null ? profile.getFullName() : userName;
+                }
+            };
             productAccessor.sendEmail(new EmailOptions().toUsername(pluginAuthor).subjectTemplate("email/forked-subject.vm").bodyTemplate("email/forked-body.vm").context(new HashMap<String, Object>()
             {{
                     put("plugin", extension);
-                    put("productAccessor", productAccessor);
+                    put("userResolver", resolver);
                     put("forkedPlugin", extensionManager.getExtension(forkedPluginKey));
                     put("forkerFullName", userFullName);
                     put("forker", user);
@@ -328,7 +337,7 @@ public class ExtensionOperationManager
     }
     private void sendEnabledEmail(final Extension enabledPlugin, final String user)
     {
-        final String userFullName = productAccessor.getUserFullName(user);
+        final String userFullName = userManager.getUserProfile(user).getFullName();
         String pluginAuthor = enabledPlugin.getAuthor();
         if (pluginAuthor != null && !user.equals(pluginAuthor) && userManager.getUserProfile(pluginAuthor) != null)
         {
@@ -417,5 +426,10 @@ public class ExtensionOperationManager
     public List<String> getEnabledPlugins(String user)
     {
         return data.getEnabledPlugins(user);
+    }
+
+    public interface FullNameResolver
+    {
+        String getFullName(String userName);
     }
 }

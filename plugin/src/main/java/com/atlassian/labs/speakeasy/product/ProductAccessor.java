@@ -13,8 +13,6 @@ public interface ProductAccessor
 
     String getDataVersion();
 
-    String getUserFullName(String username);
-
     void sendEmail(EmailOptions options);
 
     String getProfilePath();

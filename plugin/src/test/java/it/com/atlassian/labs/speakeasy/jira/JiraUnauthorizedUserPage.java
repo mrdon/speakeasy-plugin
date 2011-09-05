@@ -19,6 +19,6 @@ public class JiraUnauthorizedUserPage extends UnauthorizedUserPage
     @Override
     public boolean isAccessForbidden()
     {
-        return !driver.elementExists(By.id("up_speakeasy-plugins_li"));
+        return !driver.elementExists(By.id("up_jira5compat-speakeasy-plugins_li"));
     }
 }

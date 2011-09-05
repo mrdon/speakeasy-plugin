@@ -172,12 +172,12 @@
         <condition class="com.atlassian.labs.speakeasy.descriptor.UserCanAccessSpeakeasyCondition" />
     </web-item>
 
-    <view-profile-panel key="speakeasy-plugins" i18n-name-key="Extensions"
-                        name="User Profile Roadmap Panel"
+    <compat-view-profile-panel key="speakeasy-plugins" i18n-name-key="Extensions"
+                        name="Speakeasy User Profile Panel"
                         class="com.atlassian.labs.speakeasy.ui.jira.SpeakeasyViewProfilePanel"
                         application="jira">
         <order>30</order>
-    </view-profile-panel>
+    </compat-view-profile-panel>
 
     <web-item key="bamboo-speakeasy-plugins.menu" name="Speakeasy Menu"
               section="system.user/userconfig" weight="40" application="bamboo">
@@ -230,4 +230,7 @@
     <component-import key="appprops" interface="com.atlassian.sal.api.ApplicationProperties" />
 
     <module-type key="commonjs" class="com.atlassian.labs.speakeasy.commonjs.descriptor.CommonJsModulesDescriptor" />
+
+    <!-- JIRA 5 Compatiblity -->
+    <module-type key="compat-view-profile-panel" class="com.atlassian.labs.speakeasy.jira5.CompatViewProfilePanelModuleDescriptor" application="jira"/>
 </atlassian-plugin>

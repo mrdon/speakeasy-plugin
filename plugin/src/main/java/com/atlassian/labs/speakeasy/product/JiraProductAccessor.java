@@ -1,20 +1,17 @@
 package com.atlassian.labs.speakeasy.product;
 
-import com.atlassian.core.user.UserUtils;
 import com.atlassian.jira.ManagerFactory;
 import com.atlassian.jira.mail.Email;
 import com.atlassian.labs.speakeasy.util.PomProperties;
 import com.atlassian.mail.queue.SingleMailQueueItem;
+import com.atlassian.sal.api.user.UserManager;
 import com.atlassian.sal.api.user.UserProfile;
 import com.atlassian.templaterenderer.TemplateRenderer;
-import com.opensymphony.user.EntityNotFoundException;
-import com.opensymphony.user.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.io.StringWriter;
-import java.util.Arrays;
 import java.util.Map;
 
 import static com.google.common.collect.Maps.newHashMap;
@@ -27,11 +24,13 @@ public class JiraProductAccessor implements ProductAccessor
     private final PomProperties pomProperties;
     private final Logger log = LoggerFactory.getLogger(JiraProductAccessor.class);
     private final TemplateRenderer templateRenderer;
+    private final UserManager userManager;
 
-    public JiraProductAccessor(PomProperties pomProperties, TemplateRenderer templateRenderer)
+    public JiraProductAccessor(PomProperties pomProperties, TemplateRenderer templateRenderer, UserManager userManager)
     {
         this.pomProperties = pomProperties;
         this.templateRenderer = templateRenderer;
+        this.userManager = userManager;
     }
 
     public String getSdkName()
@@ -49,19 +48,6 @@ public class JiraProductAccessor implements ProductAccessor
         return pomProperties.get("jira.data.version");
     }
 
-    public String getUserFullName(String username)
-    {
-        try
-        {
-            return UserUtils.getUser(username).getFullName();
-        }
-        catch (EntityNotFoundException e)
-        {
-            log.error("Unknown user", e);
-            return username;
-        }
-    }
-
     public void sendEmail(EmailOptions options)
     {
         try
@@ -70,11 +56,11 @@ public class JiraProductAccessor implements ProductAccessor
             String toEmail = options.getToEmail();
             if (options.getToUsername() != null)
             {
-                User toUser = UserUtils.getUser(options.getToUsername());
+                UserProfile toUser = userManager.getUserProfile(options.getToUsername());
                 if (toUser != null)
                 {
-                    toName = toUser.getDisplayName();
-                    toEmail = toUser.getEmailAddress();
+                    toName = toUser.getFullName();
+                    toEmail = toUser.getEmail();
                 }
                 else
                 {
@@ -105,10 +91,6 @@ public class JiraProductAccessor implements ProductAccessor
             {
                 ManagerFactory.getMailQueue().sendBuffer();
             }
-        }
-        catch (EntityNotFoundException e)
-        {
-            log.error("Unable to send email", e);
         }
         catch (IOException e)
         {

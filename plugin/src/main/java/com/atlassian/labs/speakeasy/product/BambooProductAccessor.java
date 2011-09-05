@@ -1,6 +1,5 @@
 package com.atlassian.labs.speakeasy.product;
 
-import com.atlassian.core.user.UserUtils;
 import com.atlassian.labs.speakeasy.util.PomProperties;
 import com.opensymphony.user.EntityNotFoundException;
 import org.slf4j.Logger;
@@ -29,19 +28,6 @@ public class BambooProductAccessor implements ProductAccessor {
 
     public String getDataVersion() {
         return "";
-    }
-
-     public String getUserFullName(String username)
-    {
-        try
-        {
-            return UserUtils.getUser(username).getFullName();
-        }
-        catch (EntityNotFoundException e)
-        {
-            log.error("Unknown user", e);
-            return username;
-        }
     }
 
     public void sendEmail(EmailOptions options) {
