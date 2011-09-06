@@ -1,5 +1,6 @@
 package com.atlassian.labs.speakeasy.jira5.spring;
 
+import com.atlassian.jira.util.BuildUtils;
 import org.springframework.beans.factory.FactoryBean;
 import org.springframework.beans.factory.config.AutowireCapableBeanFactory;
 
@@ -15,16 +16,18 @@ public abstract class AbstractCompatFactoryBean implements FactoryBean
 
     static
     {
-        String identifier = null;
+        String identifier = "Jira4";
         try
         {
-            AbstractCompatFactoryBean.class.getClassLoader().loadClass("com.atlassian.jira.config.FeatureManager");
-            identifier = "Jira5";
+            String buildNumber = BuildUtils.getCurrentBuildNumber();
+            if (Integer.parseInt(buildNumber) >= 700)
+            {
+                identifier = "Jira5";
+            }
         }
-        catch (ClassNotFoundException e)
+        catch (Throwable e)
         {
             // not JIRA 5, assume 4
-            identifier = "Jira4";
         }
         IDENTIFIER = identifier;
     }

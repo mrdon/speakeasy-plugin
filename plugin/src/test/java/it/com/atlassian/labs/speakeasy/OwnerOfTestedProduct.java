@@ -1,8 +1,8 @@
 package it.com.atlassian.labs.speakeasy;
 
+import com.atlassian.jira.pageobjects.JiraTestedProduct;
 import com.atlassian.pageobjects.TestedProduct;
 import com.atlassian.pageobjects.TestedProductFactory;
-import com.atlassian.webdriver.jira.JiraTestedProduct;
 import com.atlassian.webdriver.refapp.RefappTestedProduct;
 import it.com.atlassian.labs.speakeasy.jira.JiraSpeakeasyUserPage;
 import it.com.atlassian.labs.speakeasy.jira.JiraUnauthorizedUserPage;

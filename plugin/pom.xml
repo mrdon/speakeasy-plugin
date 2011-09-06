@@ -28,6 +28,13 @@
                 <groupId>commons-lang</groupId>
                 <artifactId>commons-lang</artifactId>
                 <version>2.5</version>
+                <scope>provided</scope>
+            </dependency>
+            <dependency>
+                <groupId>com.google.collections</groupId>
+                <artifactId>google-collections</artifactId>
+                <version>1.0</version>
+                <scope>provided</scope>
             </dependency>
         </dependencies>
     </dependencyManagement>
@@ -56,6 +63,12 @@
         <dependency>
             <groupId>com.atlassian.applinks</groupId>
             <artifactId>applinks-api</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.codehaus.jackson</groupId>
+            <artifactId>jackson-jaxrs</artifactId>
+            <version>1.4.1</version>
             <scope>provided</scope>
         </dependency>
         <!--dependency>
@@ -252,9 +265,9 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>com.atlassian.selenium</groupId>
-            <artifactId>atlassian-webdriver-jira</artifactId>
-            <version>2.0</version>
+            <groupId>com.atlassian.jira</groupId>
+            <artifactId>atlassian-jira-pageobjects</artifactId>
+            <version>${jira.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -356,6 +369,14 @@
                             </productDataPath>
                         </product>
                         <product>
+                            <id>jira</id>
+                            <instanceId>jira-5.0</instanceId>
+                            <version>${jira.5.0.version}</version>
+                            <dataVersion>${jira.data.version}</dataVersion>
+                            <productDataPath>${basedir}/src/test/resources/jira-generated-test-resources.zip
+                            </productDataPath>
+                        </product>
+                        <product>
                             <id>fecru</id>
                             <version>${fecru.version}</version>
                             <dataVersion>${fecru.data.version}</dataVersion>
@@ -375,9 +396,19 @@
                                 <productId>jira</productId>
                             </productIds>
                             <systemProperties>
-                                <testedProductClass>com.atlassian.webdriver.jira.JiraTestedProduct</testedProductClass>
+                                <testedProductClass>com.atlassian.jira.pageobjects.JiraTestedProduct</testedProductClass>
                             </systemProperties>
                         </testGroup>
+                        <!-- TODO: broken due to https://jira.atlassian.com/browse/JRA-25593 -->
+                        <!--testGroup>
+                            <id>jira-5.0</id>
+                            <productIds>
+                                <productId>jira-5.0</productId>
+                            </productIds>
+                            <systemProperties>
+                                <testedProductClass>com.atlassian.jira.pageobjects.JiraTestedProduct</testedProductClass>
+                            </systemProperties>
+                        </testGroup-->
                         <testGroup>
                             <id>refapp</id>
                             <productIds>
@@ -509,7 +540,8 @@
         <confluence.version>3.5.2</confluence.version>
         <confluence.4.0.version>4.0-m18</confluence.4.0.version>
         <confluence.data.version>3.0</confluence.data.version>
-        <jira.version>4.3.4</jira.version>
+        <jira.version>4.4</jira.version>
+        <jira.5.0.version>5.0-m4</jira.5.0.version>
         <jira.data.version>4.1.1</jira.data.version>
         <fecru.version>2.7.0-M3-20110719025103</fecru.version>
         <fecru.data.version>2.7.0-M3-20110719025103</fecru.data.version>
