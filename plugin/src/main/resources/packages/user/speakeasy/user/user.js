@@ -256,6 +256,8 @@ function initSpeakeasy() {
 
     $('#speakeasy-loaded').html("");
 
+    AJS.tabs.setup();
+
 }
 
 exports.initSpeakeasy = initSpeakeasy;

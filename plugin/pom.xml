@@ -399,8 +399,7 @@
                                 <testedProductClass>com.atlassian.jira.pageobjects.JiraTestedProduct</testedProductClass>
                             </systemProperties>
                         </testGroup>
-                        <!-- TODO: broken due to https://jira.atlassian.com/browse/JRA-25593 -->
-                        <!--testGroup>
+                        <testGroup>
                             <id>jira-5.0</id>
                             <productIds>
                                 <productId>jira-5.0</productId>
@@ -408,7 +407,7 @@
                             <systemProperties>
                                 <testedProductClass>com.atlassian.jira.pageobjects.JiraTestedProduct</testedProductClass>
                             </systemProperties>
-                        </testGroup-->
+                        </testGroup>
                         <testGroup>
                             <id>refapp</id>
                             <productIds>
