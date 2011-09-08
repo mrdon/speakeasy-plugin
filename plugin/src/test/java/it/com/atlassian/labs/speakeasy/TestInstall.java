@@ -59,7 +59,7 @@ public class TestInstall
         assertTrue(page.canExecute("test-2", ExtensionOperations.UNINSTALL));
         assertTrue(page.canExecute("test-2", ExtensionOperations.EDIT));
         assertTrue(page.canExecute("test-2", ExtensionOperations.DOWNLOAD));
-        assertFalse(page.canExecute("test-2", ExtensionOperations.FORK));
+        assertTrue(page.canExecute("test-2", ExtensionOperations.FORK));
 
 
         // verify on reload

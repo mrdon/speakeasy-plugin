@@ -70,7 +70,7 @@ class ExtensionBuilder
         boolean canEdit = isAuthor && pureSpeakeasy && canAuthor;
         extension.setCanEdit(canEdit);
         extension.setCanUninstall(canEdit);
-        extension.setCanFork(!extension.isFork() && pureSpeakeasy && !isAuthor && canAuthor);
+        extension.setCanFork(!extension.isFork() && pureSpeakeasy && canAuthor);
         extension.setCanFavorite(!hasFavorited);
         extension.setCanDownload(pureSpeakeasy && canAuthor);
 
