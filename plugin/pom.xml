@@ -56,9 +56,9 @@
             <version>0.12.1</version>
         </dependency>
         <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>jira5-compat</artifactId>
-            <version>${project.version}</version>
+            <groupId>com.atlassian.labs</groupId>
+            <artifactId>jira4-compat</artifactId>
+            <version>0.1</version>
         </dependency>
         <dependency>
             <groupId>com.atlassian.applinks</groupId>

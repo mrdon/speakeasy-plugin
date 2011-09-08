@@ -232,5 +232,5 @@
     <module-type key="commonjs" class="com.atlassian.labs.speakeasy.commonjs.descriptor.CommonJsModulesDescriptor" />
 
     <!-- JIRA 5 Compatiblity -->
-    <module-type key="compat-view-profile-panel" class="com.atlassian.labs.speakeasy.jira5.CompatViewProfilePanelModuleDescriptor" application="jira"/>
+    <module-type key="compat-view-profile-panel" class="com.atlassian.labs.jira4compat.CompatViewProfilePanelModuleDescriptor" application="jira"/>
 </atlassian-plugin>
