@@ -5,9 +5,13 @@ import com.atlassian.labs.speakeasy.util.DefaultPluginModuleTracker;
 import com.atlassian.labs.speakeasy.util.PluginModuleTracker;
 import com.atlassian.plugin.PluginAccessor;
 import com.atlassian.plugin.event.PluginEventManager;
+import com.google.common.base.Predicate;
+import com.google.common.collect.Iterables;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+
+import java.util.Iterator;
 
 /**
  *
@@ -35,4 +39,14 @@ public class CommonJsModulesAccessor implements DisposableBean
     }
 
 
+    public Iterable<CommonJsModules> getAllPublicCommonJsModules()
+    {
+        return Iterables.filter(tracker.getModules(), new Predicate<CommonJsModules>()
+        {
+            public boolean apply(CommonJsModules input)
+            {
+                return !input.getPublicModuleIds().isEmpty();
+            }
+        });
+    }
 }

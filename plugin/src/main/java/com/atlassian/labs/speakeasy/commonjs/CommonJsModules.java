@@ -6,6 +6,7 @@ import com.atlassian.plugin.Plugin;
 import com.atlassian.plugin.util.PluginUtils;
 import com.google.common.base.Predicate;
 import com.google.common.collect.MapMaker;
+import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import org.apache.commons.io.IOUtils;
 import org.osgi.framework.Bundle;
@@ -203,6 +204,17 @@ public class CommonJsModules
     public Iterable<Module> getIterableModules()
     {
         return new IterableTreeMap<String,Module>(modules);
+    }
+
+    public Iterable<Module> getIterablePublicModules()
+    {
+        return new IterableTreeMap<String,Module>(Maps.filterValues(modules, new Predicate<Module>()
+        {
+            public boolean apply(Module input)
+            {
+                return input.getJsDoc().getAttribute("public") != null || publicModuleIds.contains(input.getId());
+            }
+        }));
     }
 
     public Set<String> getExternalModuleDependencies()

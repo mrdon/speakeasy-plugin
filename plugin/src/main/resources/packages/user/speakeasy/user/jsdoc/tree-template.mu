@@ -31,15 +31,8 @@ var exportedFunctionOrProperty = require('some/module');
             </tr>
         </thead>
         <tbody>
-            {{#iterableModules}}
-            <tr data-moduleId="{{id}}"
-                    {{#jsDoc}}
-                        {{#attributes}}
-                            {{^public}}
-                                class="private-module"
-                            {{/public}}
-                        {{/attributes}}
-                    {{/jsDoc}}>
+            {{#iterablePublicModules}}
+            <tr data-moduleId="{{id}}">
                 <td><code class="module-id">{{id}}</code></td>
                 <td>
                 <ul>
@@ -69,7 +62,7 @@ var exportedFunctionOrProperty = require('some/module');
                     </ul>
                 </td-->
             </tr>
-            {{/iterableModules}}
+            {{/iterablePublicModules}}
         </tbody>
     </table>
 {{/pluginModules}}

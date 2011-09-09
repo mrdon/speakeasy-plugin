@@ -104,7 +104,7 @@ public class UserProfileRenderer
                 put("enabledPlugins", filter(plugins.getPlugins(), new EnabledPluginsFilter())).
                 put("availablePlugins", filter(plugins.getPlugins(), new AvailablePluginsFilter())).
                 put("rowRenderer", new RowRenderer(req.getContextPath(), plugin)).
-                put("jsdocRenderer", new JsDocRenderer(plugin, commonJsModulesAccessor.getAllCommonJsModules())).
+                put("jsdocRenderer", new JsDocRenderer(plugin, commonJsModulesAccessor.getAllPublicCommonJsModules())).
                 put("staticResourcesPrefix", webResourceManager.getStaticResourcePrefix(UrlMode.RELATIVE)).
                 put("product", productAccessor.getSdkName()).
                 put("devmode", devMode).
