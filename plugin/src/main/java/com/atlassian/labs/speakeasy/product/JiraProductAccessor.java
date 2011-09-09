@@ -7,6 +7,7 @@ import com.atlassian.mail.queue.SingleMailQueueItem;
 import com.atlassian.sal.api.user.UserManager;
 import com.atlassian.sal.api.user.UserProfile;
 import com.atlassian.templaterenderer.TemplateRenderer;
+import com.atlassian.user.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -101,6 +102,12 @@ public class JiraProductAccessor implements ProductAccessor
     public String getProfilePath()
     {
         return "/secure/ViewProfile.jspa#selectedTab=com.atlassian.labs.speakeasy-plugin:speakeasy-plugins";
+    }
+
+    public String getTargetUsernameFromCondition(Map<String, Object> context)
+    {
+        // JIRA doesn't pass the user of the profile you are looking at in the context
+        return null;
     }
 
     private String render(String templateName, Map<String,Object> context) throws IOException

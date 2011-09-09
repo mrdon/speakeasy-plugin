@@ -1,6 +1,7 @@
 package com.atlassian.labs.speakeasy.product;
 
 import com.atlassian.confluence.mail.template.ConfluenceMailQueueItem;
+import com.atlassian.crowd.embedded.atlassianuser.EmbeddedCrowdUser;
 import com.atlassian.labs.speakeasy.util.PomProperties;
 import com.atlassian.mail.Email;
 import com.atlassian.mail.MailException;
@@ -121,6 +122,16 @@ public class ConfluenceProductAccessor implements ProductAccessor
     public String getProfilePath()
     {
         return "/plugins/servlet/speakeasy/user";
+    }
+
+    public String getTargetUsernameFromCondition(Map<String, Object> context)
+    {
+        Object user = context.get("targetUser");
+        if (user != null && user instanceof User)
+        {
+            return ((User)user).getName();
+        }
+        return null;
     }
 
     private String render(String templateName, Map<String,Object> context) throws IOException

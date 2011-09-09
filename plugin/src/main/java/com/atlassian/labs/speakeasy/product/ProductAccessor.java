@@ -16,4 +16,6 @@ public interface ProductAccessor
     void sendEmail(EmailOptions options);
 
     String getProfilePath();
+
+    String getTargetUsernameFromCondition(Map<String, Object> context);
 }

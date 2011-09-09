@@ -38,4 +38,9 @@ public class BambooProductAccessor implements ProductAccessor {
     {
         return "/plugins/servlet/speakeasy/user";
     }
+
+    public String getTargetUsernameFromCondition(Map<String, Object> context)
+    {
+        return null;
+    }
 }

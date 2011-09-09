@@ -43,6 +43,11 @@ public class FecruProductAccessor implements ProductAccessor {
         return "/plugins/servlet/speakeasy/user";
     }
 
+    public String getTargetUsernameFromCondition(Map<String, Object> context)
+    {
+        return null;
+    }
+
     public String getVersion() {
         return pomProperties.get("fecru.version");
     }
