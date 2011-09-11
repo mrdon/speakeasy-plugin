@@ -1,45 +1,33 @@
 package com.atlassian.labs.speakeasy.manager.convention;
 
-import com.atlassian.jira.permission.PermissionSchemeManager;
 import com.atlassian.labs.speakeasy.commonjs.CommonJsModules;
 import com.atlassian.labs.speakeasy.commonjs.Module;
+import com.atlassian.labs.speakeasy.commonjs.descriptor.SpeakeasyCommonJsModulesDescriptor;
 import com.atlassian.labs.speakeasy.commonjs.util.JsDoc;
 import com.atlassian.labs.speakeasy.descriptor.DescriptorGeneratorManager;
 import com.atlassian.labs.speakeasy.descriptor.SpeakeasyWebResourceModuleDescriptor;
-import com.atlassian.labs.speakeasy.commonjs.descriptor.SpeakeasyCommonJsModulesDescriptor;
 import com.atlassian.labs.speakeasy.descriptor.server.SpeakeasyWebPanelModuleDescriptor;
 import com.atlassian.labs.speakeasy.descriptor.webfragment.SpeakeasyWebItemModuleDescriptor;
-import com.atlassian.labs.speakeasy.manager.PermissionManager;
 import com.atlassian.labs.speakeasy.manager.PluginOperationFailedException;
 import com.atlassian.labs.speakeasy.manager.convention.external.ConventionDescriptorGenerator;
 import com.atlassian.labs.speakeasy.model.JsonManifest;
-import com.atlassian.labs.speakeasy.model.Permission;
-import com.atlassian.labs.speakeasy.ringojs.external.ServerSideJsNotEnabledException;
-import com.atlassian.plugin.*;
-import com.atlassian.plugin.descriptors.UnloadableModuleDescriptorFactory;
-import com.atlassian.plugin.event.PluginEventManager;
+import com.atlassian.plugin.ModuleDescriptor;
+import com.atlassian.plugin.Plugin;
+import com.atlassian.plugin.PluginAccessor;
 import com.atlassian.plugin.hostcontainer.HostContainer;
 import com.atlassian.plugin.module.ModuleFactory;
 import com.atlassian.plugin.osgi.util.OsgiHeaderUtil;
 import com.atlassian.plugin.webresource.WebResourceManager;
 import com.atlassian.plugin.webresource.WebResourceModuleDescriptor;
-import com.google.common.collect.ComputationException;
 import org.apache.commons.lang.Validate;
-import org.apache.velocity.test.IntrospectorTestCase2;
 import org.dom4j.DocumentFactory;
 import org.dom4j.Element;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceFactory;
 import org.osgi.framework.ServiceRegistration;
-import sun.security.krb5.internal.crypto.Des;
-
-import javax.xml.stream.Location;
 
 import java.util.Collections;
-
-import static com.google.common.collect.Sets.newHashSet;
-import static java.util.Collections.emptySet;
 
 /**
  *

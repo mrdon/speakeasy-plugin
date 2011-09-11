@@ -1,20 +1,12 @@
 package com.atlassian.labs.speakeasy.ringojs.internal.js;
 
-import com.atlassian.labs.speakeasy.util.BundleUtil;
 import com.atlassian.plugin.PluginAccessor;
-import com.atlassian.plugin.elements.ResourceDescriptor;
-import com.atlassian.plugin.osgi.container.OsgiContainerManager;
-import com.atlassian.plugin.webresource.WebResourceModuleDescriptor;
 import org.mozilla.javascript.Scriptable;
+import org.mozilla.javascript.ScriptableObject;
 import org.osgi.framework.*;
 import org.osgi.util.tracker.ServiceTracker;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.BeanFactory;
-import sun.org.mozilla.javascript.internal.ScriptableObject;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  *
