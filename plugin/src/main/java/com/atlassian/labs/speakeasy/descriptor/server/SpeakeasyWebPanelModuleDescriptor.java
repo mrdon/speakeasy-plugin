@@ -4,7 +4,7 @@ import com.atlassian.labs.speakeasy.descriptor.DescriptorGenerator;
 import com.atlassian.labs.speakeasy.descriptor.DescriptorGeneratorManager;
 import com.atlassian.labs.speakeasy.ringojs.external.CommonJsEngine;
 import com.atlassian.labs.speakeasy.ringojs.external.CommonJsEngineFactory;
-import com.atlassian.labs.speakeasy.util.WebResourceUtil;
+import com.atlassian.labs.speakeasy.util.GeneratedDescriptorUtil;
 import com.atlassian.plugin.ModuleDescriptor;
 import com.atlassian.plugin.Plugin;
 import com.atlassian.plugin.PluginParseException;
@@ -14,12 +14,8 @@ import com.atlassian.plugin.impl.AbstractDelegatingPlugin;
 import com.atlassian.plugin.module.ModuleFactory;
 import com.atlassian.plugin.web.WebInterfaceManager;
 import com.atlassian.plugin.web.descriptors.DefaultWebPanelModuleDescriptor;
-import com.atlassian.plugin.web.descriptors.WebItemModuleDescriptor;
 import com.atlassian.plugin.web.descriptors.WebPanelModuleDescriptor;
 import com.atlassian.plugin.web.model.WebPanel;
-import com.atlassian.plugin.webresource.UrlMode;
-import com.atlassian.plugin.webresource.WebResourceManager;
-import org.aspectj.apache.bcel.generic.NEW;
 import org.dom4j.Element;
 import org.osgi.framework.BundleContext;
 
@@ -112,7 +108,7 @@ public class SpeakeasyWebPanelModuleDescriptor extends AbstractModuleDescriptor<
         Element userElement = (Element) originalElement.clone();
         userElement.addAttribute("key", getStatefulKey(userElement.attributeValue("key"), state));
 
-        WebResourceUtil.addUsersCondition(users, userElement);
+        GeneratedDescriptorUtil.addUsersCondition(users, userElement);
 
         descriptor.init(new AbstractDelegatingPlugin(getPlugin())
         {

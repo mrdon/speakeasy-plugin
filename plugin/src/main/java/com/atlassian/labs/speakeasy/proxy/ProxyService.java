@@ -38,10 +38,10 @@ import java.util.*;
 @Component
 public class ProxyService
 {
-    private static final String APP_TYPE = "appType";
-    private static final String APP_ID = "appId";
+    public static final String APP_TYPE = "appType";
+    public static final String APP_ID = "appId";
     private static final String FORMAT_ERRORS = "formatErrors";
-    private static final String PATH = "path";
+    public static final String PATH = "path";
     private final static Set<String> RESERVED_PARAMS = ImmutableSet.of(PATH, APP_ID, APP_TYPE, FORMAT_ERRORS);
     private final static Map<String,Class<? extends ApplicationType>> APPLINKS_TYPE_ALIASES = ImmutableMap.<String,Class<? extends ApplicationType>>builder().
             put("jira", JiraApplicationType.class).
@@ -302,7 +302,7 @@ public class ProxyService
     }
 
     @SuppressWarnings("unchecked")
-    private ApplicationLink getPrimaryAppLinkByType(String type) throws ClassNotFoundException
+    public ApplicationLink getPrimaryAppLinkByType(String type) throws ClassNotFoundException
     {
 
         Class<? extends ApplicationType> clazz = APPLINKS_TYPE_ALIASES.get(type.toLowerCase(Locale.US));
@@ -313,7 +313,7 @@ public class ProxyService
         return appLinkService.getPrimaryApplicationLink(clazz);
     }
 
-    private ApplicationLink getApplicationLinkByIdOrName(String id) throws TypeNotInstalledException
+    public ApplicationLink getApplicationLinkByIdOrName(String id) throws TypeNotInstalledException
     {
         ApplicationId appId = null;
         try

@@ -62,15 +62,6 @@ public class WebResourceUtil
         return descriptor;
     }
 
-    public static void addUsersCondition(List<String> users, Element userElement)
-    {
-        Element condElement = userElement.addElement("condition");
-        condElement.addAttribute("class", UserScopedCondition.class.getName());
-        Element paramElement = condElement.addElement("param");
-        paramElement.addAttribute("name", "users");
-        paramElement.setText(users != null ? StringUtils.join(users, "|") : "");
-    }
-
     public static void resolveDependency(Plugin plugin, Element dep, long state)
     {
         String fullKey = dep.getTextTrim();

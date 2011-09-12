@@ -1,6 +1,7 @@
 package com.atlassian.labs.speakeasy.descriptor;
 
 import com.atlassian.labs.speakeasy.util.BundleUtil;
+import com.atlassian.labs.speakeasy.util.GeneratedDescriptorUtil;
 import com.atlassian.labs.speakeasy.util.WebResourceUtil;
 import com.atlassian.plugin.Plugin;
 import com.atlassian.plugin.PluginParseException;
@@ -23,6 +24,9 @@ import java.util.Collections;
 import java.util.List;
 
 import static com.atlassian.labs.speakeasy.descriptor.DescriptorGeneratorManager.getStatefulKey;
+import static com.atlassian.labs.speakeasy.util.GeneratedDescriptorUtil.addUsersCondition;
+import static com.atlassian.labs.speakeasy.util.GeneratedDescriptorUtil.initHandlingConditionLoading;
+import static com.atlassian.labs.speakeasy.util.GeneratedDescriptorUtil.printGeneratedDescriptor;
 
 /**
  *
@@ -96,39 +100,9 @@ public class SpeakeasyWebResourceModuleDescriptor extends AbstractModuleDescript
         }
         userElement.addAttribute("key", getStatefulKey(userElement.attributeValue("key"), state));
 
-        WebResourceUtil.addUsersCondition(users, userElement);
-
-        if (log.isDebugEnabled())
-        {
-            StringWriter out = new StringWriter();
-            OutputFormat format = OutputFormat.createPrettyPrint();
-            XMLWriter writer = new XMLWriter( out, format );
-            try
-            {
-                writer.write(userElement);
-            }
-            catch (IOException e)
-            {
-                e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
-            }
-
-            log.debug("Creating dynamic descriptor of key {}: {}", getCompleteKey(), out.toString());
-        }
-        descriptor.init(new AbstractDelegatingPlugin(getPlugin())
-        {
-            @Override
-            public <T> Class<T> loadClass(String clazz, Class<?> callingClass) throws ClassNotFoundException
-            {
-                if (clazz.equals(UserScopedCondition.class.getName()))
-                {
-                    return (Class<T>) UserScopedCondition.class;
-                }
-                else
-                {
-                    return super.loadClass(clazz, callingClass);
-                }
-            }
-        }, userElement);
+        addUsersCondition(users, userElement);
+        printGeneratedDescriptor(log, getCompleteKey(), userElement);
+        initHandlingConditionLoading(descriptor, getPlugin(), userElement);
         return Collections.singleton(descriptor);
     }
 }

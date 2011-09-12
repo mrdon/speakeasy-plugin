@@ -171,7 +171,7 @@
         <dependency>
             <groupId>org.twdata.org.ringojs</groupId>
             <artifactId>ringojs</artifactId>
-            <version>0.8.0</version>
+            <version>0.8.0-db1-SNAPSHOT</version>
             <exclusions>
                 <exclusion>
                     <groupId>org.slf4j</groupId>
@@ -353,7 +353,7 @@
                         <Export-Package>
                             com.atlassian.labs.speakeasy.install.convention.external,
                             com.atlassian.labs.speakeasy.manager.convention.external,
-                            com.atlassian.crowd.*
+                            <!--com.atlassian.labs.speakeasy.ringojs.external, -->
                         </Export-Package>
                     </instructions>
                     <products>

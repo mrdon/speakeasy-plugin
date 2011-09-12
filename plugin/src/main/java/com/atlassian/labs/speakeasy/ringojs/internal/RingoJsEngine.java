@@ -45,4 +45,9 @@ public class RingoJsEngine implements CommonJsEngine
             throw (new RuntimeException(x));
         }
     }
+
+    public RhinoEngine getEngine()
+    {
+        return engine;
+    }
 }

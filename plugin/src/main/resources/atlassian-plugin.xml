@@ -115,6 +115,7 @@
     <component-import key="applicationLinkService" interface="com.atlassian.applinks.api.ApplicationLinkService" />
     <component-import key="pluginRetrievalService" interface="com.atlassian.plugin.osgi.bridge.external.PluginRetrievalService" />
     <component-import key="i18nResolver" interface="com.atlassian.sal.api.message.I18nResolver" />
+    <component-import key="servletModuleManager" interface="com.atlassian.plugin.servlet.ServletModuleManager" />
 
     <module-type key="scoped-web-resource" class="com.atlassian.labs.speakeasy.descriptor.SpeakeasyWebResourceModuleDescriptor"/>
 

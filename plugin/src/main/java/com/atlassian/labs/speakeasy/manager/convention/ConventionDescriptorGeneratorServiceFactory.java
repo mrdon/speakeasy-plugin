@@ -11,12 +11,15 @@ import com.atlassian.labs.speakeasy.descriptor.webfragment.SpeakeasyWebItemModul
 import com.atlassian.labs.speakeasy.manager.PluginOperationFailedException;
 import com.atlassian.labs.speakeasy.manager.convention.external.ConventionDescriptorGenerator;
 import com.atlassian.labs.speakeasy.model.JsonManifest;
+import com.atlassian.labs.speakeasy.ringojs.descriptor.SpeakeasyJsgiModuleDescriptor;
+import com.atlassian.labs.speakeasy.ringojs.external.CommonJsEngineFactory;
 import com.atlassian.plugin.ModuleDescriptor;
 import com.atlassian.plugin.Plugin;
 import com.atlassian.plugin.PluginAccessor;
 import com.atlassian.plugin.hostcontainer.HostContainer;
 import com.atlassian.plugin.module.ModuleFactory;
 import com.atlassian.plugin.osgi.util.OsgiHeaderUtil;
+import com.atlassian.plugin.servlet.ServletModuleManager;
 import com.atlassian.plugin.webresource.WebResourceManager;
 import com.atlassian.plugin.webresource.WebResourceModuleDescriptor;
 import org.apache.commons.lang.Validate;
@@ -42,10 +45,11 @@ public class ConventionDescriptorGeneratorServiceFactory implements ServiceFacto
     private final JsonToElementParser jsonToElementParser;
     private final WebResourceManager webResourceManager;
     private final JsonManifestHandler jsonManifestHandler;
+    private final ServletModuleManager servletModuleManager;
 
     //private final Set<String> trackedPlugins = new CopyOnWriteArraySet<String>();
 
-    public ConventionDescriptorGeneratorServiceFactory(ModuleFactory moduleFactory, final BundleContext bundleContext, final PluginAccessor pluginAccessor, HostContainer hostContainer, DescriptorGeneratorManager descriptorGeneratorManager, JsonToElementParser jsonToElementParser, WebResourceManager webResourceManager, JsonManifestHandler jsonManifestHandler)
+    public ConventionDescriptorGeneratorServiceFactory(ModuleFactory moduleFactory, final BundleContext bundleContext, final PluginAccessor pluginAccessor, HostContainer hostContainer, DescriptorGeneratorManager descriptorGeneratorManager, JsonToElementParser jsonToElementParser, WebResourceManager webResourceManager, JsonManifestHandler jsonManifestHandler, ServletModuleManager servletModuleManager)
     {
         this.moduleFactory = moduleFactory;
         this.bundleContext = bundleContext;
@@ -55,6 +59,7 @@ public class ConventionDescriptorGeneratorServiceFactory implements ServiceFacto
         this.jsonToElementParser = jsonToElementParser;
         this.webResourceManager = webResourceManager;
         this.jsonManifestHandler = jsonManifestHandler;
+        this.servletModuleManager = servletModuleManager;
     }
 
     public Object getService(Bundle bundle, ServiceRegistration registration)
@@ -90,7 +95,9 @@ public class ConventionDescriptorGeneratorServiceFactory implements ServiceFacto
 
         if (bundle.getEntry("server/") != null)
         {
-            registerSpeakeasyWebPanels(factory, bundle, plugin);
+            CommonJsModules modules = new CommonJsModules(plugin, bundle, "server/", Collections.<String>emptySet());
+            registerSpeakeasyWebPanels(factory, modules, bundle, plugin);
+            registerSpeakeasyJsgi(factory, modules, bundle, plugin);
         }
 
         if (bundle.getEntry("images/") != null)
@@ -115,9 +122,8 @@ public class ConventionDescriptorGeneratorServiceFactory implements ServiceFacto
         };
     }
 
-    private void registerSpeakeasyWebPanels(DocumentFactory factory, Bundle bundle, Plugin plugin)
+    private void registerSpeakeasyWebPanels(DocumentFactory factory, CommonJsModules modules, Bundle bundle, Plugin plugin)
     {
-        CommonJsModules modules = new CommonJsModules(plugin, bundle, "server/", Collections.<String>emptySet());
         for (Module module : modules.getIterableModules())
         {
             final JsDoc jsDoc = module.getJsDoc();
@@ -134,6 +140,30 @@ public class ConventionDescriptorGeneratorServiceFactory implements ServiceFacto
                         .addAttribute("class", module.getId());
 
                 ModuleDescriptor descriptor = new SpeakeasyWebPanelModuleDescriptor(bundle.getBundleContext(), descriptorGeneratorManager, hostContainer);
+                descriptor.init(plugin, element);
+                bundle.getBundleContext().registerService(ModuleDescriptor.class.getName(), descriptor, null);
+            }
+        }
+    }
+
+    private void registerSpeakeasyJsgi(DocumentFactory factory, CommonJsModules modules, Bundle bundle, Plugin plugin)
+    {
+        for (Module module : modules.getIterableModules())
+        {
+            final JsDoc jsDoc = module.getJsDoc();
+            if (jsDoc.getAttribute("jsgi") != null)
+            {
+                Element element = factory.createElement("jsgi-servlet")
+                        .addAttribute("key", "jsgi-" + module.getId())
+                        .addAttribute("module", module.getId())
+                        .addAttribute("function", "main");
+                element.addElement("url-pattern").setText("/" + module.getId());
+                element.addElement("url-pattern").setText("/" + module.getId() + "/*");
+
+                CommonJsEngineFactory engineFactory = (CommonJsEngineFactory) bundle.getBundleContext().getService(bundle.getBundleContext().getServiceReference(CommonJsEngineFactory.class.getName()));
+
+                ModuleDescriptor descriptor = new SpeakeasyJsgiModuleDescriptor(moduleFactory, descriptorGeneratorManager,
+                        hostContainer, servletModuleManager, engineFactory);
                 descriptor.init(plugin, element);
                 bundle.getBundleContext().registerService(ModuleDescriptor.class.getName(), descriptor, null);
             }

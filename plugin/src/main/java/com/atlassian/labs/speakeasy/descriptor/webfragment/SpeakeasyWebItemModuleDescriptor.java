@@ -2,7 +2,7 @@ package com.atlassian.labs.speakeasy.descriptor.webfragment;
 
 import com.atlassian.labs.speakeasy.descriptor.DescriptorGenerator;
 import com.atlassian.labs.speakeasy.descriptor.DescriptorGeneratorManager;
-import com.atlassian.labs.speakeasy.util.WebResourceUtil;
+import com.atlassian.labs.speakeasy.util.GeneratedDescriptorUtil;
 import com.atlassian.plugin.Plugin;
 import com.atlassian.plugin.PluginParseException;
 import com.atlassian.plugin.descriptors.AbstractModuleDescriptor;
@@ -101,7 +101,7 @@ public class SpeakeasyWebItemModuleDescriptor extends AbstractModuleDescriptor<V
         Element userElement = (Element) originalElement.clone();
         userElement.addAttribute("key", getStatefulKey(userElement.attributeValue("key"), state));
 
-        WebResourceUtil.addUsersCondition(users, userElement);
+        GeneratedDescriptorUtil.addUsersCondition(users, userElement);
         resolveLinkPaths(state, userElement);
 
         descriptor.init(new AbstractDelegatingPlugin(getPlugin())
