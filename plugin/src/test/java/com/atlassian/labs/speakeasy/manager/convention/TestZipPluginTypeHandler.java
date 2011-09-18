@@ -31,4 +31,12 @@ public class TestZipPluginTypeHandler
         assertTrue(handler.allowEntryPath("__MACOSX/._images"));
         assertFalse(handler.allowEntryPath("__MACOSX/._hack.class"));
     }
+
+    @Test
+    public void testReadmeFiles()
+    {
+        assertTrue(handler.allowEntryPath("README.txt"));
+        assertTrue(handler.allowEntryPath("README.md"));
+        assertTrue(handler.allowEntryPath("LICENSE.txt"));
+    }
 }

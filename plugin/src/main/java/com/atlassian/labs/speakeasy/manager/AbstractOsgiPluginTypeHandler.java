@@ -44,6 +44,9 @@ public abstract class AbstractOsgiPluginTypeHandler implements PluginTypeHandler
             Pattern.compile("META-INF/MANIFEST.MF"),
             Pattern.compile(".*/pom.xml"),
             Pattern.compile(".*/pom.properties"),
+            Pattern.compile("README.txt"),
+            Pattern.compile("LICENSE.txt"),
+            Pattern.compile("README.md"),
             Pattern.compile("\\.gitignore"),
             Pattern.compile(".*\\.DS_Store"));
     private final TemplateRenderer templateRenderer;
