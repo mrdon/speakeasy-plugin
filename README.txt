@@ -8,6 +8,7 @@ When getting started developing the Speakeasy plugin, these commands will come i
   Refapp: mvn refapp:debug
   Confluence: mvn refapp:debug -Dproduct=confluence
   JIRA: mvn refapp:debug -Dproduct=jira
+  Bamboo: mvn refapp:debug -Dproduct=bamboo
 
 * Deploy the plugin at runtime in the desired product:
   Refapp: mvn refapp:cli
