@@ -1,5 +1,6 @@
 package com.atlassian.labs.speakeasy.commonjs.descriptor;
 
+import com.atlassian.labs.speakeasy.descriptor.ConditionGenerator;
 import com.atlassian.labs.speakeasy.descriptor.DescriptorGenerator;
 import com.atlassian.labs.speakeasy.descriptor.DescriptorGeneratorManager;
 import com.atlassian.labs.speakeasy.descriptor.SpeakeasyWebResourceModuleDescriptor;
@@ -31,7 +32,7 @@ public class SpeakeasyCommonJsModulesDescriptor extends CommonJsModulesDescripto
         this.descriptorGeneratorManager = descriptorGeneratorManager;
     }
 
-    public Iterable<CommonJsModulesDescriptor> getDescriptorsToExposeForUsers(List<String> users, long state)
+    public Iterable<CommonJsModulesDescriptor> getDescriptorsToExposeForUsers(ConditionGenerator conditionGenerator, long state)
     {
         return emptySet();
     }

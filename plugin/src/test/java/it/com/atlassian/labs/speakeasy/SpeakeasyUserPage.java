@@ -122,13 +122,19 @@ public class SpeakeasyUserPage implements Page
 
     public boolean isPluginEnabled(String pluginKey)
     {
-        return !canEnable(pluginKey);
+        return "true".equalsIgnoreCase(getPluginRow(pluginKey).getAttribute("data-enabled"));
     }
 
     public boolean canEnable(String pluginKey)
     {
         final String disabled = getPluginRow(pluginKey).findElement(By.className("pk-enable")).getAttribute("disabled");
         return disabled == null || "false".equalsIgnoreCase(disabled);
+    }
+
+    public boolean canDisable(String pluginKey)
+    {
+        final String enabled = getPluginRow(pluginKey).findElement(By.className("pk-disable")).getAttribute("disabled");
+        return enabled == null || "false".equalsIgnoreCase(enabled);
     }
 
     private WebElement getPluginRow(String key)
@@ -309,6 +315,20 @@ public class SpeakeasyUserPage implements Page
     {
         applinksTab.click();
         return pageBinder.bind(ApplinksTab.class);
+    }
+
+    public ConfirmDialog enablePluginForEveryone(String pluginKey)
+    {
+        clickActionLink(pluginKey, ExtensionOperations.ENABLEGLOBALLY);
+
+        return pageBinder.bind(ConfirmDialog.class);
+    }
+
+    public ConfirmDialog disablePluginForEveryone(String pluginKey)
+    {
+        clickActionLink(pluginKey, ExtensionOperations.DISABLEGLOBALLY);
+
+        return pageBinder.bind(ConfirmDialog.class);
     }
 
     public static class PluginRow

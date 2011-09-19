@@ -182,6 +182,25 @@ public class PluginsResource
         return Response.ok().entity(entity).build();
     }
 
+    @DELETE
+    @Path("global/{pluginKey}")
+    @Produces("application/json")
+    public Response disableGlobally(@PathParam("pluginKey") String pluginKey) throws UnauthorizedAccessException
+    {
+        UserPlugins entity = speakeasyService.disableGlobally(pluginKey, userManager.getRemoteUsername());
+        return Response.ok().entity(entity).build();
+    }
+
+    @PUT
+    @Path("global/{pluginKey}")
+    @Produces("application/json")
+    @RequiresXsrfCheck
+    public Response enableGlobally(@PathParam("pluginKey") String pluginKey) throws UnauthorizedAccessException
+    {
+        UserPlugins entity = speakeasyService.enableGlobally(pluginKey, userManager.getRemoteUsername());
+        return Response.ok().entity(entity).build();
+    }
+
     @GET
     @Path("plugin/{pluginKey}/index")
     @Produces("application/json")

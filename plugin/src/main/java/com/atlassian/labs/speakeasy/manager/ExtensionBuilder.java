@@ -93,6 +93,39 @@ class ExtensionBuilder
             extension.setCanFork(false);
             extension.setCanEdit(false);
         }
+
+        // global extensions are quite limited
+        final boolean isGlobalExtension = data.isGlobalExtension(plugin.getKey());
+        if (isGlobalExtension)
+        {
+            extension.setCanEnable(false);
+            extension.setCanDisable(false);
+            extension.setEnabled(true);
+            extension.setCanEdit(false);
+            extension.setCanUninstall(false);
+            extension.setCanFork(false);
+        }
+
+        // forks of global extensions can't be enabled
+        if (data.isGlobalExtension(extension.getForkedPluginKey()))
+        {
+            extension.setCanEnable(false);
+        }
+
+        if (userManager.isAdmin(userName))
+        {
+            // if already a global extension, allow the admin to disable it
+            if (isGlobalExtension)
+            {
+                extension.setCanDisableGlobally(true);
+                extension.setCanEdit(true);
+                extension.setCanUninstall(true);
+            }
+            else
+            {
+                extension.setCanEnableGlobally(true);
+            }
+        }
         return extension;
     }
 

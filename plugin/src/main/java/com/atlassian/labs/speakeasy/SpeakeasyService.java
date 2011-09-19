@@ -388,6 +388,42 @@ public class SpeakeasyService
         return getRemotePluginList(user, unfavoritedPluginkey);
     }
 
+    public UserPlugins enableGlobally(String pluginKey, final String user)
+    {
+        validateAccess(user);
+        validateAdmin(user);
+        validatePluginExists(pluginKey);
+        exec.forKey(pluginKey, user, new Operation<UserExtension, Void>()
+        {
+            public Void operateOn(UserExtension repo) throws Exception
+            {
+                validateAccessType(repo, "enable globally", repo.isCanEnableGlobally(), user);
+                extensionOperationManager.enableGlobally(repo, user);
+                return null;
+            }
+        });
+        log.info("Enabled extension '{}' globally by user '{}'", pluginKey, user);
+        return getRemotePluginList(user, pluginKey);
+    }
+
+    public UserPlugins disableGlobally(String pluginKey, final String user)
+    {
+        validateAccess(user);
+        validateAdmin(user);
+        validatePluginExists(pluginKey);
+        exec.forKey(pluginKey, user, new Operation<UserExtension, Void>()
+        {
+            public Void operateOn(UserExtension repo) throws Exception
+            {
+                validateAccessType(repo, "disable globally", repo.isCanDisableGlobally(), user);
+                extensionOperationManager.disableGlobally(repo);
+                return null;
+            }
+        });
+        log.info("Disabled extension '{}' globally by user '{}'", pluginKey, user);
+        return getRemotePluginList(user, pluginKey);
+    }
+
     public void sendFeedback(final String pluginKey, final Feedback feedback, final String user) throws UnauthorizedAccessException
     {
         validateAccess(user);

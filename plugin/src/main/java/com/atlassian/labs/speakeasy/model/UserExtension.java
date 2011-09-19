@@ -22,6 +22,8 @@ public class UserExtension extends Extension implements Comparable
     private boolean canDisable;
     private boolean canDownload;
     private boolean canFavorite;
+    private boolean canEnableGlobally;
+    private boolean canDisableGlobally;
 
     public UserExtension()
     {
@@ -111,5 +113,25 @@ public class UserExtension extends Extension implements Comparable
     public void setCanFavorite(boolean canFavorite)
     {
         this.canFavorite = canFavorite;
+    }
+
+    public boolean isCanEnableGlobally()
+    {
+        return canEnableGlobally;
+    }
+
+    public void setCanEnableGlobally(boolean canEnableGlobally)
+    {
+        this.canEnableGlobally = canEnableGlobally;
+    }
+
+    public boolean isCanDisableGlobally()
+    {
+        return canDisableGlobally;
+    }
+
+    public void setCanDisableGlobally(boolean canDisableGlobally)
+    {
+        this.canDisableGlobally = canDisableGlobally;
     }
 }

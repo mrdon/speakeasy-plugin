@@ -20,6 +20,7 @@ import com.atlassian.plugin.PluginAccessor;
 import com.atlassian.sal.api.user.UserManager;
 import com.atlassian.sal.api.user.UserProfile;
 import com.google.common.base.Function;
+import com.google.common.collect.Lists;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,6 +32,7 @@ import java.util.*;
 import static com.google.common.collect.Iterables.filter;
 import static com.google.common.collect.Lists.newArrayList;
 import static com.google.common.collect.Lists.transform;
+import static java.util.Collections.singletonList;
 
 /**
  *
@@ -68,6 +70,14 @@ public class ExtensionOperationManager
         List<String> affectedPluginKeys = new ArrayList<String>();
         String pluginKey = enabledPlugin.getKey();
         List<String> accessList = data.getUsersList(pluginKey);
+
+        // don't allow enabling of forks of global extensions
+        if (data.isGlobalExtension(enabledPlugin.getForkedPluginKey()))
+        {
+            return affectedPluginKeys;
+        }
+
+        // only enable if not already enabled
         if (!accessList.contains(user))
         {
             accessList.add(user);
@@ -77,6 +87,17 @@ public class ExtensionOperationManager
         }
 
         // clear other allowed forks
+        clearEnabledForks(enabledPlugin, user, affectedPluginKeys);
+
+        if (sendNotification)
+        {
+            sendEnabledEmail(enabledPlugin, user);
+        }
+        return affectedPluginKeys;
+    }
+
+    private void clearEnabledForks(Extension enabledPlugin, String user, List<String> affectedPluginKeys)
+    {
         String parentKey = enabledPlugin.getForkedPluginKey() != null ? enabledPlugin.getForkedPluginKey() : enabledPlugin.getKey();
 
         for (Plugin plugin : extensionManager.getAllExtensionPlugins())
@@ -90,12 +111,6 @@ public class ExtensionOperationManager
                 }
             }
         }
-
-        if (sendNotification)
-        {
-            sendEnabledEmail(enabledPlugin, user);
-        }
-        return affectedPluginKeys;
     }
 
     public String disable(Extension repo, String user)
@@ -121,7 +136,7 @@ public class ExtensionOperationManager
         List<String> keysModified = new ArrayList<String>();
         String pluginKey = plugin.getKey();
         String originalKey = plugin.getForkedPluginKey();
-        if (originalKey != null && pluginAccessor.getPlugin(originalKey) != null)
+        if (originalKey != null && pluginAccessor.getPlugin(originalKey) != null && !data.isGlobalExtension(originalKey))
         {
             if (hasAccess(pluginKey, user))
             {
@@ -187,6 +202,38 @@ public class ExtensionOperationManager
         return pluginKey;
     }
 
+    public List<String> enableGlobally(UserExtension enabledPlugin, String user)
+    {
+        data.addGlobalExtension(enabledPlugin.getKey());
+        descriptorGeneratorManager.refreshGeneratedDescriptorsForPlugin(enabledPlugin.getKey());
+
+        // clear all forks of this plugin
+        String parentKey = enabledPlugin.getForkedPluginKey() != null ? enabledPlugin.getForkedPluginKey() : enabledPlugin.getKey();
+        List<String> affectedPluginKeys = newArrayList();
+        for (Plugin plugin : extensionManager.getAllExtensionPlugins())
+        {
+            if (!plugin.getKey().equals(enabledPlugin.getKey()) && (plugin.getKey().equals(parentKey)
+                    || parentKey.equals(Extension.getForkedPluginKey(plugin.getKey()))))
+            {
+                if (data.getUsersList(plugin.getKey()).contains(user))
+                {
+                    affectedPluginKeys.add(plugin.getKey());
+                }
+                disallowAllPluginAccess(plugin.getKey());
+            }
+        }
+
+        // TODO: send notification email?
+        return affectedPluginKeys;
+    }
+
+    public void disableGlobally(UserExtension repo)
+    {
+        data.removeGlobalExtension(repo.getKey());
+        descriptorGeneratorManager.refreshGeneratedDescriptorsForPlugin(repo.getKey());
+    }
+
+
     public void sendFeedback(final Extension extension, final Feedback feedback, final String user)
     {
         sendFeedbackType(extension, feedback, "feedback", user);
@@ -227,10 +274,7 @@ public class ExtensionOperationManager
     public String install(Extension ext, File uploadedFile, String user)
     {
         String pluginKey = pluginSystemManager.install(uploadedFile, ext != null ? ext.getKey() : null, user);
-        eventPublisher.publish(new PluginInstalledEvent(pluginKey)
-                .setUserName(user)
-                .setUserEmail(userManager.getUserProfile(user).getEmail())
-                .setMessage("Installed from a JAR upload"));
+        eventPublisher.publish(new PluginInstalledEvent(pluginKey).setUserName(user).setUserEmail(userManager.getUserProfile(user).getEmail()).setMessage("Installed from a JAR upload"));
         return pluginKey;
     }
 
@@ -330,9 +374,7 @@ public class ExtensionOperationManager
 
     private void disallowAllPluginAccess(String pluginKey)
     {
-        List<String> accessList = data.getUsersList(pluginKey);
-        accessList.clear();
-        data.saveUsersList(pluginKey, accessList);
+        data.saveUsersList(pluginKey, Lists.<String>newArrayList());
         descriptorGeneratorManager.refreshGeneratedDescriptorsForPlugin(pluginKey);
     }
     private void sendEnabledEmail(final Extension enabledPlugin, final String user)

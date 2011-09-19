@@ -85,7 +85,7 @@ public class SpeakeasyWebResourceModuleDescriptor extends AbstractModuleDescript
         descriptorGeneratorManager.unregisterGenerator(getPluginKey(), getKey());
     }
 
-    public Iterable<WebResourceModuleDescriptor> getDescriptorsToExposeForUsers(List<String> users, long state)
+    public Iterable<WebResourceModuleDescriptor> getDescriptorsToExposeForUsers(ConditionGenerator conditionGenerator, long state)
     {
         WebResourceModuleDescriptor descriptor = WebResourceUtil.instantiateDescriptor(hostContainer);
 
@@ -96,7 +96,7 @@ public class SpeakeasyWebResourceModuleDescriptor extends AbstractModuleDescript
         }
         userElement.addAttribute("key", getStatefulKey(userElement.attributeValue("key"), state));
 
-        WebResourceUtil.addUsersCondition(users, userElement);
+        conditionGenerator.addConditionElement(userElement);
 
         if (log.isDebugEnabled())
         {

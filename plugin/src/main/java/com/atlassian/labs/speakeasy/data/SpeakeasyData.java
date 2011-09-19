@@ -117,6 +117,41 @@ public class SpeakeasyData
         return value;
     }
 
+    public boolean isGlobalExtension(String pluginKey)
+    {
+        if (pluginKey == null)
+        {
+            return false;
+        }
+        List<String> extensions = (List<String>)getPluginSettings().get(createAccessKey("globalExtensions"));
+        return extensions != null && extensions.contains(pluginKey);
+    }
+
+    public void addGlobalExtension(String pluginKey)
+    {
+        final PluginSettings pluginSettings = getPluginSettings();
+        final String accessKey = createAccessKey("globalExtensions");
+        List<String> extensions = (List<String>) pluginSettings.get(accessKey);
+        if (extensions == null)
+        {
+            extensions = new ArrayList<String>();
+        }
+        extensions.add(pluginKey);
+        pluginSettings.put(accessKey, extensions);
+    }
+
+    public void removeGlobalExtension(String pluginKey)
+    {
+        final PluginSettings pluginSettings = getPluginSettings();
+        final String accessKey = createAccessKey("globalExtensions");
+        List<String> extensions = (List<String>) pluginSettings.get(accessKey);
+        if (extensions != null)
+        {
+            extensions.remove(pluginKey);
+            pluginSettings.put(accessKey, extensions);
+        }
+    }
+
     public void favorite(String pluginKey, String user)
     {
         // concurrent marks handled through lock higher up

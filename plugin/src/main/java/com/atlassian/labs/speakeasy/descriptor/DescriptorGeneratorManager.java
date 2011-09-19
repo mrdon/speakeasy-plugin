@@ -49,11 +49,12 @@ public class DescriptorGeneratorManager
         waitUntilModulesAreDisabled(unregisteredDescriptors);
 
         // generate and register new services
-        List<String> accessList = data.getUsersList(pluginKey);
         Bundle targetBundle = findBundleForPlugin(bundleContext, pluginKey);
         List<ModuleDescriptor> generatedDescriptors = new ArrayList<ModuleDescriptor>();
         List<ServiceRegistration> serviceRegistrations = newArrayList();
-        for (ModuleDescriptor generatedDescriptor : descriptorGenerator.getDescriptorsToExposeForUsers(accessList, targetBundle.getLastModified()))
+        ConditionGenerator conditionGenerator = data.isGlobalExtension(pluginKey) ? new GlobalConditionGenerator() :
+                new UsersConditionGenerator(data.getUsersList(pluginKey));
+        for (ModuleDescriptor generatedDescriptor : descriptorGenerator.getDescriptorsToExposeForUsers(conditionGenerator, targetBundle.getLastModified()))
         {
             ServiceRegistration reg = targetBundle.getBundleContext().registerService(ModuleDescriptor.class.getName(), generatedDescriptor, null);
             serviceRegistrations.add(reg);

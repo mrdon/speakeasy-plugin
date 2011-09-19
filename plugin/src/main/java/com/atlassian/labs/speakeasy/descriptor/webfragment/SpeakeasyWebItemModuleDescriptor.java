@@ -1,5 +1,6 @@
 package com.atlassian.labs.speakeasy.descriptor.webfragment;
 
+import com.atlassian.labs.speakeasy.descriptor.ConditionGenerator;
 import com.atlassian.labs.speakeasy.descriptor.DescriptorGenerator;
 import com.atlassian.labs.speakeasy.descriptor.DescriptorGeneratorManager;
 import com.atlassian.labs.speakeasy.util.WebResourceUtil;
@@ -66,7 +67,7 @@ public class SpeakeasyWebItemModuleDescriptor extends AbstractModuleDescriptor<V
         descriptorGeneratorManager.unregisterGenerator(getPluginKey(), getKey());
     }
 
-    public Iterable<WebItemModuleDescriptor> getDescriptorsToExposeForUsers(List<String> users, long state)
+    public Iterable<WebItemModuleDescriptor> getDescriptorsToExposeForUsers(ConditionGenerator conditionGenerator, long state)
     {
         WebItemModuleDescriptor descriptor;
         try
@@ -101,7 +102,7 @@ public class SpeakeasyWebItemModuleDescriptor extends AbstractModuleDescriptor<V
         Element userElement = (Element) originalElement.clone();
         userElement.addAttribute("key", getStatefulKey(userElement.attributeValue("key"), state));
 
-        WebResourceUtil.addUsersCondition(users, userElement);
+        conditionGenerator.addConditionElement(userElement);
         resolveLinkPaths(state, userElement);
 
         descriptor.init(new AbstractDelegatingPlugin(getPlugin())

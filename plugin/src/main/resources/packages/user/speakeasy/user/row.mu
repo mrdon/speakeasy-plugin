@@ -1,4 +1,4 @@
-<tr data-pluginKey="{{key}}"
+<tr data-pluginKey="{{key}}" data-enabled="{{enabled}}"
         {{#fork}}
         class="forked-row"
         {{/fork}}
@@ -98,6 +98,12 @@
                             {{#canDownload}}
                             <li class="dropdown-item"><a class="item-link pk-gitcommands" data-extension="{{extension}}" href="/plugins/servlet/git/{{key}}.git">Git Commands</a></li>
                             {{/canDownload}}
+                            {{#canEnableGlobally}}
+                            <li class="dropdown-item"><a class="item-link pk-enableglobally" href="/rest/speakeasy/1/plugins/global/{{key}}">Enable Globally</a></li>
+                            {{/canEnableGlobally}}
+                            {{#canDisableGlobally}}
+                            <li class="dropdown-item"><a class="item-link pk-disableglobally" href="/rest/speakeasy/1/plugins/global/{{key}}">Disable Globally</a></li>
+                            {{/canDisableGlobally}}
                             </ul>
                         </div>
                     </li>

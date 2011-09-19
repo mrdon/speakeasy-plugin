@@ -11,6 +11,7 @@ var fork = require('./fork/fork');
 var pac = require('./pac/pac');
 var git = require('./git/git');
 var install = require('./install/install');
+var global = require('./global/global');
 var spinMaker = require('speakeasy/spinner');
 
 var pluginActions = {
@@ -32,7 +33,9 @@ var pluginActions = {
     },
     'gitcommands' : function (key, link, attachedRow) {
         git.viewCommands(key, getAbsoluteHref(link), link.attr("data-extension"), attachedRow);
-    }
+    },
+    'enableglobally' : global.enableGlobally,
+    'disableglobally' : global.disableGlobally
 };
 
 function getAbsoluteHref($link) {

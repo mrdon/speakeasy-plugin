@@ -1,6 +1,7 @@
 package com.atlassian.labs.speakeasy.git;
 
 import com.atlassian.labs.speakeasy.SpeakeasyService;
+import com.atlassian.labs.speakeasy.model.UserExtension;
 import com.atlassian.sal.api.user.UserManager;
 import com.atlassian.sal.api.user.UserProfile;
 import org.eclipse.jgit.lib.Repository;
@@ -38,7 +39,12 @@ public class Receive implements ReceivePackFactory<HttpServletRequest>
         String pluginKey = repo.getWorkTree().getName();
         UserProfile userProfile = userManager.getUserProfile(user);
 
-        ReceiveCommits rc = new ReceiveCommits(userProfile, speakeasyService.getRemotePlugin(pluginKey, user), repo, speakeasyService, gitRepositoryManager);
+        final UserExtension userExtension = speakeasyService.getRemotePlugin(pluginKey, user);
+        if (userExtension != null && !userExtension.isCanEdit())
+        {
+            throw new ServiceNotAuthorizedException();
+        }
+        ReceiveCommits rc = new ReceiveCommits(userProfile, userExtension, repo, speakeasyService, gitRepositoryManager);
         return rc.getReceivePack();
     }
 }

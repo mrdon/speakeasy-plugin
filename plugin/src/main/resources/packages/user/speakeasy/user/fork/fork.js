@@ -4,7 +4,7 @@ var dialog = require('speakeasy/dialog');
 
 exports.openDialog = function(pluginKey, link, attachedRow) {
     var desc = $.trim($('.plugin-description', attachedRow).text());
-    var pluginName = $('td[headers=plugin-name] .plugin-name', attachedRow).text();
+    var pluginName = $('td[headers="plugin-info"] .plugin-name', attachedRow).text();
     dialog.openOnePanelDialog({
         id : 'fork-dialog',
         width : 500,
