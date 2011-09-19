@@ -3,9 +3,12 @@ package com.atlassian.labs.speakeasy.git;
 import com.atlassian.labs.speakeasy.SpeakeasyService;
 import com.atlassian.labs.speakeasy.UnauthorizedAccessException;
 import com.atlassian.labs.speakeasy.manager.PluginOperationFailedException;
+import com.atlassian.plugin.PluginAccessor;
 import com.atlassian.sal.api.user.UserManager;
 import org.eclipse.jgit.http.server.GitServlet;
 import org.eclipse.jgit.lib.Repository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.servlet.Filter;
 import javax.servlet.FilterChain;
@@ -18,6 +21,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
+import static com.atlassian.labs.speakeasy.util.ExtensionValidate.isValidExtensionKey;
+import static javax.servlet.http.HttpServletResponse.SC_NOT_FOUND;
 import static org.eclipse.jgit.http.server.ServletUtils.ATTRIBUTE_REPOSITORY;
 
 /**
@@ -29,15 +34,19 @@ public class ExtensionGitServlet extends GitServlet
     private final SpeakeasyRepositoryResolver speakeasyRepositoryResolver;
     private final GitRepositoryManager gitRepositoryManager;
     private final UserManager userManager;
+    private final PluginAccessor pluginAccessor;
     private final Receive receive;
 
-    public ExtensionGitServlet(UserManager userManager, SpeakeasyService speakeasyService, SpeakeasyRepositoryResolver speakeasyRepositoryResolver, GitRepositoryManager gitRepositoryManager, Receive receive)
+    private static final Logger log = LoggerFactory.getLogger(ExtensionGitServlet.class);
+
+    public ExtensionGitServlet(UserManager userManager, SpeakeasyService speakeasyService, SpeakeasyRepositoryResolver speakeasyRepositoryResolver, GitRepositoryManager gitRepositoryManager, Receive receive, PluginAccessor pluginAccessor)
     {
         this.userManager = userManager;
         this.speakeasyService = speakeasyService;
         this.speakeasyRepositoryResolver = speakeasyRepositoryResolver;
         this.gitRepositoryManager = gitRepositoryManager;
         this.receive = receive;
+        this.pluginAccessor = pluginAccessor;
     }
 
     @Override
@@ -55,27 +64,48 @@ public class ExtensionGitServlet extends GitServlet
         String user = userManager.getRemoteUsername(req);
         if (user == null)
         {
-            rsp.setHeader("WWW-Authenticate","Basic realm=\"Speakeasy git server\"");
+            rsp.setHeader("WWW-Authenticate", "Basic realm=\"Speakeasy git server\"");
             rsp.sendError(HttpServletResponse.SC_UNAUTHORIZED, "");
         }
         else
         {
-            super.service(req,  rsp);
+            createIfNecessary(req);
+            super.service(req, rsp);
         }
     }
 
-    private abstract class AuthenticationFilter implements Filter
+    /**
+     * Creates a git repository if none exist for Speakeasy authors.  Unfortunately, in order to work, we have to do
+     * this on a GET request for the refs.
+     * @param req The request
+     */
+    private void createIfNecessary(HttpServletRequest req)
     {
-        public void init(FilterConfig filterConfig) throws ServletException
+        String curInfo = req.getPathInfo();
+        final String suffix = "/info/refs";
+        if (curInfo != null && curInfo.length() > 0 && curInfo.endsWith(suffix))
         {
-        }
+            String name = curInfo.substring(0, curInfo.length() - suffix.length());
+            if (name.length() > 0)
+            {
+                if (name.startsWith("/"))
+                {
+                    name = name.substring(1);
+                }
 
-        public void destroy()
-        {
+                String key = speakeasyRepositoryResolver.extractKeyFromUrl(name);
+                String user = userManager.getRemoteUsername(req);
+                if (pluginAccessor.getPlugin(key) == null && speakeasyService.canAuthorExtensions(user) && isValidExtensionKey(key))
+                {
+                    log.info("Creating new extension '" + key + "' via git push");
+                    // treat as a new plugin install
+                    gitRepositoryManager.ensureRepository(key);
+                }
+            }
         }
     }
 
-    private class UploadPackFilter extends AuthenticationFilter
+    private class UploadPackFilter implements Filter
     {
         public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException
         {
@@ -85,43 +115,13 @@ public class ExtensionGitServlet extends GitServlet
                 chain.doFilter(request, response);
             }
         }
-    }
 
-    private class ReceivePackFilter extends AuthenticationFilter
-    {
-        public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException
+        public void init(FilterConfig filterConfig) throws ServletException
         {
-            HttpServletRequest req = (HttpServletRequest) request;
-            String user = userManager.getRemoteUsername(req);
-            Repository repo = (Repository) request.getAttribute(ATTRIBUTE_REPOSITORY);
-            if (repo != null)
-            {
-                String pluginKey = repo.getWorkTree().getName();
-                if (speakeasyService.canAuthorExtensions(user) &&
-                        (!speakeasyService.doesPluginExist(pluginKey) || speakeasyService.canEditPlugin(pluginKey, user)))
-                {
-                    chain.doFilter(request, response);
-                    if (req.getRequestURI().endsWith("receive-pack"))
-                    {
-                        try
-                        {
-                            speakeasyService.installPlugin(
-                                    gitRepositoryManager.buildJarFromRepository(pluginKey),
-                                    pluginKey,
-                                    user);
-                        }
-                        catch (UnauthorizedAccessException e)
-                        {
-                            // should never happen
-                            throw new ServletException(e);
-                        }
-                        catch (PluginOperationFailedException ex)
-                        {
-                            throw new ServletException(ex);
-                        }
-                    }
-                }
-            }
+        }
+
+        public void destroy()
+        {
         }
     }
 }

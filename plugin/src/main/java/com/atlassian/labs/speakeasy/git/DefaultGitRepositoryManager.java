@@ -190,7 +190,7 @@ public class DefaultGitRepositoryManager implements DisposableBean, GitRepositor
         {
             git.commit().
                 setAll(true).
-                setAuthor(event.getUserName(), event.getUserEmail()). //"speakeasy", "speakeasy@atlassian.com").
+                setAuthor(event.getUserName(), event.getUserEmail()).
                 setCommitter("speakeasy", "speakeasy@atlassian.com").
                 setMessage(event.getMessage()).
                 call();
@@ -246,10 +246,13 @@ public class DefaultGitRepositoryManager implements DisposableBean, GitRepositor
             public File operateOn(Repository repo) throws Exception
             {
                 Git git = new Git(repo);
-                git.reset().setMode(ResetCommand.ResetType.HARD).setRef("HEAD").call();
-                for (String path : git.status().call().getUntracked())
+                if (repo.getAllRefs().containsKey("refs/heads/master"))
                 {
-                    new File(repo.getWorkTree(), path).delete();
+                    git.reset().setMode(ResetCommand.ResetType.HARD).setRef("HEAD").call();
+                    for (String path : git.status().call().getUntracked())
+                    {
+                        new File(repo.getWorkTree(), path).delete();
+                    }
                 }
                 return ZipWriter.addDirectoryContentsToJar(repo.getWorkTree(), ".git");
             }

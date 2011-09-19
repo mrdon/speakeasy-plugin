@@ -59,10 +59,9 @@ public class ReceiveCommits implements PreReceiveHook, PostReceiveHook
                 //
                 continue;
             }
-            if (!extension.isCanEdit())
+            if (extension != null && !extension.isCanEdit())
             {
                 reject(cmd, "You do not have author permissions on this extension");
-                continue;
             }
         }
     }
@@ -82,8 +81,8 @@ public class ReceiveCommits implements PreReceiveHook, PostReceiveHook
             try
             {
                 speakeasyService.installPlugin(
-                        gitRepositoryManager.buildJarFromRepository(extension.getKey()),
-                        extension.getKey(),
+                        gitRepositoryManager.buildJarFromRepository(repository.getWorkTree().getName()),
+                        repository.getWorkTree().getName(),
                         user.getUsername());
                 rp.sendMessage("");
                 rp.sendMessage("Your Speakeasy extension has been installed successfully");

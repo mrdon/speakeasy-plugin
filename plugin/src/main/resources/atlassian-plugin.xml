@@ -20,6 +20,10 @@
         <url-pattern>/speakeasy/restore</url-pattern>
     </servlet>
 
+    <servlet-filter key="fixAuthenticateHeader" class="com.atlassian.labs.speakeasy.git.FixAuthenticateHeaderFilter"
+            location="after-encoding">
+        <url-pattern>/plugins/servlet/git/*</url-pattern>
+    </servlet-filter>
     <servlet key="git-servlet" name="Git Repository Servlet"
              class="com.atlassian.labs.speakeasy.git.ExtensionGitServlet">
         <url-pattern>/git/*</url-pattern>

@@ -17,6 +17,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import javax.servlet.http.HttpServletRequest;
+import java.io.File;
+
+import static com.atlassian.labs.speakeasy.util.ExtensionValidate.isPureSpeakeasyExtension;
 
 /**
  *
@@ -41,9 +44,9 @@ public class SpeakeasyRepositoryResolver implements RepositoryResolver<HttpServl
 
     public Repository open(HttpServletRequest req, String name) throws RepositoryNotFoundException, ServiceNotAuthorizedException, ServiceNotEnabledException
     {
-        String pluginKey = name.endsWith(".git") ? name.substring(0, name.length() - 4) : name;
+        String pluginKey = extractKeyFromUrl(name);
         Plugin plugin = pluginAccessor.getPlugin(pluginKey);
-        if (plugin != null && ExtensionValidate.isPureSpeakeasyExtension(bundleContext, plugin))
+        if ((plugin != null && isPureSpeakeasyExtension(bundleContext, plugin)) || new File(gitRepositoryManager.getRepositoriesDir(), pluginKey).exists())
         {
             gitRepositoryManager.ensureRepository(pluginKey);
             return resolver.open(req, pluginKey);
@@ -52,5 +55,10 @@ public class SpeakeasyRepositoryResolver implements RepositoryResolver<HttpServl
         {
             throw new RepositoryNotFoundException(name);
         }
+    }
+
+    public String extractKeyFromUrl(String name)
+    {
+        return name.endsWith(".git") ? name.substring(0, name.length() - 4) : name;
     }
 }

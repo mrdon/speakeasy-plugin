@@ -38,6 +38,10 @@ public class ZipWriter
         {
             IOUtils.closeQuietly(zos);
         }
+        if (zipFile.length() == 0)
+        {
+            return null;
+        }
         return zipFile;
     }
 
