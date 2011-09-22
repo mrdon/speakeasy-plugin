@@ -34,7 +34,7 @@ public class TestFeedback
     @Before
     public void login()
     {
-        product.visit(LoginPage.class).loginAsSysAdmin(HomePage.class);
+        product.visit(LoginPage.class).loginAsSysAdmin(SpeakeasyUserPage.class);
     }
 
     @After
@@ -60,7 +60,7 @@ public class TestFeedback
     @Test
     public void testFeedbackInSpeakeasyUser() throws IOException, MessagingException
     {
-        product.visit(SpeakeasyUserPage.class)
+        product.getPageBinder().bind(SpeakeasyUserPage.class)
                 .openInstallDialog()
                 .uploadPlugin(buildSimplePluginFile("feedback", "Feedback collector"));
         logout();
@@ -87,7 +87,7 @@ public class TestFeedback
     @Test
     public void testReportBroken() throws IOException, MessagingException
     {
-        product.visit(SpeakeasyUserPage.class)
+        product.getPageBinder().bind(SpeakeasyUserPage.class)
                 .openInstallDialog()
                 .uploadPlugin(buildSimplePluginFile("broken", "Broken extension"));
         logout();

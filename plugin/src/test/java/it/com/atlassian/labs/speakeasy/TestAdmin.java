@@ -32,7 +32,7 @@ public class TestAdmin
     @Before
     public void login()
     {
-        product.visit(LoginPage.class).loginAsSysAdmin(HomePage.class);
+        product.visit(LoginPage.class).loginAsSysAdmin(AdminPage.class);
     }
 
     @After
@@ -44,7 +44,7 @@ public class TestAdmin
     @Test
     public void testAllowAdminsToEnable() throws IOException
     {
-        product.visit(AdminPage.class)
+        product.getPageBinder().bind(AdminPage.class)
                 .edit()
                     .allowAdmins(false)
                     .save();
@@ -133,7 +133,7 @@ public class TestAdmin
     @Test
     public void testRestrictAccessToGroups()
     {
-        final AdminPage admin = product.visit(AdminPage.class);
+        final AdminPage admin = product.getPageBinder().bind(AdminPage.class);
         Set<String> originalGroups = admin.getAccessGroups();
         admin.edit()
             .allowAdmins(false)
@@ -158,7 +158,7 @@ public class TestAdmin
     @Test
     public void testSearch()
     {
-        final AdminPage page = product.visit(AdminPage.class);
+        final AdminPage page = product.getPageBinder().bind(AdminPage.class);
         assertTrue(page.search("tests").contains("plugin-tests"));
         assertTrue(page.search("asdfweqasfdsdfweqasdf").isEmpty());
     }

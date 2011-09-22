@@ -69,9 +69,9 @@ public class ZipTransformer
         }
         return null;
     }
-    public JsonManifest readManifest(InputStream in)
+    public JsonManifest readManifest(String key, InputStream in)
     {
-        return jsonHandler.read(in);
+        return jsonHandler.read(key, in);
     }
 
     public void writeManifest(JsonManifest manifest, OutputStream out) throws IOException

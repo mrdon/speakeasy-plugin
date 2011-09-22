@@ -15,6 +15,7 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 
 import static com.google.common.collect.Lists.newArrayList;
+import static it.com.atlassian.labs.speakeasy.ExtensionBuilder.buildSimpleExtensionFile;
 import static java.util.Arrays.asList;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -30,7 +31,7 @@ public class TestConventionExtensions
     @Before
     public void login()
     {
-        product.visit(LoginPage.class).loginAsSysAdmin(HomePage.class);
+        product.visit(LoginPage.class).loginAsSysAdmin(SpeakeasyUserPage.class);
     }
 
     @After
@@ -42,26 +43,9 @@ public class TestConventionExtensions
     @Test
     public void testBasicConventionPlugin() throws IOException, URISyntaxException
     {
-         File jar = new PluginJarBuilder("ConventionZip")
-                .addFormattedResource("atlassian-extension.json",
-                        "{'key'         : 'test-convention',",
-                        " 'name'         : 'Test Convention',",
-                        " 'version'      : '1'",
-                        "}")
-                .addResource("js/", "")
-                .addResource("js/test/", "")
-                .addFile("js/test/foo.js", new File(getClass().getResource("/archetype/main.js").toURI()))
-                .addResource("css/", "")
-                .addFile("css/test-convention.css", new File(getClass().getResource("/archetype/main.css").toURI()))
-                .addResource("images/", "")
-                .addFile("images/projectavatar.png", new File(getClass().getResource("/archetype/projectavatar.png").toURI()))
-                .addResource("ui/", "")
-                .addFile("ui/web-items.json", new File(getClass().getResource("/archetype/web-items.json").toURI()))
-                .buildWithNoManifest();
-        File zip = new File(jar.getPath() + ".zip");
-        FileUtils.moveFile(jar, zip);
+         File zip = buildSimpleExtensionFile("test-convention");
 
-        product.visit(SpeakeasyUserPage.class)
+        product.getPageBinder().bind(SpeakeasyUserPage.class)
                 .openInstallDialog()
                 .uploadPlugin(zip)
                 .enablePlugin("test-convention");
@@ -83,7 +67,7 @@ public class TestConventionExtensions
     @Test
     public void testEditAndBreakWithJavascriptSyntaxErrorThenFixPlugin() throws IOException
     {
-        SpeakeasyUserPage page = product.visit(SpeakeasyUserPage.class)
+        SpeakeasyUserPage page = product.getPageBinder().bind(SpeakeasyUserPage.class)
                 .openInstallDialog()
                 .openCreateExtensionDialog()
                     .key("breakjs")

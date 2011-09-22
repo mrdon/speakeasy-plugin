@@ -22,6 +22,7 @@ import java.util.zip.ZipFile;
 import java.util.zip.ZipOutputStream;
 
 import static com.atlassian.labs.speakeasy.util.ExtensionValidate.isValidExtensionKey;
+import static com.atlassian.labs.speakeasy.util.KeyExtractor.createExtractableTempFile;
 import static java.util.Arrays.asList;
 
 /**
@@ -71,9 +72,9 @@ public abstract class AbstractOsgiPluginTypeHandler implements PluginTypeHandler
         return false;
     }
 
-    public final File createTempFile(String operation) throws IOException
+    public final File createTempFile(String pluginKey) throws IOException
     {
-        return File.createTempFile("speakeasy-" + operation + "-", "." + getExtension());
+        return createExtractableTempFile(pluginKey, "." + getExtension());
     }
 
     public final String canInstall(File file)
@@ -189,7 +190,7 @@ public abstract class AbstractOsgiPluginTypeHandler implements PluginTypeHandler
         File tmpFile = null;
         try
         {
-            tmpFile = createTempFile("create");
+            tmpFile = createTempFile(pluginKey);
             zout = new ZipOutputStream(new FileOutputStream(tmpFile));
 
             createExampleContents(zout, pluginKey, name, description);
@@ -206,14 +207,14 @@ public abstract class AbstractOsgiPluginTypeHandler implements PluginTypeHandler
     public File createFork(String pluginKey, final String forkPluginKey, String user, final String description) throws IOException
     {
         return gitRepositoryManager.operateOnRepository(pluginKey, new ReadOnlyOperation<Repository, File>()
-        {
+        { 
             public File operateOn(Repository repo) throws Exception
             {
                 ZipOutputStream zout = null;
                 File tmpFile = null;
                 try
                 {
-                    tmpFile = createTempFile("fork");
+                    tmpFile = createTempFile(forkPluginKey);
                     zout = new ZipOutputStream(new FileOutputStream(tmpFile));
                     final File repoDir = repo.getWorkTree();
                     List<String> bundlePaths = RepositoryDirectoryUtil.getEntries(repoDir);
@@ -244,7 +245,7 @@ public abstract class AbstractOsgiPluginTypeHandler implements PluginTypeHandler
         });
     }
 
-    public File rebuildPlugin(String pluginKey, final String fileName, final String contents) throws IOException
+    public File rebuildPlugin(final String pluginKey, final String fileName, final String contents) throws IOException
     {
         return gitRepositoryManager.operateOnRepository(pluginKey, new ReadOnlyOperation<Repository, File>()
         {
@@ -254,7 +255,7 @@ public abstract class AbstractOsgiPluginTypeHandler implements PluginTypeHandler
                 File tmpFile = null;
                 try
                 {
-                    tmpFile = createTempFile("edit");
+                    tmpFile = createTempFile(pluginKey);
                     zout = new ZipOutputStream(new FileOutputStream(tmpFile));
                     final File repoDir = repo.getWorkTree();
                     for (String path : RepositoryDirectoryUtil.getEntries(repoDir))

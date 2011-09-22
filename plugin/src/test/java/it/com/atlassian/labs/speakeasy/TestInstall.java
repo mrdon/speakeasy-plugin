@@ -27,7 +27,7 @@ public class TestInstall
     @Before
     public void login()
     {
-        product.visit(LoginPage.class).loginAsSysAdmin(HomePage.class);
+        product.visit(LoginPage.class).loginAsSysAdmin(SpeakeasyUserPage.class);
     }
 
     @After
@@ -41,45 +41,45 @@ public class TestInstall
     {
         File jar = buildSimplePluginFile();
 
-        SpeakeasyUserPage page = product.visit(SpeakeasyUserPage.class)
+        SpeakeasyUserPage page = product.getPageBinder().bind(SpeakeasyUserPage.class)
                 .openInstallDialog()
                 .uploadPlugin(jar);
 
         List<String> messages = page.getSuccessMessages();
         assertEquals(1, messages.size());
         assertTrue(messages.get(0).contains("Test Plugin"));
-        assertTrue(page.getPluginKeys().contains("test-2"));
+        assertTrue(page.getPluginKeys().contains("test2"));
 
-        SpeakeasyUserPage.PluginRow row = page.getPlugins().get("test-2");
+        SpeakeasyUserPage.PluginRow row = page.getPlugins().get("test2");
         assertNotNull(row);
-        assertEquals("test-2", row.getKey());
+        assertEquals("test2", row.getKey());
         assertEquals("Test Plugin", row.getName());
         assertEquals("Desc", row.getDescription());
         assertEquals("A. D. Ministrator (Sysadmin)", row.getAuthor());
-        assertTrue(page.canExecute("test-2", ExtensionOperations.UNINSTALL));
-        assertTrue(page.canExecute("test-2", ExtensionOperations.EDIT));
-        assertTrue(page.canExecute("test-2", ExtensionOperations.DOWNLOAD));
-        assertTrue(page.canExecute("test-2", ExtensionOperations.FORK));
+        assertTrue(page.canExecute("test2", ExtensionOperations.UNINSTALL));
+        assertTrue(page.canExecute("test2", ExtensionOperations.EDIT));
+        assertTrue(page.canExecute("test2", ExtensionOperations.DOWNLOAD));
+        assertTrue(page.canExecute("test2", ExtensionOperations.FORK));
 
 
         // verify on reload
         page = product.visit(SpeakeasyUserPage.class);
-        assertTrue(page.getPluginKeys().contains("test-2"));
+        assertTrue(page.getPluginKeys().contains("test2"));
 
-        row = page.getPlugins().get("test-2");
+        row = page.getPlugins().get("test2");
         assertNotNull(row);
-        assertEquals("test-2", row.getKey());
+        assertEquals("test2", row.getKey());
         assertEquals("Test Plugin", row.getName());
         assertEquals("Desc", row.getDescription());
         assertEquals("A. D. Ministrator (Sysadmin)", row.getAuthor());
-        page.uninstallPlugin("test-2");
+        page.uninstallPlugin("test2");
     }
 
     @Test
     @Ignore
     public void testInstallLotsOfPlugin() throws IOException
     {
-        SpeakeasyUserPage page = product.visit(SpeakeasyUserPage.class);
+        SpeakeasyUserPage page = product.getPageBinder().bind(SpeakeasyUserPage.class);
         for (int x=0; x < 100; x++)
         {
             File jar = buildSimplePluginFile("test-" + x, "Test " + x);

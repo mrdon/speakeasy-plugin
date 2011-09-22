@@ -17,6 +17,7 @@ import java.util.Set;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
+import static com.atlassian.labs.speakeasy.util.KeyExtractor.createExtractableTempFile;
 import static com.google.common.collect.Sets.newHashSet;
 
 /**
@@ -26,7 +27,7 @@ public class ZipWriter
 {
     public static File addDirectoryContentsToJar(File dir, String... pathsToExclude) throws IOException
     {
-        File zipFile = File.createTempFile("speakeasy-", ".jar");
+        File zipFile = createExtractableTempFile(dir.getName(), ".jar");
         Set<String> excludes = newHashSet(pathsToExclude);
         ZipOutputStream zos = null;
         try

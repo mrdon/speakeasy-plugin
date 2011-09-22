@@ -30,7 +30,7 @@ public class TestCommonJsModules
     @Before
     public void login()
     {
-        product.visit(LoginPage.class).loginAsSysAdmin(HomePage.class);
+        product.visit(LoginPage.class).loginAsSysAdmin(SpeakeasyUserPage.class);
     }
 
     @After
@@ -42,7 +42,7 @@ public class TestCommonJsModules
     @Test
     public void testExports()
     {
-        CommonJsModulesTab tab = product.visit(SpeakeasyUserPage.class)
+        CommonJsModulesTab tab = product.getPageBinder().bind(SpeakeasyUserPage.class)
                 .viewCommonJsModulesTab();
         assertEquals(newArrayList("sayHi"), tab.getExportNames("test/my-module"));
         assertTrue(tab.getExportNames("test/private").isEmpty());
@@ -67,7 +67,7 @@ public class TestCommonJsModules
                         "    $('<h1 />').attr('id', 'foo').html(name).prependTo('body');",
                         "});")
                 .build();
-        product.visit(SpeakeasyUserPage.class)
+        product.getPageBinder().bind(SpeakeasyUserPage.class)
                 .openInstallDialog()
                 .uploadPlugin(host)
                 .openInstallDialog()

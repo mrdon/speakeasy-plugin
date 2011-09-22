@@ -67,7 +67,7 @@ public class ZipPluginTypeHandler extends AbstractOsgiPluginTypeHandler implemen
     @Override
     protected void forkDescriptor(InputStream original, OutputStream output, String key, String description) throws IOException
     {
-        JsonManifest mf = zipTransformer.readManifest(original);
+        JsonManifest mf = zipTransformer.readManifest(key, original);
         mf.setKey(key);
         mf.setDescription(description);
         zipTransformer.writeManifest(mf, output);

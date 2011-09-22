@@ -36,6 +36,9 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.List;
 
+import static com.atlassian.labs.speakeasy.util.KeyExtractor.createExtractableTempFile;
+import static com.atlassian.labs.speakeasy.util.KeyExtractor.extractFromFilename;
+
 /**
  *
  */
@@ -321,7 +324,9 @@ public class PluginsResource
                 {
                     try
                     {
-                        pluginFile = File.createTempFile("speakeasy-", processFileName(item.getName()));
+                        String fileName = processFileName(item.getName());
+                        String key = extractFromFilename(fileName);
+                        pluginFile = createExtractableTempFile(key, fileName);
                         item.write(pluginFile);
                     }
                     catch (Exception e)

@@ -41,7 +41,7 @@ public class TestUserProfile
     @Before
     public void login()
     {
-        product.visit(LoginPage.class).loginAsSysAdmin(HomePage.class);
+        product.visit(LoginPage.class).loginAsSysAdmin(SpeakeasyUserPage.class);
     }
 
     @After
@@ -64,7 +64,7 @@ public class TestUserProfile
     @Test
     public void testPluginList()
     {
-        List<String> pluginKeys = product.visit(SpeakeasyUserPage.class)
+        List<String> pluginKeys = product.getPageBinder().bind(SpeakeasyUserPage.class)
                 .getPluginKeys();
         assertTrue(pluginKeys.size() > 0);
         assertTrue(pluginKeys.contains("plugin-tests"));
@@ -73,7 +73,7 @@ public class TestUserProfile
     @Test
     public void testEditPlugin() throws IOException
     {
-        SpeakeasyUserPage page = product.visit(SpeakeasyUserPage.class)
+        SpeakeasyUserPage page = product.getPageBinder().bind(SpeakeasyUserPage.class)
                 .openInstallDialog()
                     .uploadPlugin(startSimpleBuilder("edit", "Edit").addFormattedResource("foo-min.js", "var bar;").build());
         IdeDialog ide =  page.openEditDialog("edit");
@@ -97,7 +97,7 @@ public class TestUserProfile
     @Test
     public void testViewSourceOnPlugin() throws IOException
     {
-        IdeDialog ide = product.visit(SpeakeasyUserPage.class)
+        IdeDialog ide = product.getPageBinder().bind(SpeakeasyUserPage.class)
                 .openInstallDialog()
                 .uploadPlugin(
                         startSimpleBuilder("viewsource", "View Source")
@@ -114,7 +114,7 @@ public class TestUserProfile
     @Test
     public void testEditAndBreakThenFixPlugin() throws IOException
     {
-        product.visit(SpeakeasyUserPage.class)
+        product.getPageBinder().bind(SpeakeasyUserPage.class)
                 .openInstallDialog()
                 .uploadPlugin(buildSimplePluginFile());
 
@@ -122,33 +122,33 @@ public class TestUserProfile
         IdeDialog ide =  product.visit(SpeakeasyUserPage.class)
                 .openInstallDialog()
                 .uploadPlugin(buildSimplePluginFile())
-                .openEditDialog("test-2")
+                .openEditDialog("test2")
                 .editAndSaveFile("modules/test.js", "require('nonexistent/module');", "nonexistent/module");
 
         assertTrue(ide.getStatus().contains("nonexistent/module"));
 
         SpeakeasyUserPage page = ide.done();
-        assertTrue(page.getPlugins().get("test-2").getDescription().contains("nonexistent/module"));
+        assertTrue(page.getPlugins().get("test2").getDescription().contains("nonexistent/module"));
 
         // break by changing the plugin key
-        ide = page.openEditDialog("test-2");
+        ide = page.openEditDialog("test2");
         final String oldXml = ide.getFileContents("atlassian-plugin.xml");
         page = ide
                 .editAndSaveFile("modules/test.js", "require('speakeasy/jquery');")
                 .editAndSaveFile("atlassian-plugin.xml",
-                        oldXml.replaceAll("test-2", "test-3"), "Unable to install")
+                        oldXml.replaceAll("test2", "test-3"), "Unable to install")
                 .editAndSaveFile("atlassian-plugin.xml", oldXml)
                 .done();
 
 
-        assertEquals("Desc", page.getPlugins().get("test-2").getDescription());
-        page.uninstallPlugin("test-2");
+        assertEquals("Desc", page.getPlugins().get("test2").getDescription());
+        page.uninstallPlugin("test2");
     }
 
     @Test
     public void testDownloadPluginJarAsAmpsProject() throws IOException
     {
-        final SpeakeasyUserPage page = product.visit(SpeakeasyUserPage.class)
+        final SpeakeasyUserPage page = product.getPageBinder().bind(SpeakeasyUserPage.class)
                 .openInstallDialog()
                 .uploadPlugin(
                         buildSimplePluginFile("download.jar-project", "Download Jar"));
@@ -192,7 +192,7 @@ public class TestUserProfile
     public void testDownloadPluginJarAsExtension() throws IOException
     {
         final SpeakeasyUserPage page = product.
-                visit(SpeakeasyUserPage.class).
+                getPageBinder().bind(SpeakeasyUserPage.class).
                 openInstallDialog().
                 uploadPlugin(buildSimplePluginFile("download.jar-file", "Jar File"));
         File file = page
@@ -229,7 +229,7 @@ public class TestUserProfile
     @Test
     public void testEnableTestPlugin() throws IOException
     {
-        SpeakeasyUserPage page = product.visit(SpeakeasyUserPage.class);
+        SpeakeasyUserPage page = product.getPageBinder().bind(SpeakeasyUserPage.class);
 
         assertEquals(0, page.getPlugins().get("plugin-tests").getUsers());
         PluginTestActivated activated = product.getPageBinder().bind(PluginTestActivated.class);
@@ -260,34 +260,34 @@ public class TestUserProfile
     {
         File jar = buildSimplePluginFile();
 
-        product.visit(SpeakeasyUserPage.class)
+        product.getPageBinder().bind(SpeakeasyUserPage.class)
                 .openInstallDialog()
                 .uploadPlugin(jar);
 
         logout();
         SpeakeasyUserPage page = product.visit(LoginPage.class)
                .login("barney", "barney", SpeakeasyUserPage.class)
-               .enablePlugin("test-2");
+               .enablePlugin("test2");
 
         assertEmailExists(mailServer, "admin@example.com", "Barney User has enabled ", asList("you may want to try", "Test Plugin"));
 
-        page.disablePlugin("test-2");
+        page.disablePlugin("test2");
         logout();
 
         product.visit(LoginPage.class)
            .loginAsSysAdmin(SpeakeasyUserPage.class)
-           .enablePlugin("test-2");
+           .enablePlugin("test2");
         logout();
         page = product.visit(LoginPage.class)
                .login("barney", "barney", SpeakeasyUserPage.class)
-               .enablePlugin("test-2");
+               .enablePlugin("test2");
 
         assertEmailExists(mailServer, "admin@example.com", "Barney User has enabled your Speakeasy extension!", asList("extensions in common", "Test Plugin"));
-        page.disablePlugin("test-2");
+        page.disablePlugin("test2");
         logout();
         product.visit(LoginPage.class)
            .loginAsSysAdmin(SpeakeasyUserPage.class)
-           .uninstallPlugin("test-2");
+           .uninstallPlugin("test2");
     }
 
     @Test
@@ -295,7 +295,7 @@ public class TestUserProfile
     {
         File jar = buildSimplePluginFile("test", "First Plugin");
 
-        SpeakeasyUserPage page = product.visit(SpeakeasyUserPage.class)
+        SpeakeasyUserPage page = product.getPageBinder().bind(SpeakeasyUserPage.class)
                 .openInstallDialog()
                     .uploadPlugin(jar)
                 .openInstallDialog()
@@ -327,9 +327,9 @@ public class TestUserProfile
     public void testForkPlugin() throws IOException, MessagingException
     {
         File jar = buildSimplePluginFile("test", "First Plugin");
-        File jar2 = buildSimplePluginFile("test-2", "Second Plugin");
+        File jar2 = buildSimplePluginFile("test2", "Second Plugin");
 
-        product.visit(SpeakeasyUserPage.class)
+        product.getPageBinder().bind(SpeakeasyUserPage.class)
                 .openInstallDialog()
                 .uploadPlugin(jar)
                 .openInstallDialog()
@@ -341,62 +341,62 @@ public class TestUserProfile
                 .openForkDialog("test")
                     .setDescription("Fork Description")
                     .fork()
-                .enablePlugin("test-2")
-                .openForkDialog("test-2")
+                .enablePlugin("test2")
+                .openForkDialog("test2")
                     .setDescription("Fork\' \"Description\"")
                     .fork();
 
         List<String> messages = page.getSuccessMessages();
         assertEquals(1, messages.size());
         assertTrue(messages.get(0).contains("was forked successfully"));
-        assertTrue(page.getPluginKeys().contains("test-2-fork-barney"));
+        assertTrue(page.getPluginKeys().contains("test2-fork-barney"));
         assertEmailExists(mailServer, "admin@example.com", "Barney User has forked your Speakeasy extension!", asList(
                 "'Second Plugin'",
                 "First Plugin by A. D. Ministrator (Sysadmin)"));
 
         assertFalse(page.canExecute("test", ExtensionOperations.FORK));
-        assertFalse(page.canExecute("test-2", ExtensionOperations.FORK));
+        assertFalse(page.canExecute("test2", ExtensionOperations.FORK));
 
-        SpeakeasyUserPage.PluginRow row = page.getPlugins().get("test-2-fork-barney");
-        assertEquals("test-2-fork-barney", row.getKey());
+        SpeakeasyUserPage.PluginRow row = page.getPlugins().get("test2-fork-barney");
+        assertEquals("test2-fork-barney", row.getKey());
         assertEquals("Fork\' \"Description\"", row.getDescription());
-        assertFalse(page.isPluginEnabled("test-2"));
-        assertTrue(page.isPluginEnabled("test-2-fork-barney"));
-        assertTrue(page.canExecute("test-2-fork-barney", ExtensionOperations.UNINSTALL));
-        assertTrue(!page.canExecute("test-2-fork-barney", ExtensionOperations.FORK));
-        assertTrue(page.canExecute("test-2-fork-barney", ExtensionOperations.DOWNLOAD));
-        assertTrue(page.canExecute("test-2-fork-barney", ExtensionOperations.EDIT));
-        assertTrue(!page.canExecute("test-2", ExtensionOperations.UNINSTALL));
+        assertFalse(page.isPluginEnabled("test2"));
+        assertTrue(page.isPluginEnabled("test2-fork-barney"));
+        assertTrue(page.canExecute("test2-fork-barney", ExtensionOperations.UNINSTALL));
+        assertTrue(!page.canExecute("test2-fork-barney", ExtensionOperations.FORK));
+        assertTrue(page.canExecute("test2-fork-barney", ExtensionOperations.DOWNLOAD));
+        assertTrue(page.canExecute("test2-fork-barney", ExtensionOperations.EDIT));
+        assertTrue(!page.canExecute("test2", ExtensionOperations.UNINSTALL));
 
-        page.enablePlugin("test-2");
-        assertFalse(page.isPluginEnabled("test-2-fork-barney"));
-        page.enablePlugin("test-2-fork-barney");
-        assertFalse(page.isPluginEnabled("test-2"));
+        page.enablePlugin("test2");
+        assertFalse(page.isPluginEnabled("test2-fork-barney"));
+        page.enablePlugin("test2-fork-barney");
+        assertFalse(page.isPluginEnabled("test2"));
 
         // verify on reload
         page = product.visit(SpeakeasyUserPage.class);
-        assertTrue(page.getPluginKeys().contains("test-2-fork-barney"));
+        assertTrue(page.getPluginKeys().contains("test2-fork-barney"));
 
-        row = page.getPlugins().get("test-2-fork-barney");
-        assertEquals("test-2-fork-barney", row.getKey());
+        row = page.getPlugins().get("test2-fork-barney");
+        assertEquals("test2-fork-barney", row.getKey());
         assertEquals("Fork\' \"Description\"", row.getDescription());
 
-        page.uninstallPlugin("test-2-fork-barney");
-        assertTrue(page.isPluginEnabled("test-2"));
-        assertTrue(product.visit(SpeakeasyUserPage.class).isPluginEnabled("test-2"));
+        page.uninstallPlugin("test2-fork-barney");
+        assertTrue(page.isPluginEnabled("test2"));
+        assertTrue(product.visit(SpeakeasyUserPage.class).isPluginEnabled("test2"));
         page.uninstallPlugin("test-fork-barney");
 
         logout();
         product.visit(LoginPage.class)
                .loginAsSysAdmin(SpeakeasyUserPage.class)
-               .uninstallPlugin("test-2")
+               .uninstallPlugin("test2")
                .uninstallPlugin("test");
     }
 
     @Test
     public void testForkZipPlugin() throws IOException, MessagingException
     {
-        product.visit(SpeakeasyUserPage.class)
+        product.getPageBinder().bind(SpeakeasyUserPage.class)
                 .openInstallDialog()
                 .openCreateExtensionDialog()
                     .key("tofork-zip")
@@ -429,25 +429,25 @@ public class TestUserProfile
     {
         File jar = buildSimplePluginFile();
 
-        SpeakeasyUserPage page = product.visit(SpeakeasyUserPage.class)
+        SpeakeasyUserPage page = product.getPageBinder().bind(SpeakeasyUserPage.class)
                 .openInstallDialog()
                 .uploadPlugin(jar)
-                .enablePlugin("test-2")
+                .enablePlugin("test2")
                 .enablePlugin("plugin-tests");
 
-        assertTrue(page.isPluginEnabled("test-2"));
+        assertTrue(page.isPluginEnabled("test2"));
         assertTrue(page.isPluginEnabled("plugin-tests"));
 
         page = page.unsubscribeFromAllPlugins();
 
-        assertFalse(page.isPluginEnabled("test-2"));
+        assertFalse(page.isPluginEnabled("test2"));
         assertFalse(page.isPluginEnabled("plugin-tests"));
 
         page = page.restoreEnabledPlugins();
 
-        assertTrue(page.isPluginEnabled("test-2"));
+        assertTrue(page.isPluginEnabled("test2"));
         assertTrue(page.isPluginEnabled("plugin-tests"));
-        page.uninstallPlugin("test-2")
+        page.uninstallPlugin("test2")
             .disablePlugin("plugin-tests");
     }
 
@@ -464,7 +464,7 @@ public class TestUserProfile
                         "</atlassian-plugin>")
                 .build();
 
-        SpeakeasyUserPage page = product.visit(SpeakeasyUserPage.class)
+        SpeakeasyUserPage page = product.getPageBinder().bind(SpeakeasyUserPage.class)
                 .openInstallDialog()
                 .uploadPluginExpectingFailure(jar);
 
@@ -492,7 +492,7 @@ public class TestUserProfile
                 .addFormattedResource("modules/foo.js", "require('speakeasy/user/user');")
                 .build();
 
-        SpeakeasyUserPage page = product.visit(SpeakeasyUserPage.class)
+        SpeakeasyUserPage page = product.getPageBinder().bind(SpeakeasyUserPage.class)
                 .openInstallDialog()
                 .uploadPluginExpectingFailure(jar);
 
@@ -510,28 +510,28 @@ public class TestUserProfile
     {
         File jar = buildSimplePluginFile();
 
-        product.visit(SpeakeasyUserPage.class)
+        product.getPageBinder().bind(SpeakeasyUserPage.class)
                 .openInstallDialog()
                 .uploadPlugin(jar);
 
         SpeakeasyUserPage page = product.visit(SpeakeasyUserPage.class);
-        assertTrue(page.getPluginKeys().contains("test-2"));
-        assertTrue(page.canExecute("test-2", ExtensionOperations.UNINSTALL));
-        page.uninstallPlugin("test-2");
+        assertTrue(page.getPluginKeys().contains("test2"));
+        assertTrue(page.canExecute("test2", ExtensionOperations.UNINSTALL));
+        page.uninstallPlugin("test2");
         List<String> messages = page.getSuccessMessages();
         assertEquals(1, messages.size());
         assertTrue(messages.get(0).contains("uninstalled"));
-        assertFalse(page.getPluginKeys().contains("test-2"));
+        assertFalse(page.getPluginKeys().contains("test2"));
 
         // verify on reload
         page = product.visit(SpeakeasyUserPage.class);
-        assertFalse(page.getPluginKeys().contains("test-2"));
+        assertFalse(page.getPluginKeys().contains("test2"));
     }
 
     @Test
     public void testActionsIfNotAuthorAndNotPureSpeakeasy() throws IOException
     {
-        SpeakeasyUserPage page = product.visit(SpeakeasyUserPage.class);
+        SpeakeasyUserPage page = product.getPageBinder().bind(SpeakeasyUserPage.class);
         assertTrue(page.getPluginKeys().contains("plugin-tests"));
         assertFalse(page.canExecute("plugin-tests", ExtensionOperations.UNINSTALL));
         assertFalse(page.canExecute("plugin-tests", ExtensionOperations.DOWNLOAD));

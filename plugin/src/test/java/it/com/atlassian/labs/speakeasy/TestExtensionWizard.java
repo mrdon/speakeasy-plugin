@@ -26,7 +26,7 @@ public class TestExtensionWizard
     @Before
     public void login()
     {
-        product.visit(LoginPage.class).loginAsSysAdmin(HomePage.class);
+        product.visit(LoginPage.class).loginAsSysAdmin(SpeakeasyUserPage.class);
     }
 
     @After
@@ -38,7 +38,7 @@ public class TestExtensionWizard
     @Test
     public void testCreate() throws IOException
     {
-        SpeakeasyUserPage page = product.visit(SpeakeasyUserPage.class)
+        SpeakeasyUserPage page = product.getPageBinder().bind(SpeakeasyUserPage.class)
                 .openInstallDialog()
                 .openCreateExtensionDialog()
                     .key("myextension")
@@ -57,7 +57,7 @@ public class TestExtensionWizard
     @Test
     public void testEditPlugin() throws IOException
     {
-        product.visit(SpeakeasyUserPage.class)
+        product.getPageBinder().bind(SpeakeasyUserPage.class)
                 .openInstallDialog()
                 .openCreateExtensionDialog()
                     .key("myextension")
