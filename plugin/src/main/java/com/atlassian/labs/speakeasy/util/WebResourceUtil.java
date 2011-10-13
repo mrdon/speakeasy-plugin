@@ -1,16 +1,13 @@
 package com.atlassian.labs.speakeasy.util;
 
 import com.atlassian.labs.speakeasy.descriptor.SpeakeasyWebResourceModuleDescriptor;
-import com.atlassian.labs.speakeasy.descriptor.UserScopedCondition;
 import com.atlassian.plugin.ModuleDescriptor;
 import com.atlassian.plugin.Plugin;
 import com.atlassian.plugin.hostcontainer.HostContainer;
 import com.atlassian.plugin.webresource.WebResourceModuleDescriptor;
-import org.apache.commons.lang.StringUtils;
 import org.dom4j.Element;
 
 import java.lang.reflect.InvocationTargetException;
-import java.util.List;
 
 /**
  *
@@ -60,15 +57,6 @@ public class WebResourceUtil
             }
         }
         return descriptor;
-    }
-
-    public static void addUsersCondition(List<String> users, Element userElement)
-    {
-        Element condElement = userElement.addElement("condition");
-        condElement.addAttribute("class", UserScopedCondition.class.getName());
-        Element paramElement = condElement.addElement("param");
-        paramElement.addAttribute("name", "users");
-        paramElement.setText(users != null ? StringUtils.join(users, "|") : "");
     }
 
     public static void resolveDependency(Plugin plugin, Element dep, long state)

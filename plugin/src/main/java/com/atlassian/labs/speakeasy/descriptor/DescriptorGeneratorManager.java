@@ -1,6 +1,7 @@
 package com.atlassian.labs.speakeasy.descriptor;
 
 import com.atlassian.labs.speakeasy.data.SpeakeasyData;
+import com.atlassian.labs.speakeasy.manager.SettingsManager;
 import com.atlassian.plugin.ModuleDescriptor;
 import com.atlassian.plugin.PluginAccessor;
 import com.atlassian.plugin.PluginController;
@@ -26,6 +27,7 @@ import static com.google.common.collect.Lists.newArrayList;
 public class DescriptorGeneratorManager
 {
     private final SpeakeasyData data;
+    private final SettingsManager settingsManager;
     private final PluginAccessor pluginAccessor;
     private final BundleContext bundleContext;
     private final Map<String, Registration> registrations;
@@ -33,12 +35,13 @@ public class DescriptorGeneratorManager
 
 
     @Autowired
-    public DescriptorGeneratorManager(SpeakeasyData data, PluginAccessor pluginAccessor, BundleContext bundleContext, PluginController pluginController)
+    public DescriptorGeneratorManager(SpeakeasyData data, PluginAccessor pluginAccessor, BundleContext bundleContext, PluginController pluginController, SettingsManager settingsManager)
     {
         this.data = data;
         this.pluginAccessor = pluginAccessor;
         this.bundleContext = bundleContext;
         this.pluginController = pluginController;
+        this.settingsManager = settingsManager;
         this.registrations = new ConcurrentHashMap<String, Registration>();
     }
 
@@ -52,7 +55,7 @@ public class DescriptorGeneratorManager
         Bundle targetBundle = findBundleForPlugin(bundleContext, pluginKey);
         List<ModuleDescriptor> generatedDescriptors = new ArrayList<ModuleDescriptor>();
         List<ServiceRegistration> serviceRegistrations = newArrayList();
-        ConditionGenerator conditionGenerator = data.isGlobalExtension(pluginKey) ? new GlobalConditionGenerator() :
+        ConditionGenerator conditionGenerator = data.isGlobalExtension(pluginKey) ? new GroupsConditionGenerator(settingsManager.getSettings().getAccessGroups()) :
                 new UsersConditionGenerator(data.getUsersList(pluginKey));
         for (ModuleDescriptor generatedDescriptor : descriptorGenerator.getDescriptorsToExposeForUsers(conditionGenerator, targetBundle.getLastModified()))
         {

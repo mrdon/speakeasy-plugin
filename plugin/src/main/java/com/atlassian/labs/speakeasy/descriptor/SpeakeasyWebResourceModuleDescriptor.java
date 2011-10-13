@@ -123,6 +123,10 @@ public class SpeakeasyWebResourceModuleDescriptor extends AbstractModuleDescript
                 {
                     return (Class<T>) UserScopedCondition.class;
                 }
+                else if (clazz.equals(GroupScopedCondition.class.getName()))
+                {
+                    return (Class<T>) GroupScopedCondition.class;
+                }
                 else
                 {
                     return super.loadClass(clazz, callingClass);
