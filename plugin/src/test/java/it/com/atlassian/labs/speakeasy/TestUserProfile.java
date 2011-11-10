@@ -1,7 +1,6 @@
 package it.com.atlassian.labs.speakeasy;
 
 import com.atlassian.pageobjects.TestedProduct;
-import com.atlassian.pageobjects.page.HomePage;
 import com.atlassian.pageobjects.page.LoginPage;
 import com.atlassian.plugin.test.PluginJarBuilder;
 import com.atlassian.plugin.util.zip.FileUnzipper;
@@ -234,7 +233,7 @@ public class TestUserProfile
         assertEquals(0, page.getPlugins().get("plugin-tests").getUsers());
         PluginTestActivated activated = product.getPageBinder().bind(PluginTestActivated.class);
         assertFalse(activated.isBannerVisible());
-        assertTrue(activated.isUploadDialogVisible());
+        assertTrue(activated.isChangesLinkVisible());
         assertFalse(activated.isGoogleLinkVisible());
         page.enablePlugin("plugin-tests");
         assertEquals(1, page.getPlugins().get("plugin-tests").getUsers());
@@ -242,7 +241,7 @@ public class TestUserProfile
         assertEquals(1, page.getPlugins().get("plugin-tests").getUsers());
         activated.waitForBanner();
         assertTrue(activated.isBannerVisible());
-        assertFalse(activated.isUploadDialogVisible());
+        assertFalse(activated.isChangesLinkVisible());
         assertTrue(activated.isGoogleLinkVisible());
         page.disablePlugin("plugin-tests");
         assertEquals(0, page.getPlugins().get("plugin-tests").getUsers());
@@ -250,7 +249,7 @@ public class TestUserProfile
         assertEquals(0, page.getPlugins().get("plugin-tests").getUsers());
         activated = product.getPageBinder().bind(PluginTestActivated.class);
         assertFalse(activated.isBannerVisible());
-        assertTrue(activated.isUploadDialogVisible());
+        assertTrue(activated.isChangesLinkVisible());
         assertFalse(activated.isGoogleLinkVisible());
     }
 
@@ -422,6 +421,18 @@ public class TestUserProfile
         product.visit(LoginPage.class)
                .loginAsSysAdmin(SpeakeasyUserPage.class)
                .uninstallPlugin("tofork-zip");
+    }
+
+    @Test
+    public void testCustomInstallLink() throws IOException
+    {
+        product.getPageBinder().bind(SpeakeasyUserPage.class)
+                .enablePlugin("plugin-tests");
+        SpeakeasyUserPage page = product.visit(SpeakeasyUserPage.class)
+                .openInstallDialog()
+                .clickCustomLink();
+        assertTrue(!page.getSuccessMessages().isEmpty());
+        page.disablePlugin("plugin-tests");
     }
 
     @Test

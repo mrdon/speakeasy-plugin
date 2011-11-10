@@ -1,5 +1,6 @@
 package it.com.atlassian.labs.speakeasy;
 
+import com.atlassian.jira.functest.framework.admin.plugins.Plugins;
 import com.atlassian.pageobjects.PageBinder;
 import com.atlassian.pageobjects.ProductInstance;
 import com.atlassian.pageobjects.binder.Init;
@@ -73,5 +74,17 @@ public class InstallDialog
         pluginFileUploadSubmit.click();
         driver.waitUntilElementIsNotLocated(By.id("install-dialog"));
         messagesBar.waitForMessages();
+    }
+
+    public SpeakeasyUserPage clickCustomLink()
+    {
+        driver.findElement(By.id("custom-install-link")).click();
+        return pageBinder.bind(SpeakeasyUserPage.class);
+    }
+
+    public SpeakeasyUserPage cancel()
+    {
+        driver.findElement(By.linkText("Cancel")).click();
+        return pageBinder.bind(SpeakeasyUserPage.class);
     }
 }

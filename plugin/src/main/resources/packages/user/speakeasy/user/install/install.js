@@ -1,6 +1,21 @@
+/**
+ * Handles install operations
+ * @public
+ */
+
 var $ = require('speakeasy/jquery').jQuery;
 var messages = require('speakeasy/messages');
 var wizard = require('../wizard/create');
+
+var installLinks = [];
+
+function addInstallLink(id, label, clickFunc) {
+  installLinks.push({
+    id : id,
+    label : label,
+    onclick : clickFunc
+  });
+}
 
 function successSubmit(response, status, xhr, $form) {
     var pluginsTable = $('#plugins-table');
@@ -27,7 +42,8 @@ function openDialog() {
     var dialogContents = require('./install-dialog').render({
                                     submitUrl : contextPath + "/rest/speakeasy/1/plugins",
                                     xsrfTokenName : xsrfTokenName,
-                                    xsrfToken : xsrfToken
+                                    xsrfToken : xsrfToken,
+                                    installLinks : installLinks
                                    });
     dialog.addPanel("Install", dialogContents, "panel-body");
     dialog.addCancel("Cancel", function() {
@@ -59,6 +75,16 @@ function openDialog() {
         });
     };
 
+    $.each(installLinks, function() {
+        var link = this;
+        $('#' + link.id).click(function(e) {
+            e.preventDefault();
+            dialog.remove();
+            link.onclick(e);
+        });
+
+    });
+
     $('#extension-wizard-link').click(function(e) {
         e.preventDefault();
         dialog.remove();
@@ -71,3 +97,4 @@ function openDialog() {
 }
 
 exports.openDialog = openDialog;
+exports.addInstallLink = addInstallLink;

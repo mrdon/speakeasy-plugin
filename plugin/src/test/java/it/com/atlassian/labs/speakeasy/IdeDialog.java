@@ -8,9 +8,11 @@ import com.atlassian.webdriver.utils.JavaScriptUtils;
 import com.google.common.base.Function;
 import org.apache.http.impl.client.RedirectLocations;
 import org.openqa.selenium.By;
+import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 
+import javax.annotation.Nullable;
 import javax.inject.Inject;
 import java.util.ArrayList;
 import java.util.List;
@@ -81,6 +83,13 @@ public class IdeDialog
     public String getFileContents(String fileName)
     {
         ideBrowser.findElement(By.id(fileName)).click();
+        driver.waitUntil(new Function()
+        {
+            public Object apply(@Nullable Object from)
+            {
+                return getStatus().contains("Loaded");
+            }
+        });
         return getEditorContents();
     }
 

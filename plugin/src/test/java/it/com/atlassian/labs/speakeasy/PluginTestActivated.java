@@ -19,9 +19,9 @@ public class PluginTestActivated
         return Check.elementIsVisible(By.id("plugin-tests-enabled"), driver);
     }
 
-    public boolean isUploadDialogVisible()
+    public boolean isChangesLinkVisible()
     {
-        return Check.elementIsVisible(By.id("sp-top-bar"), driver);
+        return Check.elementIsVisible(By.id("sp-updates"), driver);
     }
 
     public boolean isGoogleLinkVisible()

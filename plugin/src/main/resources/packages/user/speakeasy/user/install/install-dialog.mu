@@ -10,3 +10,9 @@
 <div id="extension-wizard">
     <a id="extension-wizard-link" href="javascript:void(0)">Use the wizard</a>
 </div>
+{{#installLinks}}
+<hr />
+<div>
+    <a id="{{id}}" href="javascript:void(0)">{{label}}</a>
+</div>
+{{/installLinks}}
