@@ -1,7 +1,7 @@
 package com.atlassian.labs.speakeasy.ui.jira;
 
 import com.atlassian.crowd.embedded.api.User;
-import com.atlassian.labs.speakeasy.UnauthorizedAccessException;
+import com.atlassian.labs.speakeasy.external.UnauthorizedAccessException;
 import com.atlassian.labs.jira4compat.api.CompatViewProfilePanel;
 import com.atlassian.labs.speakeasy.ui.UserProfileRenderer;
 import com.atlassian.plugin.ModuleDescriptor;

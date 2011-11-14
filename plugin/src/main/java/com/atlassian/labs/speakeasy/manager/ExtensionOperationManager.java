@@ -1,10 +1,10 @@
 package com.atlassian.labs.speakeasy.manager;
 
 import com.atlassian.event.api.EventPublisher;
-import com.atlassian.labs.speakeasy.SpeakeasyService;
-import com.atlassian.labs.speakeasy.UnauthorizedAccessException;
+import com.atlassian.labs.speakeasy.SpeakeasyServiceImpl;
+import com.atlassian.labs.speakeasy.external.UnauthorizedAccessException;
 import com.atlassian.labs.speakeasy.data.SpeakeasyData;
-import com.atlassian.labs.speakeasy.descriptor.DescriptorGeneratorManager;
+import com.atlassian.labs.speakeasy.descriptor.DescriptorGeneratorManagerImpl;
 import com.atlassian.labs.speakeasy.event.PluginForkedEvent;
 import com.atlassian.labs.speakeasy.event.PluginInstalledEvent;
 import com.atlassian.labs.speakeasy.event.PluginUninstalledEvent;
@@ -32,7 +32,6 @@ import java.util.*;
 import static com.google.common.collect.Iterables.filter;
 import static com.google.common.collect.Lists.newArrayList;
 import static com.google.common.collect.Lists.transform;
-import static java.util.Collections.singletonList;
 
 /**
  *
@@ -44,15 +43,15 @@ public class ExtensionOperationManager
     private final SpeakeasyData data;
     private final PluginSystemManager pluginSystemManager;
     private final ProductAccessor productAccessor;
-    private final DescriptorGeneratorManager descriptorGeneratorManager;
+    private final DescriptorGeneratorManagerImpl descriptorGeneratorManager;
     private final UserManager userManager;
     private final EventPublisher eventPublisher;
     private final ExtensionBuilder extensionBuilder;
     private final ExtensionManager extensionManager;
-    private static final Logger log = LoggerFactory.getLogger(SpeakeasyService.class);
+    private static final Logger log = LoggerFactory.getLogger(SpeakeasyServiceImpl.class);
 
     @Autowired
-    public ExtensionOperationManager(PluginAccessor pluginAccessor, SpeakeasyData data, PluginSystemManager pluginSystemManager, ProductAccessor productAccessor, DescriptorGeneratorManager descriptorGeneratorManager, UserManager userManager, EventPublisher eventPublisher, ExtensionBuilder extensionBuilder, ExtensionManager extensionManager)
+    public ExtensionOperationManager(PluginAccessor pluginAccessor, SpeakeasyData data, PluginSystemManager pluginSystemManager, ProductAccessor productAccessor, DescriptorGeneratorManagerImpl descriptorGeneratorManager, UserManager userManager, EventPublisher eventPublisher, ExtensionBuilder extensionBuilder, ExtensionManager extensionManager)
     {
         this.pluginAccessor = pluginAccessor;
         this.data = data;

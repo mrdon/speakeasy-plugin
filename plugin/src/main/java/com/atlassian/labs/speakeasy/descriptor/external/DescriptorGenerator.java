@@ -1,9 +1,7 @@
-package com.atlassian.labs.speakeasy.descriptor;
+package com.atlassian.labs.speakeasy.descriptor.external;
 
+import com.atlassian.labs.speakeasy.descriptor.external.ConditionGenerator;
 import com.atlassian.plugin.ModuleDescriptor;
-import com.atlassian.plugin.webresource.WebResourceModuleDescriptor;
-
-import java.util.List;
 
 /**
  *

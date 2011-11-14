@@ -1,11 +1,7 @@
 package com.atlassian.labs.speakeasy.git;
 
-import com.atlassian.labs.speakeasy.SpeakeasyService;
-import com.atlassian.labs.speakeasy.UnauthorizedAccessException;
-import com.atlassian.labs.speakeasy.util.ExtensionValidate;
 import com.atlassian.plugin.Plugin;
 import com.atlassian.plugin.PluginAccessor;
-import com.atlassian.sal.api.user.UserManager;
 import org.eclipse.jgit.errors.RepositoryNotFoundException;
 import org.eclipse.jgit.lib.Repository;
 import org.eclipse.jgit.transport.resolver.FileResolver;

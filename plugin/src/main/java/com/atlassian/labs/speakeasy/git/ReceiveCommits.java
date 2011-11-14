@@ -1,9 +1,8 @@
 package com.atlassian.labs.speakeasy.git;
 
-import com.atlassian.labs.speakeasy.SpeakeasyService;
-import com.atlassian.labs.speakeasy.UnauthorizedAccessException;
+import com.atlassian.labs.speakeasy.external.SpeakeasyService;
+import com.atlassian.labs.speakeasy.external.UnauthorizedAccessException;
 import com.atlassian.labs.speakeasy.manager.PluginOperationFailedException;
-import com.atlassian.labs.speakeasy.model.Extension;
 import com.atlassian.labs.speakeasy.model.UserExtension;
 import com.atlassian.sal.api.user.UserProfile;
 import org.eclipse.jgit.lib.PersonIdent;
@@ -13,7 +12,6 @@ import org.eclipse.jgit.transport.PreReceiveHook;
 import org.eclipse.jgit.transport.ReceiveCommand;
 import org.eclipse.jgit.transport.ReceivePack;
 
-import javax.servlet.ServletException;
 import java.util.Collection;
 
 /**

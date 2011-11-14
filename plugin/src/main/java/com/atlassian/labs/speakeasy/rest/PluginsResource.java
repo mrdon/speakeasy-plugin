@@ -1,8 +1,8 @@
 package com.atlassian.labs.speakeasy.rest;
 
-import com.atlassian.labs.speakeasy.PluginType;
-import com.atlassian.labs.speakeasy.SpeakeasyService;
-import com.atlassian.labs.speakeasy.UnauthorizedAccessException;
+import com.atlassian.labs.speakeasy.external.PluginType;
+import com.atlassian.labs.speakeasy.external.SpeakeasyService;
+import com.atlassian.labs.speakeasy.external.UnauthorizedAccessException;
 import com.atlassian.labs.speakeasy.manager.PluginOperationFailedException;
 import com.atlassian.labs.speakeasy.model.*;
 import com.atlassian.plugins.rest.common.json.JaxbJsonMarshaller;

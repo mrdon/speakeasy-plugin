@@ -1,6 +1,6 @@
 package com.atlassian.labs.speakeasy.ui;
 
-import com.atlassian.labs.speakeasy.UnauthorizedAccessException;
+import com.atlassian.labs.speakeasy.external.UnauthorizedAccessException;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;

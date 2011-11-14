@@ -2,6 +2,9 @@ package com.atlassian.labs.speakeasy;
 
 import com.atlassian.event.api.EventPublisher;
 import com.atlassian.labs.speakeasy.event.PluginInstalledEvent;
+import com.atlassian.labs.speakeasy.external.PluginType;
+import com.atlassian.labs.speakeasy.external.SpeakeasyService;
+import com.atlassian.labs.speakeasy.external.UnauthorizedAccessException;
 import com.atlassian.labs.speakeasy.manager.*;
 import com.atlassian.labs.speakeasy.model.*;
 import com.atlassian.labs.speakeasy.product.ProductAccessor;
@@ -33,8 +36,7 @@ import static java.util.Arrays.asList;
 /**
  *
  */
-@Component
-public class SpeakeasyService
+public class SpeakeasyServiceImpl implements SpeakeasyService
 {
     private final ApplicationProperties applicationProperties;
     private final PluginAccessor pluginAccessor;
@@ -50,11 +52,10 @@ public class SpeakeasyService
     private final ExtensionOperationManager extensionOperationManager;
     private final KeyedSyncExecutor<UserExtension, String> exec;
     private final ExtensionManager extensionManager;
-    private static final Logger log = LoggerFactory.getLogger(SpeakeasyService.class);
+    private static final Logger log = LoggerFactory.getLogger(SpeakeasyServiceImpl.class);
     private final SearchManager searchManager;
 
-    @Autowired
-    public SpeakeasyService(PluginAccessor pluginAccessor, PluginSystemManager pluginSystemManager, ProductAccessor productAccessor, BundleContext bundleContext, PermissionManager permissionManager, UserManager userManager, SettingsManager settingsManager, ApplicationProperties applicationProperties, WebResourceManager webResourceManager, EventPublisher eventPublisher, ExtensionOperationManager extensionOperationManager, final ExtensionManager extensionManager, SearchManager searchManager)
+    public SpeakeasyServiceImpl(PluginAccessor pluginAccessor, PluginSystemManager pluginSystemManager, ProductAccessor productAccessor, BundleContext bundleContext, PermissionManager permissionManager, UserManager userManager, SettingsManager settingsManager, ApplicationProperties applicationProperties, WebResourceManager webResourceManager, EventPublisher eventPublisher, ExtensionOperationManager extensionOperationManager, final ExtensionManager extensionManager, SearchManager searchManager)
     {
         this.pluginAccessor = pluginAccessor;
         this.pluginSystemManager = pluginSystemManager;

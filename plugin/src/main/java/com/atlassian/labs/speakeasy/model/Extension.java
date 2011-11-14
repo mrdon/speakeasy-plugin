@@ -1,6 +1,6 @@
 package com.atlassian.labs.speakeasy.model;
 
-import com.atlassian.labs.speakeasy.PluginType;
+import com.atlassian.labs.speakeasy.external.PluginType;
 import com.atlassian.plugin.Plugin;
 
 import javax.xml.bind.annotation.XmlAccessType;

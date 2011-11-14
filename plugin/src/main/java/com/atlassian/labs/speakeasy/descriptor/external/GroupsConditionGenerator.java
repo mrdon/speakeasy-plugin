@@ -1,9 +1,10 @@
-package com.atlassian.labs.speakeasy.descriptor;
+package com.atlassian.labs.speakeasy.descriptor.external;
 
+import com.atlassian.labs.speakeasy.descriptor.external.ConditionGenerator;
+import com.atlassian.labs.speakeasy.descriptor.external.GroupScopedCondition;
 import org.apache.commons.lang.StringUtils;
 import org.dom4j.Element;
 
-import java.util.List;
 import java.util.Set;
 
 /**

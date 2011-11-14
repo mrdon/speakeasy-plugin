@@ -1,4 +1,4 @@
-package com.atlassian.labs.speakeasy.descriptor;
+package com.atlassian.labs.speakeasy.descriptor.external;
 
 import org.apache.commons.lang.StringUtils;
 import org.dom4j.Element;

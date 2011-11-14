@@ -1,6 +1,11 @@
 package com.atlassian.labs.speakeasy.descriptor;
 
 import com.atlassian.labs.speakeasy.data.SpeakeasyData;
+import com.atlassian.labs.speakeasy.descriptor.external.ConditionGenerator;
+import com.atlassian.labs.speakeasy.descriptor.external.DescriptorGenerator;
+import com.atlassian.labs.speakeasy.descriptor.external.DescriptorGeneratorManager;
+import com.atlassian.labs.speakeasy.descriptor.external.GroupsConditionGenerator;
+import com.atlassian.labs.speakeasy.descriptor.external.UsersConditionGenerator;
 import com.atlassian.labs.speakeasy.manager.SettingsManager;
 import com.atlassian.plugin.ModuleDescriptor;
 import com.atlassian.plugin.PluginAccessor;
@@ -23,8 +28,7 @@ import static com.google.common.collect.Lists.newArrayList;
 /**
  *
  */
-@Component
-public class DescriptorGeneratorManager
+public class DescriptorGeneratorManagerImpl implements DescriptorGeneratorManager
 {
     private final SpeakeasyData data;
     private final SettingsManager settingsManager;
@@ -33,9 +37,7 @@ public class DescriptorGeneratorManager
     private final Map<String, Registration> registrations;
     private final PluginController pluginController;
 
-
-    @Autowired
-    public DescriptorGeneratorManager(SpeakeasyData data, PluginAccessor pluginAccessor, BundleContext bundleContext, PluginController pluginController, SettingsManager settingsManager)
+    public DescriptorGeneratorManagerImpl(SpeakeasyData data, PluginAccessor pluginAccessor, BundleContext bundleContext, PluginController pluginController, SettingsManager settingsManager)
     {
         this.data = data;
         this.pluginAccessor = pluginAccessor;

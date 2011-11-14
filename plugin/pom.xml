@@ -318,6 +318,11 @@
                         <Export-Package>
                             com.atlassian.labs.speakeasy.install.convention.external,
                             com.atlassian.labs.speakeasy.manager.convention.external,
+                            com.atlassian.labs.speakeasy.external,
+                            com.atlassian.labs.speakeasy.descriptor.external,
+                            com.atlassian.labs.speakeasy.descriptor.external.webfragment,
+                            com.atlassian.labs.speakeasy.model,
+                            com.atlassian.labs.speakeasy.event,
                             com.atlassian.crowd.*
                         </Export-Package>
                     </instructions>

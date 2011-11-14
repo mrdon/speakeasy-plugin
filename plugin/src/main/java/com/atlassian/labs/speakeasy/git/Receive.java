@@ -1,6 +1,6 @@
 package com.atlassian.labs.speakeasy.git;
 
-import com.atlassian.labs.speakeasy.SpeakeasyService;
+import com.atlassian.labs.speakeasy.external.SpeakeasyService;
 import com.atlassian.labs.speakeasy.model.UserExtension;
 import com.atlassian.sal.api.user.UserManager;
 import com.atlassian.sal.api.user.UserProfile;

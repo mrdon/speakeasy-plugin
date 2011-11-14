@@ -1,6 +1,6 @@
 package com.atlassian.labs.speakeasy.rest;
 
-import com.atlassian.labs.speakeasy.SpeakeasyService;
+import com.atlassian.labs.speakeasy.external.SpeakeasyService;
 import com.atlassian.labs.speakeasy.manager.PluginOperationFailedException;
 import com.atlassian.sal.api.user.UserManager;
 import org.slf4j.Logger;

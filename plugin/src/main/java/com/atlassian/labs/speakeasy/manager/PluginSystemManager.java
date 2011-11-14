@@ -1,20 +1,15 @@
 package com.atlassian.labs.speakeasy.manager;
 
-import com.atlassian.labs.speakeasy.PluginType;
+import com.atlassian.labs.speakeasy.external.PluginType;
 import com.atlassian.labs.speakeasy.commonjs.descriptor.CommonJsModulesDescriptor;
 import com.atlassian.labs.speakeasy.data.SpeakeasyData;
-import com.atlassian.labs.speakeasy.manager.convention.JsonManifestHandler;
 import com.atlassian.labs.speakeasy.manager.convention.ZipPluginTypeHandler;
-import com.atlassian.labs.speakeasy.manager.convention.ZipTransformer;
 import com.atlassian.labs.speakeasy.product.ProductAccessor;
 import com.atlassian.plugin.*;
 import com.atlassian.plugin.descriptors.UnloadableModuleDescriptor;
 import com.atlassian.plugin.descriptors.UnrecognisedModuleDescriptor;
 import com.atlassian.plugin.util.WaitUntil;
-import com.atlassian.sal.api.user.UserManager;
-import com.atlassian.templaterenderer.TemplateRenderer;
 import com.google.common.collect.ImmutableMap;
-import org.osgi.framework.BundleContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;

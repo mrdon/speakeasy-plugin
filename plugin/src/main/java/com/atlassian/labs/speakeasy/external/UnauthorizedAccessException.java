@@ -1,4 +1,4 @@
-package com.atlassian.labs.speakeasy;
+package com.atlassian.labs.speakeasy.external;
 
 /**
  *

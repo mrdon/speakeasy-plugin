@@ -1,4 +1,4 @@
-package com.atlassian.labs.speakeasy.descriptor;
+package com.atlassian.labs.speakeasy.descriptor.external;
 
 import com.atlassian.labs.speakeasy.util.BundleUtil;
 import com.atlassian.labs.speakeasy.util.WebResourceUtil;
@@ -20,9 +20,8 @@ import java.io.IOException;
 import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.List;
 
-import static com.atlassian.labs.speakeasy.descriptor.DescriptorGeneratorManager.getStatefulKey;
+import static com.atlassian.labs.speakeasy.descriptor.DescriptorGeneratorManagerImpl.getStatefulKey;
 
 /**
  *

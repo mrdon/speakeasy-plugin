@@ -1,10 +1,10 @@
 package com.atlassian.labs.speakeasy.manager.convention;
 
-import com.atlassian.labs.speakeasy.descriptor.DescriptorGeneratorManager;
-import com.atlassian.labs.speakeasy.descriptor.SpeakeasyWebResourceModuleDescriptor;
+import com.atlassian.labs.speakeasy.descriptor.DescriptorGeneratorManagerImpl;
+import com.atlassian.labs.speakeasy.descriptor.external.SpeakeasyWebResourceModuleDescriptor;
 import com.atlassian.labs.speakeasy.commonjs.descriptor.SpeakeasyCommonJsModulesDescriptor;
 import com.atlassian.labs.speakeasy.manager.PluginOperationFailedException;
-import com.atlassian.labs.speakeasy.descriptor.webfragment.SpeakeasyWebItemModuleDescriptor;
+import com.atlassian.labs.speakeasy.descriptor.external.webfragment.SpeakeasyWebItemModuleDescriptor;
 import com.atlassian.labs.speakeasy.manager.convention.external.ConventionDescriptorGenerator;
 import com.atlassian.labs.speakeasy.model.JsonManifest;
 import com.atlassian.plugin.*;
@@ -30,7 +30,7 @@ public class ConventionDescriptorGeneratorServiceFactory implements ServiceFacto
     private final BundleContext bundleContext;
     private final PluginAccessor pluginAccessor;
     private final HostContainer hostContainer;
-    private final DescriptorGeneratorManager descriptorGeneratorManager;
+    private final DescriptorGeneratorManagerImpl descriptorGeneratorManager;
     private final PluginEventManager pluginEventManager;
     private final JsonToElementParser jsonToElementParser;
     private final WebResourceManager webResourceManager;
@@ -39,7 +39,7 @@ public class ConventionDescriptorGeneratorServiceFactory implements ServiceFacto
 
     //private final Set<String> trackedPlugins = new CopyOnWriteArraySet<String>();
 
-    public ConventionDescriptorGeneratorServiceFactory(final BundleContext bundleContext, final PluginAccessor pluginAccessor, HostContainer hostContainer, DescriptorGeneratorManager descriptorGeneratorManager, JsonToElementParser jsonToElementParser, WebResourceManager webResourceManager, PluginEventManager pluginEventManager, final PluginController pluginController, JsonManifestHandler jsonManifestHandler)
+    public ConventionDescriptorGeneratorServiceFactory(final BundleContext bundleContext, final PluginAccessor pluginAccessor, HostContainer hostContainer, DescriptorGeneratorManagerImpl descriptorGeneratorManager, JsonToElementParser jsonToElementParser, WebResourceManager webResourceManager, PluginEventManager pluginEventManager, final PluginController pluginController, JsonManifestHandler jsonManifestHandler)
     {
         this.bundleContext = bundleContext;
         this.pluginAccessor = pluginAccessor;

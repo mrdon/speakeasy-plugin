@@ -1,6 +1,6 @@
 package com.atlassian.labs.speakeasy.util;
 
-import com.atlassian.labs.speakeasy.descriptor.DescriptorGenerator;
+import com.atlassian.labs.speakeasy.descriptor.external.DescriptorGenerator;
 import com.atlassian.plugin.ModuleDescriptor;
 import com.atlassian.plugin.Plugin;
 import com.atlassian.plugin.descriptors.UnloadableModuleDescriptor;

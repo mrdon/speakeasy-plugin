@@ -1,6 +1,6 @@
 package com.atlassian.labs.speakeasy.descriptor;
 
-import com.atlassian.labs.speakeasy.SpeakeasyService;
+import com.atlassian.labs.speakeasy.external.SpeakeasyService;
 import com.atlassian.labs.speakeasy.product.ProductAccessor;
 import com.atlassian.plugin.PluginParseException;
 import com.atlassian.plugin.web.Condition;

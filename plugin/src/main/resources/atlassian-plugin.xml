@@ -117,10 +117,10 @@
     <component-import key="pluginRetrievalService" interface="com.atlassian.plugin.osgi.bridge.external.PluginRetrievalService" />
     <component-import key="i18nResolver" interface="com.atlassian.sal.api.message.I18nResolver" />
 
-    <module-type key="scoped-web-resource" class="com.atlassian.labs.speakeasy.descriptor.SpeakeasyWebResourceModuleDescriptor"/>
+    <module-type key="scoped-web-resource" class="com.atlassian.labs.speakeasy.descriptor.external.SpeakeasyWebResourceModuleDescriptor"/>
 
     <module-type key="scoped-web-item"
-                 class="com.atlassian.labs.speakeasy.descriptor.webfragment.SpeakeasyWebItemModuleDescriptor"/>
+                 class="com.atlassian.labs.speakeasy.descriptor.external.webfragment.SpeakeasyWebItemModuleDescriptor"/>
 
     <module-type key="scoped-modules" class="com.atlassian.labs.speakeasy.commonjs.descriptor.SpeakeasyCommonJsModulesDescriptor" />
 
@@ -138,6 +138,13 @@
                application="fecru"/>
     <component key="productAccessor" class="com.atlassian.labs.speakeasy.product.RefappProductAccessor"
                application="refapp"/>
+
+    <!-- public services -->
+    <component key="descriptorGenerator" class="com.atlassian.labs.speakeasy.descriptor.DescriptorGeneratorManagerImpl"
+               interface="com.atlassian.labs.speakeasy.descriptor.external.DescriptorGeneratorManager" public="true" />
+
+    <component key="speakeasyService" class="com.atlassian.labs.speakeasy.SpeakeasyServiceImpl"
+               interface="com.atlassian.labs.speakeasy.external.SpeakeasyService" public="true" />
 
     <!-- user profile links -->
 
