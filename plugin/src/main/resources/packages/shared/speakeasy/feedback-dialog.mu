@@ -8,5 +8,5 @@
             <label for="feedback-message">Message</label>
             <textarea name="feedback-message" id="feedback-message" cols="40" rows="5"></textarea>
         </div>
-    <fieldset>
+    </fieldset>
 </form>
