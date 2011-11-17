@@ -244,4 +244,7 @@
 
     <!-- JIRA 5 Compatiblity -->
     <module-type key="compat-view-profile-panel" class="com.atlassian.labs.jira4compat.CompatViewProfilePanelModuleDescriptor" application="jira"/>
+
+    <!-- integration for remoteapps -->
+    <access-level key="user-access-level" class="com.atlassian.labs.speakeasy.remoteapps.SpeakeasyAccessLevel" />
 </atlassian-plugin>

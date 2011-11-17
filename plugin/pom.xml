@@ -71,6 +71,12 @@
             <version>1.4.1</version>
             <scope>provided</scope>
         </dependency>
+        <dependency>
+            <groupId>com.atlassian.labs</groupId>
+            <artifactId>remoteapps-plugin</artifactId>
+            <version>0.1.1</version>
+            <scope>provided</scope>
+        </dependency>
         <!--dependency>
             <groupId>com.github.spullara.mustache.java</groupId>
             <artifactId>compiler</artifactId>
@@ -325,6 +331,7 @@
                             com.atlassian.labs.speakeasy.event,
                             com.atlassian.crowd.*
                         </Export-Package>
+                        <DynamicImport-Package>com.atlassian.labs.remoteapps.descriptor.external</DynamicImport-Package>
                     </instructions>
                     <products>
                         <product>
