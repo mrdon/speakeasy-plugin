@@ -1,6 +1,7 @@
 package com.atlassian.labs.speakeasy.remoteapps;
 
 import com.atlassian.applinks.api.ApplicationLink;
+import com.atlassian.applinks.spi.application.NonAppLinksApplicationType;
 import com.atlassian.labs.remoteapps.descriptor.external.AccessLevel;
 import com.atlassian.labs.speakeasy.descriptor.external.DescriptorGeneratorManager;
 import com.atlassian.labs.speakeasy.descriptor.external.webfragment.SpeakeasyWebItemModuleDescriptor;
@@ -36,7 +37,7 @@ public class SpeakeasyAccessLevel implements AccessLevel
 
     public boolean canAccessRemoteApp(String username, ApplicationLink applicationLink)
     {
-        final String pluginKey = applicationLink.getId().get();
+        final String pluginKey = ((NonAppLinksApplicationType)applicationLink.getType()).getId().get();
         final UserExtension remotePlugin = speakeasyService.getRemotePlugin(pluginKey, username);
         if (remotePlugin != null)
         {
