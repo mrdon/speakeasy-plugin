@@ -319,6 +319,8 @@
                             com.atlassian.sal.api.*;version="(2.4,3.0]",
                             org.apache.commons.lang.*;version="2.4",
                             com.atlassian.jira.config;resolution:=optional,
+                            <!-- fixme: this should be a dynamic package once PLUG-822 is rolled out -->
+                            com.atlassian.labs.remoteapps.descriptor.external;resolution:=optional,
                             *;resolution:=optional
                         </Import-Package>
                         <Export-Package>
@@ -331,7 +333,6 @@
                             com.atlassian.labs.speakeasy.event,
                             com.atlassian.crowd.*
                         </Export-Package>
-                        <DynamicImport-Package>com.atlassian.labs.remoteapps.descriptor.external</DynamicImport-Package>
                     </instructions>
                     <products>
                         <product>
