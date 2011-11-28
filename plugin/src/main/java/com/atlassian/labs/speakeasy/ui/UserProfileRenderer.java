@@ -99,6 +99,7 @@ public class UserProfileRenderer
         render("templates/user" + (useUserProfileDecorator ? "-with-decorator" : "") + ".vm", ImmutableMap.<String, Object>builder().
                 put("accessList", speakeasyService.getRemotePluginList(user)).
                 put("user", user).
+                put("req", req).
                 put("baseUrl", applicationProperties.getBaseUrl()).
                 put("contextPath", req.getContextPath()).
                 put("enabledPlugins", filter(plugins.getPlugins(), new EnabledPluginsFilter())).

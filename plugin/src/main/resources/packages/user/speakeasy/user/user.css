@@ -6,18 +6,27 @@
 #sp-top-bar a:link{
     text-decoration: none;
 }
+#sp-top-bar ul {
+    margin: .5em 0 0;
+    padding:  0;
+}
+li.sp-top-button {
+    margin-left: 2em;
+    list-style-type: none;
+    float: left;
+    margin-bottom: .5em;
+
+}
 #sp-install {
     padding-left: 24px;
     background: url("@modulePrefix/speakeasy/user/images/add_20.png") no-repeat 0 50%;
 }
 #sp-updates {
-    margin-left: 2em;
     padding-left: 24px;
     background: url("@modulePrefix/speakeasy/user/images/rss_20.png") no-repeat 0 50%;
 }
 
 #sp-firefox-xpi {
-    margin-left: 2em;
     padding-left: 24px;
     background: url("@modulePrefix/speakeasy/user/images/firefox_18.png") no-repeat 0 50%;
 }

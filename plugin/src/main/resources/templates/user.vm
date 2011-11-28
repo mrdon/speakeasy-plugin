@@ -12,13 +12,33 @@
             No one has access to this page.  Click <a href="$contextPath/plugins/servlet/speakeasy/admin">here</a> to change these settings.
         </div>
     #end
-#if ($canAuthor)
+
 <div id="sp-top-bar">
-    <a id="sp-install" href="#">Install</a>
-    <a id="sp-updates" href="$contextPath/rest/speakeasy/latest/plugins/atom">Updates</a>
-    <a id="sp-firefox-xpi" data-hash="sha1:$firefoxXpi.hash" data-iconurl="$firefoxXpi.iconUrl" href="$firefoxXpi.xpiUrl">Firefox</a>
+    <ul>
+        #set ($topWebItems = $webInterfaceManager.getDisplayableItems("speakeasy.user-profile/actions", $webInterfaceContext))
+        #if (!$topWebItems.empty)
+                #foreach ($item in $topWebItems)
+                 <li class="sp-top-button">
+                    <a href="$item.link.getDisplayableUrl($req, $webInterfaceContext)"
+                        #if ($item.link.id) id="$item.link.id"#end
+                        #if ($item.styleClass) class="$item.styleClass"#end
+                        #if ($item.link.hasAccessKey()) accessKey="$item.link.getAccessKey($helper)"#end>
+                       $item.webLabel.getDisplayableLabel($req, $webInterfaceContext)
+                    </a>
+                #end
+            #end
+    #if ($canAuthor)
+    <li class="sp-top-button"><a id="sp-install" href="#">Install</a></li>
+    <li class="sp-top-button">
+        <a id="sp-firefox-xpi" data-hash="sha1:$firefoxXpi.hash" data-iconurl="$firefoxXpi.iconUrl" href="$firefoxXpi.xpiUrl">Firefox</a>
+    </li>
+    #end
+    <li class="sp-top-button">
+        <a id="sp-updates" href="$contextPath/rest/speakeasy/latest/plugins/atom">Updates</a>
+    </li>
+    </ul>
 </div>
-#end
+
 <div class="aui-tabs horizontal-tabs" id="horizontal">
     <ul class="tabs-menu">
         <li class="menu-item active-tab">

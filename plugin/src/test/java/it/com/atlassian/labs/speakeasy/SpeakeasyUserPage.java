@@ -263,7 +263,7 @@ public class SpeakeasyUserPage implements Page
 
     public boolean canCreateExtension()
     {
-        return driver.elementExists(By.id("sp-top-bar"));
+        return driver.elementExists(By.id("sp-install"));
     }
 
     public SpeakeasyUserPage unsubscribeFromAllPlugins()
