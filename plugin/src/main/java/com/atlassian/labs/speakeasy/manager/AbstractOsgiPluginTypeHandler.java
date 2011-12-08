@@ -32,6 +32,11 @@ public abstract class AbstractOsgiPluginTypeHandler implements PluginTypeHandler
 {
     protected static final Iterable<Pattern> CORE_WHITELIST = asList(
             Pattern.compile(".*[._]js", Pattern.CASE_INSENSITIVE),
+            Pattern.compile(".*[._]eot", Pattern.CASE_INSENSITIVE),
+            Pattern.compile(".*[._]ttf", Pattern.CASE_INSENSITIVE),
+            Pattern.compile(".*[._]woff", Pattern.CASE_INSENSITIVE),
+            Pattern.compile(".*[._]svg", Pattern.CASE_INSENSITIVE),
+            Pattern.compile(".*[._]svgz", Pattern.CASE_INSENSITIVE),
             Pattern.compile(".*[._]mu", Pattern.CASE_INSENSITIVE),
             Pattern.compile(".*[._]json", Pattern.CASE_INSENSITIVE),
             Pattern.compile(".*[._]gif", Pattern.CASE_INSENSITIVE),
