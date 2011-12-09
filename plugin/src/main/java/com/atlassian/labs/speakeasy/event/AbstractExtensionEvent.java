@@ -3,14 +3,14 @@ package com.atlassian.labs.speakeasy.event;
 /**
  *
  */
-public class AbstractPluginEvent<T extends AbstractPluginEvent>
+public class AbstractExtensionEvent<T extends AbstractExtensionEvent>
 {
     protected final String pluginKey;
     private String userName;
     private String userEmail;
     private String message;
 
-    public AbstractPluginEvent(String pluginKey)
+    public AbstractExtensionEvent(String pluginKey)
     {
         this.pluginKey = pluginKey;
     }

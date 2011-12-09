@@ -1,14 +1,12 @@
 package com.atlassian.labs.speakeasy.event;
 
-import java.util.List;
-
 /**
  *
  */
-public class PluginForkedEvent extends AbstractPluginEvent<PluginForkedEvent>
+public class ExtensionForkedEvent extends AbstractExtensionEvent<ExtensionForkedEvent>
 {
     private final String forkedPluginKey;
-    public PluginForkedEvent(String pluginKey, String forkedPluginKey)
+    public ExtensionForkedEvent(String pluginKey, String forkedPluginKey)
     {
         super(pluginKey);
         this.forkedPluginKey = forkedPluginKey;

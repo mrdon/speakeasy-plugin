@@ -7,11 +7,11 @@ import static com.google.common.collect.Lists.newArrayList;
 /**
  *
  */
-public class PluginUpdatedEvent extends AbstractPluginEvent<PluginUpdatedEvent>
+public class ExtensionUpdatedEvent extends AbstractExtensionEvent<ExtensionUpdatedEvent>
 {
     private List<String> updatedFiles = newArrayList();
 
-    public PluginUpdatedEvent(String pluginKey)
+    public ExtensionUpdatedEvent(String pluginKey)
     {
         super(pluginKey);
     }
@@ -21,7 +21,7 @@ public class PluginUpdatedEvent extends AbstractPluginEvent<PluginUpdatedEvent>
         return updatedFiles;
     }
 
-    public PluginUpdatedEvent addUpdatedFile(String file)
+    public ExtensionUpdatedEvent addUpdatedFile(String file)
     {
         this.updatedFiles.add(file);
         return this;

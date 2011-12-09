@@ -2,13 +2,17 @@ package com.atlassian.labs.speakeasy.manager;
 
 import com.atlassian.event.api.EventPublisher;
 import com.atlassian.labs.speakeasy.SpeakeasyServiceImpl;
-import com.atlassian.labs.speakeasy.external.UnauthorizedAccessException;
 import com.atlassian.labs.speakeasy.data.SpeakeasyData;
 import com.atlassian.labs.speakeasy.descriptor.DescriptorGeneratorManagerImpl;
-import com.atlassian.labs.speakeasy.event.PluginForkedEvent;
-import com.atlassian.labs.speakeasy.event.PluginInstalledEvent;
-import com.atlassian.labs.speakeasy.event.PluginUninstalledEvent;
-import com.atlassian.labs.speakeasy.event.PluginUpdatedEvent;
+import com.atlassian.labs.speakeasy.event.ExtensionEnabledEvent;
+import com.atlassian.labs.speakeasy.event.ExtensionEnabledGloballyEvent;
+import com.atlassian.labs.speakeasy.event.ExtensionFavoritedEvent;
+import com.atlassian.labs.speakeasy.event.ExtensionForkedEvent;
+import com.atlassian.labs.speakeasy.event.ExtensionInstalledEvent;
+import com.atlassian.labs.speakeasy.event.ExtensionUnfavoritedEvent;
+import com.atlassian.labs.speakeasy.event.ExtensionUninstalledEvent;
+import com.atlassian.labs.speakeasy.event.ExtensionUpdatedEvent;
+import com.atlassian.labs.speakeasy.external.UnauthorizedAccessException;
 import com.atlassian.labs.speakeasy.model.Extension;
 import com.atlassian.labs.speakeasy.model.Feedback;
 import com.atlassian.labs.speakeasy.model.UserExtension;
@@ -27,9 +31,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.io.File;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
-import static com.google.common.collect.Iterables.filter;
 import static com.google.common.collect.Lists.newArrayList;
 import static com.google.common.collect.Lists.transform;
 
@@ -92,6 +99,10 @@ public class ExtensionOperationManager
         {
             sendEnabledEmail(enabledPlugin, user);
         }
+
+        eventPublisher.publish(new ExtensionEnabledEvent(pluginKey)
+                .setUserName(user)
+                .setUserEmail(userManager.getUserProfile(user).getEmail()));
         return affectedPluginKeys;
     }
 
@@ -114,7 +125,11 @@ public class ExtensionOperationManager
 
     public String disable(Extension repo, String user)
     {
-        return removeFromAccessList(repo.getKey(), user);
+        String key = removeFromAccessList(repo.getKey(), user);
+        eventPublisher.publish(new ExtensionEnabledEvent(key)
+                .setUserName(user)
+                .setUserEmail(userManager.getUserProfile(user).getEmail()));
+        return key;
     }
 
     public List<String> findAllEnabledExtensions(String user)
@@ -130,7 +145,7 @@ public class ExtensionOperationManager
         return result;
     }
 
-    public List<String> uninstallExtension(Extension plugin, String user, Operation<String,Void> enableCallback) throws Exception
+    public List<String> uninstallExtension(Extension plugin, String user, Operation<String, Void> enableCallback) throws Exception
     {
         List<String> keysModified = new ArrayList<String>();
         String pluginKey = plugin.getKey();
@@ -146,14 +161,14 @@ public class ExtensionOperationManager
         disallowAllPluginAccess(pluginKey);
         data.clearFavorites(pluginKey);
         pluginSystemManager.uninstall(pluginKey, user);
-        eventPublisher.publish(new PluginUninstalledEvent(pluginKey)
-            .setUserName(user)
-            .setUserEmail(plugin.getAuthorEmail())
-            .setMessage("Uninstalled from the UI"));
+        eventPublisher.publish(new ExtensionUninstalledEvent(pluginKey)
+                .setUserName(user)
+                .setUserEmail(plugin.getAuthorEmail())
+                .setMessage("Uninstalled from the UI"));
 
         return keysModified;
     }
-    
+
     public List<String> forkExtension(Extension plugin, String user, String description) throws Exception
     {
         String pluginKey = plugin.getKey();
@@ -170,7 +185,7 @@ public class ExtensionOperationManager
         {
             sendForkedEmail(plugin, forkedPluginKey, user);
         }
-        eventPublisher.publish(new PluginForkedEvent(pluginKey, forkedPluginKey).setUserName(user).setUserEmail(userManager.getUserProfile(user).getEmail()).setMessage("Forked from the UI"));
+        eventPublisher.publish(new ExtensionForkedEvent(pluginKey, forkedPluginKey).setUserName(user).setUserEmail(userManager.getUserProfile(user).getEmail()).setMessage("Forked from the UI"));
         return modifiedKeys;
     }
 
@@ -178,7 +193,7 @@ public class ExtensionOperationManager
     {
         String pluginKey = plugin.getKey();
         String installedPluginKey = pluginSystemManager.saveAndRebuild(pluginKey, plugin.getPluginType(), fileName, contents, user);
-        eventPublisher.publish(new PluginUpdatedEvent(pluginKey)
+        eventPublisher.publish(new ExtensionUpdatedEvent(pluginKey)
                 .setUserName(user)
                 .setUserEmail(plugin.getAuthorEmail())
                 .addUpdatedFile(fileName)
@@ -191,6 +206,9 @@ public class ExtensionOperationManager
         String pluginKey = ex.getKey();
         data.favorite(pluginKey, user);
         sendFavoritedEmail(ex, user);
+        eventPublisher.publish(new ExtensionFavoritedEvent(pluginKey)
+                .setUserName(user)
+                .setUserEmail(userManager.getUserProfile(user).getEmail()));
         return pluginKey;
     }
 
@@ -198,6 +216,9 @@ public class ExtensionOperationManager
     {
         String pluginKey = ex.getKey();
         data.unfavorite(pluginKey, user);
+        eventPublisher.publish(new ExtensionUnfavoritedEvent(pluginKey)
+                .setUserName(user)
+                .setUserEmail(userManager.getUserProfile(user).getEmail()));
         return pluginKey;
     }
 
@@ -223,13 +244,19 @@ public class ExtensionOperationManager
         }
 
         // TODO: send notification email?
+        eventPublisher.publish(new ExtensionEnabledGloballyEvent(enabledPlugin.getKey())
+                .setUserName(user)
+                .setUserEmail(userManager.getUserProfile(user).getEmail()));
         return affectedPluginKeys;
     }
 
-    public void disableGlobally(UserExtension repo)
+    public void disableGlobally(UserExtension repo, String user)
     {
-        data.removeGlobalExtension(repo.getKey());
-        descriptorGeneratorManager.refreshGeneratedDescriptorsForPlugin(repo.getKey());
+        String pluginKey = repo.getKey();
+        data.removeGlobalExtension(pluginKey);
+        descriptorGeneratorManager.refreshGeneratedDescriptorsForPlugin(pluginKey);
+        eventPublisher.publish(new ExtensionEnabledGloballyEvent(pluginKey).setUserName(user)
+                .setUserEmail(userManager.getUserProfile(user).getEmail()));
     }
 
 
@@ -273,7 +300,10 @@ public class ExtensionOperationManager
     public String install(Extension ext, File uploadedFile, String user)
     {
         String pluginKey = pluginSystemManager.install(uploadedFile, ext != null ? ext.getKey() : null, user);
-        eventPublisher.publish(new PluginInstalledEvent(pluginKey).setUserName(user).setUserEmail(userManager.getUserProfile(user).getEmail()).setMessage("Installed from a JAR upload"));
+        eventPublisher.publish(new ExtensionInstalledEvent(pluginKey)
+                .setUserName(user)
+                .setUserEmail(userManager.getUserProfile(user).getEmail())
+                .setMessage("Installed from a JAR upload"));
         return pluginKey;
     }
 
@@ -376,6 +406,7 @@ public class ExtensionOperationManager
         data.saveUsersList(pluginKey, Lists.<String>newArrayList());
         descriptorGeneratorManager.refreshGeneratedDescriptorsForPlugin(pluginKey);
     }
+
     private void sendEnabledEmail(final Extension enabledPlugin, final String user)
     {
         final String userFullName = userManager.getUserProfile(user).getFullName();
@@ -406,13 +437,13 @@ public class ExtensionOperationManager
                     .bodyTemplate("email/enabled-body.vm")
                     .context(new HashMap<String, Object>()
                     {{
-                        put("plugin", enabledPlugin);
-                        put("enablerFullName", userFullName);
-                        put("enabler", user);
-                        put("commonExtensions", commonExtensions);
-                        put("suggestedExtensions", suggestedExtensions);
-                        put("enabledTotal", data.getUsersList(enabledPlugin.getKey()).size());
-                    }}));
+                            put("plugin", enabledPlugin);
+                            put("enablerFullName", userFullName);
+                            put("enabler", user);
+                            put("commonExtensions", commonExtensions);
+                            put("suggestedExtensions", suggestedExtensions);
+                            put("enabledTotal", data.getUsersList(enabledPlugin.getKey()).size());
+                        }}));
         }
     }
 
@@ -429,7 +460,6 @@ public class ExtensionOperationManager
         }
         return null;
     }
-
 
 
     private List<UserExtension> getAllRemoteSpeakeasyPlugins(final String userName)

@@ -54,9 +54,9 @@ public class DefaultGitRepositoryManager implements DisposableBean, GitRepositor
     private final Map<String,Repository> repositories = new MapMaker().makeMap();
     private final BundleContext bundleContext;
     private final EventPublisher eventPublisher;
-    private final KeyedSyncExecutor<Repository,AbstractPluginEvent<?>> executor;
+    private final KeyedSyncExecutor<Repository,AbstractExtensionEvent<?>> executor;
     private static final Logger log = LoggerFactory.getLogger(DefaultGitRepositoryManager.class);
-    private static final AbstractPluginEvent SYNC_EVENT = new AbstractPluginEvent("")
+    private static final AbstractExtensionEvent SYNC_EVENT = new AbstractExtensionEvent("")
         {
             @Override
             public String getMessage()
@@ -84,10 +84,10 @@ public class DefaultGitRepositoryManager implements DisposableBean, GitRepositor
         this.eventPublisher = eventPublisher;
         repositoriesDir = new File(applicationProperties.getHomeDirectory(), "data/speakeasy/repositories");
         repositoriesDir.mkdirs();
-        executor = new KeyedSyncExecutor<Repository, AbstractPluginEvent<?>>()
+        executor = new KeyedSyncExecutor<Repository, AbstractExtensionEvent<?>>()
         {
             @Override
-            protected Repository getTarget(String id, AbstractPluginEvent<?> targetContext) throws Exception
+            protected Repository getTarget(String id, AbstractExtensionEvent<?> targetContext) throws Exception
             {
                 return getRepository(id, targetContext);
             }
@@ -101,7 +101,7 @@ public class DefaultGitRepositoryManager implements DisposableBean, GitRepositor
         eventPublisher.register(this);
     }
 
-    private Repository getRepository(String id, AbstractPluginEvent event) throws NoHeadException, NoMessageException, ConcurrentRefUpdateException, WrongRepositoryStateException, IOException, NoFilepatternException
+    private Repository getRepository(String id, AbstractExtensionEvent event) throws NoHeadException, NoMessageException, ConcurrentRefUpdateException, WrongRepositoryStateException, IOException, NoFilepatternException
     {
         Repository repo = repositories.get(id);
         if (repo == null)
@@ -146,7 +146,7 @@ public class DefaultGitRepositoryManager implements DisposableBean, GitRepositor
         return this.repositoriesDir;
     }
 
-    private void updateRepositoryIfDirty(Repository repo, AbstractPluginEvent event, Bundle bundle) throws IOException, NoFilepatternException, NoHeadException, NoMessageException, ConcurrentRefUpdateException, WrongRepositoryStateException
+    private void updateRepositoryIfDirty(Repository repo, AbstractExtensionEvent event, Bundle bundle) throws IOException, NoFilepatternException, NoHeadException, NoMessageException, ConcurrentRefUpdateException, WrongRepositoryStateException
     {
         final File workTree = repo.getWorkTree();
         Git git = new Git(repo);
@@ -265,7 +265,7 @@ public class DefaultGitRepositoryManager implements DisposableBean, GitRepositor
     }
 
     @EventListener
-    public void onPluginInstalledEvent(final PluginInstalledEvent event)
+    public void onPluginInstalledEvent(final ExtensionInstalledEvent event)
     {
         executor.forKey(event.getPluginKey(), event, new Operation<Repository, Void>()
         {
@@ -279,7 +279,7 @@ public class DefaultGitRepositoryManager implements DisposableBean, GitRepositor
     }
 
     @EventListener
-    public void onPluginUninstalledEvent(final PluginUninstalledEvent event)
+    public void onPluginUninstalledEvent(final ExtensionUninstalledEvent event)
     {
         executor.forKey(event.getPluginKey(), event, new Operation<Repository, Void>()
         {
@@ -292,7 +292,7 @@ public class DefaultGitRepositoryManager implements DisposableBean, GitRepositor
     }
 
     @EventListener
-    public void onPluginUpdatedEvent(final PluginUpdatedEvent event)
+    public void onPluginUpdatedEvent(final ExtensionUpdatedEvent event)
     {
         executor.forKey(event.getPluginKey(), event, new Operation<Repository, Void>()
         {
@@ -305,7 +305,7 @@ public class DefaultGitRepositoryManager implements DisposableBean, GitRepositor
     }
 
     @EventListener
-    public void onPluginForkedEvent(final PluginForkedEvent event)
+    public void onPluginForkedEvent(final ExtensionForkedEvent event)
     {
         executor.forKey(event.getPluginKey(), event, new Operation<Repository, Void>()
         {

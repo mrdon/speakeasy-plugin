@@ -1,7 +1,6 @@
 package com.atlassian.labs.speakeasy;
 
 import com.atlassian.event.api.EventPublisher;
-import com.atlassian.labs.speakeasy.event.PluginInstalledEvent;
 import com.atlassian.labs.speakeasy.external.PluginType;
 import com.atlassian.labs.speakeasy.external.SpeakeasyService;
 import com.atlassian.labs.speakeasy.external.UnauthorizedAccessException;
@@ -22,8 +21,6 @@ import com.google.common.base.Predicate;
 import org.osgi.framework.BundleContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -48,14 +45,13 @@ public class SpeakeasyServiceImpl implements SpeakeasyService
     private final SettingsManager settingsManager;
     private final WebResourceManager webResourceManager;
     private final ModuleDescriptor unknownScreenshotDescriptor;
-    private final EventPublisher eventPublisher;
     private final ExtensionOperationManager extensionOperationManager;
     private final KeyedSyncExecutor<UserExtension, String> exec;
     private final ExtensionManager extensionManager;
     private static final Logger log = LoggerFactory.getLogger(SpeakeasyServiceImpl.class);
     private final SearchManager searchManager;
 
-    public SpeakeasyServiceImpl(PluginAccessor pluginAccessor, PluginSystemManager pluginSystemManager, ProductAccessor productAccessor, BundleContext bundleContext, PermissionManager permissionManager, UserManager userManager, SettingsManager settingsManager, ApplicationProperties applicationProperties, WebResourceManager webResourceManager, EventPublisher eventPublisher, ExtensionOperationManager extensionOperationManager, final ExtensionManager extensionManager, SearchManager searchManager)
+    public SpeakeasyServiceImpl(PluginAccessor pluginAccessor, PluginSystemManager pluginSystemManager, ProductAccessor productAccessor, BundleContext bundleContext, PermissionManager permissionManager, UserManager userManager, SettingsManager settingsManager, ApplicationProperties applicationProperties, WebResourceManager webResourceManager, ExtensionOperationManager extensionOperationManager, final ExtensionManager extensionManager, SearchManager searchManager)
     {
         this.pluginAccessor = pluginAccessor;
         this.pluginSystemManager = pluginSystemManager;
@@ -66,7 +62,6 @@ public class SpeakeasyServiceImpl implements SpeakeasyService
         this.settingsManager = settingsManager;
         this.applicationProperties = applicationProperties;
         this.webResourceManager = webResourceManager;
-        this.eventPublisher = eventPublisher;
         this.extensionManager = extensionManager;
         this.extensionOperationManager = extensionOperationManager;
         this.searchManager = searchManager;
@@ -417,7 +412,7 @@ public class SpeakeasyServiceImpl implements SpeakeasyService
             public Void operateOn(UserExtension repo) throws Exception
             {
                 validateAccessType(repo, "disable globally", repo.isCanDisableGlobally(), user);
-                extensionOperationManager.disableGlobally(repo);
+                extensionOperationManager.disableGlobally(repo, user);
                 return null;
             }
         });
@@ -489,10 +484,6 @@ public class SpeakeasyServiceImpl implements SpeakeasyService
             pluginSystemManager.createExtension(pluginType, pluginKey, remoteUser, description, name);
             List<String> modifiedKeys = new ArrayList<String>();
             modifiedKeys.add(pluginKey);
-            eventPublisher.publish(new PluginInstalledEvent(pluginKey)
-                .setUserName(remoteUser)
-                .setUserEmail(userManager.getUserProfile(remoteUser).getEmail())
-                .setMessage("Created from the UI"));
             log.info("Created extension '{}' by user '{}'", pluginKey, remoteUser);
             return getRemotePluginList(remoteUser, modifiedKeys);
         }
