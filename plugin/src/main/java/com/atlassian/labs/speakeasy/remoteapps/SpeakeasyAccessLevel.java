@@ -6,6 +6,7 @@ import com.atlassian.event.api.EventListener;
 import com.atlassian.event.api.EventPublisher;
 import com.atlassian.labs.remoteapps.descriptor.external.AccessLevel;
 import com.atlassian.labs.remoteapps.event.RemoteAppInstalledEvent;
+import com.atlassian.labs.speakeasy.data.SpeakeasyData;
 import com.atlassian.labs.speakeasy.descriptor.external.DescriptorGeneratorManager;
 import com.atlassian.labs.speakeasy.descriptor.external.webfragment.SpeakeasyWebItemModuleDescriptor;
 import com.atlassian.labs.speakeasy.external.SpeakeasyService;
@@ -26,17 +27,19 @@ public class SpeakeasyAccessLevel implements AccessLevel, DisposableBean
     private final WebResourceManager webResourceManager;
     private final EventPublisher eventPublisher;
     private final UserManager userManager;
+    private final SpeakeasyData data;
 
     public SpeakeasyAccessLevel(SpeakeasyService speakeasyService,
                                 DescriptorGeneratorManager descriptorGeneratorManager,
                                 WebResourceManager webResourceManager,
-                                EventPublisher eventPublisher, UserManager userManager)
+                                EventPublisher eventPublisher, UserManager userManager, SpeakeasyData data)
     {
         this.speakeasyService = speakeasyService;
         this.descriptorGeneratorManager = descriptorGeneratorManager;
         this.webResourceManager = webResourceManager;
         this.eventPublisher = eventPublisher;
         this.userManager = userManager;
+        this.data = data;
         this.eventPublisher.register(this);
     }
 
@@ -44,7 +47,7 @@ public class SpeakeasyAccessLevel implements AccessLevel, DisposableBean
     public void onRemoteAppInstall(RemoteAppInstalledEvent event)
     {
         // special handling of global apps to ensure they show up correctly
-        if ("global".equals(event.getAccessLevel()))
+        if ("global".equals(event.getAccessLevel()) && !data.isGlobalExtension(event.getPluginKey()))
         {
             speakeasyService.enableGlobally(event.getPluginKey(), userManager.getRemoteUsername());
         }
