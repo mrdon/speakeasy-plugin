@@ -49,7 +49,10 @@ public class SpeakeasyAccessLevel implements AccessLevel, DisposableBean
         // special handling of global apps to ensure they show up correctly
         if ("global".equals(event.getAccessLevel()) && !data.isGlobalExtension(event.getPluginKey()))
         {
-            speakeasyService.enableGlobally(event.getPluginKey(), userManager.getRemoteUsername());
+            // this bypasses the SpeakeasyService as we don't need a lot that they do there
+            UserExtension ext = speakeasyService.getRemotePlugin(event.getPluginKey(), userManager.getRemoteUsername());
+            data.addGlobalExtension(ext.getKey());
+            descriptorGeneratorManager.refreshGeneratedDescriptorsForPlugin(ext.getKey());
         }
     }
 
