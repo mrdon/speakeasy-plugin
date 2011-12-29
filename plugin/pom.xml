@@ -18,13 +18,6 @@
     <dependencyManagement>
         <dependencies>
             <dependency>
-                <groupId>com.atlassian.refapp</groupId>
-                <artifactId>atlassian-platform</artifactId>
-                <version>${platform.version}</version>
-                <type>pom</type>
-                <scope>import</scope>
-            </dependency>
-            <dependency>
                 <groupId>commons-lang</groupId>
                 <artifactId>commons-lang</artifactId>
                 <version>2.5</version>
@@ -63,6 +56,7 @@
         <dependency>
             <groupId>com.atlassian.applinks</groupId>
             <artifactId>applinks-api</artifactId>
+            <version>${applinks.version}</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
@@ -183,6 +177,7 @@
         <dependency>
             <groupId>com.atlassian.plugins.rest</groupId>
             <artifactId>atlassian-rest-common</artifactId>
+            <version>${rest.version}</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
@@ -194,39 +189,44 @@
         <dependency>
             <groupId>com.atlassian.plugins</groupId>
             <artifactId>atlassian-plugins-webresource</artifactId>
+            <version>${plugins.version}</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>com.atlassian.plugins</groupId>
             <artifactId>atlassian-plugins-webfragment</artifactId>
+            <version>${plugins.version}</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>com.atlassian.plugins</groupId>
             <artifactId>atlassian-plugins-osgi</artifactId>
+            <version>${plugins.version}</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>com.atlassian.plugins</groupId>
             <artifactId>atlassian-plugins-osgi-spring-extender</artifactId>
-            <version>2.7.0</version>
+            <version>${plugins.version}</version>
             <scope>provided</scope>
         </dependency>
 
         <dependency>
             <groupId>com.atlassian.plugins</groupId>
             <artifactId>atlassian-plugins-servlet</artifactId>
+            <version>${plugins.version}</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>com.atlassian.plugins</groupId>
             <artifactId>atlassian-plugins-osgi-bridge</artifactId>
-            <version>2.7.0</version>
+            <version>${plugins.version}</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>com.atlassian.templaterenderer</groupId>
             <artifactId>atlassian-template-renderer-api</artifactId>
+            <version>${templaterenderer.version}</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
@@ -256,6 +256,7 @@
         <dependency>
             <groupId>com.atlassian.sal</groupId>
             <artifactId>sal-api</artifactId>
+            <version>${sal.version}</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
@@ -560,6 +561,11 @@
         <bamboo.version>3.1-m2</bamboo.version>
         <bamboo.data.version>2.6.1</bamboo.data.version>
         <webdriver.browser>firefox-3.6</webdriver.browser>
+        <plugins.version>2.7.0</plugins.version>
+        <sal.version>2.5.0</sal.version>
+        <rest.version>2.5.0</rest.version>
+        <templaterenderer.version>1.3.0</templaterenderer.version>
+        <applinks.version>3.0</applinks.version>
     </properties>
 
 </project>
