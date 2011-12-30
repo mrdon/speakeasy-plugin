@@ -247,4 +247,5 @@
 
     <!-- integration for remoteapps -->
     <access-level key="user-access-level" class="com.atlassian.labs.speakeasy.remoteapps.SpeakeasyAccessLevel" />
+    <component key="shutdownExecutor" class="com.atlassian.labs.speakeasy.util.ShutdownExecutor" />
 </atlassian-plugin>

@@ -11,6 +11,7 @@ import com.atlassian.labs.speakeasy.descriptor.external.DescriptorGeneratorManag
 import com.atlassian.labs.speakeasy.descriptor.external.webfragment.SpeakeasyWebItemModuleDescriptor;
 import com.atlassian.labs.speakeasy.external.SpeakeasyService;
 import com.atlassian.labs.speakeasy.model.UserExtension;
+import com.atlassian.labs.speakeasy.util.ShutdownExecutor;
 import com.atlassian.plugin.ModuleDescriptor;
 import com.atlassian.plugin.webresource.WebResourceManager;
 import com.atlassian.sal.api.user.UserManager;
@@ -20,27 +21,33 @@ import org.springframework.beans.factory.DisposableBean;
 /**
  *
  */
-public class SpeakeasyAccessLevel implements AccessLevel, DisposableBean
+public class SpeakeasyAccessLevel implements AccessLevel
 {
     private final SpeakeasyService speakeasyService;
     private final DescriptorGeneratorManager descriptorGeneratorManager;
     private final WebResourceManager webResourceManager;
-    private final EventPublisher eventPublisher;
     private final UserManager userManager;
     private final SpeakeasyData data;
 
     public SpeakeasyAccessLevel(SpeakeasyService speakeasyService,
                                 DescriptorGeneratorManager descriptorGeneratorManager,
                                 WebResourceManager webResourceManager,
-                                EventPublisher eventPublisher, UserManager userManager, SpeakeasyData data)
+                                final EventPublisher eventPublisher, UserManager userManager, SpeakeasyData data, ShutdownExecutor shutdownExecutor)
     {
         this.speakeasyService = speakeasyService;
         this.descriptorGeneratorManager = descriptorGeneratorManager;
         this.webResourceManager = webResourceManager;
-        this.eventPublisher = eventPublisher;
         this.userManager = userManager;
         this.data = data;
-        this.eventPublisher.register(this);
+        eventPublisher.register(this);
+        shutdownExecutor.execute(new Runnable()
+        {
+            public void run()
+            {
+                eventPublisher.unregister(SpeakeasyAccessLevel.this);
+            }
+        });
+
     }
 
     @EventListener
@@ -78,10 +85,5 @@ public class SpeakeasyAccessLevel implements AccessLevel, DisposableBean
     public ModuleDescriptor createWebItemModuleDescriptor(BundleContext bundleContext)
     {
         return new SpeakeasyWebItemModuleDescriptor(bundleContext, descriptorGeneratorManager, webResourceManager);
-    }
-
-    public void destroy() throws Exception
-    {
-        eventPublisher.unregister(this);
     }
 }
