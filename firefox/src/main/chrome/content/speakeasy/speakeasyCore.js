@@ -186,7 +186,7 @@ function auto_repair_it(doc, node) {
   Dump("After fix_page_it.");
 };
 function find_biggest_elem(doc) {
-  const big_element_limit = 0.25;
+  var big_element_limit = 0.25;
   var size_of_doc = doc.documentElement.offsetHeight *
       doc.documentElement.offsetWidth;
   var body = doc.body;
