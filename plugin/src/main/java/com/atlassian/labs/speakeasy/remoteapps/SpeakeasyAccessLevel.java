@@ -71,14 +71,21 @@ public class SpeakeasyAccessLevel implements AccessLevel
     public boolean canAccessRemoteApp(String username, ApplicationLink applicationLink)
     {
         final String pluginKey = ((NonAppLinksApplicationType)applicationLink.getType()).getId().get();
-        final UserExtension remotePlugin = speakeasyService.getRemotePlugin(pluginKey, username);
-        if (remotePlugin != null)
+        if (!speakeasyService.canAccessSpeakeasy(username))
         {
-            return remotePlugin.isEnabled();
+            return false;
         }
         else
         {
-            throw new IllegalArgumentException("Cannot find plugin '" + pluginKey + "'");
+            final UserExtension remotePlugin = speakeasyService.getRemotePlugin(pluginKey, username);
+            if (remotePlugin != null)
+            {
+                return remotePlugin.isEnabled();
+            }
+            else
+            {
+                throw new IllegalArgumentException("Cannot find plugin '" + pluginKey + "'");
+            }
         }
     }
 
