@@ -68,7 +68,7 @@
         <dependency>
             <groupId>com.atlassian.labs</groupId>
             <artifactId>remoteapps-plugin</artifactId>
-            <version>0.3</version>
+            <version>0.4.4</version>
             <scope>provided</scope>
         </dependency>
         <!--dependency>
