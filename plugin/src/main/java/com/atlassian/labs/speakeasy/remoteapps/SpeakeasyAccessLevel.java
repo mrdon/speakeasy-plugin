@@ -71,6 +71,10 @@ public class SpeakeasyAccessLevel implements AccessLevel
     public boolean canAccessRemoteApp(String username, ApplicationLink applicationLink)
     {
         final String pluginKey = ((NonAppLinksApplicationType)applicationLink.getType()).getId().get();
+        if (data.isGlobalExtension(pluginKey))
+        {
+            return true;
+        }
         if (!speakeasyService.canAccessSpeakeasy(username))
         {
             return false;
