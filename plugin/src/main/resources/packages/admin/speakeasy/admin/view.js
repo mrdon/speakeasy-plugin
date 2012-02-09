@@ -59,7 +59,7 @@ var editArgs = {
 
         this.model.save(this.model, {
             success: function(model, resp) {
-                $.data($('#sp-form')[0], AJS.DIRTY_FORM_VALUE, null);
+                AJS.DIRTY_FORM_VALUE && $.data($('#sp-form')[0], AJS.DIRTY_FORM_VALUE, null);
                 messages.add('success', {body:'Settings saved successfully'});
                 window.location.hash = '#';
             },

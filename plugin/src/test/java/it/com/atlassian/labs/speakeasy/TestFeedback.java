@@ -46,10 +46,17 @@ public class TestFeedback
     @Before
     public void startMailServer() throws IOException
     {
-        mailServer = SimpleSmtpServer.start(2525);
+        // starting it this way as we don't want to wait for a open socket
+        mailServer = new SimpleSmtpServer(2525);
+        Thread t = new Thread(mailServer);
+        t.start();
         flushMailQueue(product.getProductInstance());
         mailServer.stop();
-        mailServer = SimpleSmtpServer.start(2525);
+
+        // starting it this way as we don't want to wait for a open socket
+        mailServer = new SimpleSmtpServer(2525);
+        t = new Thread(mailServer);
+        t.start();
     }
     @After
     public void stopMailServer()
