@@ -66,23 +66,6 @@
             <scope>provided</scope>
         </dependency>
         <dependency>
-            <groupId>com.atlassian.labs</groupId>
-            <artifactId>remoteapps-plugin</artifactId>
-            <version>0.4.4</version>
-            <scope>provided</scope>
-        </dependency>
-        <!--dependency>
-            <groupId>com.github.spullara.mustache.java</groupId>
-            <artifactId>compiler</artifactId>
-            <version>0.3-SNAPSHOT</version>
-            <exclusions>
-                <exclusion>
-                    <groupId>org.eclipse.jetty</groupId>
-                    <artifactId>jetty-client</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency-->
-        <dependency>
             <groupId>com.atlassian.jira</groupId>
             <artifactId>atlassian-jira</artifactId>
             <version>${jira.version}</version>
@@ -320,8 +303,6 @@
                             com.atlassian.sal.api.*;version="(2.4,3.0]",
                             org.apache.commons.lang.*;version="2.4",
                             com.atlassian.jira.config;resolution:=optional,
-                            <!-- fixme: this should be a dynamic package once PLUG-822 is rolled out -->
-                            com.atlassian.labs.remoteapps.descriptor.external;resolution:=optional,
                             *;resolution:=optional
                         </Import-Package>
                         <Export-Package>

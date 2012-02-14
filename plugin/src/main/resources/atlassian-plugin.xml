@@ -146,6 +146,9 @@
     <component key="speakeasyService" class="com.atlassian.labs.speakeasy.SpeakeasyServiceImpl"
                interface="com.atlassian.labs.speakeasy.external.SpeakeasyService" public="true" />
 
+    <component key="speakeasyData" class="com.atlassian.labs.speakeasy.data.SpeakeasyData"
+               interface="com.atlassian.labs.speakeasy.external.SpeakeasyBackendService" public="true" />
+
     <!-- user profile links -->
 
     <web-item key="refimpl-speakeasy-user-menu" name="Speakeasy Plugins" section="system.admin/general" weight="1"
@@ -245,7 +248,5 @@
     <!-- JIRA 5 Compatiblity -->
     <module-type key="compat-view-profile-panel" class="com.atlassian.labs.jira4compat.CompatViewProfilePanelModuleDescriptor" application="jira"/>
 
-    <!-- integration for remoteapps -->
-    <access-level key="user-access-level" class="com.atlassian.labs.speakeasy.remoteapps.SpeakeasyAccessLevel" />
     <component key="shutdownExecutor" class="com.atlassian.labs.speakeasy.util.ShutdownExecutor" />
 </atlassian-plugin>

@@ -1,5 +1,6 @@
 package com.atlassian.labs.speakeasy.data;
 
+import com.atlassian.labs.speakeasy.external.SpeakeasyBackendService;
 import com.atlassian.labs.speakeasy.util.PomProperties;
 import com.atlassian.sal.api.pluginsettings.PluginSettings;
 import com.atlassian.sal.api.pluginsettings.PluginSettingsFactory;
@@ -16,8 +17,7 @@ import static com.google.common.collect.Lists.newArrayList;
 /**
  *
  */
-@Component
-public class SpeakeasyData
+public class SpeakeasyData implements SpeakeasyBackendService
 {
     private final PluginSettingsFactory pluginSettingsFactory;
     private final PomProperties pomProperties;
