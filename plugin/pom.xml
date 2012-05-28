@@ -534,11 +534,11 @@
         <platform.version>2.10.0</platform.version>
         <refapp.version>2.12.0-alpha1</refapp.version>
         <confluence.version>3.5.2</confluence.version>
-        <confluence.4.0.version>4.2-m7</confluence.4.0.version>
-        <confluence.data.version>3.0</confluence.data.version>
+        <confluence.4.0.version>4.2.4</confluence.4.0.version>
+        <confluence.data.version>4.2.4</confluence.data.version>
         <jira.version>4.4</jira.version>
-        <jira.5.0.version>5.0-m4</jira.5.0.version>
-        <jira.data.version>4.1.1</jira.data.version>
+        <jira.5.0.version>5.0.4</jira.5.0.version>
+        <jira.data.version>5.0</jira.data.version>
         <fecru.version>2.7.0-M3-20110719025103</fecru.version>
         <fecru.data.version>2.7.0-M3-20110719025103</fecru.data.version>
         <bamboo.version>3.1-m2</bamboo.version>
