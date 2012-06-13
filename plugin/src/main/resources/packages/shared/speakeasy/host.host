@@ -13,5 +13,17 @@ exports.staticResourcesPrefix = "@staticResourcePrefix";
  * Finds the context path of the current page.  Can only be called after the page has been fully loaded.
  */
 exports.findContextPath = function() {
-    return window.contextPath || window.AJS.params.contextPath || (window.BAMBOO && window.BAMBOO.contextPath) || window.fishEyePageContext || '/refapp';
+  if (window.contextPath !== undefined) {
+    return window.contextPath;
+  } else if (window.AJS.params.contextPath !== undefined) {
+    return window.AJS.params.contextPath;
+  } else if (window.AJS.Meta && window.AJS.Meta.get("context-path") !== undefined) {
+    return window.AJS.Meta.get("context-path");
+  } else if (window.BAMBOO && window.BAMBOO.contextPath !== undefined) {
+    return window.BAMBOO.contextPath;
+  } else if (window.fishEyePageContext !== undefined) {
+    return window.fishEyePageContext;
+  } else {
+    return '/refapp';
+  }
 }
