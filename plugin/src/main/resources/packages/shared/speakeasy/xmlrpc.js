@@ -633,7 +633,6 @@ rpc.ServiceProxy.prototype.__upgradeValuesFromJSON = function(obj){
 					if(matches[5]) obj[key].setMinutes(parseInt(matches[5], 10));
 					if(matches[6]) obj[key].setMilliseconds(parseInt(matches[6], 10));
 				}
-				//@timestamp@ / @ticks@
 				else if(matches = obj[key].match(/^@(\d+)@$/)){
 					obj[key] = new Date(parseInt(matches[1]))
 				}
