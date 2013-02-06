@@ -2,7 +2,6 @@ package it.com.atlassian.labs.speakeasy.proxy;
 
 import com.atlassian.webdriver.AtlassianWebDriver;
 import org.openqa.selenium.By;
-import org.openqa.selenium.RenderedWebElement;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 
@@ -10,6 +9,7 @@ import javax.inject.Inject;
 import java.util.List;
 
 import static com.google.common.collect.Lists.newArrayList;
+import static it.com.atlassian.labs.speakeasy.SeleniumUtils.isDisplayed;
 
 /**
  *
@@ -38,7 +38,7 @@ public class ApplinksTab
 
         for (WebElement row : driver.findElements(By.tagName("tr")))
         {
-            if (moduleId.equals(row.getAttribute("data-moduleId")) && ((RenderedWebElement)row).isDisplayed())
+            if (moduleId.equals(row.getAttribute("data-moduleId")) && isDisplayed(row))
             {
                 return row;
             }

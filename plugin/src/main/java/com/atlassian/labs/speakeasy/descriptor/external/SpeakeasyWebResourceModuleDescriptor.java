@@ -7,6 +7,7 @@ import com.atlassian.plugin.PluginParseException;
 import com.atlassian.plugin.descriptors.AbstractModuleDescriptor;
 import com.atlassian.plugin.hostcontainer.HostContainer;
 import com.atlassian.plugin.impl.AbstractDelegatingPlugin;
+import com.atlassian.plugin.module.ModuleFactory;
 import com.atlassian.plugin.webresource.WebResourceModuleDescriptor;
 import org.dom4j.Element;
 import org.dom4j.io.OutputFormat;
@@ -30,13 +31,16 @@ public class SpeakeasyWebResourceModuleDescriptor extends AbstractModuleDescript
 {
     private Element originalElement;
     private static final Logger log = LoggerFactory.getLogger(SpeakeasyWebResourceModuleDescriptor.class);
+    private final ModuleFactory moduleFactory;
     private final HostContainer hostContainer;
     private final BundleContext bundleContext;
     private final DescriptorGeneratorManager descriptorGeneratorManager;
     private volatile String directoryToScan;
 
-    public SpeakeasyWebResourceModuleDescriptor(HostContainer hostContainer, BundleContext bundleContext, DescriptorGeneratorManager descriptorGeneratorManager)
+    public SpeakeasyWebResourceModuleDescriptor(ModuleFactory moduleFactory, HostContainer hostContainer, BundleContext bundleContext, DescriptorGeneratorManager descriptorGeneratorManager)
     {
+        super(moduleFactory);
+        this.moduleFactory = moduleFactory;
         this.hostContainer = hostContainer;
         this.bundleContext = bundleContext;
         this.descriptorGeneratorManager = descriptorGeneratorManager;
@@ -86,7 +90,7 @@ public class SpeakeasyWebResourceModuleDescriptor extends AbstractModuleDescript
 
     public Iterable<WebResourceModuleDescriptor> getDescriptorsToExposeForUsers(ConditionGenerator conditionGenerator, long state)
     {
-        WebResourceModuleDescriptor descriptor = WebResourceUtil.instantiateDescriptor(hostContainer);
+        WebResourceModuleDescriptor descriptor = WebResourceUtil.instantiateDescriptor(moduleFactory, hostContainer);
 
         Element userElement = (Element) originalElement.clone();
         for (Element dep : new ArrayList<Element>(userElement.elements("dependency")))

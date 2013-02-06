@@ -7,6 +7,7 @@ import com.atlassian.labs.speakeasy.descriptor.external.SpeakeasyWebResourceModu
 import com.atlassian.plugin.ModuleDescriptor;
 import com.atlassian.plugin.PluginAccessor;
 import com.atlassian.plugin.hostcontainer.HostContainer;
+import com.atlassian.plugin.module.ModuleFactory;
 import org.osgi.framework.BundleContext;
 
 import static com.atlassian.labs.speakeasy.descriptor.DescriptorGeneratorManagerImpl.getStatefulKey;
@@ -18,13 +19,15 @@ import static java.util.Collections.emptySet;
 public class SpeakeasyCommonJsModulesDescriptor extends CommonJsModulesDescriptor implements DescriptorGenerator<CommonJsModulesDescriptor>
 {
     private final HostContainer hostContainer;
+    private final ModuleFactory moduleFactory;
     private final BundleContext bundleContext;
     private final DescriptorGeneratorManagerImpl descriptorGeneratorManager;
 
-    public SpeakeasyCommonJsModulesDescriptor(BundleContext bundleContext, HostContainer hostContainer, DescriptorGeneratorManagerImpl descriptorGeneratorManager,
+    public SpeakeasyCommonJsModulesDescriptor(ModuleFactory moduleFactory, BundleContext bundleContext, HostContainer hostContainer, DescriptorGeneratorManagerImpl descriptorGeneratorManager,
                                               PluginAccessor pluginAccessor)
     {
-        super(bundleContext, hostContainer, pluginAccessor);
+        super(moduleFactory, bundleContext, hostContainer, pluginAccessor);
+        this.moduleFactory = moduleFactory;
         this.bundleContext = bundleContext;
         this.hostContainer = hostContainer;
         this.descriptorGeneratorManager = descriptorGeneratorManager;
@@ -38,7 +41,7 @@ public class SpeakeasyCommonJsModulesDescriptor extends CommonJsModulesDescripto
     @Override
     public ModuleDescriptor createIndividualModuleDescriptor()
     {
-        return new SpeakeasyWebResourceModuleDescriptor(hostContainer, bundleContext, descriptorGeneratorManager);
+        return new SpeakeasyWebResourceModuleDescriptor(moduleFactory, hostContainer, bundleContext, descriptorGeneratorManager);
     }
 
     @Override

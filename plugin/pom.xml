@@ -289,6 +289,7 @@
                         <xvfb.enable>${xvfb.enable}</xvfb.enable>
                         <webdriver.browser>${webdriver.browser}</webdriver.browser>
                         <atlassian.mail.senddisabled>false</atlassian.mail.senddisabled>
+                        <jvmArgs>-Xmx512m -XX:MaxPermSize=192m</jvmArgs>
                         <!--atlassian.dev.mode>false</atlassian.dev.mode-->
                     </systemPropertyVariables>
                     <extractDependencies>true</extractDependencies>
@@ -536,6 +537,7 @@
         <confluence.version>3.5.2</confluence.version>
         <confluence.4.0.version>4.2.4</confluence.4.0.version>
         <confluence.data.version>4.2.4</confluence.data.version>
+        <!--jira.version>6.0-breakit-SNAPSHOT</jira.version-->
         <jira.version>4.4</jira.version>
         <jira.5.0.version>5.0.4</jira.5.0.version>
         <jira.data.version>5.0</jira.data.version>

@@ -10,6 +10,7 @@ import com.atlassian.plugin.PluginParseException;
 import com.atlassian.plugin.descriptors.AbstractModuleDescriptor;
 import com.atlassian.plugin.event.PluginEventManager;
 import com.atlassian.plugin.hostcontainer.HostContainer;
+import com.atlassian.plugin.module.ModuleFactory;
 import com.atlassian.plugin.osgi.factory.OsgiPlugin;
 import com.atlassian.util.concurrent.NotNull;
 import org.dom4j.Element;
@@ -30,6 +31,7 @@ public class CommonJsModulesDescriptor extends AbstractModuleDescriptor<CommonJs
 {
     private String location = "/modules";
 
+    private final ModuleFactory moduleFactory;
     private final BundleContext bundleContext;
     private final PluginEventManager pluginEventManager;
     private final PluginAccessor pluginAccessor;
@@ -41,8 +43,10 @@ public class CommonJsModulesDescriptor extends AbstractModuleDescriptor<CommonJs
     private volatile Set<String> explicitPublicModules;
 
 
-    public CommonJsModulesDescriptor(BundleContext bundleContext, HostContainer hostContainer, PluginAccessor pluginAccessor)
+    public CommonJsModulesDescriptor(ModuleFactory moduleFactory, BundleContext bundleContext, HostContainer hostContainer, PluginAccessor pluginAccessor)
     {
+        super(moduleFactory);
+        this.moduleFactory = moduleFactory;
         this.bundleContext = bundleContext;
         this.hostContainer = hostContainer;
         this.pluginEventManager = (PluginEventManager) bundleContext.getService(bundleContext.getServiceReference(PluginEventManager.class.getName()));
@@ -118,7 +122,7 @@ public class CommonJsModulesDescriptor extends AbstractModuleDescriptor<CommonJs
 
     public ModuleDescriptor createIndividualModuleDescriptor()
     {
-        return WebResourceUtil.instantiateDescriptor(hostContainer);
+        return WebResourceUtil.instantiateDescriptor(moduleFactory, hostContainer);
     }
 
     String getLocation()

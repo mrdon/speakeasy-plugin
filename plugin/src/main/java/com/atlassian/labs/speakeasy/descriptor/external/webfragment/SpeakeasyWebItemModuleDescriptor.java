@@ -4,10 +4,13 @@ import com.atlassian.labs.speakeasy.descriptor.DescriptorGeneratorManagerImpl;
 import com.atlassian.labs.speakeasy.descriptor.external.ConditionGenerator;
 import com.atlassian.labs.speakeasy.descriptor.external.DescriptorGenerator;
 import com.atlassian.labs.speakeasy.descriptor.external.DescriptorGeneratorManager;
+import com.atlassian.plugin.AutowireCapablePlugin;
 import com.atlassian.plugin.Plugin;
 import com.atlassian.plugin.PluginParseException;
 import com.atlassian.plugin.descriptors.AbstractModuleDescriptor;
 import com.atlassian.plugin.impl.AbstractDelegatingPlugin;
+import com.atlassian.plugin.module.ContainerManagedPlugin;
+import com.atlassian.plugin.module.ModuleFactory;
 import com.atlassian.plugin.web.WebInterfaceManager;
 import com.atlassian.plugin.web.descriptors.DefaultWebItemModuleDescriptor;
 import com.atlassian.plugin.web.descriptors.WebItemModuleDescriptor;
@@ -32,8 +35,9 @@ public class SpeakeasyWebItemModuleDescriptor extends AbstractModuleDescriptor<V
     private WebInterfaceManager webInterfaceManager;
     private final WebResourceManager webResourceManager;
 
-    public SpeakeasyWebItemModuleDescriptor(BundleContext bundleContext, DescriptorGeneratorManager descriptorGeneratorManager, WebResourceManager webResourceManager)
+    public SpeakeasyWebItemModuleDescriptor(ModuleFactory moduleFactory, BundleContext bundleContext, DescriptorGeneratorManager descriptorGeneratorManager, WebResourceManager webResourceManager)
     {
+        super(moduleFactory);
         this.bundleContext = bundleContext;
         this.descriptorGeneratorManager = descriptorGeneratorManager;
         this.webResourceManager = webResourceManager;
@@ -105,21 +109,7 @@ public class SpeakeasyWebItemModuleDescriptor extends AbstractModuleDescriptor<V
         conditionGenerator.addConditionElement(userElement);
         resolveLinkPaths(state, userElement);
 
-        descriptor.init(new AbstractDelegatingPlugin(getPlugin())
-        {
-            @Override
-            public <T> Class<T> loadClass(String clazz, Class<?> callingClass) throws ClassNotFoundException
-            {
-                try
-                {
-                    return super.loadClass(clazz, callingClass);
-                }
-                catch (ClassNotFoundException ex)
-                {
-                    return (Class<T>) getClass().getClassLoader().loadClass(clazz);
-                }
-            }
-        }, userElement);
+        descriptor.init(new AutowirePlugin(getPlugin()), userElement);
         return Collections.singleton(descriptor);
     }
 
@@ -148,5 +138,36 @@ public class SpeakeasyWebItemModuleDescriptor extends AbstractModuleDescriptor<V
         }
         return fullUrl;
     }
+
+    private static class AutowirePlugin extends AbstractDelegatingPlugin implements AutowireCapablePlugin
+    {
+
+        public AutowirePlugin(Plugin delegate) {
+            super(delegate);
+        }
+
+        @Override
+        public <T> Class<T> loadClass(String clazz, Class<?> callingClass) throws ClassNotFoundException
+        {
+            try
+            {
+                return super.loadClass(clazz, callingClass);
+            }
+            catch (ClassNotFoundException ex)
+            {
+                return (Class<T>) getClass().getClassLoader().loadClass(clazz);
+            }
+        }
+
+        @Override
+        public <T> T autowire(Class<T> clazz) throws UnsupportedOperationException {
+            if (getDelegate() instanceof ContainerManagedPlugin) {
+                return ((ContainerManagedPlugin)getDelegate()).getContainerAccessor().createBean(clazz);
+            } else {
+                return super.autowire(clazz);
+            }
+        }
+    }
+
 
 }

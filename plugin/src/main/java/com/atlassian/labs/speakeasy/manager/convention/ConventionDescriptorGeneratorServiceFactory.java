@@ -7,9 +7,11 @@ import com.atlassian.labs.speakeasy.manager.PluginOperationFailedException;
 import com.atlassian.labs.speakeasy.descriptor.external.webfragment.SpeakeasyWebItemModuleDescriptor;
 import com.atlassian.labs.speakeasy.manager.convention.external.ConventionDescriptorGenerator;
 import com.atlassian.labs.speakeasy.model.JsonManifest;
+import com.atlassian.labs.speakeasy.util.WebResourceUtil;
 import com.atlassian.plugin.*;
 import com.atlassian.plugin.event.PluginEventManager;
 import com.atlassian.plugin.hostcontainer.HostContainer;
+import com.atlassian.plugin.module.ModuleFactory;
 import com.atlassian.plugin.osgi.util.OsgiHeaderUtil;
 import com.atlassian.plugin.webresource.WebResourceManager;
 import com.atlassian.plugin.webresource.WebResourceModuleDescriptor;
@@ -27,6 +29,7 @@ import static com.google.common.collect.Sets.newHashSet;
  */
 public class ConventionDescriptorGeneratorServiceFactory implements ServiceFactory
 {
+    private final ModuleFactory moduleFactory;
     private final BundleContext bundleContext;
     private final PluginAccessor pluginAccessor;
     private final HostContainer hostContainer;
@@ -39,8 +42,9 @@ public class ConventionDescriptorGeneratorServiceFactory implements ServiceFacto
 
     //private final Set<String> trackedPlugins = new CopyOnWriteArraySet<String>();
 
-    public ConventionDescriptorGeneratorServiceFactory(final BundleContext bundleContext, final PluginAccessor pluginAccessor, HostContainer hostContainer, DescriptorGeneratorManagerImpl descriptorGeneratorManager, JsonToElementParser jsonToElementParser, WebResourceManager webResourceManager, PluginEventManager pluginEventManager, final PluginController pluginController, JsonManifestHandler jsonManifestHandler)
+    public ConventionDescriptorGeneratorServiceFactory(final ModuleFactory moduleFactory, final BundleContext bundleContext, final PluginAccessor pluginAccessor, HostContainer hostContainer, DescriptorGeneratorManagerImpl descriptorGeneratorManager, JsonToElementParser jsonToElementParser, WebResourceManager webResourceManager, PluginEventManager pluginEventManager, final PluginController pluginController, JsonManifestHandler jsonManifestHandler)
     {
+        this.moduleFactory = moduleFactory;
         this.bundleContext = bundleContext;
         this.pluginAccessor = pluginAccessor;
         this.hostContainer = hostContainer;
@@ -70,7 +74,7 @@ public class ConventionDescriptorGeneratorServiceFactory implements ServiceFacto
         if (bundle.getEntry("js/") != null)
         {
             SpeakeasyCommonJsModulesDescriptor descriptor = new SpeakeasyCommonJsModulesDescriptor(
-                    bundleContext, hostContainer, descriptorGeneratorManager, pluginAccessor);
+                    moduleFactory, bundleContext, hostContainer, descriptorGeneratorManager, pluginAccessor);
 
             Element modules = factory.createElement("scoped-modules")
                 .addAttribute("key", "modules")
@@ -113,7 +117,7 @@ public class ConventionDescriptorGeneratorServiceFactory implements ServiceFacto
         {
             for (Element element : jsonToElementParser.createWebItems(plugin.getResourceAsStream("ui/web-items.json")))
             {
-                SpeakeasyWebItemModuleDescriptor descriptor = new SpeakeasyWebItemModuleDescriptor(bundleContext, descriptorGeneratorManager, webResourceManager);
+                SpeakeasyWebItemModuleDescriptor descriptor = new SpeakeasyWebItemModuleDescriptor(moduleFactory, bundleContext, descriptorGeneratorManager, webResourceManager);
                 descriptor.init(plugin, element);
                 bundle.getBundleContext().registerService(ModuleDescriptor.class.getName(), descriptor, null);
             }
@@ -127,7 +131,7 @@ public class ConventionDescriptorGeneratorServiceFactory implements ServiceFacto
 
     private void registerScreenshotWebResourceDescriptor(Bundle bundle, DocumentFactory factory, Plugin plugin, String screenshotPath)
     {
-        WebResourceModuleDescriptor descriptor = new WebResourceModuleDescriptor(hostContainer);
+        WebResourceModuleDescriptor descriptor = WebResourceUtil.instantiateDescriptor(moduleFactory, hostContainer);
 
         Element element = factory.createElement("web-resource")
                 .addAttribute("key", "screenshot");
@@ -142,7 +146,7 @@ public class ConventionDescriptorGeneratorServiceFactory implements ServiceFacto
 
     private void registerSpeakeasyWebResourceDescriptor(Bundle bundle, DocumentFactory factory, Plugin plugin, String type)
     {
-        SpeakeasyWebResourceModuleDescriptor descriptor = new SpeakeasyWebResourceModuleDescriptor(hostContainer, bundleContext, descriptorGeneratorManager);
+        SpeakeasyWebResourceModuleDescriptor descriptor = new SpeakeasyWebResourceModuleDescriptor(moduleFactory, hostContainer, bundleContext, descriptorGeneratorManager);
 
         Element element = factory.createElement("scoped-web-resource")
                 .addAttribute("key", type)

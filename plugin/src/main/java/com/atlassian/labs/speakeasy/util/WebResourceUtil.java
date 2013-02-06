@@ -4,6 +4,7 @@ import com.atlassian.labs.speakeasy.descriptor.external.SpeakeasyWebResourceModu
 import com.atlassian.plugin.ModuleDescriptor;
 import com.atlassian.plugin.Plugin;
 import com.atlassian.plugin.hostcontainer.HostContainer;
+import com.atlassian.plugin.module.ModuleFactory;
 import com.atlassian.plugin.webresource.WebResourceModuleDescriptor;
 import org.dom4j.Element;
 
@@ -14,7 +15,7 @@ import java.lang.reflect.InvocationTargetException;
  */
 public class WebResourceUtil
 {
-    public static WebResourceModuleDescriptor instantiateDescriptor(HostContainer hostContainer)
+    public static WebResourceModuleDescriptor instantiateDescriptor(ModuleFactory moduleFactory, HostContainer hostContainer)
     {
         WebResourceModuleDescriptor descriptor;
         try
@@ -30,13 +31,21 @@ public class WebResourceUtil
             {
                 try
                 {
-                    // Plugins 2.7
-                    descriptor = cls.getConstructor(HostContainer.class).newInstance(hostContainer);
+                    // Plugins 3.0
+                    descriptor = cls.getConstructor(ModuleFactory.class, HostContainer.class).newInstance(moduleFactory, hostContainer);
                 }
                 catch (NoSuchMethodException e1)
                 {
-                    // Plugins 2.6 or earlier
-                    descriptor = cls.getConstructor().newInstance();
+                    try
+                    {
+                        // Plugins 2.7
+                        descriptor = cls.getConstructor(HostContainer.class).newInstance(hostContainer);
+                    }
+                    catch (NoSuchMethodException e2)
+                    {
+                        // Plugins 2.6 or earlier
+                        descriptor = cls.getConstructor().newInstance();
+                    }
                 }
             }
             catch (NoSuchMethodException e1)

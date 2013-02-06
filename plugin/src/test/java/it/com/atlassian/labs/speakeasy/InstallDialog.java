@@ -1,21 +1,16 @@
 package it.com.atlassian.labs.speakeasy;
 
-import com.atlassian.jira.functest.framework.admin.plugins.Plugins;
 import com.atlassian.pageobjects.PageBinder;
-import com.atlassian.pageobjects.ProductInstance;
 import com.atlassian.pageobjects.binder.Init;
 import com.atlassian.pageobjects.binder.WaitUntil;
 import com.atlassian.webdriver.AtlassianWebDriver;
-import com.google.common.base.Function;
 import org.apache.commons.lang.Validate;
 import org.openqa.selenium.By;
-import org.openqa.selenium.RenderedWebElement;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 
 import javax.inject.Inject;
 import java.io.File;
-import java.io.IOException;
 
 /**
  *
