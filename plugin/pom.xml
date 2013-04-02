@@ -29,6 +29,12 @@
                 <version>1.0</version>
                 <scope>provided</scope>
             </dependency>
+            <dependency>
+                <groupId>com.google.guava</groupId>
+                <artifactId>guava</artifactId>
+                <version>10.0.1</version>
+                <scope>provided</scope>
+            </dependency>
         </dependencies>
     </dependencyManagement>
     <dependencies>
@@ -280,7 +286,7 @@
             <plugin>
                 <groupId>com.atlassian.maven.plugins</groupId>
                 <artifactId>maven-refapp-plugin</artifactId>
-                <version>3.4</version>
+                <version>4.1.6</version>
                 <extensions>true</extensions>
                 <configuration>
                     <skipManifestValidation>true</skipManifestValidation>
@@ -289,7 +295,7 @@
                         <xvfb.enable>${xvfb.enable}</xvfb.enable>
                         <webdriver.browser>${webdriver.browser}</webdriver.browser>
                         <atlassian.mail.senddisabled>false</atlassian.mail.senddisabled>
-                        <jvmArgs>-Xmx512m -XX:MaxPermSize=192m</jvmArgs>
+                        <jvmArgs>-Xmx1024m -XX:MaxPermSize=256m</jvmArgs>
                         <!--atlassian.dev.mode>false</atlassian.dev.mode-->
                     </systemPropertyVariables>
                     <extractDependencies>true</extractDependencies>
@@ -534,7 +540,7 @@
         <xvfb.enable>true</xvfb.enable>
         <platform.version>2.10.0</platform.version>
         <refapp.version>2.12.0-alpha1</refapp.version>
-        <confluence.version>3.5.2</confluence.version>
+        <confluence.version>5.0.1</confluence.version>
         <confluence.4.0.version>4.2.4</confluence.4.0.version>
         <confluence.data.version>4.2.4</confluence.data.version>
         <!--jira.version>6.0-breakit-SNAPSHOT</jira.version-->
@@ -546,7 +552,7 @@
         <bamboo.version>3.1-m2</bamboo.version>
         <bamboo.data.version>2.6.1</bamboo.data.version>
         <webdriver.browser>firefox-3.6</webdriver.browser>
-        <plugins.version>2.7.0</plugins.version>
+        <plugins.version>2.13.4</plugins.version>
         <sal.version>2.5.0</sal.version>
         <rest.version>2.5.0</rest.version>
         <templaterenderer.version>1.1.1</templaterenderer.version>

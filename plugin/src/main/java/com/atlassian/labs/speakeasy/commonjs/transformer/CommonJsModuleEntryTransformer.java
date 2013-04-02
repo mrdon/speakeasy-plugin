@@ -57,7 +57,7 @@ public class CommonJsModuleEntryTransformer implements WebResourceTransformer
 
         public boolean isResourceModified(HttpServletRequest request, HttpServletResponse response)
         {
-            return false;
+            return true;
         }
 
         public void serveResource(HttpServletRequest request, HttpServletResponse response) throws DownloadException
