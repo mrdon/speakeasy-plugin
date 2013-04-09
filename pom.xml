@@ -20,9 +20,9 @@
     </modules>
 
     <scm>
-        <connection>scm:git:git://github.com/mrdon/speakeasy-plugin.git</connection>
-        <developerConnection>scm:git:git://github.com/mrdon/speakeasy-plugin.git</developerConnection>
-        <url>scm:git:git://github.com/mrdon/speakeasy-plugin.git</url>
+        <connection>scm:git:git@github.com:mrdon/speakeasy-plugin.git</connection>
+        <developerConnection>scm:git:git@github.com:mrdon/speakeasy-plugin.git</developerConnection>
+        <url>http://github.com/mrdon/speakeasy-plugin.git</url>
     </scm>
 
     <repositories>
