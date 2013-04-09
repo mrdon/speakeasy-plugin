@@ -52,7 +52,9 @@
 
     <web-resource key="user-jira" application="jira">
         <context>speakeasy.user-profile</context>
+        <context>atl.userprofile</context>
         <resource type="download" name="user-jira.css" location="jira/user-jira.css"/>
+
     </web-resource>
 
     <web-resource key="user-fecru" application="fecru">
@@ -182,16 +184,16 @@
     <web-item key="jira-speakeasy-plugins.menu" name="Speakeasy JIRA User Menu Item"
               section="system.user.options/personal" weight="100" application="jira">
         <label>Extensions</label>
-        <link linkId="speakeasy-user-link">/secure/ViewProfile.jspa#selectedTab=com.atlassian.labs.speakeasy-plugin:jira5compat-speakeasy-plugins</link>
+        <link linkId="speakeasy-user-link">/secure/ViewProfile.jspa#selectedTab=com.atlassian.labs.speakeasy-plugin:speakeasy-plugins</link>
         <condition class="com.atlassian.labs.speakeasy.descriptor.UserCanAccessSpeakeasyCondition" />
     </web-item>
 
-    <compat-view-profile-panel key="speakeasy-plugins" i18n-name-key="Extensions"
+    <view-profile-panel key="speakeasy-plugins" i18n-name-key="Extensions"
                         name="Speakeasy User Profile Panel"
                         class="com.atlassian.labs.speakeasy.ui.jira.SpeakeasyViewProfilePanel"
                         application="jira">
         <order>30</order>
-    </compat-view-profile-panel>
+    </view-profile-panel>
 
     <web-item key="bamboo-speakeasy-plugins.menu" name="Speakeasy Menu"
               section="system.user/userconfig" weight="40" application="bamboo">
@@ -244,9 +246,6 @@
     <component-import key="appprops" interface="com.atlassian.sal.api.ApplicationProperties" />
 
     <module-type key="commonjs" class="com.atlassian.labs.speakeasy.commonjs.descriptor.CommonJsModulesDescriptor" />
-
-    <!-- JIRA 5 Compatiblity -->
-    <module-type key="compat-view-profile-panel" class="com.atlassian.labs.jira4compat.CompatViewProfilePanelModuleDescriptor" application="jira"/>
 
     <component key="shutdownExecutor" class="com.atlassian.labs.speakeasy.util.ShutdownExecutor" />
 </atlassian-plugin>

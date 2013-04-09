@@ -50,5 +50,6 @@ exports.init = function() {
         e.preventDefault();
         AJS.DIRTY_FORM_VALUE && $.data($('#sp-search-form')[0], AJS.DIRTY_FORM_VALUE, null);
         executeSearch($(e.target), $('#sp-search-field').val());
+        $('#sp-search-field').val("")
     });
 };

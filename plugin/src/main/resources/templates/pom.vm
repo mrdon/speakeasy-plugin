@@ -36,7 +36,7 @@
                 <extensions>true</extensions>
                 <configuration>
                     <productVersion>${productVersion}</productVersion>
-                    <productDataVersion>${productDataVersion}</productDataVersion>
+                    <productDataVersion>${productVersion}</productDataVersion>
                     <pluginArtifacts>
                         <pluginArtifact>
                             <groupId>com.atlassian.labs</groupId>

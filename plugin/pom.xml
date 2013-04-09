@@ -55,11 +55,6 @@
             <version>1.0.0.201106090707-r</version>
         </dependency>
         <dependency>
-            <groupId>com.atlassian.labs</groupId>
-            <artifactId>jira4-compat</artifactId>
-            <version>0.3</version>
-        </dependency>
-        <dependency>
             <groupId>com.atlassian.applinks</groupId>
             <artifactId>applinks-api</artifactId>
             <version>${applinks.version}</version>
@@ -73,7 +68,7 @@
         </dependency>
         <dependency>
             <groupId>com.atlassian.jira</groupId>
-            <artifactId>atlassian-jira</artifactId>
+            <artifactId>jira-core</artifactId>
             <version>${jira.version}</version>
             <scope>provided</scope>
             <exclusions>
@@ -86,6 +81,12 @@
                     <artifactId>js</artifactId>
                 </exclusion>
             </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>com.atlassian.jira</groupId>
+            <artifactId>jira-api</artifactId>
+            <version>${jira.version}</version>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>com.atlassian.confluence</groupId>
@@ -138,7 +139,7 @@
         <dependency>
             <groupId>org.apache.httpcomponents</groupId>
             <artifactId>httpclient</artifactId>
-            <version>4.1</version>
+            <version>4.2.1</version>
             <scope>test</scope>
         </dependency>
 
@@ -169,12 +170,12 @@
             <version>${rest.version}</version>
             <scope>provided</scope>
         </dependency>
-        <dependency>
-            <groupId>com.atlassian.velocity.htmlsafe</groupId>
-            <artifactId>velocity-htmlsafe</artifactId>
-            <version>1.0.2</version>
-            <scope>provided</scope>
-        </dependency>
+        <!--<dependency>-->
+            <!--<groupId>com.atlassian.velocity.htmlsafe</groupId>-->
+            <!--<artifactId>velocity-htmlsafe</artifactId>-->
+            <!--<version>1.0.2</version>-->
+            <!--<scope>provided</scope>-->
+        <!--</dependency>-->
         <dependency>
             <groupId>com.atlassian.plugins</groupId>
             <artifactId>atlassian-plugins-webresource</artifactId>
@@ -249,21 +250,21 @@
             <scope>provided</scope>
         </dependency>
         <dependency>
-            <groupId>com.atlassian.selenium</groupId>
-            <artifactId>atlassian-webdriver-refapp</artifactId>
-            <version>2.0</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>com.atlassian.selenium</groupId>
-            <artifactId>atlassian-webdriver-confluence</artifactId>
-            <version>2.0</version>
+            <groupId>com.atlassian.confluence</groupId>
+            <artifactId>atlassian-confluence-pageobjects</artifactId>
+            <version>${confluence.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>com.atlassian.jira</groupId>
             <artifactId>atlassian-jira-pageobjects</artifactId>
             <version>${jira.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.atlassian.refapp</groupId>
+            <artifactId>atlassian-refapp-pageobjects</artifactId>
+            <version>${refapp.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -285,12 +286,13 @@
         <plugins>
             <plugin>
                 <groupId>com.atlassian.maven.plugins</groupId>
-                <artifactId>maven-refapp-plugin</artifactId>
+                <artifactId>maven-amps-plugin</artifactId>
                 <version>4.1.6</version>
                 <extensions>true</extensions>
                 <configuration>
                     <skipManifestValidation>true</skipManifestValidation>
                     <compressResources>false</compressResources>
+                    <enableFastdev>false</enableFastdev>
                     <systemPropertyVariables>
                         <xvfb.enable>${xvfb.enable}</xvfb.enable>
                         <webdriver.browser>${webdriver.browser}</webdriver.browser>
@@ -351,30 +353,12 @@
                         <product>
                             <id>confluence</id>
                             <version>${confluence.version}</version>
-                            <dataVersion>${confluence.data.version}</dataVersion>
-                            <productDataPath>${basedir}/src/test/resources/confluence-generated-test-resources.zip
-                            </productDataPath>
-                        </product>
-                        <product>
-                            <instanceId>confluence-4.0</instanceId>
-                            <id>confluence</id>
-                            <version>${confluence.4.0.version}</version>
-                            <dataVersion>${confluence.data.version}</dataVersion>
                             <productDataPath>${basedir}/src/test/resources/confluence-generated-test-resources.zip
                             </productDataPath>
                         </product>
                         <product>
                             <id>jira</id>
                             <version>${jira.version}</version>
-                            <dataVersion>${jira.data.version}</dataVersion>
-                            <productDataPath>${basedir}/src/test/resources/jira-generated-test-resources.zip
-                            </productDataPath>
-                        </product>
-                        <product>
-                            <id>jira</id>
-                            <instanceId>jira-5.0</instanceId>
-                            <version>${jira.5.0.version}</version>
-                            <dataVersion>${jira.data.version}</dataVersion>
                             <productDataPath>${basedir}/src/test/resources/jira-generated-test-resources.zip
                             </productDataPath>
                         </product>
@@ -412,19 +396,19 @@
                                 <testedProductClass>com.atlassian.jira.pageobjects.JiraTestedProduct</testedProductClass>
                             </systemProperties>
                         </testGroup-->
-                        <testGroup>
-                            <id>refapp</id>
-                            <productIds>
-                                <productId>refapp</productId>
-                            </productIds>
-                        </testGroup>
+                        <!--<testGroup>-->
+                            <!--<id>refapp</id>-->
+                            <!--<productIds>-->
+                                <!--<productId>refapp</productId>-->
+                            <!--</productIds>-->
+                        <!--</testGroup>-->
                         <testGroup>
                             <id>confluence</id>
                             <productIds>
                                 <productId>confluence</productId>
                             </productIds>
                             <systemProperties>
-                                <testedProductClass>com.atlassian.webdriver.confluence.ConfluenceTestedProduct
+                                <testedProductClass>com.atlassian.confluence.pageobjects.ConfluenceTestedProduct
                                 </testedProductClass>
                             </systemProperties>
                         </testGroup>
@@ -454,7 +438,6 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
-                <version>2.4.3</version>
                 <configuration>
                     <excludes>
                         <exclude>**/*$*</exclude>
@@ -538,17 +521,13 @@
 
     <properties>
         <xvfb.enable>true</xvfb.enable>
-        <platform.version>2.10.0</platform.version>
-        <refapp.version>2.12.0-alpha1</refapp.version>
-        <confluence.version>5.0.1</confluence.version>
-        <confluence.4.0.version>4.2.4</confluence.4.0.version>
-        <confluence.data.version>4.2.4</confluence.data.version>
+        <platform.version>3.0.0-m5</platform.version>
+        <refapp.version>3.0.0-m5</refapp.version>
+        <confluence.version>5.2-m1</confluence.version>
         <!--jira.version>6.0-breakit-SNAPSHOT</jira.version-->
-        <jira.version>4.4</jira.version>
-        <jira.5.0.version>5.0.4</jira.5.0.version>
-        <jira.data.version>5.0</jira.data.version>
-        <fecru.version>2.7.0-M3-20110719025103</fecru.version>
-        <fecru.data.version>2.7.0-M3-20110719025103</fecru.data.version>
+        <jira.version>6.0-m10</jira.version>
+        <fecru.version>3.0.0-M1-20111004030302</fecru.version>
+        <fecru.data.version>3.0.0-M1-20111004030302</fecru.data.version>
         <bamboo.version>3.1-m2</bamboo.version>
         <bamboo.data.version>2.6.1</bamboo.data.version>
         <webdriver.browser>firefox-3.6</webdriver.browser>

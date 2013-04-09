@@ -29,5 +29,10 @@
     </servlet>
     <component-import key="mail" interface="com.atlassian.core.task.MultiQueueTaskManager" application="confluence" />
 
+    <!-- Necessary because Confluence page objects suck to use  -->
+    <web-resource key='scriptsfinished'>
+        <resource type='download' name='allscriptsfinished.js' location='scriptsfinished.js'></resource>
+        <context>afterjavascripts</context>
+    </web-resource>
 
 </atlassian-plugin>

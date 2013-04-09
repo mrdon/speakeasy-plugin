@@ -1,12 +1,12 @@
 package com.atlassian.labs.speakeasy.descriptor.external;
 
 import com.atlassian.labs.speakeasy.util.BundleUtil;
+import com.atlassian.labs.speakeasy.util.ClassOverwrittingPlugin;
 import com.atlassian.labs.speakeasy.util.WebResourceUtil;
 import com.atlassian.plugin.Plugin;
 import com.atlassian.plugin.PluginParseException;
 import com.atlassian.plugin.descriptors.AbstractModuleDescriptor;
 import com.atlassian.plugin.hostcontainer.HostContainer;
-import com.atlassian.plugin.impl.AbstractDelegatingPlugin;
 import com.atlassian.plugin.module.ModuleFactory;
 import com.atlassian.plugin.webresource.WebResourceModuleDescriptor;
 import org.dom4j.Element;
@@ -117,25 +117,7 @@ public class SpeakeasyWebResourceModuleDescriptor extends AbstractModuleDescript
 
             log.debug("Creating dynamic descriptor of key {}: {}", getCompleteKey(), out.toString());
         }
-        descriptor.init(new AbstractDelegatingPlugin(getPlugin())
-        {
-            @Override
-            public <T> Class<T> loadClass(String clazz, Class<?> callingClass) throws ClassNotFoundException
-            {
-                if (clazz.equals(UserScopedCondition.class.getName()))
-                {
-                    return (Class<T>) UserScopedCondition.class;
-                }
-                else if (clazz.equals(GroupScopedCondition.class.getName()))
-                {
-                    return (Class<T>) GroupScopedCondition.class;
-                }
-                else
-                {
-                    return super.loadClass(clazz, callingClass);
-                }
-            }
-        }, userElement);
+        descriptor.init(new ClassOverwrittingPlugin(getPlugin()), userElement);
         return Collections.singleton(descriptor);
     }
 }

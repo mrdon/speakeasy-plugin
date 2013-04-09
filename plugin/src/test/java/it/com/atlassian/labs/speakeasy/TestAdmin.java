@@ -1,11 +1,11 @@
 package it.com.atlassian.labs.speakeasy;
 
 import com.atlassian.pageobjects.TestedProduct;
-import com.atlassian.pageobjects.page.HomePage;
 import com.atlassian.pageobjects.page.LoginPage;
 import com.atlassian.plugin.test.PluginJarBuilder;
 import com.atlassian.webdriver.pageobjects.WebDriverTester;
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -16,9 +16,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
-import static com.google.common.collect.Lists.newArrayList;
 import static it.com.atlassian.labs.speakeasy.ExtensionBuilder.buildSimplePluginFile;
-import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
@@ -33,6 +31,7 @@ public class TestAdmin
     public void login()
     {
         product.visit(LoginPage.class).loginAsSysAdmin(AdminPage.class);
+
     }
 
     @After
@@ -160,6 +159,6 @@ public class TestAdmin
     {
         final AdminPage page = product.getPageBinder().bind(AdminPage.class);
         assertTrue(page.search("tests").contains("plugin-tests"));
-        assertTrue(page.search("asdfweqasfdsdfweqasdf").isEmpty());
+        assertTrue(page.search(StringUtils.repeat("xy", 10)).isEmpty());
     }
 }

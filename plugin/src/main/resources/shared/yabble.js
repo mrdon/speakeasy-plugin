@@ -24,6 +24,8 @@
   */
 
 (function(globalEval) {
+
+  if (window.speakeasyRequire) return;
 	
 	var Yabble = function() {
 		throw "Synchronous require() is not supported.";
@@ -494,6 +496,8 @@
 			definedModules = [];
 		
 		var deps = transport.deps;
+
+    if (_modules[moduleId]) return;
 
 		for (var i = transport.modules.length; i--;) {
 			var moduleDef = transport.modules[i],

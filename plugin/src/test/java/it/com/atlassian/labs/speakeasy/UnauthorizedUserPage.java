@@ -1,9 +1,9 @@
 package it.com.atlassian.labs.speakeasy;
 
 import com.atlassian.pageobjects.Page;
+import com.atlassian.pageobjects.binder.PageBindingException;
 import com.atlassian.pageobjects.binder.WaitUntil;
 import com.atlassian.webdriver.AtlassianWebDriver;
-import com.google.common.base.Function;
 import org.openqa.selenium.By;
 
 import javax.inject.Inject;
@@ -30,5 +30,9 @@ public class UnauthorizedUserPage implements Page
     public void waitForBody()
     {
         driver.waitUntilElementIsLocated(By.tagName("body"));
+        if (!driver.getDriver().getCurrentUrl().contains(getUrl()))
+        {
+            throw new PageBindingException("", this);
+        }
     }
 }

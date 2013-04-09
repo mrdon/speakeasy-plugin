@@ -67,7 +67,7 @@ public class DownloadDialog
     {
         DefaultHttpClient httpclient = new DefaultHttpClient();
         httpclient.getCredentialsProvider().setCredentials(AuthScope.ANY, new UsernamePasswordCredentials("admin", "admin"));
-        HttpGet get = new HttpGet("http://localhost:" + productInstance.getHttpPort() + href + "?os_username=admin&os_password=admin");
+        HttpGet get = new HttpGet(href + "?os_username=admin&os_password=admin");
         HttpResponse res = httpclient.execute(get);
         File tmpFile = File.createTempFile("speakeasy-download-", href.substring(href.lastIndexOf(".")));
         FileOutputStream fout = new FileOutputStream(tmpFile);

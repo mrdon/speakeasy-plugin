@@ -4,6 +4,7 @@
 var $ = require('../../jquery').jQuery;
 require('treeview/jquery-treeview');
 
+AJS.log("Loading IDE module");
 var editor;
 
 function retrieveEditor() {
@@ -133,6 +134,7 @@ function openDialog(pluginKey, href, extension, readOnly){
     $("#ide-loading").hide();
     $("#ide-editor").show();
 
+    AJS.log("Initializing editor");
     editor = CodeMirror.fromTextArea('ide-editor', {
         height: '480px',
         width: '95%',
@@ -147,6 +149,7 @@ function openDialog(pluginKey, href, extension, readOnly){
 }
 
 function loadFile(pluginKey, filePath) {
+    editor.setCode("");
     updateStatus("Loading " + filePath + " . . .");
     $.get(contextPath + "/rest/speakeasy/1/plugins/plugin/" + pluginKey + "/file", {path:filePath}, function(data) {
         editor.setCode(data);
@@ -199,6 +202,7 @@ function saveAndReload(pluginKey, fileName, contents) {
 
 exports.openDialog = openDialog;
 exports.text = function() {
+    AJS.log("setting editor manually");
     if (arguments.length == 1) {
         editor.setCode(arguments[0]);
     }

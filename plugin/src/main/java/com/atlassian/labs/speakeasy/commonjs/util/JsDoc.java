@@ -1,9 +1,5 @@
 package com.atlassian.labs.speakeasy.commonjs.util;
 
-import com.google.common.collect.ImmutableMap;
-import org.apache.oro.text.regex.PatternMatcher;
-import org.quartz.impl.jdbcjobstore.AttributeRestoringConnectionInvocationHandler;
-
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import java.util.Collection;
@@ -14,7 +10,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import static com.google.common.collect.Lists.newArrayList;
-import static com.google.common.collect.Maps.newHashMap;
 
 /**
  *

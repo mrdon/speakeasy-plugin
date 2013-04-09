@@ -1,15 +1,12 @@
 package com.atlassian.labs.speakeasy.descriptor.external.webfragment;
 
-import com.atlassian.labs.speakeasy.descriptor.DescriptorGeneratorManagerImpl;
 import com.atlassian.labs.speakeasy.descriptor.external.ConditionGenerator;
 import com.atlassian.labs.speakeasy.descriptor.external.DescriptorGenerator;
 import com.atlassian.labs.speakeasy.descriptor.external.DescriptorGeneratorManager;
-import com.atlassian.plugin.AutowireCapablePlugin;
+import com.atlassian.labs.speakeasy.util.ClassOverwrittingPlugin;
 import com.atlassian.plugin.Plugin;
 import com.atlassian.plugin.PluginParseException;
 import com.atlassian.plugin.descriptors.AbstractModuleDescriptor;
-import com.atlassian.plugin.impl.AbstractDelegatingPlugin;
-import com.atlassian.plugin.module.ContainerManagedPlugin;
 import com.atlassian.plugin.module.ModuleFactory;
 import com.atlassian.plugin.web.WebInterfaceManager;
 import com.atlassian.plugin.web.descriptors.DefaultWebItemModuleDescriptor;
@@ -109,7 +106,7 @@ public class SpeakeasyWebItemModuleDescriptor extends AbstractModuleDescriptor<V
         conditionGenerator.addConditionElement(userElement);
         resolveLinkPaths(state, userElement);
 
-        descriptor.init(new AutowirePlugin(getPlugin()), userElement);
+        descriptor.init(new ClassOverwrittingPlugin(getPlugin()), userElement);
         return Collections.singleton(descriptor);
     }
 
@@ -137,36 +134,6 @@ public class SpeakeasyWebItemModuleDescriptor extends AbstractModuleDescriptor<V
             fullUrl = fullUrl.substring(fullUrl.indexOf("/s"));
         }
         return fullUrl;
-    }
-
-    private static class AutowirePlugin extends AbstractDelegatingPlugin implements AutowireCapablePlugin
-    {
-
-        public AutowirePlugin(Plugin delegate) {
-            super(delegate);
-        }
-
-        @Override
-        public <T> Class<T> loadClass(String clazz, Class<?> callingClass) throws ClassNotFoundException
-        {
-            try
-            {
-                return super.loadClass(clazz, callingClass);
-            }
-            catch (ClassNotFoundException ex)
-            {
-                return (Class<T>) getClass().getClassLoader().loadClass(clazz);
-            }
-        }
-
-        @Override
-        public <T> T autowire(Class<T> clazz) throws UnsupportedOperationException {
-            if (getDelegate() instanceof ContainerManagedPlugin) {
-                return ((ContainerManagedPlugin)getDelegate()).getContainerAccessor().createBean(clazz);
-            } else {
-                return super.autowire(clazz);
-            }
-        }
     }
 
 

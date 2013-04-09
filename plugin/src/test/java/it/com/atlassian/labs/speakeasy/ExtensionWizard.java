@@ -65,6 +65,7 @@ public class ExtensionWizard
         createButton.click();
         SpeakeasyUserPage result = pageBinder.bind(SpeakeasyUserPage.class);
         result.waitForMessages();
+        driver.waitUntilElementIsNotVisible(By.className("extension-wizard-create"));
         return result;
     }
 }

@@ -104,7 +104,8 @@ public class IdeDialog
             throw new IllegalStateException("Can't edit file in readonly mode");
         }
         ideBrowser.findElement(By.id(fileName)).click();
-        driver.waitUntil(new Function() {
+        driver.waitUntil(new Function()
+        {
 
             public Object apply(Object from)
             {
@@ -131,7 +132,7 @@ public class IdeDialog
 
     private String getEditorContents()
     {
-         return (String) JavaScriptUtils.execute("return speakeasyRequire.run('speakeasy/user/ide/ide').text()", driver);
+         return JavaScriptUtils.execute("return speakeasyRequire.run('speakeasy/user/ide/ide').text()", driver);
     }
 
     public String getStatus()

@@ -2,8 +2,9 @@ package it.com.atlassian.labs.speakeasy;
 
 import com.atlassian.pageobjects.Page;
 import com.atlassian.pageobjects.binder.WaitUntil;
+import com.atlassian.pageobjects.elements.ElementBy;
+import com.atlassian.pageobjects.elements.PageElement;
 import com.atlassian.webdriver.AtlassianWebDriver;
-import org.apache.commons.collections.ExtendedProperties;
 import org.apache.commons.lang.StringUtils;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
@@ -12,6 +13,7 @@ import javax.inject.Inject;
 import java.util.List;
 import java.util.Set;
 
+import static com.atlassian.pageobjects.elements.query.Poller.waitUntilTrue;
 import static com.google.common.collect.Lists.newArrayList;
 import static com.google.common.collect.Sets.newHashSet;
 
@@ -23,20 +25,23 @@ public class AdminPage implements Page
     @Inject
     private AtlassianWebDriver driver;
 
+    @ElementBy(id = "sp-edit")
+    private PageElement editButton;
+
     public String getUrl()
     {
         return "/plugins/servlet/speakeasy/admin";
     }
 
     @WaitUntil
-    public void waitForBody()
+    public void init()
     {
-        driver.waitUntilElementIsLocated(By.id("sp-edit"));
+        waitUntilTrue(editButton.timed().isPresent());
     }
 
     public EditView edit()
     {
-        driver.findElement(By.id("sp-edit")).click();
+        editButton.click();
         driver.waitUntilElementIsVisible(By.id("sp-ADMINS_ENABLE-edit"));
         return new EditView();
     }
@@ -54,7 +59,8 @@ public class AdminPage implements Page
     public List<String> search(String q)
     {
         //driver.findElement(By.id("sp-search-tab")).click();
-        driver.findElement(By.id("sp-search-field")).sendKeys(q);
+        WebElement searchField = driver.findElement(By.id("sp-search-field"));
+        searchField.sendKeys(q);
         final WebElement submitButton = driver.findElement(By.id("sp-search-submit"));
         submitButton.click();
         driver.waitUntilElementIsNotLocatedAt(By.tagName("img"), submitButton);
