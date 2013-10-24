@@ -36,6 +36,11 @@ public class GroupScopedCondition implements Condition
     {
         boolean result = false;
         String user = userManager.getRemoteUsername();
+
+        // Fix for SPEAKEASY-135. userManager.isUserInGroup(...) returns NPE if user is null.
+        if (user == null) {
+            return result;
+        }
         for (String group : groups)
         {
             if (userManager.isUserInGroup(user, group))
