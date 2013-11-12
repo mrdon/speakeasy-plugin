@@ -101,18 +101,6 @@
             <scope>provided</scope>
         </dependency>
         <dependency>
-            <groupId>com.atlassian.fisheye</groupId>
-            <artifactId>fisheye-jar</artifactId>
-            <version>${fecru.version}</version>
-            <scope>provided</scope>
-            <exclusions>
-                <exclusion>
-                    <groupId>com.atlassian.fisheye</groupId>
-                    <artifactId>atlassian-fisheye-dependencies</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
-        <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
             <version>4.8</version>
@@ -179,13 +167,13 @@
         <dependency>
             <groupId>com.atlassian.plugins</groupId>
             <artifactId>atlassian-plugins-webresource</artifactId>
-            <version>${plugins.version}</version>
+            <version>${webresource.plugins.version}</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>com.atlassian.plugins</groupId>
             <artifactId>atlassian-plugins-webfragment</artifactId>
-            <version>${plugins.version}</version>
+            <version>${webfragment.plugins.version}</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
@@ -311,6 +299,7 @@
                             com.atlassian.plugins.rest.common.security,
                             com.atlassian.sal.api.*;version="(2.4,3.0]",
                             org.apache.commons.lang.*;version="2.4",
+                            com.atlassian.fisheye.spi.services,
                             com.atlassian.jira.config;resolution:=optional,
                             *;resolution:=optional
                         </Import-Package>
@@ -531,7 +520,9 @@
         <bamboo.version>3.1-m2</bamboo.version>
         <bamboo.data.version>2.6.1</bamboo.data.version>
         <webdriver.browser>firefox-3.6</webdriver.browser>
-        <plugins.version>2.13.4</plugins.version>
+        <plugins.version>3.0.8</plugins.version>
+        <webresource.plugins.version>3.0.2</webresource.plugins.version>
+        <webfragment.plugins.version>3.0.0</webfragment.plugins.version>
         <sal.version>2.5.0</sal.version>
         <rest.version>2.5.0</rest.version>
         <templaterenderer.version>1.1.1</templaterenderer.version>

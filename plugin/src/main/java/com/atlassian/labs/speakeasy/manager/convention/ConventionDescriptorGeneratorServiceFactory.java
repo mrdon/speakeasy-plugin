@@ -15,6 +15,8 @@ import com.atlassian.plugin.module.ModuleFactory;
 import com.atlassian.plugin.osgi.util.OsgiHeaderUtil;
 import com.atlassian.plugin.webresource.WebResourceManager;
 import com.atlassian.plugin.webresource.WebResourceModuleDescriptor;
+import com.atlassian.plugin.webresource.WebResourceUrlProvider;
+
 import org.dom4j.DocumentFactory;
 import org.dom4j.Element;
 import org.osgi.framework.Bundle;
@@ -38,11 +40,23 @@ public class ConventionDescriptorGeneratorServiceFactory implements ServiceFacto
     private final JsonToElementParser jsonToElementParser;
     private final WebResourceManager webResourceManager;
     private final JsonManifestHandler jsonManifestHandler;
+    private final WebResourceUrlProvider webResourceUrlProvider;
     private final PluginController pluginController;
 
     //private final Set<String> trackedPlugins = new CopyOnWriteArraySet<String>();
 
-    public ConventionDescriptorGeneratorServiceFactory(final ModuleFactory moduleFactory, final BundleContext bundleContext, final PluginAccessor pluginAccessor, HostContainer hostContainer, DescriptorGeneratorManagerImpl descriptorGeneratorManager, JsonToElementParser jsonToElementParser, WebResourceManager webResourceManager, PluginEventManager pluginEventManager, final PluginController pluginController, JsonManifestHandler jsonManifestHandler)
+    public ConventionDescriptorGeneratorServiceFactory(
+            final ModuleFactory moduleFactory,
+            final BundleContext bundleContext,
+            final PluginAccessor pluginAccessor,
+            HostContainer hostContainer,
+            DescriptorGeneratorManagerImpl descriptorGeneratorManager,
+            JsonToElementParser jsonToElementParser,
+            WebResourceManager webResourceManager,
+            PluginEventManager pluginEventManager,
+            final PluginController pluginController,
+            JsonManifestHandler jsonManifestHandler,
+            WebResourceUrlProvider webResourceUrlProvider)
     {
         this.moduleFactory = moduleFactory;
         this.bundleContext = bundleContext;
@@ -54,6 +68,7 @@ public class ConventionDescriptorGeneratorServiceFactory implements ServiceFacto
         this.webResourceManager = webResourceManager;
         this.pluginController = pluginController;
         this.jsonManifestHandler = jsonManifestHandler;
+        this.webResourceUrlProvider = webResourceUrlProvider;
     }
 
     public Object getService(Bundle bundle, ServiceRegistration registration)
@@ -117,7 +132,7 @@ public class ConventionDescriptorGeneratorServiceFactory implements ServiceFacto
         {
             for (Element element : jsonToElementParser.createWebItems(plugin.getResourceAsStream("ui/web-items.json")))
             {
-                SpeakeasyWebItemModuleDescriptor descriptor = new SpeakeasyWebItemModuleDescriptor(moduleFactory, bundleContext, descriptorGeneratorManager, webResourceManager);
+                SpeakeasyWebItemModuleDescriptor descriptor = new SpeakeasyWebItemModuleDescriptor(moduleFactory, bundleContext, descriptorGeneratorManager, webResourceManager, webResourceUrlProvider);
                 descriptor.init(plugin, element);
                 bundle.getBundleContext().registerService(ModuleDescriptor.class.getName(), descriptor, null);
             }

@@ -111,6 +111,7 @@
     <component-import key="pluginAccessor" interface="com.atlassian.plugin.PluginAccessor"/>
     <component-import key="pluginEventManager" interface="com.atlassian.plugin.event.PluginEventManager" />
     <component-import key="webResourceManager" interface="com.atlassian.plugin.webresource.WebResourceManager" />
+    <component-import key="webResourceUrlProvider" interface="com.atlassian.plugin.webresource.WebResourceUrlProvider" />
     <component-import key="webInterfaceManager" interface="com.atlassian.plugin.web.WebInterfaceManager" />
     <component-import key="xsrfTokenAccessor" interface="com.atlassian.sal.api.xsrf.XsrfTokenAccessor" />
     <component-import key="xsrfTokenValidator" interface="com.atlassian.sal.api.xsrf.XsrfTokenValidator" />
@@ -118,6 +119,7 @@
     <component-import key="applicationLinkService" interface="com.atlassian.applinks.api.ApplicationLinkService" />
     <component-import key="pluginRetrievalService" interface="com.atlassian.plugin.osgi.bridge.external.PluginRetrievalService" />
     <component-import key="i18nResolver" interface="com.atlassian.sal.api.message.I18nResolver" />
+    <component-import key="mailService" interface="com.atlassian.fisheye.spi.services.MailService" application="fecru" />
 
     <module-type key="scoped-web-resource" class="com.atlassian.labs.speakeasy.descriptor.external.SpeakeasyWebResourceModuleDescriptor"/>
 
@@ -135,7 +137,6 @@
                application="jira"/>
     <component key="productAccessor" class="com.atlassian.labs.speakeasy.product.BambooProductAccessor"
                application="bamboo"/>
-    <component-import key="fecruUserManager" interface="com.cenqua.fisheye.user.UserManager" application="fecru" />
     <component key="productAccessor" class="com.atlassian.labs.speakeasy.product.FecruProductAccessor"
                application="fecru"/>
     <component key="productAccessor" class="com.atlassian.labs.speakeasy.product.RefappProductAccessor"

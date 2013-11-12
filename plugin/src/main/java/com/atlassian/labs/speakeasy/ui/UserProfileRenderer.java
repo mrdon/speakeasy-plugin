@@ -13,6 +13,7 @@ import com.atlassian.plugin.PluginAccessor;
 import com.atlassian.plugin.web.WebInterfaceManager;
 import com.atlassian.plugin.webresource.UrlMode;
 import com.atlassian.plugin.webresource.WebResourceManager;
+import com.atlassian.plugin.webresource.WebResourceUrlProvider;
 import com.atlassian.sal.api.ApplicationProperties;
 import com.atlassian.sal.api.user.UserManager;
 import com.atlassian.sal.api.xsrf.XsrfTokenAccessor;
@@ -58,10 +59,25 @@ public class UserProfileRenderer
     private final XsrfTokenAccessor xsrfTokenAccessor;
     private final XsrfTokenValidator xsrfTokenValidator;
     private final ApplinkPanelRenderer applinkPanelRenderer;
+    private final WebResourceUrlProvider webResourceUrlProvider;
     private final FirefoxXpi firefoxXpi;
 
     @Autowired
-    public UserProfileRenderer(PluginAccessor pluginAccessor, TemplateRenderer templateRenderer, SpeakeasyService speakeasyService, UserManager userManager, WebResourceManager webResourceManager, ProductAccessor productAccessor, CommonJsModulesAccessor commonJsModulesAccessor, WebInterfaceManager webInterfaceManager, XsrfTokenAccessor xsrfTokenAccessor, XsrfTokenValidator xsrfTokenValidator, ApplicationProperties applicationProperties, FirefoxXpi firefoxXpi, ApplinkPanelRenderer applinkPanelRenderer)
+    public UserProfileRenderer(
+            PluginAccessor pluginAccessor,
+            TemplateRenderer templateRenderer,
+            SpeakeasyService speakeasyService,
+            UserManager userManager,
+            WebResourceManager webResourceManager,
+            ProductAccessor productAccessor,
+            CommonJsModulesAccessor commonJsModulesAccessor,
+            WebInterfaceManager webInterfaceManager,
+            XsrfTokenAccessor xsrfTokenAccessor,
+            XsrfTokenValidator xsrfTokenValidator,
+            ApplicationProperties applicationProperties,
+            FirefoxXpi firefoxXpi,
+            ApplinkPanelRenderer applinkPanelRenderer,
+            WebResourceUrlProvider webResourceUrlProvider)
     {
         this.templateRenderer = templateRenderer;
         this.commonJsModulesAccessor = commonJsModulesAccessor;
@@ -71,6 +87,7 @@ public class UserProfileRenderer
         this.applicationProperties = applicationProperties;
         this.firefoxXpi = firefoxXpi;
         this.applinkPanelRenderer = applinkPanelRenderer;
+        this.webResourceUrlProvider = webResourceUrlProvider;
         this.plugin = pluginAccessor.getPlugin("com.atlassian.labs.speakeasy-plugin");
         this.speakeasyService = speakeasyService;
         this.userManager = userManager;
@@ -106,7 +123,7 @@ public class UserProfileRenderer
                 put("availablePlugins", filter(plugins.getPlugins(), new AvailablePluginsFilter())).
                 put("rowRenderer", new RowRenderer(req.getContextPath(), plugin)).
                 put("jsdocRenderer", new JsDocRenderer(plugin, commonJsModulesAccessor.getAllPublicCommonJsModules())).
-                put("staticResourcesPrefix", webResourceManager.getStaticResourcePrefix(UrlMode.RELATIVE)).
+                put("staticResourcesPrefix", webResourceUrlProvider.getStaticResourcePrefix(UrlMode.RELATIVE)).
                 put("product", productAccessor.getSdkName()).
                 put("devmode", devMode).
                 put("canAuthor", speakeasyService.canAuthorExtensions(user)).
