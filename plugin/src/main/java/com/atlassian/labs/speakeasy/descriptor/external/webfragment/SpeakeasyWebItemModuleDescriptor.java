@@ -13,6 +13,8 @@ import com.atlassian.plugin.web.descriptors.DefaultWebItemModuleDescriptor;
 import com.atlassian.plugin.web.descriptors.WebItemModuleDescriptor;
 import com.atlassian.plugin.webresource.UrlMode;
 import com.atlassian.plugin.webresource.WebResourceManager;
+import com.atlassian.plugin.webresource.WebResourceUrlProvider;
+
 import org.dom4j.Element;
 import org.osgi.framework.BundleContext;
 
@@ -31,13 +33,20 @@ public class SpeakeasyWebItemModuleDescriptor extends AbstractModuleDescriptor<V
     private final DescriptorGeneratorManager descriptorGeneratorManager;
     private WebInterfaceManager webInterfaceManager;
     private final WebResourceManager webResourceManager;
+    private final WebResourceUrlProvider webResourceUrlProvider;
 
-    public SpeakeasyWebItemModuleDescriptor(ModuleFactory moduleFactory, BundleContext bundleContext, DescriptorGeneratorManager descriptorGeneratorManager, WebResourceManager webResourceManager)
+    public SpeakeasyWebItemModuleDescriptor(
+            ModuleFactory moduleFactory,
+            BundleContext bundleContext,
+            DescriptorGeneratorManager descriptorGeneratorManager,
+            WebResourceManager webResourceManager,
+            WebResourceUrlProvider webResourceUrlProvider)
     {
         super(moduleFactory);
         this.bundleContext = bundleContext;
         this.descriptorGeneratorManager = descriptorGeneratorManager;
         this.webResourceManager = webResourceManager;
+        this.webResourceUrlProvider = webResourceUrlProvider;
     }
 
     @Override
@@ -128,7 +137,7 @@ public class SpeakeasyWebItemModuleDescriptor extends AbstractModuleDescriptor<V
 
     private String getImageUrl(String pluginKey, long stateKey, String fileName)
     {
-        String fullUrl = webResourceManager.getStaticResourcePrefix(UrlMode.AUTO) + "/download/resources/" + pluginKey + ":images-" + stateKey + "/" + fileName;
+        String fullUrl = webResourceUrlProvider.getStaticResourcePrefix(UrlMode.AUTO) + "/download/resources/" + pluginKey + ":images-" + stateKey + "/" + fileName;
         if (!fullUrl.startsWith("/s"))
         {
             fullUrl = fullUrl.substring(fullUrl.indexOf("/s"));

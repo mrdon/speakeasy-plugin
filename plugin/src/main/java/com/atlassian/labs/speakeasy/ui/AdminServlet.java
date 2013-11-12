@@ -6,6 +6,7 @@ import com.atlassian.labs.speakeasy.model.Permission;
 import com.atlassian.labs.speakeasy.model.Settings;
 import com.atlassian.plugin.webresource.UrlMode;
 import com.atlassian.plugin.webresource.WebResourceManager;
+import com.atlassian.plugin.webresource.WebResourceUrlProvider;
 import com.atlassian.plugins.rest.common.json.JaxbJsonMarshaller;
 import com.atlassian.sal.api.user.UserManager;
 import com.atlassian.templaterenderer.TemplateRenderer;
@@ -32,14 +33,22 @@ public class AdminServlet extends HttpServlet
     private final UserManager userManager;
     private final WebResourceManager webResourceManager;
     private final JaxbJsonMarshaller jsonMarshaller;
+    private final WebResourceUrlProvider webResourceUrlProvider;
 
-    public AdminServlet(SpeakeasyService speakeasyService, UserManager userManager, TemplateRenderer templateRenderer, WebResourceManager webResourceManager, JaxbJsonMarshaller jsonMarshaller)
+    public AdminServlet(
+            SpeakeasyService speakeasyService,
+            UserManager userManager,
+            TemplateRenderer templateRenderer,
+            WebResourceManager webResourceManager,
+            JaxbJsonMarshaller jsonMarshaller,
+            WebResourceUrlProvider webResourceUrlProvider)
     {
         this.speakeasyService = speakeasyService;
         this.userManager = userManager;
         this.templateRenderer = templateRenderer;
         this.webResourceManager = webResourceManager;
         this.jsonMarshaller = jsonMarshaller;
+        this.webResourceUrlProvider = webResourceUrlProvider;
     }
 
     @Override
@@ -62,7 +71,7 @@ public class AdminServlet extends HttpServlet
             render("templates/admin.vm", ImmutableMap.<String,Object>builder().
                     put("user", user).
                     put("contextPath", req.getContextPath()).
-                    put("staticResourcesPrefix", webResourceManager.getStaticResourcePrefix(UrlMode.RELATIVE)).
+                    put("staticResourcesPrefix", webResourceUrlProvider.getStaticResourcePrefix(UrlMode.RELATIVE)).
                     put("settings", new JsRenderer(jsonMarshaller.marshal(settings))).
                     put("permissionsJson", new JsRenderer(jsonMarshaller.marshal(Permission.ALL))).
                     put("permissions", Permission.ALL).

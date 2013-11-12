@@ -4,8 +4,8 @@ import com.atlassian.labs.speakeasy.ui.mustache.TemplateDownloadableResource;
 import com.atlassian.plugin.elements.ResourceLocation;
 import com.atlassian.plugin.servlet.DownloadableResource;
 import com.atlassian.plugin.webresource.UrlMode;
-import com.atlassian.plugin.webresource.WebResourceManager;
-import com.atlassian.plugin.webresource.transformer.AbstractStringTransformedDownloadableResource;
+import com.atlassian.plugin.webresource.WebResourceUrlProvider;
+import com.atlassian.plugin.webresource.transformer.CharSequenceDownloadableResource;
 import com.atlassian.plugin.webresource.transformer.WebResourceTransformer;
 import com.atlassian.sal.api.xsrf.XsrfTokenAccessor;
 import com.atlassian.sal.api.xsrf.XsrfTokenValidator;
@@ -16,15 +16,18 @@ import org.dom4j.Element;
  */
 public class CssVariableTransformer implements WebResourceTransformer
 {
-    private final WebResourceManager webResourceManager;
     private final XsrfTokenAccessor xsrfTokenAccessor;
     private final XsrfTokenValidator xsrfTokenValidator;
+    private final WebResourceUrlProvider webResourceUrlProvider;
 
-    public CssVariableTransformer(WebResourceManager webResourceManager, XsrfTokenAccessor xsrfTokenAccessor, XsrfTokenValidator xsrfTokenValidator)
+    public CssVariableTransformer(
+            XsrfTokenAccessor xsrfTokenAccessor,
+            XsrfTokenValidator xsrfTokenValidator,
+            WebResourceUrlProvider webResourceUrlProvider)
     {
-        this.webResourceManager = webResourceManager;
         this.xsrfTokenAccessor = xsrfTokenAccessor;
         this.xsrfTokenValidator = xsrfTokenValidator;
+        this.webResourceUrlProvider = webResourceUrlProvider;
     }
 
     public DownloadableResource transform(Element configElement, ResourceLocation location, String filePath, DownloadableResource nextResource)
@@ -32,7 +35,7 @@ public class CssVariableTransformer implements WebResourceTransformer
         return new CssVariableDownloadableResource(nextResource, configElement);
     }
 
-    private class CssVariableDownloadableResource extends AbstractStringTransformedDownloadableResource
+    private class CssVariableDownloadableResource extends CharSequenceDownloadableResource
     {
         private final Element configElement;
 
@@ -43,18 +46,19 @@ public class CssVariableTransformer implements WebResourceTransformer
         }
 
         @Override
-        protected String transform(String originalContent)
+        protected CharSequence transform(CharSequence originalSequence)
         {
-            String content = originalContent.replace("@staticResourcePrefix", webResourceManager.getStaticResourcePrefix(UrlMode.RELATIVE) + "/download/resources");
+            String originalContent = originalSequence.toString();
+            String content = originalContent.replace("@staticResourcePrefix", webResourceUrlProvider.getStaticResourcePrefix(UrlMode.RELATIVE) + "/download/resources");
             String fullModuleKey = configElement.attributeValue("fullModuleKey");
             if (fullModuleKey != null)
             {
-                content = content.replace("@modulePrefix", webResourceManager.getStaticResourcePrefix(UrlMode.RELATIVE) + "/download/resources/" + fullModuleKey);
+                content = content.replace("@modulePrefix", webResourceUrlProvider.getStaticResourcePrefix(UrlMode.RELATIVE) + "/download/resources/" + fullModuleKey);
             }
             String imagesModuleKey = configElement.attributeValue("imagesModuleKey");
             if (imagesModuleKey != null)
             {
-                content = content.replace("@imagesPrefix", webResourceManager.getStaticResourcePrefix(UrlMode.RELATIVE) + "/download/resources/" + imagesModuleKey);
+                content = content.replace("@imagesPrefix", webResourceUrlProvider.getStaticResourcePrefix(UrlMode.RELATIVE) + "/download/resources/" + imagesModuleKey);
             }
             return content;
         }

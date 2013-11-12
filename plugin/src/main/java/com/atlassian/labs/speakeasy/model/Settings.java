@@ -1,14 +1,10 @@
 package com.atlassian.labs.speakeasy.model;
 
-import com.cenqua.fisheye.config1.Admins;
 import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.Sets;
 
 import javax.xml.bind.annotation.*;
-import java.util.Arrays;
 import java.util.Set;
 
-import static com.google.common.collect.Iterables.concat;
 import static com.google.common.collect.Sets.newHashSet;
 
 /**
