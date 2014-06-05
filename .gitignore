@@ -1,9 +1,12 @@
-target
-.idea
 *.iml
 *.ipr
 *.iws
-*.swp
-*.swo
-*~
 *.log
+*.swo
+*.swp
+*~
+.classpath
+.idea
+.project
+.settings
+target
