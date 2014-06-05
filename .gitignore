@@ -1,9 +1,9 @@
-target
-.idea
 *.iml
 *.ipr
 *.iws
-*.swp
-*.swo
-*~
 *.log
+*.swo
+*.swp
+*~
+.idea
+target
