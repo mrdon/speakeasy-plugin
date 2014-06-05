@@ -5,5 +5,8 @@
 *.swo
 *.swp
 *~
+.classpath
 .idea
+.project
+.settings
 target
